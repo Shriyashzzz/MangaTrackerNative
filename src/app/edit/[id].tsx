@@ -1,13 +1,16 @@
 // Edit details, as the Android app's (web pages/UpdateManga/UpdateManga.tsx):
-// fix the title, cover or genre, or update where they're up to. The checks
-// and the request are the web's own (core seriesFormRules). The cover strip
-// (CoverPicker) and the spine picker (VolumePicker) are the next two parts
+// fix the title, cover or genre, or update where they're up to, and which
+// volumes they own on the spine picker (an edition's books, for a collector
+// of one). The checks and the request are the web's own (core
+// seriesFormRules)
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 import Button from "@/components/Button";
+import CoverPicker, { type OwnCover } from "@/components/CoverPicker";
+import VolumePicker, { useVolumePicker } from "@/components/VolumePicker";
 import DoubleRule from "@/components/DoubleRule";
 import { Field, Input } from "@/components/Field";
 import PickSheet from "@/components/PickSheet";
@@ -19,7 +22,14 @@ import {
 } from "@/core/components/icons/Icons";
 import { apiFetch, errorMessages } from "@/core/lib/api";
 import { GENRES } from "@/core/lib/content/genres";
-import { ownedVolumes } from "@/core/lib/ownedVolumes";
+import { ownCoversOf } from "@/core/lib/books";
+import { getBooks } from "@/core/lib/booksApi";
+import { todayOf } from "@/core/lib/editionNews";
+import { slotsOf } from "@/core/lib/editionShelf";
+import { ownedOf } from "@/core/lib/ownedVolumes";
+import { priceName } from "@/core/lib/prices";
+import { useBuyOptions } from "@/core/pages/Details/useBuyOptions";
+import { useEditions } from "@/core/pages/Details/useEditions";
 import { tracksOf } from "@/core/lib/reading";
 import {
   problemsIn,
@@ -52,6 +62,7 @@ export default function EditScreen() {
   const [manga, setManga] = useState<Manga | null>(null);
   const [title, setTitle] = useState("");
   const [image, setImage] = useState("");
+  const [ownCovers, setOwnCovers] = useState<OwnCover[]>([]);
   const [genre, setGenre] = useState("");
   const [pickingGenre, setPickingGenre] = useState(false);
   const [stage, setStage] = useState<Stage>("reading");
@@ -68,6 +79,27 @@ export default function EditScreen() {
   const [errors, setErrors] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const tracks = tracksOf({ byVolume }, trackBy);
+  // as the series page asks: what's out, and the edition they collect
+  const series = useBuyOptions(manga ? priceName(manga) : null, {
+    volumesOwned: manga?.volumesOwned ?? null,
+    ownedList: manga?.ownedList,
+  });
+  const editions = useEditions(
+    manga && !manga.lightNovel ? priceName(manga) : null,
+    manga?.id ?? null,
+    manga?.edition,
+    manga ? ownedOf(manga) : [],
+    series.volumes.map((v) => v.isbn13),
+  );
+  const out = series.latest?.volume ?? null;
+  const volumes = useVolumePicker({ volumesOwned: null });
+  const { reset: resetVolumes } = volumes;
+  // the manga arrives after the page: the picker starts from it
+  const loadedId = manga?.id;
+  useEffect(() => {
+    if (manga) resetVolumes(manga);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadedId]);
 
   useEffect(() => {
     let live = true;
@@ -81,6 +113,9 @@ export default function EditScreen() {
           );
         const { manga: m } = (await res.json()) as { manga: Manga };
         if (!live) return;
+        getBooks(m.id)
+          .then((books) => setOwnCovers(ownCoversOf(books)))
+          .catch(() => {});
         setManga(m);
         setStage(m.planned ? "planned" : m.status ? "finished" : "reading");
         setLightNovel(Boolean(m.lightNovel));
@@ -100,11 +135,6 @@ export default function EditScreen() {
 
   const save = async () => {
     if (!manga) return;
-    // what they own stays as it is until the spine picker is in
-    const owned = ownedVolumes(
-      manga.volumesOwned ?? null,
-      manga.ownedList ?? [],
-    );
     const values: SeriesFormValues = {
       title,
       stage,
@@ -119,8 +149,10 @@ export default function EditScreen() {
       description,
       lightNovel,
       volumesOwned:
-        owned.volumesOwned == null ? "" : String(owned.volumesOwned),
-      ownedList: owned.ownedList.join(","),
+        volumes.saved.volumesOwned == null
+          ? ""
+          : String(volumes.saved.volumesOwned),
+      ownedList: volumes.saved.ownedList.join(","),
     };
     const found = problemsIn(values);
     setProblems(found);
@@ -196,20 +228,16 @@ export default function EditScreen() {
               invalid={Boolean(problems.title)}
             />
           </Field>
-          <Field label="Cover image link" optional error={problems.image}>
-            <Input
-              value={image}
-              onChangeText={(next) => {
-                setImage(next.trim());
-                setProblems((p) => ({ ...p, image: undefined }));
-              }}
-              placeholder="https://…"
-              autoCapitalize="none"
-              autoCorrect={false}
-              keyboardType="url"
-              invalid={Boolean(problems.image)}
-            />
-          </Field>
+          <CoverPicker
+            title={title}
+            value={image}
+            error={problems.image}
+            ownCovers={ownCovers}
+            onChange={(url) => {
+              setImage(url);
+              setProblems((p) => ({ ...p, image: undefined }));
+            }}
+          />
           <Field label="Type">
             <Segmented
               label="Type"
@@ -244,6 +272,18 @@ export default function EditScreen() {
               chapterError={problems.bookmark}
             />
           ) : null}
+          <VolumePicker
+            picker={volumes}
+            out={out}
+            edition={
+              editions.line && out
+                ? {
+                    line: editions.line,
+                    slots: slotsOf(editions.line, out, todayOf()),
+                  }
+                : null
+            }
+          />
           <Field label="Genre" optional>
             <Pressable
               onPress={() => setPickingGenre(true)}
