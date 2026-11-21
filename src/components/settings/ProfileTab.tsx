@@ -11,7 +11,6 @@ import {
   type RefObject,
 } from "react";
 import {
-  Linking,
   Pressable,
   ScrollView,
   Share,
@@ -107,7 +106,7 @@ export default function ProfileTab({
         () => page.current?.scrollTo({ y: shareY.current, animated: true }),
         300,
       );
-  }, [scrollTo]);
+  }, [scrollTo, page]);
 
   return (
     <View className="gap-7">

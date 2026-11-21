@@ -6,7 +6,7 @@
 // gaps with what they cost. The rules are the web's (core seriesPageRules,
 // finishCost, useSeriesData)
 import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
@@ -72,7 +72,12 @@ export default function PriceSeriesScreen() {
     params.edition ? "editions" : "volumes",
   );
   const [toGetOnly, setToGetOnly] = useState(params.toget === "1");
-  const [grownCount, setGrownCount] = useState(PAGE_SIZE);
+  // how many rows are shown, for the list they were grown for: a new series
+  // or filter starts at the first page again
+  const listKey = `${name}|${toGetOnly}`;
+  const [grown, setGrown] = useState({ key: listKey, count: PAGE_SIZE });
+  const grownCount = grown.key === listKey ? grown.count : PAGE_SIZE;
+  const setGrownCount = (count: number) => setGrown({ key: listKey, count });
   const [editions, setEditions] = useState<{
     name: string;
     lines: EditionLine[];
@@ -80,7 +85,6 @@ export default function PriceSeriesScreen() {
   const [askedEdition, setAskedEdition] = useState<string | null>(
     params.edition ?? null,
   );
-  useEffect(() => setGrownCount(PAGE_SIZE), [name, toGetOnly]);
 
   const frame = (title: string, body: React.ReactNode) => (
     <Safe edges={["top"]} className="flex-1 bg-paper">

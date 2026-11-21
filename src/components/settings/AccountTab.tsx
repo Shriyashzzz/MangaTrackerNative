@@ -28,10 +28,10 @@ type NoteOf = { text: string; failed?: boolean } | null;
 function AlertsSection() {
   const [granted, setGranted] = useState<boolean | null>(null);
   const [note, setNote] = useState<NoteOf>(null);
-  const check = async () =>
-    setGranted((await Notifications.getPermissionsAsync()).granted);
   useEffect(() => {
-    void check();
+    Notifications.getPermissionsAsync()
+      .then((asked) => setGranted(asked.granted))
+      .catch(() => setGranted(false));
   }, []);
   if (granted === null) return null;
   const flip = async (on: boolean) => {

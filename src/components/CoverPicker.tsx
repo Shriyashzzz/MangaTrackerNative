@@ -14,6 +14,50 @@ import { Input } from "./Field";
 
 export type OwnCover = { url: string; name: string };
 
+// one cover to pick: a search hit, or one of their own books ("yours")
+function Thumb({
+  url,
+  selected,
+  label,
+  onPress,
+  yours = false,
+}: {
+  url: string;
+  selected: boolean;
+  label: string;
+  onPress: () => void;
+  yours?: boolean;
+}) {
+  const c = useColors();
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityLabel={label}
+      accessibilityState={{ selected }}
+      style={{ width: 58 }}
+    >
+      <Image
+        source={{ uri: yours ? coverSrc(url) : url }}
+        style={{
+          width: 58,
+          aspectRatio: 2 / 3,
+          borderWidth: selected ? 2.5 : 1.5,
+          borderColor: selected ? c.accent : c.lineSoft,
+          backgroundColor: c.paper2,
+        }}
+        contentFit="cover"
+      />
+      {yours ? (
+        <View className="absolute inset-x-0 bottom-0 bg-ink py-[1px]">
+          <Text className="text-center font-mono text-[9px] tracking-[0.5px] text-paper uppercase">
+            yours
+          </Text>
+        </View>
+      ) : null}
+    </Pressable>
+  );
+}
+
 export default function CoverPicker({
   title,
   value,
@@ -69,41 +113,6 @@ export default function CoverPicker({
             ? "From books you own"
             : "";
 
-  const thumb = (
-    url: string,
-    selected: boolean,
-    label: string,
-    onPress: () => void,
-    yours = false,
-  ) => (
-    <Pressable
-      key={url}
-      onPress={onPress}
-      accessibilityLabel={label}
-      accessibilityState={{ selected }}
-      style={{ width: 58 }}
-    >
-      <Image
-        source={{ uri: yours ? coverSrc(url) : url }}
-        style={{
-          width: 58,
-          aspectRatio: 2 / 3,
-          borderWidth: selected ? 2.5 : 1.5,
-          borderColor: selected ? c.accent : c.lineSoft,
-          backgroundColor: c.paper2,
-        }}
-        contentFit="cover"
-      />
-      {yours ? (
-        <View className="absolute inset-x-0 bottom-0 bg-ink py-[1px]">
-          <Text className="text-center font-mono text-[9px] tracking-[0.5px] text-paper uppercase">
-            yours
-          </Text>
-        </View>
-      ) : null}
-    </Pressable>
-  );
-
   return (
     <View className="gap-2">
       <Text className="font-body-semibold text-[14.5px] text-ink">
@@ -157,24 +166,28 @@ export default function CoverPicker({
               contentContainerStyle={{ gap: 6 }}
               style={{ opacity: search.status === "loading" ? 0.6 : 1 }}
             >
-              {ownCovers.map((own) =>
-                thumb(
-                  own.url,
-                  value === own.url,
-                  `${own.name}, your book`,
-                  () => pick(value === own.url ? "" : own.url),
-                  true,
-                ),
-              )}
-              {search.hits.map((r) =>
-                thumb(
-                  r.cover,
-                  value === r.cover,
-                  (r.year ? `${r.title} (${r.year})` : r.title) +
-                    (r.lightNovel ? ", light novel" : ""),
-                  () => pick(value === r.cover ? "" : r.cover, r),
-                ),
-              )}
+              {ownCovers.map((own) => (
+                <Thumb
+                  key={own.url}
+                  url={own.url}
+                  selected={value === own.url}
+                  label={`${own.name}, your book`}
+                  onPress={() => pick(value === own.url ? "" : own.url)}
+                  yours
+                />
+              ))}
+              {search.hits.map((r) => (
+                <Thumb
+                  key={r.cover}
+                  url={r.cover}
+                  selected={value === r.cover}
+                  label={
+                    (r.year ? `${r.title} (${r.year})` : r.title) +
+                    (r.lightNovel ? ", light novel" : "")
+                  }
+                  onPress={() => pick(value === r.cover ? "" : r.cover, r)}
+                />
+              ))}
             </ScrollView>
           ) : null}
           <Input

@@ -21,10 +21,9 @@ import {
 } from "@/core/lib/editionLookup";
 import { getEditionsIndex, type EditionsEntry } from "@/core/lib/editionsIndex";
 import { ownedOf } from "@/core/lib/ownedVolumes";
-import { slugify } from "@/core/lib/pricePaths";
+import { seriesPath, slugify } from "@/core/lib/pricePaths";
 import { useColors } from "@/lib/colors";
 import { openWebPath } from "@/lib/webRoutes";
-import { seriesPath } from "@/core/lib/pricePaths";
 import { useShelf } from "@/store/shelf";
 
 const linesOf = (entry: EditionsEntry): LookupLine[] =>

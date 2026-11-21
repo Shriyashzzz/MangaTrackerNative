@@ -7,7 +7,6 @@
 // and the way to its prices. The rules are the web's (core SharedShelf)
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { Image } from "expo-image";
 import {
   Linking,
   Pressable,
@@ -42,7 +41,7 @@ import {
 import { apiFetch } from "@/core/lib/api";
 import { dayName } from "@/core/lib/collector";
 import { setFollowing } from "@/core/lib/friends";
-import { coverSrc, formatCents, priceName } from "@/core/lib/prices";
+import { formatCents, priceName } from "@/core/lib/prices";
 import { seriesPath, volumePath } from "@/core/lib/pricePaths";
 import { placeText } from "@/core/lib/reading";
 import { titleKey as sameName } from "@/core/lib/titleKey";
@@ -53,7 +52,6 @@ import {
   ownedVolumesOf,
   shelfOf,
   statusOf,
-  TONES,
   volumeRanges,
   type SharedManga,
 } from "@/core/pages/SharedShelf/shareParts";
@@ -491,7 +489,8 @@ function SeriesSheet({
       ? `${owned.length} volume${owned.length === 1 ? "" : "s"}`
       : "None yet",
   ]);
-  if (m.rating) facts.push(["Their rating", <StarRating value={m.rating} />]);
+  if (m.rating)
+    facts.push(["Their rating", <StarRating key="rating" value={m.rating} />]);
   if (m.genre && m.genre !== "unlabled") facts.push(["Genre", m.genre]);
   if (m.lightNovel) facts.push(["Kind", "Light novel"]);
   const link = `${shareUrl(code)}?series=${encodeURIComponent(m.name)}`;

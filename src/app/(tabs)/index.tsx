@@ -5,6 +5,7 @@
 // rules (core filterShelf); it opens on the tab and sort the account chose
 import { useEffect, useState } from "react";
 import {
+  Alert,
   FlatList,
   Pressable,
   RefreshControl,
@@ -22,13 +23,12 @@ import Toast from "@/components/Toast";
 import VolumesView from "@/components/VolumesView";
 import AddChoice from "@/components/AddChoice";
 import SelectDock, { MovedNote } from "@/components/SelectDock";
-import { PlusIcon } from "@/core/components/icons/Icons";
 import { useSelectMode } from "@/lib/useSelectMode";
 import { router } from "expo-router";
-import { Alert } from "react-native";
 import {
   ChevronDownIcon,
   CloseIcon,
+  PlusIcon,
   SearchIcon,
   SortIcon,
 } from "@/core/components/icons/Icons";

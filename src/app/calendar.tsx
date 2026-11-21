@@ -42,13 +42,16 @@ export default function CalendarScreen() {
   const c = useColors();
   const [months, setMonths] = useState<CalendarMonth[] | null | undefined>();
   const [open, setOpen] = useState<Set<string>>(() => new Set());
-  const load = () => {
-    setMonths(undefined);
+  const fetchMonths = () =>
     getCalendar()
       .then(setMonths)
       .catch(() => setMonths(null));
+  useEffect(() => void fetchMonths(), []);
+  // Try again: the loading state back while it's fetched
+  const load = () => {
+    setMonths(undefined);
+    void fetchMonths();
   };
-  useEffect(load, []);
   return (
     <Page title="Upcoming Releases">
       <P muted>Upcoming English volumes for the series on your shelf.</P>

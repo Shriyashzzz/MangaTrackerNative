@@ -5,11 +5,17 @@
 // just checked. A search lists the series found, with Did you mean for a
 // typo. The rules are the web's (core findSeries, nearMatches, askedEdition)
 import { router } from "expo-router";
-import { Linking } from "react-native";
 import { AFTER_ANIME_PATH } from "@/core/lib/afterAnime";
 import { siteOrigin } from "@/core/lib/siteOrigin";
 import { useEffect, useState } from "react";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import {
+  Linking,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 import AppHeader from "@/components/AppHeader";

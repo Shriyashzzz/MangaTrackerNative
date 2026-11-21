@@ -18,7 +18,6 @@ import ScanEdit from "@/components/ScanEdit";
 import { CheckIcon, CloseIcon, TorchIcon } from "@/core/components/icons/Icons";
 import { isbnFromTyped } from "@/core/lib/barcode";
 import { editScan, shelveScan, type ScanResult } from "@/core/lib/scan";
-import { useColors } from "@/lib/colors";
 import { useShelf } from "@/store/shelf";
 
 const Safe = withUniwind(SafeAreaView);
@@ -53,7 +52,6 @@ function flashFor(kind: ScanResult["kind"]): {
 }
 
 export default function ScanScreen() {
-  const c = useColors();
   const { isbn: firstIsbn } = useLocalSearchParams<{ isbn?: string }>();
   const [permission, askPermission] = useCameraPermissions();
   const [rows, setRows] = useState<Row[]>([]);

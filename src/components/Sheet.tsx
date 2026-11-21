@@ -53,7 +53,7 @@ export default function Sheet({
   onScrollRef?: (scroller: Scroller | null) => void;
 }) {
   const { height: screen } = useWindowDimensions();
-  const slide = useRef(new Animated.Value(0)).current;
+  const [slide] = useState(() => new Animated.Value(0));
   const [atTop, setAtTop] = useState(true);
   const dragStart = useRef(0);
   const scroller = useRef<Scroller | null>(null);

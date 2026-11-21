@@ -9,13 +9,7 @@
 // edition's books instead: tap a book to own every volume in it
 import * as Haptics from "expo-haptics";
 import { useRef, useState } from "react";
-import {
-  Pressable,
-  Text,
-  TextInput,
-  View,
-  type LayoutChangeEvent,
-} from "react-native";
+import { Pressable, Text, View, type LayoutChangeEvent } from "react-native";
 import {
   GestureDetector,
   useExclusiveGestures,

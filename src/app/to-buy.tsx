@@ -4,7 +4,7 @@
 // Marking one theirs whose series isn't on the shelf offers to add it
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Alert,
   Pressable,

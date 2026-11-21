@@ -4,8 +4,7 @@
 // list, Your year, Friends, Import your list), light or dark, Canadian
 // prices, What's new, FAQ, About, Privacy, and Sign out
 import { router } from "expo-router";
-import { Linking, Pressable, Text, View } from "react-native";
-import { siteOrigin } from "@/core/lib/siteOrigin";
+import { Pressable, Text, View } from "react-native";
 import { useUniwind } from "uniwind";
 import {
   CheckIcon,
@@ -31,6 +30,46 @@ import Sheet from "./Sheet";
 
 type Icon = typeof StarIcon;
 
+// a row of the menu: its icon and words, a tick when it's the one in force.
+// Pressing one closes the menu, unless it changes something shown in it
+function Item({
+  icon: Icon,
+  label,
+  onPress,
+  on,
+  keepOpen = false,
+  onClose,
+}: {
+  icon: Icon;
+  label: string;
+  onPress: () => void;
+  on?: boolean;
+  keepOpen?: boolean;
+  onClose: () => void;
+}) {
+  const c = useColors();
+  return (
+    <Pressable
+      onPress={() => {
+        if (!keepOpen) onClose();
+        onPress();
+      }}
+      accessibilityState={on === undefined ? undefined : { selected: on }}
+      className="min-h-[44px] flex-row items-center gap-3 rounded-[3px] px-3 active:bg-accent-wash"
+    >
+      <Icon color={c.inkSoft} width={18} height={18} />
+      <Text
+        className={`flex-1 text-[15.5px] ${on ? "font-body-semibold text-ink" : "font-body text-ink-soft"}`}
+      >
+        {label}
+      </Text>
+      {on ? <CheckIcon color={c.accent} width={16} height={16} /> : null}
+    </Pressable>
+  );
+}
+
+const Divider = () => <View className="my-1.5 h-px bg-line-soft" />;
+
 export default function SettingsMenu({
   open,
   onClose,
@@ -52,37 +91,6 @@ export default function SettingsMenu({
     onClose();
     router.push(to);
   };
-  const Item = ({
-    icon: Icon,
-    label,
-    onPress,
-    on,
-    keepOpen = false,
-  }: {
-    icon: Icon;
-    label: string;
-    onPress: () => void;
-    on?: boolean;
-    keepOpen?: boolean;
-  }) => (
-    <Pressable
-      onPress={() => {
-        if (!keepOpen) onClose();
-        onPress();
-      }}
-      accessibilityState={on === undefined ? undefined : { selected: on }}
-      className="min-h-[44px] flex-row items-center gap-3 rounded-[3px] px-3 active:bg-accent-wash"
-    >
-      <Icon color={c.inkSoft} width={18} height={18} />
-      <Text
-        className={`flex-1 text-[15.5px] ${on ? "font-body-semibold text-ink" : "font-body text-ink-soft"}`}
-      >
-        {label}
-      </Text>
-      {on ? <CheckIcon color={c.accent} width={16} height={16} /> : null}
-    </Pressable>
-  );
-  const Divider = () => <View className="my-1.5 h-px bg-line-soft" />;
   return (
     <Sheet
       open={open}
@@ -111,6 +119,7 @@ export default function SettingsMenu({
       </Pressable>
       <Divider />
       <Item
+        onClose={onClose}
         icon={ShareIcon}
         label="Share my list"
         onPress={() =>
@@ -124,23 +133,27 @@ export default function SettingsMenu({
               its own pages for them */}
       {hasYear ? (
         <Item
+          onClose={onClose}
           icon={StarIcon}
           label="Your year in manga"
           onPress={() => router.push("/year")}
         />
       ) : null}
       <Item
+        onClose={onClose}
         icon={LinkIcon}
         label="Friends"
         onPress={() => router.push("/friends")}
       />
       <Item
+        onClose={onClose}
         icon={ImportIcon}
         label="Import your list"
         onPress={() => router.push("/import")}
       />
       <Divider />
       <Item
+        onClose={onClose}
         icon={dark ? SunIcon : MoonIcon}
         label={dark ? "Light mode" : "Dark mode"}
         keepOpen
@@ -149,6 +162,7 @@ export default function SettingsMenu({
         }
       />
       <Item
+        onClose={onClose}
         icon={TagIcon}
         label="Canadian prices"
         on={prefs.country === "ca"}
@@ -161,23 +175,32 @@ export default function SettingsMenu({
       />
       <Divider />
       <Item
+        onClose={onClose}
         icon={StarIcon}
         label="What's new"
         onPress={() => router.push("/updates")}
       />
-      <Item icon={InfoIcon} label="FAQ" onPress={() => router.push("/faq")} />
       <Item
+        onClose={onClose}
+        icon={InfoIcon}
+        label="FAQ"
+        onPress={() => router.push("/faq")}
+      />
+      <Item
+        onClose={onClose}
         icon={InfoIcon}
         label="About"
         onPress={() => router.push("/about")}
       />
       <Item
+        onClose={onClose}
         icon={EyeIcon}
         label="Privacy"
         onPress={() => router.push("/privacy")}
       />
       <Divider />
       <Item
+        onClose={onClose}
         icon={SignOutIcon}
         label="Sign out"
         onPress={() => {
