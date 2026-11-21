@@ -16,10 +16,29 @@ const DEFAULTS: Prefs = {
 type PrefsState = {
   prefs: Prefs;
   load: () => Promise<void>;
+  // applies a change right away, and keeps it on the account (the web's
+  // savePrefs). Throws when the server turns it down
+  save: (patch: Prefs) => Promise<void>;
+  // on signing out: the next account starts from the defaults
+  reset: () => void;
 };
 
-export const usePrefs = create<PrefsState>()((set) => ({
+export const usePrefs = create<PrefsState>()((set, get) => ({
   prefs: DEFAULTS,
+  save: async (patch) => {
+    const was = get().prefs;
+    const prefs = { ...was, ...patch };
+    if (patch.country) setCountry(patch.country === "ca" ? "ca" : "us");
+    set({ prefs });
+    try {
+      const res = await apiFetch("/api/prefs", { method: "PUT", body: patch });
+      if (!res.ok) throw new Error("That didn't save. Try again.");
+    } catch (e) {
+      set({ prefs: was });
+      throw e;
+    }
+  },
+  reset: () => set({ prefs: DEFAULTS }),
   load: async () => {
     try {
       const res = await apiFetch("/api/prefs");

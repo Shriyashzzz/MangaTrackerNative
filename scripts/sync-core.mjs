@@ -77,6 +77,21 @@ const ENTRIES = [
   "pages/Details/useRateVolume.ts",
   "pages/Details/upcomingClosed.ts",
   "components/coverPicker/useCoverSearch.ts",
+  // the account, To buy, scanning, the avatars (the shelf's header and menu)
+  "lib/account.ts",
+  "lib/toBuy.ts",
+  "lib/content/avatars.ts",
+  "lib/scan.ts",
+  "lib/year.ts",
+  // "Watched the anime?" on the add form
+  "lib/afterAnime.ts",
+  "lib/afterAnimeText.ts",
+  // the menu's pages: FAQ, Friends, the contact address
+  "lib/content/faq.ts",
+  "lib/friends.ts",
+  "lib/contact.ts",
+  // To buy's "Out Dec 3", and a volume page's rules
+  "pages/Prices/volumePageRules.ts",
 ];
 
 // browser-only things a copied file may not use
@@ -177,6 +192,38 @@ const iconsDest = join(OUT, ICONS);
 mkdirSync(dirname(iconsDest), { recursive: true });
 writeFileSync(iconsDest, `// CONVERTED from inventoryApp/client/src/${ICONS} by scripts/sync-core.mjs.\n// Do not edit here: change the web app, then run \`npm run sync-core\`.\n` + icons);
 console.log(`icons converted into src/core/${ICONS}`);
+
+// The web's drawings (Kenji the mascot, the profile pictures' art), as React
+// Native SVG. Their ink and paper are Tailwind classes on each shape
+// ("fill-card stroke-line stroke-[3]"): the app reads those at run time
+// (src/lib/svgClass.ts), from the theme's colours, so the drawing files stay
+// the web's, element for element
+const DRAWINGS = ["components/mascot/Mascot.tsx", "components/avatar/avatarArt.tsx"];
+const SVG_TAGS = { svg: "Svg", path: "Path", circle: "Circle", rect: "Rect", ellipse: "Ellipse", g: "G", text: "SvgText", line: "Line", polygon: "Polygon", polyline: "Polyline" };
+for (const rel of DRAWINGS) {
+  let art = readFileSync(join(WEB, rel), "utf8")
+    .replace(/\s+aria-hidden(="true")?/g, "")
+    // a class on a shape (a lowercase SVG tag) becomes its ink and paper
+    // props; a drawing's own parts (Bust, Head) keep passing className down.
+    // A template literal ("`${INK} ...`") has braces of its own
+    .replace(
+      /<([a-z]+)((?:(?!>)[\s\S])*?)className=(?:\{(`[^`]*`|[^}]*)\}|"([^"]*)")/g,
+      (_, tag, before, expr, text) => `<${tag}${before}{...svgClass(${expr ?? JSON.stringify(text)})}`,
+    )
+;
+  for (const [tag, native] of Object.entries(SVG_TAGS))
+    art = art.replace(new RegExp(`<${tag}\\b`, "g"), `<${native}`).replace(new RegExp(`</${tag}>`, "g"), `</${native}>`);
+  const unknown = art.match(/<(?!Svg|Path|Circle|Rect|Ellipse|G|SvgText|Line|Polygon|Polyline|Art|Bust|Head|DotEyes|BigEyes|[A-Z]|\/|>)[a-z]+/g);
+  if (unknown) {
+    console.error(`\n${rel}: elements the app can't draw yet: ${[...new Set(unknown)].join(", ")}`);
+    process.exit(1);
+  }
+  const imports = `import Svg, { Circle, Ellipse, G, Line, Path, Polygon, Polyline, Rect, Text as SvgText } from "react-native-svg";\nimport { svgClass } from "@/lib/svgClass";\n`;
+  const dest = join(OUT, rel);
+  mkdirSync(dirname(dest), { recursive: true });
+  writeFileSync(dest, `// CONVERTED from inventoryApp/client/src/${rel} by scripts/sync-core.mjs.\n// Do not edit here: change the web app, then run \`npm run sync-core\`.\n// eslint-disable-next-line @typescript-eslint/no-unused-vars\n` + imports + art);
+  console.log(`drawing converted into src/core/${rel}`);
+}
 
 // The logo, as the SVG text the app draws (react-native-svg's SvgXml)
 const LOGO = "assets/logo.svg";

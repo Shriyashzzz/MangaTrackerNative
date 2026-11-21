@@ -1,0 +1,557 @@
+// COPIED from inventoryApp/client/src/lib/afterAnimeText.ts by scripts/sync-core.mjs.
+// Do not edit here: change the web app, then run `npm run sync-core`.
+// The words of the "after the anime" pages: for one season, what to start
+// at, where it stops and which volume to buy; for a page, its heading, title
+// and description. Pure rules with no imports at all, so the server's tests
+// (tests/prices/afterAnimeText.test.ts) and the site's server
+// (client/server.ts) can both use them.
+//
+// The rule behind the wording: say what to do, once, and only what's
+// certain. One volume to buy, never "21 or 22".
+
+// one season (or film, or OVA) and where it leaves the manga. The server's
+// SentStop
+export type AnimeStop = {
+  // "Season 2", "Reze Movie", "Original series", or "The anime"
+  label: string;
+  endVolume: number | null;
+  endChapter: number | null;
+  // it stops partway through endChapter
+  endsMidChapter: boolean;
+  // the first chapter to read after it, and its volume when that's known
+  nextChapter: number | null;
+  nextVolume: number | null;
+  // what else MangaUpdates says: "Skips Chap 80-81"
+  note: string;
+  // a reader's accepted correction is in it
+  corrected: boolean;
+  // it adapts the manga to its last chapter
+  coversAll: boolean;
+};
+
+// "chapter 181", "volume 21" and "final chapter, 431" stay on one line: a
+// number alone at the start of a line reads as a mistake. For text shown on the page (a
+// no-break space); descriptions and markup keep plain spaces
+export const keepNumbers = (text: string) =>
+  text.replace(
+    /\b(chapter|volume|vol\.|season|part)(,?) (?=\d)/gi,
+    "$1$2\u00a0",
+  );
+
+// ---------- one season ----------
+
+// a panel's title: "After Season 2", "After the anime", "After the original
+// series", or "After Reze Movie"
+// A label that's a plain word, not a name: "Movie", "OVA", "Original
+// series". In a sentence it needs "the" ("The movie is the latest", never
+// "Movie is the latest"); a name ("Season 2", "Reze Movie") doesn't.
+// Lower case, but for initials: "the movie", "the OVA"
+function plainWord(label: string) {
+  if (!/^(movie|film|ova|ona|specials?|original series)$/i.test(label))
+    return null;
+  return /^(ova|ona)$/i.test(label) ? label.toUpperCase() : label.toLowerCase();
+}
+
+export function afterLabel(stop: AnimeStop) {
+  if (stop.label === "The anime") return "After the anime";
+  const word = plainWord(stop.label);
+  return word ? `After the ${word}` : `After ${stop.label}`;
+}
+
+// the season as the subject of a sentence: "Season 2", "The anime", "The
+// movie"
+function seasonSubject(stop: AnimeStop) {
+  const word = plainWord(stop.label);
+  return word ? `The ${word}` : stop.label;
+}
+
+// the answer itself, said big
+export function startText(stop: AnimeStop) {
+  if (stop.coversAll) return "That's the whole story";
+  if (stop.nextChapter !== null) return `Start at chapter ${stop.nextChapter}`;
+  if (stop.nextVolume !== null) return `Start with volume ${stop.nextVolume}`;
+  if (stop.endVolume !== null) return `Start with volume ${stop.endVolume}`;
+  return "We're not sure yet";
+}
+
+// the one volume to buy to carry on; null when there's nothing to carry on
+// with, or no volume on record. The volume the next chapter is in, when
+// that's known. Otherwise the volume the anime ends in: starting there never
+// skips a chapter (at worst a few are read twice), so it's the safe pick
+export function buyVolume(stop: AnimeStop) {
+  if (stop.coversAll) return null;
+  return stop.nextVolume ?? stop.endVolume;
+}
+
+// the volume after the one to buy, offered quietly when the pick was the
+// anime's last volume: someone who already has that one wants this. Null
+// otherwise
+export function volumeAfter(stop: AnimeStop) {
+  if (stop.coversAll || stop.nextVolume !== null) return null;
+  return stop.endVolume === null ? null : stop.endVolume + 1;
+}
+
+// why the volume to buy is that one, in a few words
+export function whyThisVolume(stop: AnimeStop) {
+  if (stop.nextVolume !== null && stop.nextChapter !== null)
+    return `Chapter ${stop.nextChapter} is in this volume.`;
+  if (stop.nextVolume !== null) return "Start here.";
+  return "The anime ends in this volume, so you miss nothing.";
+}
+
+// where the season stops, as one sentence. Its volume is said only when it's
+// the volume to buy too: "ends in volume 11" beside a card for volume 12
+// reads as a mistake
+export function endText(stop: AnimeStop) {
+  const season = seasonSubject(stop);
+  if (stop.coversAll)
+    return `${season} covers the manga to its final chapter, ${stop.endChapter}.`;
+  if (stop.endChapter === null) {
+    if (stop.endVolume !== null)
+      return `${season} ends in volume ${stop.endVolume}.`;
+    // a correction that only names the volume to start from
+    return "";
+  }
+  const sameVolume =
+    stop.endVolume !== null && stop.endVolume === buyVolume(stop);
+  const inVolume = sameVolume ? `, in volume ${stop.endVolume}` : "";
+  if (stop.endsMidChapter)
+    return `${season} stops partway through chapter ${stop.endChapter}${inVolume}.`;
+  return `${season} ends at chapter ${stop.endChapter}${inVolume}.`;
+}
+
+// where someone who watched the season is in the manga, for their shelf: the
+// last chapter it covered, and the last volume it covered all of. Null for
+// what the season doesn't say
+export function placeAfter(stop: AnimeStop) {
+  let chapter: number | null = null;
+  if (stop.endChapter !== null)
+    // a chapter it stopped partway through isn't read yet
+    chapter = stop.endsMidChapter
+      ? Math.max(0, Math.floor(stop.endChapter) - 1)
+      : Math.floor(stop.endChapter);
+  // the volume to start in is known: every one before it is done. When only
+  // the last volume is, it may be half covered, so that one isn't counted
+  const startsIn = stop.nextVolume ?? stop.endVolume;
+  const volume = startsIn === null ? null : Math.max(0, startsIn - 1);
+  return { chapter, volume };
+}
+
+// a panel's heading, with the words people search: "After Season 2: start
+// at chapter 138"
+export const seasonHeading = (stop: AnimeStop) =>
+  `${afterLabel(stop)}: ${startText(stop).toLowerCase()}`;
+
+// where on the page a season's panel is, for the table's links
+export const seasonAnchor = (stop: AnimeStop) =>
+  `after-${stop.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+
+// What to call the volume to buy: "volume 14" unless the page knows better
+// ("Book 7 (vols. 13–14)", for a series sold only as books of two)
+type BuyWords = (volume: number) => string;
+const volumeWords: BuyWords = (volume) => `volume ${volume}`;
+
+// one season's answer in plain sentences, for the copy of the page search
+// engines read: "Season 2 ends at chapter 137, in volume 16. Start the manga
+// at chapter 138. Buy volume 16."
+export function answerSentence(stop: AnimeStop, words = volumeWords) {
+  const where = endText(stop);
+  if (stop.coversAll || stop.nextChapter === null) return where;
+  const volume = buyVolume(stop);
+  const buy = volume === null ? "" : ` Buy ${words(volume)}.`;
+  return `${where} Start the manga at chapter ${stop.nextChapter}.${buy}`.trim();
+}
+
+// a season as a row of the page's table: "You watched", "Start at chapter",
+// "Buy volume". An empty string is something the season doesn't have
+export function tableRow(stop: AnimeStop) {
+  const volume = buyVolume(stop);
+  let start = "";
+  if (stop.coversAll) start = "Nothing left to read";
+  else if (stop.nextChapter !== null) start = String(stop.nextChapter);
+  return {
+    watched: seasonSubject(stop),
+    start,
+    volume: volume === null ? "" : String(volume),
+  };
+}
+
+// ---------- the page's opening answer ----------
+
+// The season most people have just finished: the one that gets furthest
+// into the manga. Usually that's the last one listed, but not always: a film
+// can be listed after the newest season, and a season a reader's fix added
+// goes on the end. With no chapter to go by, the last one listed
+export function latestStop(stops: AnimeStop[]) {
+  let latest = stops[stops.length - 1];
+  for (const stop of stops) {
+    const isFurther =
+      stop.endChapter !== null &&
+      (latest?.endChapter == null || stop.endChapter > latest.endChapter);
+    if (isFurther) latest = stop;
+  }
+  return latest;
+}
+
+// The page's opening answer, for the latest season: the one most people
+// have just finished. It opens with a question, because someone arriving
+// from a search hasn't told us what they've watched. Three short lines:
+//   asked:  "Finished the anime?"
+//   lead:   "Start the manga at chapter 116. Buy volume 24."
+//   detail: "Season 3 is the latest, and it ends at chapter 115."
+export function latestAnswer(stop: AnimeStop, words = volumeWords) {
+  const asked = "Finished the anime?";
+  // "Season 3 is the latest, and it ends at…", or just "The anime ends at…"
+  const subject =
+    stop.label === "The anime"
+      ? "The anime"
+      : `${seasonSubject(stop)} is the latest, and it`;
+  if (stop.coversAll)
+    return {
+      asked,
+      lead: "You've seen the whole story.",
+      detail: `${subject} ends at the manga's final chapter, ${stop.endChapter}.`,
+    };
+  const volume = buyVolume(stop);
+  if (stop.nextChapter !== null) {
+    const buy = volume === null ? "" : ` Buy ${words(volume)}.`;
+    const how = stop.endsMidChapter ? "stops partway through" : "ends at";
+    return {
+      asked,
+      lead: `Start the manga at chapter ${stop.nextChapter}.${buy}`,
+      detail: `${subject} ${how} chapter ${stop.endChapter}.`,
+    };
+  }
+  if (volume !== null)
+    return {
+      asked,
+      lead: `Start the manga at ${words(volume)}.`,
+      detail: `${subject} ends in volume ${stop.endVolume ?? volume}.`,
+    };
+  return { asked: "", lead: "", detail: "" };
+}
+
+// the same answer as one piece of text, for a description or FAQ markup
+export function latestAnswerText(stop: AnimeStop) {
+  const { asked, lead, detail } = latestAnswer(stop);
+  return `${asked} ${lead} ${detail}`.trim();
+}
+
+// ---------- buying: the price, and what's left after the anime ----------
+
+// an English volume that's out, and its cheapest saved new price at a store
+// readers know (the server's savedBooks.ts). No price saved: nulls
+export type SavedBook = {
+  volume: number;
+  // its ISBN: the page draws its buy box from it before the series' list
+  // is in (AfterAnimeShow.tsx booksFromAnswer)
+  isbn13: string;
+  cents: number | null;
+  store: string | null;
+  checkedAt: string | null;
+};
+// whether the manga has ended, and at how many volumes
+export type MangaFacts = { finished: boolean; volumes: number | null };
+
+// whether the series has an anime and where it's up to (the server's
+// AnimeState, prices/types.ts); null when we haven't been told
+export type AnimeState = {
+  state: "none" | "upcoming" | "airing" | "ended";
+  episodes: number | null;
+};
+
+const dollars = (cents: number) => `$${(cents / 100).toFixed(2)}`;
+const DAY_MS = 24 * 60 * 60 * 1000;
+// a price older than this isn't quoted in a sentence
+const QUOTED_FOR_DAYS = 30;
+
+// "today", "yesterday", "4 days ago"; "" for a price too old to quote
+function daysAgo(at: string, now: Date) {
+  const days = Math.floor((now.getTime() - new Date(at).getTime()) / DAY_MS);
+  if (!(days >= 0) || days > QUOTED_FOR_DAYS) return "";
+  if (days === 0) return "today";
+  return days === 1 ? "yesterday" : `${days} days ago`;
+}
+
+// what the volume to buy costs, as a sentence: "Volume 21 is $9.59 new at
+// Books-A-Million, checked 4 days ago." "" with no recent saved price
+export function priceLine(
+  stop: AnimeStop,
+  books: SavedBook[],
+  now = new Date(),
+  money = dollars,
+) {
+  const volume = buyVolume(stop);
+  const book = books.find((b) => b.volume === volume);
+  if (!book || book.cents === null || !book.store || !book.checkedAt) return "";
+  const ago = daysAgo(book.checkedAt, now);
+  if (!ago) return "";
+  return `Volume ${volume} is ${money(book.cents)} new at ${book.store}, checked ${ago}.`;
+}
+
+// What's left to read after a season, in English volumes that are out: from
+// the volume to buy to the newest. `cents` is all of them new, and only said
+// when every one has a saved price: a total with volumes missing would be a
+// guess. null when there's nothing to carry on with
+export function catchUp(stop: AnimeStop, books: SavedBook[]) {
+  const first = buyVolume(stop);
+  if (first === null) return null;
+  const left = books.filter((b) => b.volume >= first);
+  if (!left.length || left[0]!.volume !== first) return null;
+  const last = left[left.length - 1]!.volume;
+  return {
+    from: first,
+    to: last,
+    count: left.length,
+    // every volume from first to last is there
+    unbroken: left.length === last - first + 1,
+    cents: left.every((b) => b.cents !== null)
+      ? left.reduce((sum, b) => sum + b.cents!, 0)
+      : null,
+  };
+}
+
+// the same, in sentences: "The manga is still running. Volumes 21 to 27 are
+// out in English: 7 to catch up. All 7 cost $67.13 new." "" when there's
+// nothing to say
+export function leftLine(
+  stop: AnimeStop,
+  manga: MangaFacts,
+  books: SavedBook[],
+  money = dollars,
+) {
+  const left = catchUp(stop, books);
+  if (!left) return "";
+  const finished = manga.volumes
+    ? `The manga is finished at ${manga.volumes} volumes.`
+    : "The manga is finished.";
+  const status = manga.finished ? finished : "The manga is still running.";
+  let out = `Volume ${left.from} is the one out in English after the anime.`;
+  if (left.count > 1)
+    out = left.unbroken
+      ? `Volumes ${left.from} to ${left.to} are out in English: ${left.count} to catch up.`
+      : `${left.count} volumes from volume ${left.from} on are out in English.`;
+  const cost =
+    left.cents !== null && left.count > 1
+      ? ` All ${left.count} cost ${money(left.cents)} new.`
+      : "";
+  return `${status} ${out}${cost}`;
+}
+
+// ---------- what a page says about itself (heading, title, description) ----------
+
+// a show, as much of it as its title and description need
+type ShowForMeta = {
+  name: string;
+  slug: string;
+  coverUrl: string | null;
+  stops: AnimeStop[];
+  // for the buying lines; a show sent without them just doesn't say them
+  books?: SavedBook[];
+  manga?: MangaFacts;
+  // when the answer was last checked at its source
+  checkedAt?: string | null;
+  anime?: AnimeState | null;
+};
+
+// fits the app's PageMeta (lib/seo.ts)
+type ShowMeta = {
+  title: string;
+  description?: string;
+  path?: string;
+  image?: string | null;
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown>;
+  // the title as it is, without " | Manga Tracker" after it
+  fullTitle?: boolean;
+  // the app's top bar (lib/seo.ts PageMeta)
+  screen?: string;
+};
+
+// about what a search result shows of a description before cutting it
+const DESCRIPTION_FITS = 160;
+// said after the answer, when there's room for it
+const WHAT_ELSE = "Every season's last chapter and the volume to buy next.";
+
+export const INDEX_META = {
+  title: "Where does the anime leave off in the manga?",
+  screen: "After the anime",
+  description:
+    "Finished a season? Look up the anime and see which manga chapter and volume to start from, with the cheapest price for that volume.",
+  path: "/after-the-anime",
+};
+
+// "the Promised Neverland anime", never "the The Promised Neverland anime"
+export const withoutThe = (name: string) => name.replace(/^the\s+/i, "");
+const theAnime = (name: string) => `the ${withoutThe(name)} anime`;
+
+// the question the page answers, as people type it into a search: the
+// page's title in a search result, not its heading
+export const showQuestion = (name: string) =>
+  `Where does ${theAnime(name)} leave off in the manga?`;
+
+// an anime that's still airing, or hasn't started: it has no last chapter
+// for anyone to know yet
+export const hasNoEndYet = (anime: AnimeState | null) =>
+  anime?.state === "airing" || anime?.state === "upcoming";
+
+// Why a show has no answer, in a sentence or two: only what's certain. An
+// anime that's still airing has no last chapter yet
+export function noAnswerLine(name: string, anime: AnimeState | null) {
+  const its = `The ${withoutThe(name)} anime`;
+  if (anime?.state === "airing") {
+    const run = anime.episodes ? `, ${anime.episodes} episodes in all` : "";
+    return `${its} is still airing${run}. It has no last chapter until it ends.`;
+  }
+  if (anime?.state === "upcoming") return `${its} hasn't started yet.`;
+  if (anime?.state === "ended")
+    return `${its} has ended, but nobody has recorded where it leaves off.`;
+  if (anime?.state === "none") return `We know of no anime for ${name}.`;
+  return `We have no answer for ${name} yet.`;
+}
+
+// the page's own heading: plain, with the series first
+export const pageHeading = (name: string, hasAnswer: boolean) =>
+  hasAnswer ? `${name}: where to start the manga` : `${name}: no answer yet`;
+
+// "Season 2 ends at chapter 137." for the list of every season's last
+// chapter; "" for a season with no chapter on record
+function endsAtChapter(stop: AnimeStop) {
+  if (stop.endChapter === null) return "";
+  const season = seasonSubject(stop);
+  if (stop.endsMidChapter)
+    return `${season} stops partway through chapter ${stop.endChapter}.`;
+  if (stop.coversAll)
+    return `${season} ends at chapter ${stop.endChapter}, the manga's last.`;
+  return `${season} ends at chapter ${stop.endChapter}.`;
+}
+
+// a question and its answer. `q` is how people type it into a search, and
+// goes in the page's markup. `shown` is the short way the page itself asks
+// it; a question with none isn't shown, because the page has already
+// answered it above. `list`: more of the answer as short lines, one a season
+export type ShowQuestion = {
+  q: string;
+  shown?: string;
+  a: string;
+  list?: string[];
+};
+
+// an answer as one piece of text, for markup that takes no lists
+export const answerText = ({ a, list }: ShowQuestion) =>
+  list?.length ? `${a} Earlier: ${list.join("; ")}.` : a;
+
+// the questions a show's page answers. Only the ones this show has an
+// answer to
+export function showQuestions(show: ShowForMeta): ShowQuestion[] {
+  const latest = latestStop(show.stops);
+  if (!latest) return [];
+  const earlier = show.stops
+    .filter((stop) => stop !== latest && stop.endChapter !== null)
+    .reverse()
+    .map((stop) => `${seasonSubject(stop)}, chapter ${stop.endChapter}`);
+  const questions: ShowQuestion[] = [
+    { q: showQuestion(show.name), a: latestAnswerText(latest) },
+    {
+      q: `What chapter does ${theAnime(show.name)} end on?`,
+      // worth showing only when there are earlier seasons to list
+      ...(earlier.length
+        ? { shown: "What chapter does each season end on?" }
+        : {}),
+      // the latest season in a sentence, the ones before it as a short list
+      a: endsAtChapter(latest),
+      list: earlier,
+    },
+  ];
+  const volume = buyVolume(latest);
+  if (volume !== null && latest.nextChapter !== null)
+    questions.push({
+      q: `Which ${show.name} volume do I buy after the anime?`,
+      a: `Volume ${volume}. The story carries on at chapter ${latest.nextChapter}.`,
+    });
+  const left = show.manga ? leftLine(latest, show.manga, show.books ?? []) : "";
+  if (left)
+    questions.push({
+      // (not shown as a question: the page says it under its answer)
+      q: `How many ${show.name} volumes are left after the anime?`,
+      a: left,
+    });
+  if (latest.endChapter !== null)
+    questions.push({
+      q: `Does ${theAnime(show.name)} cover the whole manga?`,
+      shown: "Does the anime cover the whole manga?",
+      a: latest.coversAll
+        ? `Yes. ${endText(latest)}`
+        : `No. ${endText(latest)} The manga carries on from there.`,
+    });
+  return questions.filter((question) => question.a);
+}
+
+// schema.org markup for a show: its questions and answers, and where the
+// page sits in the site. `origin`: the site's own address. The site's server
+// writes the same (client/server.ts)
+export const showJsonLd = (show: ShowForMeta, origin: string) => ({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "FAQPage",
+      // when the answer was last checked at its source (left out of the
+      // markup when there's no date)
+      dateModified: show.checkedAt ?? undefined,
+      mainEntity: showQuestions(show).map((question) => ({
+        "@type": "Question",
+        name: question.q,
+        acceptedAnswer: { "@type": "Answer", text: answerText(question) },
+      })),
+    },
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        ["After the anime", "/after-the-anime"],
+        [show.name, `/after-the-anime/${show.slug}`],
+      ].map(([name, path], at) => ({
+        "@type": "ListItem",
+        position: at + 1,
+        name,
+        item: origin + path,
+      })),
+    },
+  ],
+});
+
+// a show's page; null while it loads. A page with no answer isn't one to
+// find in a search
+export function showMeta(
+  show: ShowForMeta | null,
+  failed: boolean,
+  origin: string,
+  now = new Date(),
+): ShowMeta | null {
+  if (failed) return { title: "After the anime", noindex: true };
+  if (!show) return null;
+  const title = showQuestion(show.name);
+  const path = `/after-the-anime/${show.slug}`;
+  const screen = show.name;
+  if (!show.stops.length) return { title, screen, path, noindex: true };
+  // the answer itself, so it can be read off the search result; what else
+  // the page has only when both fit
+  const latest = latestStop(show.stops)!;
+  const answer = latestAnswerText(latest);
+  // the price first, when one is saved: it's what the search result of any
+  // other site can't say
+  const price = priceLine(latest, show.books ?? [], now);
+  const withPrice = price ? `${answer} ${price}` : "";
+  const withMore = `${answer} ${WHAT_ELSE}`;
+  const fits = (text: string) => text !== "" && text.length <= DESCRIPTION_FITS;
+  return {
+    title,
+    screen,
+    // the question is the whole title: with the site's name after it, a
+    // search result cuts the question short
+    fullTitle: true,
+    description: [withPrice, withMore].find(fits) ?? answer,
+    path,
+    image: show.coverUrl,
+    jsonLd: showJsonLd(show, origin),
+  };
+}
