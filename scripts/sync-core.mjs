@@ -135,6 +135,9 @@ const ENTRIES = [
   "pages/Import/importRowText.ts",
   "pages/Import/useNearNames.ts",
   "lib/passwordRule.ts",
+  // after the anime: which book is volume N, and the pages' shared words
+  "pages/AfterAnime/bookFor.ts",
+  "pages/AfterAnime/words.ts",
 ];
 
 // browser-only things a copied file may not use

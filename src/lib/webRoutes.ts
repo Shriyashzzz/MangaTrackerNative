@@ -17,6 +17,13 @@ export function hrefOf(webPath: string): Href | null {
   if (volume) return `/prices/${volume[1]}`;
   const series = path!.match(/^\/details\/(\d+)$/);
   if (series) return `/details/${series[1]}`;
+  if (path === "/after-the-anime") return "/after-anime";
+  const show = path!.match(/^\/after-the-anime\/([^/]+)$/);
+  if (show)
+    return {
+      pathname: "/after-anime/[slug]",
+      params: { slug: show[1]!, ...(name ? { name } : {}) },
+    };
   return null;
 }
 

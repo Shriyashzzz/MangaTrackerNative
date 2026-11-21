@@ -5,17 +5,8 @@
 // just checked. A search lists the series found, with Did you mean for a
 // typo. The rules are the web's (core findSeries, nearMatches, askedEdition)
 import { router } from "expo-router";
-import { AFTER_ANIME_PATH } from "@/core/lib/afterAnime";
-import { siteOrigin } from "@/core/lib/siteOrigin";
 import { useEffect, useState } from "react";
-import {
-  Linking,
-  Pressable,
-  ScrollView,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 import AppHeader from "@/components/AppHeader";
@@ -388,9 +379,7 @@ export default function PricesScreen() {
 
         {!searching ? (
           <Pressable
-            onPress={() =>
-              void Linking.openURL(`${siteOrigin()}${AFTER_ANIME_PATH}`)
-            }
+            onPress={() => router.push("/after-anime")}
             className="gap-0.5 rounded-[4px] border-2 border-line bg-card px-3 py-2.5 active:bg-accent-wash"
           >
             <Text className="font-brand pr-1 text-[18px] tracking-[1px] text-ink uppercase">

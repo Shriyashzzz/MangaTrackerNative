@@ -95,13 +95,24 @@ export default function AddScreen() {
     ownedVolumes?: string;
     bookTitle?: string;
     bookIsbn?: string;
+    // from After the anime: the last chapter it covered, and the last
+    // volume it covered all of
+    chapter?: string;
+    readVolume?: string;
   }>();
   const trackBy = usePrefs((s) => s.prefs.trackBy ?? "series");
   const fromPrices = (params.title ?? "").slice(0, 150);
   const novelFromPrices = params.format === "novel";
   const [stage, setStage] = useState<Stage>("reading");
-  const [chapter, setChapter] = useState("0");
-  const [readVolume, setReadVolume] = useState("");
+  // a whole number from the address, within reason
+  const whole = (typed: string | undefined, most: number) => {
+    const n = Number(typed);
+    return Number.isInteger(n) && n > 0 && n <= most ? String(n) : null;
+  };
+  const [chapter, setChapter] = useState(whole(params.chapter, 100000) ?? "0");
+  const [readVolume, setReadVolume] = useState(
+    whole(params.readVolume, 999) ?? "",
+  );
   const [byVolumeChoice, setByVolumeChoice] = useState<boolean | null>(null);
   const [rating, setRating] = useState(0);
   const [problems, setProblems] = useState<{

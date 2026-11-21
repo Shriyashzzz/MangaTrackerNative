@@ -50,19 +50,24 @@ export default function SeriesCard({
   series,
   width = 110,
   params,
+  onPress,
 }: {
   series: SeriesCardData;
   width?: number;
   params?: Record<string, string>;
+  // somewhere else than the series' price page (After the anime's shows)
+  onPress?: () => void;
 }) {
   const shown = novelParts(series.name);
   return (
     <Pressable
-      onPress={() =>
-        router.push({
-          pathname: "/prices/series",
-          params: { name: series.name, ...params },
-        })
+      onPress={
+        onPress ??
+        (() =>
+          router.push({
+            pathname: "/prices/series",
+            params: { name: series.name, ...params },
+          }))
       }
       style={{ width }}
       className="gap-1.5 active:opacity-70"

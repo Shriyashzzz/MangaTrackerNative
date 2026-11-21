@@ -10,16 +10,19 @@ export default function FoldRow({
   title,
   count,
   aside,
+  openAtFirst = false,
   children,
 }: {
   title: string;
   count?: number;
   // "$84.00 paid", in the accent colour
   aside?: string;
+  // shown open to begin with
+  openAtFirst?: boolean;
   children: ReactNode;
 }) {
   const c = useColors();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(openAtFirst);
   return (
     <View className="border-t border-line-soft">
       <Pressable
