@@ -2,7 +2,11 @@
 // the shelf for someone signed in and the sign-in page for anyone else
 import "../global.css";
 import { Bangers_400Regular } from "@expo-google-fonts/bangers";
-import { Fraunces_600SemiBold } from "@expo-google-fonts/fraunces";
+import {
+  Fraunces_400Regular,
+  Fraunces_400Regular_Italic,
+  Fraunces_600SemiBold,
+} from "@expo-google-fonts/fraunces";
 import {
   IBMPlexMono_400Regular,
   IBMPlexMono_500Medium,
@@ -25,6 +29,8 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
     Bangers_400Regular,
+    Fraunces_400Regular,
+    Fraunces_400Regular_Italic,
     Fraunces_600SemiBold,
     IBMPlexSans_400Regular,
     IBMPlexSans_500Medium,

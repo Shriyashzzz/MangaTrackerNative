@@ -62,6 +62,8 @@
 @theme {
   --font-brand: "Bangers_400Regular";
   --font-display: "Fraunces_600SemiBold";
+  --font-display-regular: "Fraunces_400Regular";
+  --font-display-italic: "Fraunces_400Regular_Italic";
   --font-body: "IBMPlexSans_400Regular";
   --font-body-medium: "IBMPlexSans_500Medium";
   --font-body-semibold: "IBMPlexSans_600SemiBold";

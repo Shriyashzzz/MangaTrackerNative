@@ -60,6 +60,8 @@ const ENTRIES = [
   "pages/Prices/offerLabels.ts",
   // the Volumes tab (phase 3): worth and what finishing costs
   "pages/Home/useShelfTools.ts",
+  // deleting with Undo, Select's Move to (phase 4)
+  "lib/restorePieces.ts",
 ];
 
 // browser-only things a copied file may not use

@@ -169,6 +169,8 @@ export function useSeriesShelf(
 
   return {
     owned,
+    place,
+    total,
     buyOptions,
     editions,
     highest,
@@ -176,6 +178,9 @@ export function useSeriesShelf(
     count,
     placeText,
     isEdition: Boolean(slots),
+    // the edition they collect with its books, for the reading counter
+    editionShelf:
+      slots && editions.line ? { line: editions.line, slots } : null,
     strip,
     saveFailed,
     undo,
