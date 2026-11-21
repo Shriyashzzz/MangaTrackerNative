@@ -1,13 +1,15 @@
 // A profile picture, as the web's components/avatar/Avatar.tsx: one of the
 // cast (core avatarArt, converted), or Kenji in a mood, on its own panel
-// colour, in a round frame. The three drawn here are the web's own too
+// colour, in a round frame. The three drawn here are the web's own too.
+// Printed: the colours stay the light theme's in dark mode, as on the web
 import type { ReactNode } from "react";
 import { View } from "react-native";
 import Svg, { Circle, Path, Rect } from "react-native-svg";
 import * as Art from "@/core/components/avatar/avatarArt";
 import KenjiArt from "@/core/components/mascot/Mascot";
 import { DEFAULT_AVATAR } from "@/core/lib/content/avatars";
-import { useColors, type Palette } from "@/lib/colors";
+import type { Palette } from "@/lib/colors";
+import { PRINTED } from "@/lib/printed";
 import { setSvgPalette, svgClass } from "@/lib/svgClass";
 
 const INK =
@@ -162,7 +164,7 @@ export default function Avatar({
   size?: number;
   border?: number;
 }) {
-  const c = useColors();
+  const c = PRINTED;
   setSvgPalette(c);
   const { art, panel } = ART[id ?? DEFAULT_AVATAR] ?? ART[DEFAULT_AVATAR]!;
   return (

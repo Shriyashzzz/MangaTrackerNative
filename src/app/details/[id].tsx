@@ -452,21 +452,22 @@ export default function DetailsScreen() {
                     {chip}
                   </Text>
                 ))}
-              {/* the edition they collect, or single volumes: the shelf, the
-                  counter and Buy next all follow it */}
-              {editions.lines.length ? (
-                <Pressable
-                  onPress={() => setPickingEdition(true)}
-                  accessibilityLabel={`Collected as ${editions.line?.label ?? "single volumes"}. Change`}
-                  className="flex-row items-center gap-1 rounded-[2px] border-[1.5px] border-line-soft px-2 py-0.5 active:bg-accent-wash"
-                >
-                  <Text className="font-body-medium text-[13px] text-ink">
-                    {editions.line?.label ?? "Single volumes"}
-                  </Text>
-                  <ChevronDownIcon color={c.ink} width={14} height={14} />
-                </Pressable>
-              ) : null}
             </View>
+            {/* the edition they collect, or single volumes, on a line of its
+                own under the chips: the shelf, the counter and Buy next all
+                follow it */}
+            {editions.lines.length ? (
+              <Pressable
+                onPress={() => setPickingEdition(true)}
+                accessibilityLabel={`Collected as ${editions.line?.label ?? "single volumes"}. Change`}
+                className="flex-row items-center gap-1 self-start rounded-[2px] border-[1.5px] border-line-soft px-2 py-0.5 active:bg-accent-wash"
+              >
+                <Text className="font-body-medium text-[13px] text-ink">
+                  {editions.line?.label ?? "Single volumes"}
+                </Text>
+                <ChevronDownIcon color={c.ink} width={14} height={14} />
+              </Pressable>
+            ) : null}
           </View>
         </View>
 
