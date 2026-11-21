@@ -71,8 +71,9 @@ export default function Sheet({
     }).start(onClose);
   };
   const pan = usePanGesture({
-    // a drag down takes the sheet; a drag up is the list's own scroll
-    activeOffsetY: [8, 8],
+    // a drag down of 8px takes the sheet (the upward bound is never reached:
+    // a drag up of 5px fails it first, and is the list's own scroll)
+    activeOffsetY: [-100000, 8],
     failOffsetY: [-5, 100000],
     enabled: atTop,
     runOnJS: true,
