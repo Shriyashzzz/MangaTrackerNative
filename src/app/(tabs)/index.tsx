@@ -18,6 +18,7 @@ import ShelfRow from "@/components/ShelfRow";
 import { ChevronDownIcon } from "@/core/components/icons/Icons";
 import type { Manga } from "@/core/lib/types";
 import { useColors } from "@/lib/colors";
+import { usePrefs } from "@/store/prefs";
 import { useShelf } from "@/store/shelf";
 
 const Safe = withUniwind(SafeAreaView);
@@ -42,6 +43,10 @@ export default function ShelfScreen() {
   const manga = useShelf((s) => s.manga);
   const failed = useShelf((s) => s.failed);
   const load = useShelf((s) => s.load);
+  const releases = useShelf((s) => s.releases);
+  const checkReleases = useShelf((s) => s.checkReleases);
+  const checksOn = usePrefs((s) => s.prefs.releaseChecks !== "off");
+  const trackBy = usePrefs((s) => s.prefs.trackBy ?? "series");
   const [tab, setTab] = useState<TabId>("all");
   const [picking, setPicking] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -49,6 +54,10 @@ export default function ShelfScreen() {
   useEffect(() => {
     void load();
   }, [load]);
+  // what's out for each series, once the shelf is here (the rows' "of 13")
+  useEffect(() => {
+    if (manga && checksOn) void checkReleases();
+  }, [manga, checksOn, checkReleases]);
 
   const shown = TABS.find((t) => t.id === tab)!;
   const list = (manga ?? []).filter(shown.has);
@@ -69,7 +78,7 @@ export default function ShelfScreen() {
           className="flex-row items-baseline gap-2"
           accessibilityLabel={`Showing ${shown.label}, ${list.length}. Change what's shown`}
         >
-          <Text className="font-brand text-[30px] tracking-[1px] text-ink uppercase">
+          <Text className="font-brand pr-1 text-[30px] tracking-[1px] text-ink uppercase">
             {shown.label}
           </Text>
           <Text className="font-mono text-[14px] text-muted">
@@ -87,7 +96,14 @@ export default function ShelfScreen() {
         <FlatList
           data={list}
           keyExtractor={(m) => String(m.id)}
-          renderItem={({ item }) => <ShelfRow manga={item} trackBy="series" />}
+          renderItem={({ item }) => (
+            <ShelfRow
+              manga={item}
+              trackBy={trackBy}
+              latestChapter={releases[item.id]?.latestChapter}
+              latestVolume={releases[item.id]?.latestVolume}
+            />
+          )}
           ItemSeparatorComponent={DashedLine}
           contentContainerClassName="px-4 pb-6"
           refreshControl={

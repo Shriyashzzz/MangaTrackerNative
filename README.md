@@ -65,6 +65,9 @@ Tailwind classes through [Uniwind](https://docs.uniwind.dev): `bg-paper`,
 `text-ink`, `font-brand`. Android needs one font name per weight, so it's
 `font-body-semibold`, not `font-body font-semibold`.
 
+Bangers (`font-brand`) leans right, and React Native sizes text without
+the lean, so the last letter gets cut: give every `font-brand` text `pr-1`.
+
 Components that aren't React Native's own (`expo-image`, safe areas) don't
 take `className`: wrap them with `withUniwind`, or give them plain styles.
 

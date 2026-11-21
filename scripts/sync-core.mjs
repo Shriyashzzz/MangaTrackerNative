@@ -20,8 +20,14 @@ const NATIVE = join(ROOT, "src/native");
 
 // web files that use the browser in a part the app never calls: copied as
 // they are. lib/shelf.ts: openReleasesOnShelf (sessionStorage), web only;
-// lib/volumeShelf.ts: pageScale (the page's font size), web only
-const BROWSER_OK = new Set(["lib/shelf.ts", "lib/volumeShelf.ts"]);
+// lib/volumeShelf.ts: pageScale (the page's font size), web only;
+// pages/Home/shelfViews.ts: its session storage is inside try, so the app
+// just gets the default
+const BROWSER_OK = new Set([
+  "lib/shelf.ts",
+  "lib/volumeShelf.ts",
+  "pages/Home/shelfViews.ts",
+]);
 
 // what the native screens use; everything they import comes along
 const ENTRIES = [
@@ -46,6 +52,12 @@ const ENTRIES = [
   "pages/Details/useBuyOptions.ts",
   "pages/Details/releaseNews.ts",
   "pages/Details/useOwnedVolumes.ts",
+  // the New tab (phase 3): who's in which pile, what each card says and links to
+  "pages/Home/piles.ts",
+  "pages/Home/newTabLinks.ts",
+  "pages/Home/farBehind.ts",
+  // prices (phase 3): which store row gets which award
+  "pages/Prices/offerLabels.ts",
 ];
 
 // browser-only things a copied file may not use

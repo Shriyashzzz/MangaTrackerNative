@@ -11,7 +11,7 @@ export default function PricesScreen() {
     <Safe edges={["top"]} className="flex-1 bg-paper">
       <AppHeader />
       <View className="flex-1 items-center justify-center px-8">
-        <Text className="font-brand text-[30px] text-ink uppercase">
+        <Text className="font-brand pr-1 text-[30px] text-ink uppercase">
           Prices
         </Text>
         <Text className="text-center font-body text-[15px] text-ink-soft">

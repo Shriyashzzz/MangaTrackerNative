@@ -16,7 +16,7 @@ export default function AppHeader() {
           <SvgXml xml={LOGO_SVG} width={30} height={30} />
           <Text
             numberOfLines={1}
-            className="font-brand text-[26px] tracking-[1px] text-ink uppercase"
+            className="font-brand pr-1 text-[26px] tracking-[1px] text-ink uppercase"
           >
             Manga Tracker
           </Text>

@@ -9,6 +9,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
+import BuyNext from "@/components/BuyNext";
 import DoubleRule from "@/components/DoubleRule";
 import Toast from "@/components/Toast";
 import VolumeStrip, { type StripSlots } from "@/components/VolumeStrip";
@@ -170,7 +171,7 @@ export default function DetailsScreen() {
         </Pressable>
         <Text
           numberOfLines={1}
-          className="flex-1 font-brand text-[24px] tracking-[1px] text-ink uppercase"
+          className="flex-1 font-brand pr-1 text-[24px] tracking-[1px] text-ink uppercase"
         >
           {manga.name}
         </Text>
@@ -213,46 +214,21 @@ export default function DetailsScreen() {
         {/* Buy next. Its room is kept while it loads, so the shelf under it
             doesn't jump when it arrives */}
         {buyOptions.loading ? <View className="h-[92px]" /> : null}
-        {!buyOptions.loading &&
-        (next || buyOptions.caughtUp || gaps.length > 0) ? (
-          <View className="gap-2">
-            <Text className="font-brand text-[22px] tracking-[1px] text-ink uppercase">
-              Buy next
-            </Text>
-            {next ? (
-              <View className="flex-row items-baseline justify-between rounded-[4px] border-2 border-accent bg-accent-wash px-3 py-2.5">
-                <View>
-                  <Text className="font-mono-medium text-[11.5px] tracking-[1px] text-accent-ink uppercase">
-                    {next.volume < highest ? "Fills a gap" : "Next for you"}
-                  </Text>
-                  <Text className="font-body-semibold text-[16px] text-ink">
-                    Vol. {next.volume}
-                  </Text>
-                </View>
-                <Text className="font-mono-medium text-[15px] text-accent-ink">
-                  {next.knownPriceCents != null
-                    ? formatCents(next.knownPriceCents)
-                    : "check price"}
-                </Text>
-              </View>
-            ) : buyOptions.caughtUp && buyOptions.latest ? (
-              <Text className="font-body text-[15px] text-ink-soft">
-                Caught up · Vol. {buyOptions.latest.volume} is the newest in
-                English
-              </Text>
-            ) : null}
-            {gaps.length > 0 && !slots ? (
-              <Text className="font-body text-[14px] text-ink-soft">
-                Not on your shelf: {rangesText(gaps)}
-              </Text>
-            ) : null}
-          </View>
-        ) : null}
+        <BuyNext
+          options={buyOptions}
+          edition={
+            editions.line && editions.plan
+              ? { line: editions.line, plan: editions.plan }
+              : null
+          }
+          highest={highest}
+          gaps={gaps}
+        />
 
         {/* Your shelf */}
         <View className="gap-2">
           <View className="flex-row items-baseline justify-between">
-            <Text className="font-brand text-[22px] tracking-[1px] text-ink uppercase">
+            <Text className="font-brand pr-1 text-[22px] tracking-[1px] text-ink uppercase">
               Your shelf
             </Text>
             <Text className="font-body text-[14px] text-ink-soft">{count}</Text>

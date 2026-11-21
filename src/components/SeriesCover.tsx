@@ -53,7 +53,7 @@ export default function SeriesCover({
       >
         <Text
           numberOfLines={4}
-          className="text-center font-brand text-[11px] text-ink-soft uppercase"
+          className="text-center font-brand pr-1 text-[11px] text-ink-soft uppercase"
         >
           {name}
         </Text>

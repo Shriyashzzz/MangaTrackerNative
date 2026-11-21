@@ -6,7 +6,10 @@ import type { ComponentProps } from "react";
 import { Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BellIcon, ShelfIcon, TagIcon } from "@/core/components/icons/Icons";
+import { editionReleases } from "@/core/lib/editionNews";
+import { countNew } from "@/core/lib/releaseMath";
 import { useColors } from "@/lib/colors";
+import { useShelf } from "@/store/shelf";
 import DoubleRule from "./DoubleRule";
 
 const TABS: Record<string, { label: string; Icon: typeof ShelfIcon }> = {
@@ -23,6 +26,12 @@ type BarProps = Parameters<
 export default function BottomBar({ state, navigateToTab }: BarProps) {
   const c = useColors();
   const insets = useSafeAreaInsets();
+  // New's badge: the series with news, as the web's bar counts them
+  const manga = useShelf((st) => st.manga);
+  const releases = useShelf((st) => st.releases);
+  const newCount = manga
+    ? countNew(manga, editionReleases(manga, releases))
+    : 0;
   return (
     <View className="bg-paper" style={{ paddingBottom: insets.bottom }}>
       <DoubleRule />
@@ -49,9 +58,16 @@ export default function BottomBar({ state, navigateToTab }: BarProps) {
                   width={24}
                   height={24}
                 />
+                {route.name === "new" && newCount > 0 ? (
+                  <View className="absolute -top-[3px] left-[38px] h-[18px] min-w-[18px] items-center justify-center rounded-[9px] bg-accent px-[5px]">
+                    <Text className="font-body-semibold text-[11px] text-on-accent">
+                      {newCount}
+                    </Text>
+                  </View>
+                ) : null}
               </View>
               <Text
-                className={`font-brand text-[15px] tracking-[1px] uppercase ${open ? "text-ink" : "text-ink-soft"}`}
+                className={`font-brand pr-1 text-[15px] tracking-[1px] uppercase ${open ? "text-ink" : "text-ink-soft"}`}
               >
                 {tab.label}
               </Text>
