@@ -14,7 +14,7 @@ import {
   type BottomSheetBackdropProps,
   type BottomSheetScrollViewMethods,
 } from "@gorhom/bottom-sheet";
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useWindowDimensions } from "react-native";
 import { useColors } from "@/lib/colors";
 
@@ -67,10 +67,18 @@ export default function Sheet({
   const { height: screen } = useWindowDimensions();
   const sheet = useRef<BottomSheetModal>(null);
   const list = useRef<BottomSheetScrollViewMethods>(null);
+  // in the tree only while it's up: a closed modal left mounted goes on
+  // taking the taps meant for the page under it. It mounts when asked to
+  // open, presents itself, and leaves once its closing slide has finished
+  const [mounted, setMounted] = useState(open);
   useEffect(() => {
-    if (open) sheet.current?.present();
+    if (open) setMounted(true);
     else sheet.current?.dismiss();
   }, [open]);
+  useEffect(() => {
+    if (mounted) sheet.current?.present();
+  }, [mounted]);
+  if (!mounted) return null;
 
   const padding = paddingOf(contentClassName);
   return (
@@ -79,7 +87,10 @@ export default function Sheet({
       enableDynamicSizing
       maxDynamicContentSize={screen * maxHeight}
       enablePanDownToClose
-      onDismiss={onClose}
+      onDismiss={() => {
+        setMounted(false);
+        onClose();
+      }}
       backdropComponent={Backdrop}
       backgroundStyle={{
         backgroundColor: c.card,
