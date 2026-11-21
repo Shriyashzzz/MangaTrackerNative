@@ -3,7 +3,7 @@
 // isn't on the shelf yet. Its name, To read or Reading (and the chapter),
 // the series' spines to tick the other volumes they own, and Don't ask again
 import { useEffect, useRef, useState } from "react";
-import { Modal, Pressable, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { getSeries, novelParts } from "@/core/lib/prices";
 import { onSale } from "@/core/lib/releaseDate";
 import {
@@ -17,6 +17,7 @@ import { usePrefs } from "@/store/prefs";
 import Button from "./Button";
 import { Field, Input } from "./Field";
 import Segmented from "./Segmented";
+import Sheet from "./Sheet";
 import SeriesCover from "./SeriesCover";
 import Switch from "./Switch";
 import VolumeStrip from "./VolumeStrip";
@@ -108,23 +109,12 @@ export default function AddSeriesModal({
   const sure = Boolean(settled.volumes?.length);
 
   return (
-    <Modal
-      visible
-      transparent
-      animationType="slide"
-      onRequestClose={saving ? () => {} : close}
-    >
-      <Pressable
-        className="flex-1 bg-black/40"
-        onPress={saving ? undefined : close}
-        accessibilityLabel="Close"
-      />
-      <View className="max-h-[88%] rounded-t-2xl bg-card">
+    <Sheet open onClose={saving ? () => {} : close} scroll={false}>
+      <View className="max-h-[80%]">
         <ScrollView
-          contentContainerClassName="gap-4 px-5 pt-3 pb-4"
+          contentContainerClassName="gap-4 px-5 pt-1 pb-4"
           keyboardShouldPersistTaps="handled"
         >
-          <View className="h-1 w-9 self-center rounded-full bg-muted/50" />
           <Text className="font-display text-[22px] text-ink">
             Add it to your shelf?
           </Text>
@@ -233,6 +223,6 @@ export default function AddSeriesModal({
           />
         </View>
       </View>
-    </Modal>
+    </Sheet>
   );
 }

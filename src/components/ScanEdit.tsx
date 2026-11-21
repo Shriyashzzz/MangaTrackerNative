@@ -3,7 +3,7 @@
 // holds. Also the question when the app couldn't tell the volumes itself
 import { Image } from "expo-image";
 import { useEffect, useState } from "react";
-import { Modal, Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { aniListGapMs, searchSeries, type SeriesHit } from "@/core/lib/anilist";
 import { volumesFrom } from "@/core/lib/barcode";
 import { knownNamesNear } from "@/core/lib/knownNames";
@@ -11,6 +11,7 @@ import { DID_YOU_MEAN, withNearMatches } from "@/core/lib/nearMatches";
 import { useColors } from "@/lib/colors";
 import Button from "./Button";
 import { Field, Input } from "./Field";
+import Sheet from "./Sheet";
 
 const TYPING_PAUSE_MS = 450;
 type Found =
@@ -176,54 +177,47 @@ export default function ScanEdit({
   );
 
   return (
-    <Modal visible transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable
-        className="flex-1 bg-black/40"
-        onPress={onClose}
-        accessibilityLabel="Close"
-      />
-      <ScrollView
-        className="max-h-[85%] rounded-t-2xl bg-card"
-        contentContainerClassName="gap-4 px-5 pt-3 pb-8"
-        keyboardShouldPersistTaps="handled"
-      >
-        <View className="h-1 w-9 self-center rounded-full bg-muted/50" />
-        <View>
-          <Text className="font-display text-[21px] text-ink">
-            {asking ? "Which volumes are in this book?" : "Edit this scan"}
+    <Sheet
+      open
+      onClose={onClose}
+      maxHeight={0.85}
+      contentClassName="gap-4 px-5 pt-1 pb-8"
+    >
+      <View>
+        <Text className="font-display text-[21px] text-ink">
+          {asking ? "Which volumes are in this book?" : "Edit this scan"}
+        </Text>
+        <Text className="font-body text-[14px] text-ink-soft">
+          {asking
+            ? `${[name, bookOf(asking)].filter(Boolean).join(" · ")}. We couldn't tell, so nothing is on your shelf yet.`
+            : `Scanned as ${name}, vol. ${volumes.join(" & ")}`}
+        </Text>
+      </View>
+      {asking ? volumesField : null}
+      {seriesField}
+      {!asking ? volumesField : null}
+      {onOpenSeries ? (
+        <Pressable onPress={onOpenSeries} hitSlop={6}>
+          <Text className="font-body-medium text-[14px] text-ink-soft underline">
+            Chapter, status or notes? Open the series' edit page
           </Text>
-          <Text className="font-body text-[14px] text-ink-soft">
-            {asking
-              ? `${[name, bookOf(asking)].filter(Boolean).join(" · ")}. We couldn't tell, so nothing is on your shelf yet.`
-              : `Scanned as ${name}, vol. ${volumes.join(" & ")}`}
-          </Text>
-        </View>
-        {asking ? volumesField : null}
-        {seriesField}
-        {!asking ? volumesField : null}
-        {onOpenSeries ? (
-          <Pressable onPress={onOpenSeries} hitSlop={6}>
-            <Text className="font-body-medium text-[14px] text-ink-soft underline">
-              Chapter, status or notes? Open the series' edit page
-            </Text>
-          </Pressable>
-        ) : null}
-        {problem ? (
-          <Text className="font-body-medium text-[14px] text-accent">
-            {problem}
-          </Text>
-        ) : null}
-        <View className="flex-row justify-end gap-3">
-          <Button label="Cancel" small onPress={onClose} />
-          <Button
-            label={saving ? "Saving…" : asking ? "Add to my shelf" : "Save"}
-            kind="primary"
-            small
-            disabled={!chosen || saving}
-            onPress={() => void save()}
-          />
-        </View>
-      </ScrollView>
-    </Modal>
+        </Pressable>
+      ) : null}
+      {problem ? (
+        <Text className="font-body-medium text-[14px] text-accent">
+          {problem}
+        </Text>
+      ) : null}
+      <View className="flex-row justify-end gap-3">
+        <Button label="Cancel" small onPress={onClose} />
+        <Button
+          label={saving ? "Saving…" : asking ? "Add to my shelf" : "Save"}
+          kind="primary"
+          small
+          disabled={!chosen || saving}
+          onPress={() => void save()}
+        />
+      </View>
+    </Sheet>
   );
 }
