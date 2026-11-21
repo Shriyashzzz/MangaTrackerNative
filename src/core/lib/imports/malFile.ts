@@ -16,7 +16,8 @@ import {
 export type MalFile = { uri: string; name: string; size: number };
 
 export async function readMalExport(file: MalFile): Promise<MalItem[]> {
-  if (file.size > MAX_MAL_FILE_BYTES) throw new ImportFileError(MAL_FILE_TOO_BIG);
+  if (file.size > MAX_MAL_FILE_BYTES)
+    throw new ImportFileError(MAL_FILE_TOO_BIG);
   const bytes = new Uint8Array(await new File(file.uri).arrayBuffer());
   return malItemsFromXml(unpackMalExport(bytes));
 }
