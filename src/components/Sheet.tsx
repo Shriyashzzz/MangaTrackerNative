@@ -1,35 +1,48 @@
 // Android's bottom sheet, as every sheet in the web app behaves
 // (lib/sheetSwipe.ts, index.css .app-sheet-dialog): up from the foot of the
-// screen with a handle, over a dimmed page. It follows the finger down from
-// its top and closes past a mark or on a quick flick, and springs back
-// otherwise. Only while its list is scrolled to its top, so a long list
-// still scrolls: dragging up scrolls, dragging down at the top closes
+// screen with a handle, over a dimmed page, as tall as what's in it up to
+// most of the screen. It follows the finger down and closes past a mark or
+// on a quick flick, and springs back otherwise. A long list scrolls inside
+// it: dragging up scrolls, dragging down once at the top closes. Built on
+// @gorhom/bottom-sheet, which does that nested drag the way the system's
+// own sheets do
 import {
-  useEffect,
-  useRef,
-  useState,
-  type ComponentRef,
-  type ReactNode,
-} from "react";
-import {
-  Animated,
-  Modal,
-  Pressable,
-  useWindowDimensions,
-  View,
-  type NativeScrollEvent,
-  type NativeSyntheticEvent,
-} from "react-native";
-import {
-  GestureDetector,
-  ScrollView,
-  usePanGesture,
-} from "react-native-gesture-handler";
+  BottomSheetBackdrop,
+  BottomSheetModal,
+  BottomSheetScrollView,
+  BottomSheetView,
+  type BottomSheetBackdropProps,
+  type BottomSheetScrollViewMethods,
+} from "@gorhom/bottom-sheet";
+import { useEffect, useRef, type ReactNode } from "react";
+import { useWindowDimensions } from "react-native";
+import { useColors } from "@/lib/colors";
 
-// how far, or how fast, a swipe closes it
-const CLOSE_PX = 90;
-const FLICK_PX_PER_MS = 0.6;
-type Scroller = ComponentRef<typeof ScrollView>;
+// the few paddings sheets ask for, as Tailwind classes ("px-4 pb-8"), in
+// points: the sheet's content view takes plain styles only
+function paddingOf(classes: string) {
+  const points = (side: string) => {
+    const found = classes.match(
+      new RegExp(`(?:^|\\s)${side}-(\\d+(?:\\.\\d+)?)`),
+    );
+    return found ? Number(found[1]) * 4 : 0;
+  };
+  return {
+    paddingHorizontal: points("px"),
+    paddingTop: points("pt"),
+    paddingBottom: points("pb"),
+  };
+}
+
+const Backdrop = (props: BottomSheetBackdropProps) => (
+  <BottomSheetBackdrop
+    {...props}
+    appearsOnIndex={0}
+    disappearsOnIndex={-1}
+    opacity={0.4}
+    pressBehavior="close"
+  />
+);
 
 export default function Sheet({
   open,
@@ -41,7 +54,6 @@ export default function Sheet({
   fromTheFoot = false,
   maxHeight = 0.88,
   contentClassName = "px-4 pb-8",
-  onScrollRef,
 }: {
   open: boolean;
   onClose: () => void;
@@ -50,109 +62,59 @@ export default function Sheet({
   fromTheFoot?: boolean;
   maxHeight?: number;
   contentClassName?: string;
-  onScrollRef?: (scroller: Scroller | null) => void;
 }) {
+  const c = useColors();
   const { height: screen } = useWindowDimensions();
-  const [slide] = useState(() => new Animated.Value(0));
-  const [atTop, setAtTop] = useState(true);
-  const dragStart = useRef(0);
-  const scroller = useRef<Scroller | null>(null);
-  const moved = useRef(0);
-  const startedAt = useRef(0);
+  const sheet = useRef<BottomSheetModal>(null);
+  const list = useRef<BottomSheetScrollViewMethods>(null);
   useEffect(() => {
-    if (open) slide.setValue(0);
-  }, [open, slide]);
+    if (open) sheet.current?.present();
+    else sheet.current?.dismiss();
+  }, [open]);
 
-  const close = () => {
-    Animated.timing(slide, {
-      toValue: screen,
-      duration: 200,
-      useNativeDriver: true,
-    }).start(onClose);
-  };
-  const pan = usePanGesture({
-    // a drag down of 8px takes the sheet (the upward bound is never reached:
-    // a drag up of 5px fails it first, and is the list's own scroll)
-    activeOffsetY: [-100000, 8],
-    failOffsetY: [-5, 100000],
-    enabled: atTop,
-    runOnJS: true,
-    onActivate: () => {
-      moved.current = 0;
-      startedAt.current = Date.now();
-    },
-    onUpdate: (e) => {
-      moved.current = e.translationY;
-      slide.setValue(Math.max(0, e.translationY));
-    },
-    onFinalize: () => {
-      const fast = moved.current / Math.max(1, Date.now() - startedAt.current);
-      if (moved.current > CLOSE_PX || fast > FLICK_PX_PER_MS) close();
-      else
-        Animated.spring(slide, {
-          toValue: 0,
-          useNativeDriver: true,
-          bounciness: 2,
-        }).start();
-    },
-  });
-  const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) =>
-    setAtTop(e.nativeEvent.contentOffset.y <= 1);
-
+  const padding = paddingOf(contentClassName);
   return (
-    <Modal
-      visible={open}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-      statusBarTranslucent
+    <BottomSheetModal
+      ref={sheet}
+      enableDynamicSizing
+      maxDynamicContentSize={screen * maxHeight}
+      enablePanDownToClose
+      onDismiss={onClose}
+      backdropComponent={Backdrop}
+      backgroundStyle={{
+        backgroundColor: c.card,
+        borderTopLeftRadius: 28,
+        borderTopRightRadius: 28,
+      }}
+      handleIndicatorStyle={{
+        backgroundColor: c.lineSoft,
+        width: 32,
+        height: 4,
+      }}
+      keyboardBehavior="interactive"
+      keyboardBlurBehavior="restore"
+      android_keyboardInputMode="adjustResize"
     >
-      <Pressable
-        className="flex-1 bg-black/40"
-        onPress={onClose}
-        accessibilityLabel="Close"
-      />
-      <GestureDetector gesture={pan}>
-        <Animated.View
-          style={{
-            transform: [{ translateY: slide }],
-            maxHeight: screen * maxHeight,
+      {scroll ? (
+        <BottomSheetScrollView
+          ref={list}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={
+            fromTheFoot
+              ? { ...padding, flexGrow: 1, justifyContent: "flex-end" }
+              : padding
+          }
+          onContentSizeChange={() => {
+            if (fromTheFoot) list.current?.scrollToEnd({ animated: false });
           }}
-          className="rounded-t-[28px] bg-card"
         >
-          <View className="mt-3 mb-1 h-1 w-8 self-center rounded-full bg-line-soft" />
-          {scroll ? (
-            <ScrollView
-              ref={(r) => {
-                scroller.current = r;
-                onScrollRef?.(r);
-              }}
-              onScroll={onScroll}
-              scrollEventThrottle={32}
-              overScrollMode="never"
-              bounces={false}
-              keyboardShouldPersistTaps="handled"
-              contentContainerClassName={contentClassName}
-              contentContainerStyle={
-                fromTheFoot
-                  ? { flexGrow: 1, justifyContent: "flex-end" }
-                  : undefined
-              }
-              onContentSizeChange={() => {
-                if (fromTheFoot && dragStart.current === 0) {
-                  dragStart.current = 1;
-                  scroller.current?.scrollToEnd({ animated: false });
-                  setAtTop(false);
-                }
-              }}
-            >
-              {children}
-            </ScrollView>
-          ) : (
-            children
-          )}
-        </Animated.View>
-      </GestureDetector>
-    </Modal>
+          {children}
+        </BottomSheetScrollView>
+      ) : (
+        <BottomSheetView style={{ ...padding, flex: 1 }}>
+          {children}
+        </BottomSheetView>
+      )}
+    </BottomSheetModal>
   );
 }

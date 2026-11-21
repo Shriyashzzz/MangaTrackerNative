@@ -81,6 +81,10 @@ control the app uses it:
 
 - Pick-one lists (the shelf's tab and sort, genres, editions) are bottom
   sheets, not dropdowns.
+- Every sheet is `@gorhom/bottom-sheet`: it follows the finger down and
+  closes, and a long list inside it scrolls until it's at the top, as the
+  system's own sheets do.
+- Changing tab slides the pages sideways, as an iPhone's do.
 - Questions (delete a series, clear To buy) are the system's own alerts.
 - "Bought on" opens Android's date picker.
 - The + button floats above the tab bar; Select starts with a long press.

@@ -22,6 +22,7 @@ import { Uniwind } from "uniwind";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { loadDeviceStore } from "@/lib/deviceStore";
 import { useAuth } from "@/store/auth";
@@ -65,43 +66,45 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <StatusBar style="auto" />
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Protected guard={isSignedIn}>
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="details/[id]" />
-          <Stack.Screen name="edit/[id]" />
-          <Stack.Screen name="add" />
-          <Stack.Screen name="scan" />
-          <Stack.Screen name="settings" />
-          <Stack.Screen name="to-buy" />
-          <Stack.Screen name="new-releases" />
-          <Stack.Screen name="friends" />
-          <Stack.Screen name="import" />
-          <Stack.Screen name="after-anime/index" />
-          <Stack.Screen name="after-anime/[slug]" />
-          <Stack.Screen name="updates" />
-          <Stack.Screen name="faq" />
-          <Stack.Screen name="about" />
-          <Stack.Screen name="acknowledgements" />
-          <Stack.Screen name="privacy" />
-          <Stack.Screen name="calendar" />
-          <Stack.Screen name="editions" />
-          <Stack.Screen name="deals" />
-          <Stack.Screen name="series" />
-          <Stack.Screen name="year" />
-          <Stack.Screen name="u/[code]" />
-          <Stack.Screen name="prices/series" />
-          <Stack.Screen name="prices/[isbn]" />
-        </Stack.Protected>
-        <Stack.Protected guard={!isSignedIn}>
-          <Stack.Screen name="sign-in" />
-          <Stack.Screen name="sign-up" />
-          <Stack.Screen name="forgot-password" />
-        </Stack.Protected>
-        {/* from a reset link, signed in or not */}
-        <Stack.Screen name="reset-password/[token]" />
-      </Stack>
+      <BottomSheetModalProvider>
+        <StatusBar style="auto" />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Protected guard={isSignedIn}>
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="details/[id]" />
+            <Stack.Screen name="edit/[id]" />
+            <Stack.Screen name="add" />
+            <Stack.Screen name="scan" />
+            <Stack.Screen name="settings" />
+            <Stack.Screen name="to-buy" />
+            <Stack.Screen name="new-releases" />
+            <Stack.Screen name="friends" />
+            <Stack.Screen name="import" />
+            <Stack.Screen name="after-anime/index" />
+            <Stack.Screen name="after-anime/[slug]" />
+            <Stack.Screen name="updates" />
+            <Stack.Screen name="faq" />
+            <Stack.Screen name="about" />
+            <Stack.Screen name="acknowledgements" />
+            <Stack.Screen name="privacy" />
+            <Stack.Screen name="calendar" />
+            <Stack.Screen name="editions" />
+            <Stack.Screen name="deals" />
+            <Stack.Screen name="series" />
+            <Stack.Screen name="year" />
+            <Stack.Screen name="u/[code]" />
+            <Stack.Screen name="prices/series" />
+            <Stack.Screen name="prices/[isbn]" />
+          </Stack.Protected>
+          <Stack.Protected guard={!isSignedIn}>
+            <Stack.Screen name="sign-in" />
+            <Stack.Screen name="sign-up" />
+            <Stack.Screen name="forgot-password" />
+          </Stack.Protected>
+          {/* from a reset link, signed in or not */}
+          <Stack.Screen name="reset-password/[token]" />
+        </Stack>
+      </BottomSheetModalProvider>
     </GestureHandlerRootView>
   );
 }
