@@ -83,6 +83,7 @@ export default function RootLayout() {
           <Stack.Screen name="updates" />
           <Stack.Screen name="faq" />
           <Stack.Screen name="about" />
+          <Stack.Screen name="acknowledgements" />
           <Stack.Screen name="privacy" />
           <Stack.Screen name="calendar" />
           <Stack.Screen name="editions" />
@@ -95,7 +96,11 @@ export default function RootLayout() {
         </Stack.Protected>
         <Stack.Protected guard={!isSignedIn}>
           <Stack.Screen name="sign-in" />
+          <Stack.Screen name="sign-up" />
+          <Stack.Screen name="forgot-password" />
         </Stack.Protected>
+        {/* from a reset link, signed in or not */}
+        <Stack.Screen name="reset-password/[token]" />
       </Stack>
     </GestureHandlerRootView>
   );

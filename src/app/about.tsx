@@ -126,6 +126,9 @@ export default function AboutScreen() {
       <P muted>
         <TextLink href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</TextLink>
       </P>
+      <TextLink onPress={() => router.push("/acknowledgements")}>
+        Acknowledgements
+      </TextLink>
       <TextLink onPress={() => router.push("/privacy")}>
         Privacy policy
       </TextLink>

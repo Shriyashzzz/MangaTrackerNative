@@ -11,7 +11,9 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
+import AuthArt from "@/components/AuthArt";
 import { useAuth } from "@/store/auth";
+import { router } from "expo-router";
 
 const Safe = withUniwind(SafeAreaView);
 
@@ -48,14 +50,11 @@ export default function SignIn() {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1 justify-center gap-5 px-6"
       >
-        <View className="gap-1">
-          <Text className="font-brand pr-1 text-[44px] tracking-[1px] text-ink uppercase">
-            Welcome back!
-          </Text>
-          <Text className="font-body text-[16px] text-ink-soft">
-            Your shelf is right where you left it.
-          </Text>
-        </View>
+        <AuthArt
+          sfx="Welcome back!"
+          chapter="374"
+          line="Your shelf is right where you left it."
+        />
         <View className="gap-1.5">
           <Text className="font-body-medium text-[15px] text-ink">
             Username
@@ -87,6 +86,12 @@ export default function SignIn() {
             textContentType="password"
             onSubmitEditing={submit}
           />
+          <Text
+            onPress={() => router.push("/forgot-password")}
+            className="self-end font-body-medium text-[13.5px] text-ink-soft underline"
+          >
+            Forgot password?
+          </Text>
         </View>
         {error ? (
           <Text className="font-body-medium text-[15px] text-accent">
@@ -102,6 +107,15 @@ export default function SignIn() {
             {loading ? "Signing in…" : "Sign in"}
           </Text>
         </Pressable>
+        <Text className="text-center font-body text-[14.5px] text-ink-soft">
+          Don't have an account?{" "}
+          <Text
+            onPress={() => router.push("/sign-up")}
+            className="font-body-semibold text-ink underline"
+          >
+            Sign up
+          </Text>
+        </Text>
       </KeyboardAvoidingView>
     </Safe>
   );

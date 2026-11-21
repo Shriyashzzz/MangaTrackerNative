@@ -8,6 +8,12 @@ type AuthState = {
   check: () => Promise<void>;
   // the server's messages when it says no; none when it's done
   signIn: (username: string, password: string) => Promise<string[]>;
+  // a new account, signed in once made; the server's messages when it says no
+  signUp: (
+    username: string,
+    password: string,
+    email: string,
+  ) => Promise<string[]>;
   logOut: () => Promise<void>;
 };
 
@@ -30,6 +36,18 @@ export const useAuth = create<AuthState>()((set) => ({
       body: { username, password },
     });
     if (res.status === 200) {
+      set({ isSignedIn: true });
+      return [];
+    }
+    return errorMessages(res);
+  },
+
+  signUp: async (username, password, email) => {
+    const res = await apiFetch("/api/auth/signup", {
+      method: "POST",
+      body: { username, password, ...(email ? { email } : {}) },
+    });
+    if (res.ok) {
       set({ isSignedIn: true });
       return [];
     }
