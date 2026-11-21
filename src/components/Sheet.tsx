@@ -71,9 +71,10 @@ export default function Sheet({
   // taking the taps meant for the page under it. It mounts when asked to
   // open, presents itself, and leaves once its closing slide has finished
   const [mounted, setMounted] = useState(open);
+  // asked to open: in the tree from this render on
+  if (open && !mounted) setMounted(true);
   useEffect(() => {
-    if (open) setMounted(true);
-    else sheet.current?.dismiss();
+    if (!open) sheet.current?.dismiss();
   }, [open]);
   useEffect(() => {
     if (mounted) sheet.current?.present();
