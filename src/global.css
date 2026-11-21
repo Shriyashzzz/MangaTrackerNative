@@ -23,6 +23,12 @@
       --color-ok: #2e6b4c;
       --color-star: #d99a00;
       --color-star-off: #7f7562;
+      --color-award-new: #2e6b4c;
+      --color-on-award-new: #fffaf2;
+      --color-award-market: #e0a21b;
+      --color-award-set: #3d4f9e;
+      --color-on-award-set: #fffaf2;
+      --color-stamp-ink: #1d1a16;
     }
     @variant dark {
       --color-paper: #16140f;
@@ -41,6 +47,12 @@
       --color-ok: #6fbf8f;
       --color-star: #f2b630;
       --color-star-off: #7d7362;
+      --color-award-new: #6fbf8f;
+      --color-on-award-new: #16140f;
+      --color-award-market: #f2b630;
+      --color-award-set: #9fb0ec;
+      --color-on-award-set: #16140f;
+      --color-stamp-ink: #16140f;
     }
   }
 }
