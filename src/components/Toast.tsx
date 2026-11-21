@@ -1,6 +1,6 @@
 // A note pinned to the foot of the screen, with an action: "6 volumes taken
 // off your shelf · UNDO", as the web's components/toast. It goes by itself
-// after 7 seconds
+// after 7 seconds. No action word: a note alone
 import { useEffect } from "react";
 import { Pressable, Text, View } from "react-native";
 
@@ -26,11 +26,13 @@ export default function Toast({
       <Text className="min-w-0 flex-1 font-body text-[15px] text-paper">
         {text}
       </Text>
-      <Pressable onPress={onAction} hitSlop={10}>
-        <Text className="font-body-semibold text-[15px] tracking-[0.5px] text-accent uppercase">
-          {action}
-        </Text>
-      </Pressable>
+      {action ? (
+        <Pressable onPress={onAction} hitSlop={10}>
+          <Text className="font-body-semibold text-[15px] tracking-[0.5px] text-accent uppercase">
+            {action}
+          </Text>
+        </Pressable>
+      ) : null}
     </View>
   );
 }
