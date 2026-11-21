@@ -96,6 +96,24 @@ const ENTRIES = [
   "lib/addToCalendar.ts",
   // "Checked 6 h ago" (the app's own stand-in)
   "lib/releaseCache.ts",
+  // the price pages' rules: the series grid, box sets, reviews' words, what
+  // a series costs, which book holds a volume, loading a volume with a live
+  // check, the recent searches
+  "pages/Prices/seriesPageRules.ts",
+  "pages/Prices/boxSetRules.ts",
+  "pages/Prices/setsBoxRules.ts",
+  "pages/Prices/reviews/reviewText.ts",
+  "pages/Prices/useVolumeLoad.ts",
+  "pages/Prices/reviews/useVolumeReviews.ts",
+  "pages/Prices/useSeriesData.ts",
+  "pages/Prices/canada/useCanadaPrices.ts",
+  "lib/finishCost.ts",
+  "lib/editionLookup.ts",
+  "lib/recentSearches.ts",
+  "lib/support.ts",
+  // the editions index page
+  "lib/editionsIndex.ts",
+  "lib/editionsWords.ts",
 ];
 
 // browser-only things a copied file may not use

@@ -82,6 +82,9 @@ export default function RootLayout() {
           <Stack.Screen name="about" />
           <Stack.Screen name="privacy" />
           <Stack.Screen name="calendar" />
+          <Stack.Screen name="editions" />
+          <Stack.Screen name="deals" />
+          <Stack.Screen name="series" />
           <Stack.Screen name="prices/series" />
           <Stack.Screen name="prices/[isbn]" />
         </Stack.Protected>
