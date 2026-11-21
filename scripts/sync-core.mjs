@@ -114,6 +114,13 @@ const ENTRIES = [
   // the editions index page
   "lib/editionsIndex.ts",
   "lib/editionsWords.ts",
+  // a shared shelf's rules, and your year in manga
+  "pages/SharedShelf/shareParts.ts",
+  "pages/SharedShelf/shelfNumbers.ts",
+  "pages/SharedShelf/sharedShelfView.ts",
+  "pages/SharedShelf/compare.ts",
+  "pages/SharedShelf/addToRead.ts",
+  "lib/sharePicks.ts",
 ];
 
 // browser-only things a copied file may not use

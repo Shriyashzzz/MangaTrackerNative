@@ -126,7 +126,7 @@ export default function SettingsMenu({
         <Item
           icon={StarIcon}
           label="Your year in manga"
-          onPress={() => void Linking.openURL(`${siteOrigin()}/year`)}
+          onPress={() => router.push("/year")}
         />
       ) : null}
       <Item

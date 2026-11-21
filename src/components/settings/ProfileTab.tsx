@@ -19,6 +19,7 @@ import {
   View,
   type LayoutChangeEvent,
 } from "react-native";
+import { router } from "expo-router";
 import { shareUrl, type Account } from "@/core/lib/account";
 import {
   AVATARS,
@@ -278,7 +279,12 @@ export default function ProfileTab({
                 <Button
                   label="Preview"
                   small
-                  onPress={() => void Linking.openURL(link)}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/u/[code]",
+                      params: { code: account.shareCode! },
+                    })
+                  }
                 />
               </View>
             </View>

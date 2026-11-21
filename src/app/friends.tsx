@@ -1,8 +1,8 @@
 // Friends, as the web's pages/Friends/Friends.tsx: the shared shelves they
 // follow, each a way to that shelf, with Unfollow
 import { useEffect, useState } from "react";
-import { Linking, Pressable, Text, View } from "react-native";
-import { shareUrl } from "@/core/lib/account";
+import { router } from "expo-router";
+import { Pressable, Text, View } from "react-native";
 import Page, { Bullet, P } from "@/components/Page";
 import { getFriends, setFollowing, type Friend } from "@/core/lib/friends";
 
@@ -42,7 +42,12 @@ export default function FriendsScreen() {
           className="flex-row items-center gap-3 border-b border-dashed border-line-soft pb-3"
         >
           <Pressable
-            onPress={() => void Linking.openURL(shareUrl(friend.code))}
+            onPress={() =>
+              router.push({
+                pathname: "/u/[code]",
+                params: { code: friend.code },
+              })
+            }
             className="min-w-0 flex-1"
           >
             <Text className="font-body-semibold text-[16px] text-ink underline">

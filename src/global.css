@@ -29,6 +29,7 @@
       --color-award-set: #3d4f9e;
       --color-on-award-set: #fffaf2;
       --color-stamp-ink: #1d1a16;
+      --color-stamp-get: #f2c9bf;
     }
     @variant dark {
       --color-paper: #16140f;
@@ -53,6 +54,7 @@
       --color-award-set: #9fb0ec;
       --color-on-award-set: #16140f;
       --color-stamp-ink: #16140f;
+      --color-stamp-get: #e59a8b;
     }
   }
 }
