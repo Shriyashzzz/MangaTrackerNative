@@ -89,12 +89,24 @@ control the app uses it:
   has a slider).
 - Share my list and Export my list hand the link or the file to the
   phone's share sheet.
-- Your year in manga, the import and shared shelves open on the website
-  until the app has pages of its own.
+- The import picks files with the phone's file picker; a MyAnimeList
+  export is read on the phone (the same reader as the website's, in
+  `src/core/lib/imports`), and a book import carries on in the app's store
+  if you leave the page.
+- After the anime's show list has a "Show more" button instead of page
+  numbers.
+- Sign in with Google is not in the app yet; the account pages (sign up,
+  forgot and reset password) are.
 
 ## Not done yet
 
-- Your year in manga, the import, shared shelves (web pages for now)
+- Sign in with Google (the website has it; the app needs Google's own
+  sign-in and the server to take its token)
+- The reset-password screen exists, but a reset email's link opens the
+  website: for the app to open it, the site needs an `assetlinks.json` for
+  this app's package
+- Owner tools (reported reviews, fixes to review, reported books), the
+  tour and practice account
 - Alerts on the phone (the server sends web push today; the app needs its
   own tokens)
 - Linking Google to an account from the app
