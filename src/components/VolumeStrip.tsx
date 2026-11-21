@@ -58,6 +58,8 @@ type Props = {
   // a page opens near this one; else where they are, or the next after theirs
   opensAt?: number | null;
   slots?: StripSlots;
+  // ordered and on their way: drawn in outline red, said in the name
+  ordered?: number[];
 };
 
 // Android's own light click; a phone without one just stays still
@@ -68,6 +70,7 @@ const tick = () => {
 export default function VolumeStrip({
   total,
   owned,
+  ordered = [],
   onToggle,
   onPaint,
   onSlideStart,
@@ -78,6 +81,7 @@ export default function VolumeStrip({
 }: Props) {
   const c = useColors();
   const yours = new Set(owned);
+  const onTheWay = new Set(ordered);
   const [width, setWidth] = useState(0);
   const [pageStart, setPageStart] = useState<number | null>(null);
   const full = (slots?.bookWidth ?? BOOK) + 2 * GAP;
@@ -206,6 +210,7 @@ export default function VolumeStrip({
                 v={v}
                 width={full}
                 theirs={yours.has(v)}
+                ordered={!yours.has(v) && onTheWay.has(v)}
                 here={here === v}
                 spine={slots?.spine(v) ?? String(v)}
                 share={!yours.has(v) && slots ? slots.share(v) : 0}
@@ -248,10 +253,12 @@ function Book({
   share,
   runName,
   apart,
+  ordered = false,
 }: {
   v: number;
   width: number;
   theirs: boolean;
+  ordered?: boolean;
   here: boolean;
   spine: string;
   share: number;
@@ -275,10 +282,14 @@ function Book({
     look = "border-[1.5px] border-ink bg-paper";
     ink = "text-ink";
   }
+  if (ordered && !theirs && !here) {
+    look = "border-[1.5px] border-dashed border-accent bg-accent-wash";
+    ink = "text-accent-ink";
+  }
   return (
     <View
       style={{ width, paddingHorizontal: GAP / 2, marginLeft: apart ? 7 : 0 }}
-      accessibilityLabel={`Vol. ${v}, ${theirs ? "yours" : "not yours yet"}`}
+      accessibilityLabel={`Vol. ${v}, ${theirs ? "yours" : ordered ? "ordered" : "not yours yet"}`}
     >
       {/* the run's name hangs over its first spines at full width, as the
           web's: never cut down to one book's width */}
