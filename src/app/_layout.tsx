@@ -68,7 +68,18 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <BottomSheetModalProvider>
         <StatusBar style="auto" />
-        <Stack screenOptions={{ headerShown: false }}>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            // pages slide in from the right and swipe back from anywhere,
+            // as an iPhone's do
+            animation: "ios_from_right",
+            animationDuration: 320,
+            gestureEnabled: true,
+            fullScreenGestureEnabled: true,
+            animationMatchesGesture: true,
+          }}
+        >
           <Stack.Protected guard={isSignedIn}>
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="details/[id]" />

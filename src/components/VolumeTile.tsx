@@ -35,6 +35,7 @@ export default function VolumeTile({
               opacity: yours ? 1 : 0.9,
             }}
             contentFit="cover"
+            transition={180}
           />
           <View className="absolute top-0 left-0 flex-row items-baseline gap-0.5 bg-ink px-1.5">
             <Text className="font-brand pr-1 text-[10px] tracking-[0.5px] text-paper uppercase">

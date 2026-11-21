@@ -102,8 +102,7 @@ export default function ImportScreen() {
                     className={`grow basis-[30%] items-center rounded-[4px] border-2 px-2 py-2.5 ${on ? "border-line bg-ink" : "border-line bg-card"} ${off ? "opacity-40" : ""}`}
                   >
                     <Text
-                      numberOfLines={1}
-                      className={`font-body-semibold text-[13.5px] ${on ? "text-paper" : "text-ink"}`}
+                      className={`text-center font-body-semibold text-[13.5px] ${on ? "text-paper" : "text-ink"}`}
                     >
                       {s.label}
                     </Text>

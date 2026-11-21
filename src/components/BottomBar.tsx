@@ -3,6 +3,7 @@
 // pill behind the open one's icon, 80px tall over the phone's own swipe strip
 import type { Tabs } from "expo-router";
 import type { ComponentProps } from "react";
+import * as Haptics from "expo-haptics";
 import { Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BellIcon, ShelfIcon, TagIcon } from "@/core/components/icons/Icons";
@@ -46,7 +47,9 @@ export default function BottomBar({ state, navigateToTab }: BarProps) {
               accessibilityRole="tab"
               accessibilityState={{ selected: open }}
               onPress={() => {
-                if (!open) navigateToTab(route.key);
+                if (open) return;
+                void Haptics.selectionAsync();
+                navigateToTab(route.key);
               }}
               className="flex-1 items-center gap-1 pt-2 pb-3.5"
             >

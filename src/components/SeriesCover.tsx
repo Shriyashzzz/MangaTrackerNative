@@ -64,6 +64,7 @@ export default function SeriesCover({
       source={{ uri: src }}
       style={box}
       contentFit="cover"
+      transition={180}
       onError={() => setFailed(src)}
     />
   );
