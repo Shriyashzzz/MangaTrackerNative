@@ -1,0 +1,63 @@
+// COPIED from inventoryApp/client/src/pages/Import/bookImportText.ts by scripts/sync-core.mjs.
+// Do not edit here: change the web app, then run `npm run sync-core`.
+// The words of the book import page: each app's name, how to get its export,
+// and the line that says what a file held.
+import { type BookSeries, type BookSource } from "../../lib/imports/bookImport";
+
+export const APP_NAME: Record<BookSource, string> = {
+  goodreads: "Goodreads",
+  bookcatalogue: "Book Catalogue",
+  csv: "your app's",
+};
+
+export const series = (n: number) => `${n.toLocaleString()} series`;
+export const books = (n: number) =>
+  `${n.toLocaleString()} book${n === 1 ? "" : "s"}`;
+
+// each row is a book; volumes of one series come in as one
+// the last screen's headline: new series, or only new volumes, or nothing
+// new
+export function doneTitle(totals: { added: number; volumesAdded?: number }) {
+  if (totals.added) return `${series(totals.added)} added!`;
+  if (totals.volumesAdded) return "Volumes added!";
+  return "All already there!";
+}
+
+export function foundLine(found: BookSeries[]) {
+  let rows = 0;
+  for (const s of found) rows += s.books;
+  // one book a series: nothing was grouped, so there's nothing more to say
+  if (rows === found.length) return `${books(rows)} found`;
+  return `${books(rows)} found, grouped into ${series(found.length)}`;
+}
+
+export const HOW: Record<
+  BookSource,
+  {
+    step: string;
+    // what the file needs and what helps, one thing a line
+    points?: string[];
+    link?: { href: string; label: string };
+  }
+> = {
+  goodreads: {
+    step: "On Goodreads, go to My Books, then Import and export, and press Export Library. Download the file once it's ready.",
+    link: {
+      href: "https://www.goodreads.com/review/import",
+      label: "Open Goodreads' export page",
+    },
+  },
+  bookcatalogue: {
+    step: "In Book Catalogue, open the menu and export your books to a CSV file. Go to Admin & Prefs or Settings, depending on your version. Then drop the file.",
+  },
+  csv: {
+    // the columns bookImport.ts reads (any of these names, any order)
+    step: "Save it from your app as a CSV file.",
+    points: [
+      "Needs a Title or ISBN column.",
+      "Series, Volume, Owned, Rating and Format columns help, if your app has them.",
+      "Box sets: we ask which volumes, when the title doesn't say.",
+      "A series already on your shelf only gets what it's missing.",
+    ],
+  },
+};

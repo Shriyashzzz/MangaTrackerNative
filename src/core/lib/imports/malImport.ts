@@ -1,0 +1,267 @@
+// COPIED from inventoryApp/client/src/lib/imports/malImport.ts by scripts/sync-core.mjs.
+// Do not edit here: change the web app, then run `npm run sync-core`.
+// Reading a MyAnimeList export where it was picked, so the file itself never
+// leaves their device (malFile.ts opens it in the browser). It arrives as
+// .xml.gz from the export page, as .xml if they've opened it, and as .zip if
+// they've zipped it up. Then sending a list, from any import, to the shelf.
+import type { NewBook } from "../books";
+import { gunzipSync, strFromU8, unzipSync } from "fflate";
+import { apiFetch } from "../api";
+
+export type MalEntry = {
+  malId?: number;
+  title: string;
+  finished: boolean;
+  chapters: number;
+  readVolumes: number;
+  ownedVolumes: number;
+  score: number;
+  comments?: string;
+  // from a plan to read or to-read list: goes on their To read list
+  planned?: boolean;
+  // AniList's cover, for a series matched by name: used when there's no
+  // MyAnimeList id to look one up by
+  cover?: string;
+  // the import already knows it's a light novel. Without it the server asks
+  // AniList, by the MyAnimeList id
+  lightNovel?: boolean;
+  // exactly which volumes they own, when a book app's file says and it isn't
+  // a run from 1 (One Piece 1 and 4)
+  ownedList?: number[];
+  // a book app's file: ownedVolumes is its own answer (server malEntry.ts)
+  ownedFromFile?: boolean;
+  // other names the series goes by (the file's own, AniList's): one on the
+  // shelf under any of them is the same series
+  otherNames?: string[];
+  // from Manga Tracker's own export: a series already on the shelf takes
+  // what it lacks too (chapter, finished, rating, notes)
+  restore?: boolean;
+  // from a backup: the edition they collect it in ("deluxe")
+  edition?: string;
+  // when they last changed it where it came from (imports/importDate.ts), so
+  // the shelf's "Last updated" order comes along. ISO text
+  updatedAt?: string;
+  // the books behind the owned volumes, with ISBNs and editions
+  books?: NewBook[];
+  // from a backup: the series keeps its place by the volume
+  byVolume?: boolean;
+  // a backup's own genre (they may have set it by hand)
+  genre?: string;
+  // a book list that says nothing about reading (server malEntry.ts)
+  readingUnknown?: boolean;
+};
+
+// the lists on MyAnimeList, in the order it shows them
+export const MAL_LISTS = [
+  { status: "Reading", label: "Reading", importByDefault: true },
+  { status: "Completed", label: "Completed", importByDefault: true },
+  { status: "On-Hold", label: "On hold", importByDefault: true },
+  { status: "Dropped", label: "Dropped", importByDefault: false },
+  { status: "Plan to Read", label: "Plan to read", importByDefault: false },
+] as const;
+
+export type MalItem = { status: string; entry: MalEntry };
+
+// errors that are worth showing as they are
+export class ImportFileError extends Error {}
+
+// series sent to the shelf at a time: small enough that the progress bar
+// moves on an import of 30, big enough that 400 is 20 requests (each one
+// asks AniList once, and AniList limits how often)
+const PIECE = 20;
+
+export const MAX_MAL_FILE_BYTES = 20 * 1024 * 1024;
+export const MAL_FILE_TOO_BIG =
+  "That file is too big to be a MyAnimeList export. Check you picked the right one.";
+
+// the export's bytes as its XML: gzipped as the export page gives it, a zip
+// if they zipped it, or the plain file
+export function unpackMalExport(bytes: Uint8Array): string {
+  try {
+    if (bytes[0] === 0x1f && bytes[1] === 0x8b)
+      return strFromU8(gunzipSync(bytes));
+    if (bytes[0] === 0x50 && bytes[1] === 0x4b) {
+      const files = unzipSync(bytes);
+      const name = Object.keys(files).find((n) => /\.xml(\.gz)?$/i.test(n));
+      const inside = name ? files[name] : undefined;
+      if (!name || !inside)
+        throw new ImportFileError("There's no list inside that zip.");
+      return strFromU8(/\.gz$/i.test(name) ? gunzipSync(inside) : inside);
+    }
+  } catch (e) {
+    if (e instanceof ImportFileError) throw e;
+    throw new ImportFileError(
+      "That file couldn't be opened. Try downloading it again.",
+    );
+  }
+  return strFromU8(bytes);
+}
+
+// the export is flat XML (a <manga> holds one level of fields, each in a
+// CDATA block or plain), so it's read without a DOM parser: the same reader
+// in the browser and the app
+const ENTITIES: Record<string, string> = {
+  amp: "&",
+  lt: "<",
+  gt: ">",
+  quot: '"',
+  apos: "'",
+};
+const unescapeXml = (text: string) =>
+  text.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (whole, code: string) => {
+    if (code[0] === "#")
+      return String.fromCodePoint(
+        code[1]?.toLowerCase() === "x"
+          ? Number.parseInt(code.slice(2), 16)
+          : Number.parseInt(code.slice(1), 10),
+      );
+    return ENTITIES[code.toLowerCase()] ?? whole;
+  });
+// a field's text: what's inside its CDATA block, else its text with the
+// entities put back
+const fieldText = (element: string, tag: string) => {
+  const match = new RegExp(`<${tag}>([\\s\\S]*?)</${tag}>`).exec(element);
+  if (!match) return "";
+  const inner = match[1]!.trim();
+  const cdata = /^<!\[CDATA\[([\s\S]*?)\]\]>$/.exec(inner);
+  return (cdata ? cdata[1]! : unescapeXml(inner)).trim();
+};
+const whole = (element: string, tag: string) => {
+  const value = Number.parseInt(fieldText(element, tag), 10);
+  return Number.isFinite(value) && value > 0 ? value : 0;
+};
+
+export function malItemsFromXml(xml: string): MalItem[] {
+  const isMal =
+    /^(?:\s*<\?xml[^>]*\?>)?(?:\s*<!--[\s\S]*?-->)*\s*<myanimelist[\s>]/i.test(
+      xml,
+    );
+  if (!isMal) {
+    throw new ImportFileError(
+      "That isn't a MyAnimeList export. Pick the file you downloaded from the export page.",
+    );
+  }
+  if (/<anime>/.test(xml)) {
+    throw new ImportFileError(
+      "That's your anime list. On the export page, choose Manga and try again.",
+    );
+  }
+
+  const items: MalItem[] = [];
+  for (const [, el] of xml.matchAll(/<manga>([\s\S]*?)<\/manga>/g)) {
+    const title = fieldText(el!, "manga_title");
+    if (!title) continue;
+    const status = fieldText(el!, "my_status");
+    const malId = whole(el!, "manga_mangadb_id");
+    const comments = fieldText(el!, "my_comments");
+    items.push({
+      status,
+      entry: {
+        ...(malId ? { malId } : {}),
+        title,
+        finished: status === "Completed",
+        ...(status === "Plan to Read" ? { planned: true } : {}),
+        chapters: Math.min(whole(el!, "my_read_chapters"), 100000),
+        readVolumes: Math.min(whole(el!, "my_read_volumes"), 999),
+        ownedVolumes: Math.min(whole(el!, "my_retail_volumes"), 999),
+        score: Math.min(whole(el!, "my_score"), 10),
+        // the shelf keeps 450 characters, so a long list of notes stays small
+        ...(comments ? { comments: comments.slice(0, 450) } : {}),
+      },
+    });
+  }
+  return items;
+}
+
+export type ImportTotals = {
+  added: number;
+  alreadyThere: number;
+  // of those already there, how many got volumes they didn't have (the
+  // server adds them, never takes any away); missing from an older server
+  volumesAdded?: number;
+  noCover: number;
+  // new series that are complete sets: every volume of an ended series, and
+  // nothing in the file about reading. The last page asks whether to mark
+  // them finished (server malEntry.ts ownsWholeSeries)
+  completeSets?: number[];
+};
+
+// how long to wait when the server says "slow down", and how often: its
+// allowance is by the minute (server rateLimit), so a minute clears it
+const SLOW_DOWN_WAITS = 3;
+const waitFor = (ms: number) => new Promise((done) => setTimeout(done, ms));
+
+// One piece. Tried again once after a pause if the connection dropped or
+// the server was busy; and when the server asks to slow down (a list of
+// thousands sends its pieces faster than it allows), it waits as long as
+// asked and carries on, telling the page it's waiting. Trying again is
+// safe: anything already added is skipped
+async function sendPiece(
+  entries: MalEntry[],
+  onWaiting: (waiting: boolean) => void,
+): Promise<Response> {
+  const send = () =>
+    apiFetch("/api/manga/import", { method: "POST", body: { entries } }).catch(
+      () => null,
+    );
+  let res = await send();
+  for (let waits = 0; res?.status === 429 && waits < SLOW_DOWN_WAITS; waits++) {
+    const asked = Number(res.headers.get("Retry-After")) || 60;
+    onWaiting(true);
+    await waitFor((Math.min(asked, 60) + 1) * 1000);
+    onWaiting(false);
+    res = await send();
+  }
+  if (res && res.status < 500) return res;
+  // dropped, or the server was busy: once more
+  await waitFor(5000);
+  res = await send();
+  if (res) return res;
+  throw new Error("The connection dropped");
+}
+
+// a piece at a time, so a long list shows progress. Stops at the first failure
+// with the totals so far and what went wrong; trying again skips what's
+// already been added
+export async function sendToShelf(
+  entries: MalEntry[],
+  onProgress: (done: number, totals: ImportTotals) => void,
+  // asked to stop: the piece being sent finishes, the rest aren't sent
+  shouldStop: () => boolean = () => false,
+  // true while it waits because the server asked it to slow down
+  onWaiting: (waiting: boolean) => void = () => {},
+) {
+  const totals: ImportTotals = {
+    added: 0,
+    alreadyThere: 0,
+    volumesAdded: 0,
+    noCover: 0,
+    completeSets: [],
+  };
+  for (let i = 0; i < entries.length && !shouldStop(); i += PIECE) {
+    const piece = entries.slice(i, i + PIECE);
+    const res = await sendPiece(piece, onWaiting).catch((e: Error) => {
+      throw Object.assign(e, { totals });
+    });
+    if (!res.ok) {
+      const data = (await res.json().catch(() => null)) as {
+        error?: { msg?: string }[];
+      } | null;
+      throw Object.assign(new Error(data?.error?.[0]?.msg ?? "Import failed"), {
+        totals,
+      });
+    }
+    const answer = (await res.json()) as ImportTotals;
+    totals.added += answer.added;
+    totals.alreadyThere += answer.alreadyThere;
+    totals.volumesAdded =
+      (totals.volumesAdded ?? 0) + (answer.volumesAdded ?? 0);
+    totals.noCover += answer.noCover;
+    totals.completeSets = [
+      ...(totals.completeSets ?? []),
+      ...(answer.completeSets ?? []),
+    ];
+    onProgress(i + piece.length, { ...totals });
+  }
+  return totals;
+}

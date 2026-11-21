@@ -137,7 +137,7 @@ export default function SettingsMenu({
       <Item
         icon={ImportIcon}
         label="Import your list"
-        onPress={() => void Linking.openURL(`${siteOrigin()}/import`)}
+        onPress={() => router.push("/import")}
       />
       <Divider />
       <Item

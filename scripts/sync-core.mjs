@@ -121,6 +121,20 @@ const ENTRIES = [
   "pages/SharedShelf/compare.ts",
   "pages/SharedShelf/addToRead.ts",
   "lib/sharePicks.ts",
+  // importing a list (MyAnimeList, AniList, Kitsu) or a book app's files:
+  // the readers, the matching, and the pages' words. malFile.ts and the
+  // CSV text are read the app's way (src/native)
+  "lib/imports/malImport.ts",
+  "lib/imports/malFile.ts",
+  "lib/imports/accountImport.ts",
+  "lib/imports/bookImport.ts",
+  "lib/imports/sharedMatches.ts",
+  "lib/imports/openBookFiles.ts",
+  "pages/Import/useListImport.ts",
+  "pages/Import/bookImportText.ts",
+  "pages/Import/importRowText.ts",
+  "pages/Import/useNearNames.ts",
+  "lib/passwordRule.ts",
 ];
 
 // browser-only things a copied file may not use

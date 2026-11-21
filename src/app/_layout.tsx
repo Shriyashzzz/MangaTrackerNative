@@ -77,6 +77,7 @@ export default function RootLayout() {
           <Stack.Screen name="to-buy" />
           <Stack.Screen name="new-releases" />
           <Stack.Screen name="friends" />
+          <Stack.Screen name="import" />
           <Stack.Screen name="updates" />
           <Stack.Screen name="faq" />
           <Stack.Screen name="about" />
