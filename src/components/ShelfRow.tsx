@@ -2,10 +2,13 @@
 // MangaCard.tsx, its rows): cover, name, their stars under it, their place
 // when the right side doesn't say it, the genre, and on the right how far
 // through they are. The words come from the web's own rules (core cardText,
-// reading), so the two apps always say the same
+// reading), so the two apps always say the same. While selecting, a tick box
+// sits on the cover and a tap picks the row; a long press starts selecting
 import SeriesCover from "@/components/SeriesCover";
 import { Link } from "expo-router";
 import { Pressable, Text, View } from "react-native";
+import { CheckIcon } from "@/core/components/icons/Icons";
+import { useColors } from "@/lib/colors";
 import { progressOf, rowKindLine } from "@/core/components/mangaCard/cardText";
 import { ownedOf } from "@/core/lib/ownedVolumes";
 import { placeText, tracksOf, type TrackBy } from "@/core/lib/reading";
@@ -17,12 +20,17 @@ export default function ShelfRow({
   trackBy,
   latestChapter,
   latestVolume,
+  select,
+  onLongPress,
 }: {
   manga: Manga;
   trackBy: TrackBy;
   latestChapter?: number | null;
   latestVolume?: number | null;
+  select?: { checked: boolean; onToggle: () => void };
+  onLongPress?: () => void;
 }) {
+  const c = useColors();
   const { unit, reading, knownTotal } = progressOf(
     manga,
     tracksOf(manga, trackBy),
@@ -36,47 +44,68 @@ export default function ShelfRow({
   const kindLine = rowKindLine(manga);
   const rating = Number(manga.rating) || 0;
 
-  return (
-    <Link href={`/details/${manga.id}`} asChild>
-      <Pressable className="flex-row items-center gap-3 py-1.5 active:opacity-70">
+  const row = (
+    <Pressable
+      onPress={select?.onToggle}
+      onLongPress={select ? undefined : onLongPress}
+      delayLongPress={400}
+      accessibilityState={select ? { selected: select.checked } : undefined}
+      className={`flex-row items-center gap-3 py-1.5 active:opacity-70 ${select?.checked ? "bg-accent-wash" : ""}`}
+    >
+      <View>
         <SeriesCover
           name={manga.name}
           lightNovel={manga.lightNovel}
           url={manga.image}
           width={44}
         />
-        <View className="min-w-0 flex-1 gap-[2px]">
-          <Text numberOfLines={1} className="font-display text-[17px] text-ink">
-            {manga.name}
+        {select ? (
+          <View
+            className={`absolute top-1 left-1 h-5 w-5 items-center justify-center rounded-[3px] border-[1.5px] ${select.checked ? "border-accent bg-accent" : "border-line bg-card"}`}
+          >
+            {select.checked ? (
+              <CheckIcon color={c.paper} width={14} height={14} />
+            ) : null}
+          </View>
+        ) : null}
+      </View>
+      <View className="min-w-0 flex-1 gap-[2px]">
+        <Text numberOfLines={1} className="font-display text-[17px] text-ink">
+          {manga.name}
+        </Text>
+        {rating > 0 && <StarRating value={rating} />}
+        {rowLine ? (
+          <Text
+            numberOfLines={1}
+            className="font-mono-medium text-[13.5px] text-ink-soft"
+          >
+            {rowLine}
           </Text>
-          {rating > 0 && <StarRating value={rating} />}
-          {rowLine ? (
-            <Text
-              numberOfLines={1}
-              className="font-mono-medium text-[13.5px] text-ink-soft"
-            >
-              {rowLine}
-            </Text>
-          ) : null}
-          {kindLine ? (
-            <Text
-              numberOfLines={1}
-              className="font-mono text-[12.5px] text-muted"
-            >
-              {kindLine}
-            </Text>
-          ) : null}
-        </View>
-        <View className="w-[120px] items-end gap-1 pr-2">
-          <RowProgress
-            finished={manga.status}
-            ownedCount={ownedOf(manga).length}
-            unit={unit}
-            reading={reading}
-            knownTotal={knownTotal}
-          />
-        </View>
-      </Pressable>
+        ) : null}
+        {kindLine ? (
+          <Text
+            numberOfLines={1}
+            className="font-mono text-[12.5px] text-muted"
+          >
+            {kindLine}
+          </Text>
+        ) : null}
+      </View>
+      <View className="w-[120px] items-end gap-1 pr-2">
+        <RowProgress
+          finished={manga.status}
+          ownedCount={ownedOf(manga).length}
+          unit={unit}
+          reading={reading}
+          knownTotal={knownTotal}
+        />
+      </View>
+    </Pressable>
+  );
+  if (select) return row;
+  return (
+    <Link href={`/details/${manga.id}`} asChild>
+      {row}
     </Link>
   );
 }

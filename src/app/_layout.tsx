@@ -18,12 +18,14 @@ import {
 } from "@expo-google-fonts/ibm-plex-sans";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
+import { Uniwind } from "uniwind";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { loadDeviceStore } from "@/lib/deviceStore";
 import { useAuth } from "@/store/auth";
+import { usePrefs } from "@/store/prefs";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -41,6 +43,11 @@ export default function RootLayout() {
   });
   const isSignedIn = useAuth((s) => s.isSignedIn);
   const check = useAuth((s) => s.check);
+  // light, dark, or the device's own, as the account chose (Settings)
+  const theme = usePrefs((s) => s.prefs.theme);
+  useEffect(() => {
+    Uniwind.setTheme(theme === "light" || theme === "dark" ? theme : "system");
+  }, [theme]);
 
   // what this device remembers (lib/deviceStore.ts): read before any screen
   const [storeLoaded, setStoreLoaded] = useState(false);
@@ -64,6 +71,16 @@ export default function RootLayout() {
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="details/[id]" />
           <Stack.Screen name="edit/[id]" />
+          <Stack.Screen name="add" />
+          <Stack.Screen name="scan" />
+          <Stack.Screen name="settings" />
+          <Stack.Screen name="to-buy" />
+          <Stack.Screen name="new-releases" />
+          <Stack.Screen name="friends" />
+          <Stack.Screen name="updates" />
+          <Stack.Screen name="faq" />
+          <Stack.Screen name="about" />
+          <Stack.Screen name="privacy" />
           <Stack.Screen name="prices/series" />
           <Stack.Screen name="prices/[isbn]" />
         </Stack.Protected>

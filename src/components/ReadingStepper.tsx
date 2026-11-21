@@ -198,7 +198,16 @@ export default function ReadingStepper({
           keyboardType="number-pad"
           selectTextOnFocus
           accessibilityLabel={`${{ chapter: "Chapter", volume: "Volume", book: "Book" }[counted]} read up to`}
-          style={{ minWidth: 44, color: c.ink }}
+          // Android sets a box's text high: centred by hand, with the
+          // font's own padding off, so the digits sit in the middle
+          style={{
+            minWidth: 44,
+            color: c.ink,
+            paddingVertical: 0,
+            textAlignVertical: "center",
+            includeFontPadding: false,
+            lineHeight: 28,
+          }}
           className="h-11 border-x-2 border-line px-1.5 text-center font-brand text-[24px]"
         />
         {button(1, `One ${counted} on`, "+", current >= max)}

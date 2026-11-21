@@ -20,6 +20,12 @@ import PickSheet from "@/components/PickSheet";
 import ShelfRow from "@/components/ShelfRow";
 import Toast from "@/components/Toast";
 import VolumesView from "@/components/VolumesView";
+import AddChoice from "@/components/AddChoice";
+import SelectDock, { MovedNote } from "@/components/SelectDock";
+import { PlusIcon } from "@/core/components/icons/Icons";
+import { useSelectMode } from "@/lib/useSelectMode";
+import { router } from "expo-router";
+import { Alert } from "react-native";
 import {
   ChevronDownIcon,
   CloseIcon,
@@ -66,6 +72,7 @@ export default function ShelfScreen() {
   const [picking, setPicking] = useState<"tab" | "sort" | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   // a series just deleted (here or on its page): its Undo, at the foot
+  const [adding, setAdding] = useState(false);
   const lastDeleted = useShelf((s) => s.lastDeleted);
   const undoMessage = useShelf((s) => s.undoMessage);
   const undoing = useShelf((s) => s.undoing);
@@ -87,6 +94,42 @@ export default function ShelfScreen() {
     sortBy,
   });
   const counts = shelfCounts(manga ?? [], releases);
+  // Select: several moved or deleted at once, with undo. Not on Volumes
+  const select = useSelectMode({
+    canSelect: tab !== "volumes" && Boolean(manga?.length),
+    shown: list,
+  });
+  const askToDeletePicked = () => {
+    const picked = select.pickedShown;
+    const one = picked.length === 1 ? picked[0]! : null;
+    Alert.alert(
+      `Delete ${one ? one.name : `${picked.length} series`}?`,
+      one
+        ? "It comes off your shelf with its volumes and books, rating, reading progress and notes."
+        : `${picked
+            .slice(0, 5)
+            .map((m) => m.name)
+            .join(
+              ", ",
+            )}${picked.length > 5 ? ` and ${picked.length - 5} more` : ""}. They come off your shelf with their volumes, ratings and reading progress.`,
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+          onPress: () => select.setConfirmingDelete(false),
+        },
+        {
+          text: one ? "Delete it" : `Delete ${picked.length}`,
+          style: "destructive",
+          onPress: () => {
+            void select.deletePicked().then((done) => {
+              if (!done) Alert.alert("That didn't delete them. Try again.");
+            });
+          },
+        },
+      ],
+    );
+  };
   const sortLabel =
     SORT_OPTIONS.find((o) => o.value === sortBy)?.label ?? "Last updated";
 
@@ -152,6 +195,18 @@ export default function ShelfScreen() {
             <SearchIcon color={c.ink} width={22} height={22} />
           </Pressable>
         )}
+        {tab !== "volumes" && !select.selectOn && !searching ? (
+          <Pressable
+            onPress={select.start}
+            hitSlop={8}
+            className="py-2 pl-1"
+            accessibilityLabel="Select several"
+          >
+            <Text className="font-body-semibold text-[14.5px] text-ink">
+              Select
+            </Text>
+          </Pressable>
+        ) : null}
         <Pressable
           onPress={() => setPicking("sort")}
           hitSlop={8}
@@ -179,6 +234,18 @@ export default function ShelfScreen() {
               trackBy={trackBy}
               latestChapter={releases[item.id]?.latestChapter}
               latestVolume={releases[item.id]?.latestVolume}
+              select={
+                select.selectOn
+                  ? {
+                      checked: select.picked.has(item.id),
+                      onToggle: () => select.toggle(item.id),
+                    }
+                  : undefined
+              }
+              onLongPress={() => {
+                select.start();
+                select.toggle(item.id);
+              }}
             />
           )}
           ItemSeparatorComponent={DashedLine}
@@ -200,6 +267,40 @@ export default function ShelfScreen() {
             ) : undefined
           }
         />
+      )}
+      {/* the floating +: type a title or scan a barcode. Not over Volumes */}
+      {tab !== "volumes" && !select.selectOn ? (
+        <Pressable
+          onPress={() => setAdding(true)}
+          accessibilityLabel="Add manga"
+          className="absolute right-4 bottom-5 h-14 w-14 items-center justify-center rounded-full border-2 border-paper bg-accent active:opacity-90"
+        >
+          <PlusIcon color={c.onAccent} width={26} height={26} />
+        </Pressable>
+      ) : null}
+      {adding ? (
+        <AddChoice
+          onType={() => router.push("/add")}
+          onScan={() => router.push("/scan")}
+          onClose={() => setAdding(false)}
+        />
+      ) : null}
+      {select.selectOn ? (
+        <SelectDock
+          select={{
+            ...select,
+            setConfirmingDelete: (on) => {
+              select.setConfirmingDelete(on);
+              if (on) askToDeletePicked();
+            },
+          }}
+          shown={list}
+          tab={tab}
+        />
+      ) : (
+        <View className="absolute inset-x-3 bottom-4">
+          <MovedNote select={select} />
+        </View>
       )}
       {lastDeleted || undoMessage ? (
         <Toast
