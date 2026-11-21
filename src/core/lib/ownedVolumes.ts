@@ -1,0 +1,173 @@
+// COPIED from inventoryApp/client/src/lib/ownedVolumes.ts by scripts/sync-core.mjs.
+// Do not edit here: change the web app, then run `npm run sync-core`.
+// Which volumes someone owns. Most own a run from the first ("up to vol. 14"),
+// which is all `volumesOwned` says; with gaps (One Piece 1 and 4) `ownedList`
+// has them exactly and `volumesOwned` is its highest. An empty list means 1 to
+// `volumesOwned`. Kept in step with server/src/util/shelf/ownedList.ts
+import type { Manga } from "./types";
+
+const MAX_VOLUME = 999;
+
+type Owned = Pick<Manga, "volumesOwned"> & { ownedList?: number[] };
+
+// the same rule as the server's: a run from 1 is just its number
+export function ownedVolumes(
+  volumesOwned: number | null | undefined,
+  list: number[] | null | undefined,
+): { volumesOwned: number | null; ownedList: number[] } {
+  const sorted = [
+    ...new Set(
+      (list ?? [])
+        .filter((v) => Number.isFinite(v) && v >= 0 && v <= MAX_VOLUME)
+        .map((v) => Math.round(v * 10) / 10),
+    ),
+  ].sort((a, b) => a - b);
+  if (!sorted.length)
+    return { volumesOwned: volumesOwned || null, ownedList: [] };
+  const highest = sorted[sorted.length - 1]!;
+  const isRun = sorted.every((v, i) => v === i + 1);
+  return {
+    volumesOwned: Math.floor(highest) || null,
+    ownedList: isRun ? [] : sorted,
+  };
+}
+
+// every volume they own, in order
+export const ownedOf = (m: Owned): number[] =>
+  m.ownedList?.length
+    ? m.ownedList
+    : Array.from({ length: m.volumesOwned ?? 0 }, (_, i) => i + 1);
+
+// any at all, and how many, without listing them (a big shelf asks on
+// every keystroke)
+export const ownsAny = (m: Owned) =>
+  Boolean(m.ownedList?.length || m.volumesOwned);
+export const ownedCount = (m: Owned) =>
+  m.ownedList?.length || m.volumesOwned || 0;
+
+// the furthest volume they own (0 for none)
+export const highestOwned = (m: Owned) => Math.max(0, ...ownedOf(m));
+
+// the volume they need next, of the ones out: the first whole one after the
+// furthest they own. A gap before it doesn't count: someone who owns 2 and 5
+// read 3 and 4 somewhere, so it's 6. Null when they own none, or have the newest
+export function nextToGet(m: Owned, out: number[]): number | null {
+  const highest = highestOwned(m);
+  if (!highest) return null;
+  return (
+    out
+      .filter((v) => v > highest && Number.isInteger(v))
+      .sort((a, b) => a - b)[0] ?? null
+  );
+}
+
+// THE volume to buy next, for every page that says one (Buy next, the price
+// pages): the next after the furthest they own; when they have that (or
+// nothing past it is out), their first gap. A reader who chose "my gaps
+// first" (Settings, Next in line) gets the gap first. Of the ones out only.
+// Null when there's nothing of it out to buy
+export function buyNextOf(
+  m: Owned,
+  out: number[],
+  gapsFirst: boolean,
+): number | null {
+  const after = nextToGet(m, out);
+  const highest = highestOwned(m);
+  const firstGap =
+    out
+      .filter(
+        (v) => Number.isInteger(v) && v >= 1 && v < highest && !owns(m, v),
+      )
+      .sort((a, b) => a - b)[0] ?? null;
+  return gapsFirst ? (firstGap ?? after) : (after ?? firstGap);
+}
+
+export const owns = (m: Owned, volume: number) =>
+  m.ownedList?.length
+    ? m.ownedList.includes(volume)
+    : volume >= 1 &&
+      volume <= (m.volumesOwned ?? 0) &&
+      Number.isInteger(volume);
+
+// what they own once this volume is added
+export const withVolume = (m: Owned, volume: number) =>
+  ownedVolumes(null, [...ownedOf(m), volume]);
+
+// what they own once this volume is ticked or unticked (the details page's
+// shelf). Halves and specials it doesn't show (10.5, 0) are kept as they are
+export const toggleVolume = (m: Owned, volume: number) =>
+  owns(m, volume)
+    ? ownedVolumes(
+        null,
+        ownedOf(m).filter((v) => v !== volume),
+      )
+    : withVolume(m, volume);
+
+// [1, 2, 3, 5, 7, 8] -> "1–3, 5, 7–8"
+export function rangesText(volumes: number[]): string {
+  const parts: string[] = [];
+  let i = 0;
+  while (i < volumes.length) {
+    let j = i;
+    while (
+      j + 1 < volumes.length &&
+      Number.isInteger(volumes[j]) &&
+      volumes[j + 1] === volumes[j]! + 1
+    )
+      j++;
+    parts.push(j > i ? `${volumes[i]}–${volumes[j]}` : String(volumes[i]));
+    i = j + 1;
+  }
+  return parts.join(", ");
+}
+
+// "1-5, 8, 10.5" -> [1, 2, 3, 4, 5, 8, 10.5]; null if any part isn't a
+// volume or a range of them. Blank is no volumes
+export function parseVolumes(text: string): number[] | null {
+  const out: number[] = [];
+  // "1 - 5" is one range
+  const tidy = text.replace(/\s*[-–]\s*/g, "-");
+  for (const raw of tidy.split(/[,\s]+/).filter(Boolean)) {
+    const range = /^(\d{1,3})\s*[-–]\s*(\d{1,3})$/.exec(raw);
+    if (range) {
+      const [from, to] = [Number(range[1]), Number(range[2])];
+      if (from < 0 || to > MAX_VOLUME || from > to) return null;
+      for (let v = from; v <= to; v++) out.push(v);
+      continue;
+    }
+    const one = /^\d{1,3}(\.\d)?$/.exec(raw);
+    if (!one) return null;
+    out.push(Number(raw));
+  }
+  return [...new Set(out)].sort((a, b) => a - b);
+}
+
+// how a card or the details page says it: "up to vol. 14", or "vols. 1, 4"
+// (long lists cut short: "vols. 1–14, 16, 20–22…")
+export function ownedPhrase(m: Owned, longest = 24): string | null {
+  if (!m.ownedList?.length)
+    return m.volumesOwned ? `up to vol. ${m.volumesOwned}` : null;
+  const text = rangesText(m.ownedList);
+  const comma = text.lastIndexOf(",", longest);
+  const cut =
+    text.length <= longest
+      ? text
+      : `${comma > 0 ? text.slice(0, comma) : text.slice(0, longest)}…`;
+  return `${m.ownedList.length === 1 ? "vol." : "vols."} ${cut}`;
+}
+
+// a series with what it owns changed: and a volume owned now is no longer
+// "ordered", as the database does the moment it's saved (its manga_arrived
+// trigger). Every place that changes what's owned goes through here, so the
+// page never shows a volume ordered that the server has already let go
+export function withOwned<M extends Owned & { orderedList?: number[] }>(
+  manga: M,
+  owned: Owned,
+): M {
+  const next = { ...manga, ...owned };
+  const have = new Set(ownedOf(next));
+  return {
+    ...next,
+    orderedList: (manga.orderedList ?? []).filter((v) => !have.has(v)),
+  };
+}
