@@ -73,7 +73,7 @@ take `className`: wrap them with `withUniwind`, or give them plain styles.
 
 ## Not done yet
 
-- New, Prices, Volumes, search, sort and Select (phase 3)
+- Shelf search, sort and Select
 - Reading counter, rating, notes, your books, settings, add and import,
   notifications (phase 4)
 - Changes made offline: the website keeps and sends them; the app says they

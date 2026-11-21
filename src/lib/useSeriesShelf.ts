@@ -43,9 +43,15 @@ function slideText(before: number[], now: number[]) {
   return `${volumes(added + removed)} changed`;
 }
 
+// where it's shown can say more than the series page knows: the newest out
+// from the shelf's release check, and the book the strip opens at (a tap on
+// a Volumes row's bar)
+type Options = { latest?: number | null; opensAt?: number | null };
+
 export function useSeriesShelf(
   manga: Manga | null,
   setManga: Dispatch<SetStateAction<Manga | null>>,
+  { latest = null, opensAt }: Options = {},
 ) {
   const trackBy = usePrefs((s) => s.prefs.trackBy ?? "series");
   const [saveFailed, setSaveFailed] = useState(false);
@@ -76,7 +82,7 @@ export function useSeriesShelf(
   });
 
   const highest = Math.floor(Math.max(0, ...owned));
-  const total = shelfSize(highest, null, buyOptions);
+  const total = shelfSize(highest, latest, buyOptions);
   const place = manga
     ? placeOnShelf(manga, tracksOf(manga, trackBy), [])
     : null;
@@ -128,7 +134,7 @@ export function useSeriesShelf(
           total: slots.length,
           owned: slotsIn(slots, owned, "all"),
           here: inEdition?.slot ?? null,
-          opensAt: null,
+          opensAt: opensAt ?? null,
           slots: stripSlots,
           onToggle: (n: number) =>
             ownedVolumes.paint(toggleSlot(slots[n - 1]!, owned)),
@@ -142,7 +148,7 @@ export function useSeriesShelf(
           total: total.size,
           owned,
           here: place?.volume ?? null,
-          opensAt: gaps[0] ?? null,
+          opensAt: opensAt ?? gaps[0] ?? null,
           onToggle: (v: number) => ownedVolumes.toggle(v),
           onPaint: (next: number[]) => ownedVolumes.paint(next),
           ...slideEvents,

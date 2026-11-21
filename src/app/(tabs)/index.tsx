@@ -1,6 +1,7 @@
 // My shelf, as the Android app's: the tab's name and count in the shelf's
 // bar ("ALL 40 ▾", a tap picks another tab), then a row per series. Pull down
-// to load it again. Search, sort, Select, Volumes and New come in later phases
+// to load it again. Volumes is its own view (VolumesView). Search, sort and
+// Select come later
 import { useEffect, useState } from "react";
 import {
   FlatList,
@@ -15,26 +16,23 @@ import { withUniwind } from "uniwind";
 import AppHeader from "@/components/AppHeader";
 import DashedLine from "@/components/DashedLine";
 import ShelfRow from "@/components/ShelfRow";
+import VolumesView from "@/components/VolumesView";
 import { ChevronDownIcon } from "@/core/components/icons/Icons";
-import type { Manga } from "@/core/lib/types";
+import { filterShelf, shelfCounts } from "@/core/pages/Home/shelfViews";
 import { useColors } from "@/lib/colors";
 import { usePrefs } from "@/store/prefs";
 import { useShelf } from "@/store/shelf";
 
 const Safe = withUniwind(SafeAreaView);
 
-// the shelf's tabs and who's in each: the web's own rule (client/src/pages/
-// Home/shelfViews.ts filterShelf, which uses the browser's storage, so isn't
-// copied). Keep the two the same
+// the shelf's tabs, as the web's (pages/Home/Home.tsx); who's in each is the
+// web's own rule (core filterShelf), and Volumes counts volumes, not series
 const TABS = [
-  { id: "all", label: "All", has: (_m: Manga) => true },
-  {
-    id: "ongoing",
-    label: "Reading",
-    has: (m: Manga) => !m.status && !m.planned,
-  },
-  { id: "finished", label: "Finished", has: (m: Manga) => m.status },
-  { id: "planned", label: "To read", has: (m: Manga) => m.planned },
+  { id: "all", label: "All" },
+  { id: "ongoing", label: "Reading" },
+  { id: "finished", label: "Finished" },
+  { id: "planned", label: "To read" },
+  { id: "volumes", label: "Volumes" },
 ] as const;
 type TabId = (typeof TABS)[number]["id"];
 
@@ -60,7 +58,16 @@ export default function ShelfScreen() {
   }, [manga, checksOn, checkReleases]);
 
   const shown = TABS.find((t) => t.id === tab)!;
-  const list = (manga ?? []).filter(shown.has);
+  const listOf = (id: TabId) =>
+    filterShelf(manga ?? [], releases, {
+      tab: id,
+      releaseKind: "volumes",
+      viewingHidden: false,
+      query: "",
+      sortBy: "",
+    });
+  const list = listOf(tab);
+  const counts = shelfCounts(manga ?? [], releases);
 
   const refresh = async () => {
     setRefreshing(true);
@@ -76,23 +83,26 @@ export default function ShelfScreen() {
         <Pressable
           onPress={() => setPicking(true)}
           className="flex-row items-baseline gap-2"
-          accessibilityLabel={`Showing ${shown.label}, ${list.length}. Change what's shown`}
+          accessibilityLabel={`Showing ${shown.label}, ${counts[tab]}. Change what's shown`}
         >
           <Text className="font-brand pr-1 text-[30px] tracking-[1px] text-ink uppercase">
             {shown.label}
           </Text>
           <Text className="font-mono text-[14px] text-muted">
-            {list.length}
+            {counts[tab]}
           </Text>
           <ChevronDownIcon color={c.inkSoft} width={18} height={18} />
         </Pressable>
       </View>
       <View className="mx-4 h-px bg-line" />
+      {failed && !manga ? null : tab === "volumes" ? (
+        <VolumesView manga={list} refreshing={refreshing} onRefresh={refresh} />
+      ) : null}
       {failed && !manga ? (
         <Text className="px-4 pt-6 font-body text-[15px] text-ink-soft">
           {failed}
         </Text>
-      ) : (
+      ) : tab === "volumes" ? null : (
         <FlatList
           data={list}
           keyExtractor={(m) => String(m.id)}
@@ -150,7 +160,7 @@ export default function ShelfScreen() {
                 {t.label}
               </Text>
               <Text className="font-mono text-[14px] text-muted">
-                {(manga ?? []).filter(t.has).length}
+                {counts[t.id]}
               </Text>
             </Pressable>
           ))}
