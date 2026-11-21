@@ -21,6 +21,7 @@ import {
   TagIcon,
 } from "@/core/components/icons/Icons";
 import { useColors } from "@/lib/colors";
+import { useRipple } from "@/lib/press";
 import { useAccount } from "@/store/account";
 import { useAuth } from "@/store/auth";
 import { usePrefs } from "@/store/prefs";
@@ -48,14 +49,16 @@ function Item({
   onClose: () => void;
 }) {
   const c = useColors();
+  const ripple = useRipple();
   return (
     <Pressable
+      android_ripple={ripple}
       onPress={() => {
         if (!keepOpen) onClose();
         onPress();
       }}
       accessibilityState={on === undefined ? undefined : { selected: on }}
-      className="min-h-[44px] flex-row items-center gap-3 rounded-[3px] px-3 active:bg-accent-wash"
+      className="min-h-[44px] flex-row items-center gap-3 overflow-hidden rounded-[3px] px-3 active:bg-accent-wash"
     >
       <Icon color={c.inkSoft} width={18} height={18} />
       <Text

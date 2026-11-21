@@ -5,7 +5,8 @@
 // seriesFormRules)
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 import Button from "@/components/Button";
@@ -210,7 +211,8 @@ export default function EditScreen() {
           </Text>
         ) : null
       ) : (
-        <ScrollView
+        <KeyboardAwareScrollView
+          bottomOffset={24}
           contentContainerClassName="gap-5 px-4 pt-4 pb-16"
           keyboardShouldPersistTaps="handled"
         >
@@ -335,7 +337,7 @@ export default function EditScreen() {
               onPress={() => void save()}
             />
           </View>
-        </ScrollView>
+        </KeyboardAwareScrollView>
       )}
       <PickSheet
         open={pickingGenre}

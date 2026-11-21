@@ -3,10 +3,15 @@
 // when the right side doesn't say it, the genre, and on the right how far
 // through they are. The words come from the web's own rules (core cardText,
 // reading), so the two apps always say the same. While selecting, a tick box
-// sits on the cover and a tap picks the row; a long press starts selecting
+// sits on the cover and a tap picks the row. A long press opens the
+// platform's own menu: Edit, Move to, Select several, Delete
 import SeriesCover from "@/components/SeriesCover";
-import { Link } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import { MenuView, type MenuAction } from "@react-native-menu/menu";
+import * as Haptics from "expo-haptics";
+import { Link, router } from "expo-router";
+import { Alert, Platform, Pressable, Text, View } from "react-native";
+import { useRipple } from "@/lib/press";
+import { useShelf } from "@/store/shelf";
 import { CheckIcon } from "@/core/components/icons/Icons";
 import { useColors } from "@/lib/colors";
 import { progressOf, rowKindLine } from "@/core/components/mangaCard/cardText";
@@ -28,9 +33,11 @@ export default function ShelfRow({
   latestChapter?: number | null;
   latestVolume?: number | null;
   select?: { checked: boolean; onToggle: () => void };
+  // "Select several" from the menu
   onLongPress?: () => void;
 }) {
   const c = useColors();
+  const ripple = useRipple();
   const { unit, reading, knownTotal } = progressOf(
     manga,
     tracksOf(manga, trackBy),
@@ -46,9 +53,8 @@ export default function ShelfRow({
 
   const row = (
     <Pressable
+      android_ripple={ripple}
       onPress={select?.onToggle}
-      onLongPress={select ? undefined : onLongPress}
-      delayLongPress={400}
       accessibilityState={select ? { selected: select.checked } : undefined}
       className={`flex-row items-center gap-3 py-1.5 active:opacity-70 ${select?.checked ? "bg-accent-wash" : ""}`}
     >
@@ -104,9 +110,86 @@ export default function ShelfRow({
   );
   if (select) return row;
   return (
-    <Link href={`/details/${manga.id}`} asChild>
-      {row}
-    </Link>
+    <MenuView
+      title={manga.name}
+      shouldOpenOnLongPress
+      actions={menuActions(manga)}
+      onPressAction={({ nativeEvent }) => {
+        void Haptics.selectionAsync();
+        const id = nativeEvent.event;
+        if (id === "edit") router.push(`/edit/${manga.id}`);
+        else if (id === "select") onLongPress?.();
+        else if (id === "delete") askToDelete(manga);
+        else if (id.startsWith("move:"))
+          void useShelf
+            .getState()
+            .moveMany([manga.id], id.slice("move:".length) as ShelfStatus);
+      }}
+    >
+      <Link href={`/details/${manga.id}`} asChild>
+        {row}
+      </Link>
+    </MenuView>
+  );
+}
+
+type ShelfStatus = "reading" | "finished" | "planned";
+
+// the other two tabs it could go to, then Select and Delete
+function menuActions(manga: Manga): MenuAction[] {
+  const current: ShelfStatus = manga.planned
+    ? "planned"
+    : manga.status
+      ? "finished"
+      : "reading";
+  const moves: { status: ShelfStatus; title: string; sf: string }[] = [
+    { status: "reading", title: "Move to Reading", sf: "book" },
+    { status: "finished", title: "Move to Finished", sf: "checkmark.circle" },
+    { status: "planned", title: "Move to To read", sf: "bookmark" },
+  ];
+  const ios = Platform.OS === "ios";
+  return [
+    { id: "edit", title: "Edit details", image: ios ? "pencil" : undefined },
+    ...moves
+      .filter((m) => m.status !== current)
+      .map((m) => ({
+        id: `move:${m.status}`,
+        title: m.title,
+        image: ios ? m.sf : undefined,
+      })),
+    {
+      id: "select",
+      title: "Select several",
+      image: ios ? "checklist" : undefined,
+    },
+    {
+      id: "delete",
+      title: "Delete",
+      attributes: { destructive: true },
+      image: ios ? "trash" : undefined,
+    },
+  ];
+}
+
+function askToDelete(manga: Manga) {
+  Alert.alert(
+    `Delete ${manga.name}?`,
+    "It comes off your shelf with its volumes and books, rating, reading progress and notes.",
+    [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete it",
+        style: "destructive",
+        onPress: () => {
+          void useShelf
+            .getState()
+            .removeMany([manga.id])
+            .then((done) => {
+              if (!done) Alert.alert("That didn't delete it. Try again.");
+            });
+        },
+      },
+    ],
   );
 }
 

@@ -4,6 +4,7 @@
 import type { ComponentType } from "react";
 import { Pressable, Text } from "react-native";
 import { useColors } from "@/lib/colors";
+import { useRipple } from "@/lib/press";
 import Sheet from "./Sheet";
 
 type Icon = ComponentType<{ color?: string; width?: number; height?: number }>;
@@ -27,6 +28,7 @@ export default function MenuSheet({
   onClose: () => void;
 }) {
   const c = useColors();
+  const ripple = useRipple();
   return (
     <Sheet open={open} onClose={onClose} contentClassName="px-2 pb-8">
       {title ? (
@@ -39,6 +41,7 @@ export default function MenuSheet({
       ) : null}
       {items.map((item) => (
         <Pressable
+          android_ripple={ripple}
           key={item.label}
           disabled={item.disabled}
           onPress={() => {

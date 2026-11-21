@@ -7,7 +7,8 @@
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 import Button from "@/components/Button";
@@ -295,7 +296,8 @@ export default function AddScreen() {
         </Text>
       </View>
       <DoubleRule />
-      <ScrollView
+      <KeyboardAwareScrollView
+        bottomOffset={24}
         contentContainerClassName="gap-5 px-4 pt-4 pb-16"
         keyboardShouldPersistTaps="handled"
       >
@@ -611,7 +613,7 @@ export default function AddScreen() {
             </View>
           </>
         )}
-      </ScrollView>
+      </KeyboardAwareScrollView>
       <PickSheet
         open={pickingGenre}
         title="Genre"

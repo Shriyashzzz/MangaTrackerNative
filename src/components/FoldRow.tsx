@@ -3,6 +3,8 @@
 // count, something quiet on the right, and a chevron that turns when open
 import { useState, type ReactNode } from "react";
 import { Pressable, Text, View } from "react-native";
+import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
+import { useRipple } from "@/lib/press";
 import { ChevronRightIcon } from "@/core/components/icons/Icons";
 import { useColors } from "@/lib/colors";
 
@@ -23,9 +25,14 @@ export default function FoldRow({
 }) {
   const c = useColors();
   const [open, setOpen] = useState(openAtFirst);
+  const ripple = useRipple();
   return (
-    <View className="border-t border-line-soft">
+    <Animated.View
+      layout={LinearTransition}
+      className="border-t border-line-soft"
+    >
       <Pressable
+        android_ripple={ripple}
         onPress={() => setOpen(!open)}
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
@@ -47,7 +54,11 @@ export default function FoldRow({
           <ChevronRightIcon color={c.muted} width={18} height={18} />
         </View>
       </Pressable>
-      {open ? <View className="pb-4">{children}</View> : null}
-    </View>
+      {open ? (
+        <Animated.View entering={FadeIn.duration(180)} className="pb-4">
+          {children}
+        </Animated.View>
+      ) : null}
+    </Animated.View>
   );
 }
