@@ -17,6 +17,9 @@ npx expo start            # day to day: start Metro, then open the app
 - Something looks unchanged after an edit: `npx expo start --clear`.
 - A phone on USB reaches Metro and the local server through adb:
   `adb reverse tcp:8081 tcp:8081` and `adb reverse tcp:8080 tcp:8080`.
+- Native modules in use (a rebuild after adding one): async storage (what
+  the device remembers), the date picker, the camera (scanning), haptics,
+  notifications, the image picker, the clipboard.
 
 While developing, the app talks to `http://localhost:8080` (the local
 server). A release build talks to `https://mangatracker.xyz`.
@@ -71,11 +74,30 @@ the lean, so the last letter gets cut: give every `font-brand` text `pr-1`.
 Components that aren't React Native's own (`expo-image`, safe areas) don't
 take `className`: wrap them with `withUniwind`, or give them plain styles.
 
+## Where the app does it its own way
+
+The screens follow the Android app's, but where the phone has a better
+control the app uses it:
+
+- Pick-one lists (the shelf's tab and sort, genres, editions) are bottom
+  sheets, not dropdowns.
+- Questions (delete a series, clear To buy) are the system's own alerts.
+- "Bought on" opens Android's date picker.
+- The + button floats above the tab bar; Select starts with a long press.
+- A scan buzzes instead of beeping, and the camera reads barcodes itself.
+- The release settings' "how many behind" is a − N + counter (the website
+  has a slider).
+- Share my list and Export my list hand the link or the file to the
+  phone's share sheet.
+- Your year in manga, the import and shared shelves open on the website
+  until the app has pages of its own.
+
 ## Not done yet
 
-- Shelf search, sort and Select
-- Reading counter, rating, notes, your books, settings, add and import,
-  notifications (phase 4)
+- Your year in manga, the import, shared shelves (web pages for now)
+- Alerts on the phone (the server sends web push today; the app needs its
+  own tokens)
+- Linking Google to an account from the app
 - Changes made offline: the website keeps and sends them; the app says they
   didn't save
 - Live price checks (the website proves a person is there first; the app
