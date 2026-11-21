@@ -21,11 +21,18 @@ type Props = {
   border?: number;
 };
 
-export default function SeriesCover({ name, lightNovel, url, width, border = 1.5 }: Props) {
+export default function SeriesCover({
+  name,
+  lightNovel,
+  url,
+  width,
+  border = 1.5,
+}: Props) {
   const c = useColors();
   const choices = coverChoices(url, { name: priceName({ name, lightNovel }) });
   const wanted = width * PixelRatio.get();
-  const choice = choices.find((x) => x.width >= wanted) ?? choices[choices.length - 1];
+  const choice =
+    choices.find((x) => x.width >= wanted) ?? choices[choices.length - 1];
   const src = coverSrc(choice?.url);
   const [failed, setFailed] = useState<string | null>(null);
   const box = {
@@ -38,13 +45,26 @@ export default function SeriesCover({ name, lightNovel, url, width, border = 1.5
   };
   if (!src || failed === src)
     return (
-      <View style={[box, { alignItems: "center", justifyContent: "center", padding: 4 }]}>
-        <Text numberOfLines={4} className="text-center font-brand text-[11px] text-ink-soft uppercase">
+      <View
+        style={[
+          box,
+          { alignItems: "center", justifyContent: "center", padding: 4 },
+        ]}
+      >
+        <Text
+          numberOfLines={4}
+          className="text-center font-brand text-[11px] text-ink-soft uppercase"
+        >
           {name}
         </Text>
       </View>
     );
   return (
-    <Image source={{ uri: src }} style={box} contentFit="cover" onError={() => setFailed(src)} />
+    <Image
+      source={{ uri: src }}
+      style={box}
+      contentFit="cover"
+      onError={() => setFailed(src)}
+    />
   );
 }
