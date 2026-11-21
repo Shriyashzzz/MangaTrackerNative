@@ -13,58 +13,73 @@ export default function NewRow({
   found,
   kind,
   onHide,
+  hideWord = "Hide",
+  onOpenList,
 }: {
   manga: Manga;
   found: ReleaseStatus | null | undefined;
   kind: ReleaseKind;
   onHide: () => void;
+  // "Show" on the hidden list
+  hideWord?: string;
+  // several behind: a tap opens the list of them instead of the series
+  onOpenList?: () => void;
 }) {
   const news = newsFor(manga, found, kind);
+  const body = (
+    <Pressable
+      onPress={onOpenList}
+      className="min-w-0 flex-1 flex-row items-center gap-3 active:opacity-70"
+    >
+      <SeriesCover
+        name={manga.name}
+        lightNovel={manga.lightNovel}
+        url={manga.image}
+        width={52}
+      />
+      <View className="min-w-0 flex-1 gap-[2px]">
+        <Text numberOfLines={1} className="font-display text-[17px] text-ink">
+          {manga.name}
+        </Text>
+        <Text
+          className={`font-brand pr-1 text-[17px] tracking-[1px] uppercase ${news.behind ? "text-ink-soft" : "text-accent"}`}
+        >
+          {news.text}
+        </Text>
+        {news.behind ? (
+          <Text className="font-brand pr-1 text-[14px] tracking-[1px] text-ink-soft uppercase">
+            {news.behind}
+          </Text>
+        ) : null}
+        {news.yours ? (
+          <Text
+            numberOfLines={1}
+            className="font-body text-[13px] text-ink-soft"
+          >
+            {news.yours}
+          </Text>
+        ) : null}
+      </View>
+    </Pressable>
+  );
   return (
     <View className="flex-row items-center gap-3 py-2">
-      <Link href={`/details/${manga.id}`} asChild>
-        <Pressable className="min-w-0 flex-1 flex-row items-center gap-3 active:opacity-70">
-          <SeriesCover
-            name={manga.name}
-            lightNovel={manga.lightNovel}
-            url={manga.image}
-            width={52}
-          />
-          <View className="min-w-0 flex-1 gap-[2px]">
-            <Text
-              numberOfLines={1}
-              className="font-display text-[17px] text-ink"
-            >
-              {manga.name}
-            </Text>
-            <Text
-              className={`font-brand pr-1 text-[17px] tracking-[1px] uppercase ${news.behind ? "text-ink-soft" : "text-accent"}`}
-            >
-              {news.text}
-            </Text>
-            {news.behind ? (
-              <Text className="font-brand pr-1 text-[14px] tracking-[1px] text-ink-soft uppercase">
-                {news.behind}
-              </Text>
-            ) : null}
-            {news.yours ? (
-              <Text
-                numberOfLines={1}
-                className="font-body text-[13px] text-ink-soft"
-              >
-                {news.yours}
-              </Text>
-            ) : null}
-          </View>
-        </Pressable>
-      </Link>
+      {onOpenList ? (
+        body
+      ) : (
+        <Link href={`/details/${manga.id}`} asChild>
+          {body}
+        </Link>
+      )}
       <Pressable
         onPress={onHide}
         hitSlop={6}
         className="rounded-[3px] border-[1.5px] border-line px-3 py-1.5 active:bg-accent-wash"
-        accessibilityLabel={`Hide ${manga.name}`}
+        accessibilityLabel={`${hideWord} ${manga.name}`}
       >
-        <Text className="font-body-medium text-[14px] text-ink">Hide</Text>
+        <Text className="font-body-medium text-[14px] text-ink">
+          {hideWord}
+        </Text>
       </Pressable>
     </View>
   );

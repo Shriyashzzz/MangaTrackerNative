@@ -92,6 +92,10 @@ const ENTRIES = [
   "lib/contact.ts",
   // To buy's "Out Dec 3", and a volume page's rules
   "pages/Prices/volumePageRules.ts",
+  // release dates into a calendar (New's Upcoming Releases, the calendar page)
+  "lib/addToCalendar.ts",
+  // "Checked 6 h ago" (the app's own stand-in)
+  "lib/releaseCache.ts",
 ];
 
 // browser-only things a copied file may not use

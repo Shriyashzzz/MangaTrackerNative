@@ -5,9 +5,15 @@ import { create } from "zustand";
 import { apiFetch, getJson } from "@/core/lib/api";
 import { restorable, restorePieces } from "@/core/lib/restorePieces";
 import {
+  isStillNew,
+  type ReleaseOutcome,
+  type SeenKind,
+} from "@/core/lib/releaseMath";
+import {
   getReleases,
   getSavedReleases,
   RELEASE_CHECK_TIMEOUT_MS,
+  saveSeen,
 } from "@/core/lib/shelf";
 import type { Manga, ReleaseStatus } from "@/core/lib/types";
 
@@ -28,13 +34,25 @@ type ShelfState = {
   // each series' release check: what's out past theirs; null when it found
   // nothing to say. A series not in here hasn't been checked yet
   releases: Record<number, ReleaseStatus | null>;
+  // how each check went: news, nothing known, or it failed (asked again
+  // next time), and when, for "Checked 6 h ago"
+  outcomes: Record<number, ReleaseOutcome>;
+  checkedAt: Record<number, number>;
   load: () => Promise<void>;
   // the server's saved answers first (one request), then every series it has
   // none for, one at a time, as the web does
   checkReleases: () => Promise<void>;
-  // Hide on New: off the list at once (the server's answer agrees once saved),
-  // as the web's markSeen
-  hide: (id: number, kind: "volumes" | "chapters" | "japan") => void;
+  // Hide on New (and its undo), as the web's markSeen: the series is marked
+  // seen up to that number at once, and put back if the save fails. Says
+  // whether it saved
+  markSeen: (
+    id: number,
+    kind: SeenKind,
+    number: number | null,
+    hiddenVolumes?: number[],
+  ) => Promise<boolean>;
+  // the settings changed: every answer is asked for again
+  recheckReleases: () => void;
   // it's been deleted: gone at once, not after the next refresh
   remove: (ids: number | number[]) => void;
   // several deleted at once with Select, all or none. Says whether it
@@ -60,6 +78,13 @@ type ShelfState = {
 // a check under way: a second one waits for it rather than doubling up
 let checking = false;
 
+// where each kind of "Hide" lives on a manga, and the flag it switches off
+const SEEN = {
+  volume: { field: "seenVolume", flag: "hasNewVolume" },
+  chapter: { field: "seenChapter", flag: "hasNewChapter" },
+  japan: { field: "seenJapanVolume", flag: "hasNewJapaneseVolume" },
+} as const;
+
 // one series, given up on after a while so one stuck title can't stop the rest
 async function askAbout(id: number) {
   const controller = new AbortController();
@@ -77,6 +102,8 @@ export const useShelf = create<ShelfState>()((set, get) => ({
   manga: null,
   failed: null,
   releases: {},
+  outcomes: {},
+  checkedAt: {},
   lastDeleted: null,
   undoing: false,
   undoMessage: "",
@@ -250,15 +277,47 @@ export const useShelf = create<ShelfState>()((set, get) => ({
     }
   },
 
-  hide: (id, kind) => {
-    const found = get().releases[id];
-    if (!found) return;
-    const flag = {
-      volumes: "hasNewVolume",
-      chapters: "hasNewChapter",
-      japan: "hasNewJapaneseVolume",
-    }[kind];
-    set({ releases: { ...get().releases, [id]: { ...found, [flag]: false } } });
+  markSeen: async (id, kind, number, hiddenVolumes) => {
+    const { field, flag } = SEEN[kind];
+    const apply = (seen: number | null, hiddenList?: number[]) =>
+      set((state) => {
+        const manga =
+          state.manga?.map((m) =>
+            m.id === id
+              ? {
+                  ...m,
+                  [field]: seen,
+                  ...(hiddenList ? { hiddenVolumes: hiddenList } : {}),
+                }
+              : m,
+          ) ?? null;
+        const release = state.releases[id];
+        const changed = manga?.find((m) => m.id === id);
+        return {
+          manga,
+          releases:
+            release && changed
+              ? {
+                  ...state.releases,
+                  [id]: {
+                    ...release,
+                    [flag]: isStillNew(kind, changed, release),
+                  },
+                }
+              : state.releases,
+        };
+      });
+    const before = get().manga?.find((m) => m.id === id);
+    const previous = before?.[field] ?? null;
+    const previousList = before?.hiddenVolumes ?? [];
+    apply(number, hiddenVolumes);
+    try {
+      await saveSeen(id, kind, number, hiddenVolumes);
+      return true;
+    } catch {
+      apply(previous, hiddenVolumes ? previousList : undefined);
+      return false;
+    }
   },
 
   checkReleases: async () => {
@@ -267,19 +326,38 @@ export const useShelf = create<ShelfState>()((set, get) => ({
     try {
       const saved = await getSavedReleases().catch(() => null);
       if (saved) {
+        const now = Date.now();
         const releases = { ...get().releases };
-        for (const [id, answer] of Object.entries(saved.answers))
-          releases[Number(id)] = answer.releaseStatus;
-        set({ releases });
+        const outcomes = { ...get().outcomes };
+        const checkedAt = { ...get().checkedAt };
+        for (const [key, answer] of Object.entries(saved.answers)) {
+          const id = Number(key);
+          releases[id] = answer.releaseStatus;
+          outcomes[id] = answer.releaseStatus ? "news" : "notFound";
+          checkedAt[id] = now;
+        }
+        set({ releases, outcomes, checkedAt });
       }
       for (const m of get().manga ?? []) {
         if (m.id in get().releases) continue;
         const found = await askAbout(m.id);
-        if (!found) continue;
-        set({ releases: { ...get().releases, [m.id]: found.releaseStatus } });
+        const outcome: ReleaseOutcome = !found
+          ? "failed"
+          : found.releaseStatus
+            ? "news"
+            : found.complete
+              ? "notFound"
+              : "failed";
+        set({
+          releases: { ...get().releases, [m.id]: found?.releaseStatus ?? null },
+          outcomes: { ...get().outcomes, [m.id]: outcome },
+          checkedAt: { ...get().checkedAt, [m.id]: Date.now() },
+        });
       }
     } finally {
       checking = false;
     }
   },
+
+  recheckReleases: () => set({ releases: {}, outcomes: {}, checkedAt: {} }),
 }));

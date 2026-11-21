@@ -1,0 +1,90 @@
+// The red Upcoming Releases bar at the top of New (the web's pages/Home/
+// UpcomingReleases.tsx): the next release day and this month's count, with
+// three covers; opened, the month at a glance, the dates to save, the first
+// few releases, and the way to the full calendar
+import { router } from "expo-router";
+import { useEffect, useState } from "react";
+import { Pressable, Text, View } from "react-native";
+import { ChevronDownIcon } from "@/core/components/icons/Icons";
+import {
+  dayName,
+  getCalendar,
+  monthName,
+  monthOnly,
+  type CalendarMonth,
+} from "@/core/lib/collector";
+import AddToCalendar from "./calendar/AddToCalendar";
+import MiniMonth from "./calendar/MiniMonth";
+import ReleaseList, { VolumeCover } from "./calendar/ReleaseList";
+
+const SHOWN = 6;
+
+export default function UpcomingReleases() {
+  const [months, setMonths] = useState<CalendarMonth[] | null>(null);
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    const controller = new AbortController();
+    getCalendar(controller.signal)
+      .then(setMonths)
+      .catch(() => {});
+    return () => controller.abort();
+  }, []);
+  const first = months?.[0];
+  if (!first?.volumes.length) return null;
+  const next = first.volumes[0]!;
+  const count = first.volumes.length;
+  return (
+    <View className="overflow-hidden rounded-[6px] border-2 border-line bg-accent">
+      <Pressable
+        onPress={() => setOpen(!open)}
+        accessibilityState={{ expanded: open }}
+        className="flex-row items-center gap-3 px-3 py-2.5"
+      >
+        <View className="flex-row">
+          {first.volumes.slice(0, 3).map((v, i) => (
+            <View
+              key={v.isbn13}
+              style={{
+                transform: [{ rotate: `${[-4, 3, -2][i]}deg` }],
+                marginLeft: i ? -10 : 0,
+              }}
+            >
+              <VolumeCover volume={v} />
+            </View>
+          ))}
+        </View>
+        <View className="min-w-0 flex-1">
+          <Text className="font-brand pr-1 text-[18px] tracking-[1px] text-on-accent uppercase">
+            Upcoming Releases
+          </Text>
+          <Text className="font-body text-[13.5px] text-on-accent">
+            Next: {dayName(next.published)} · {count} in{" "}
+            {monthOnly(first.month)}
+          </Text>
+        </View>
+        <View style={{ transform: [{ rotate: open ? "180deg" : "0deg" }] }}>
+          <ChevronDownIcon color="#fffaf2" width={20} height={20} />
+        </View>
+      </Pressable>
+      {open ? (
+        <View className="gap-3 bg-paper px-3 pt-3 pb-2">
+          <MiniMonth month={first.month} volumes={first.volumes} />
+          <View className="flex-row flex-wrap items-center gap-3">
+            <AddToCalendar
+              big
+              volumes={first.volumes}
+              label={`Save ${monthName(first.month)}'s release dates to your calendar`}
+              text={`Save ${first.volumes.length > 1 ? `${first.volumes.length} dates` : "the date"}`}
+            />
+            <Pressable onPress={() => router.push("/calendar")} hitSlop={6}>
+              <Text className="font-body-semibold text-[14px] text-ink underline">
+                Full calendar
+              </Text>
+            </Pressable>
+          </View>
+          <ReleaseList volumes={first.volumes.slice(0, SHOWN)} />
+        </View>
+      ) : null}
+    </View>
+  );
+}
