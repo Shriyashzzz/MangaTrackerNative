@@ -1,0 +1,43 @@
+// New releases (the web's NewReleasesTab): checks on or off, and what New
+// lists when they're on
+import { router } from "expo-router";
+import { Pressable, Text } from "react-native";
+import { usePrefs } from "@/store/prefs";
+import ReleaseControls from "./ReleaseControls";
+import { Help, Section, Tick } from "./parts";
+
+export default function NewReleasesTab() {
+  const checksOn = usePrefs((s) => s.prefs.releaseChecks !== "off");
+  const save = usePrefs((s) => s.save);
+  return (
+    <Section title="New releases">
+      <Tick
+        label="Check for new volumes and chapters"
+        value={checksOn}
+        onChange={(on) =>
+          void save({ releaseChecks: on ? "on" : "off" }).catch(() => {})
+        }
+      />
+      {checksOn ? (
+        <>
+          <Help>
+            What your shelf's New tab lists.{" "}
+            <Text
+              className="font-body-semibold text-ink underline"
+              onPress={() => router.push("/new-releases")}
+            >
+              How this works
+            </Text>
+          </Help>
+          <ReleaseControls />
+        </>
+      ) : (
+        <Help>
+          Off. Your shelf has no New tab, and manga pages don't show new
+          releases or next chapter dates. Prices still work.
+        </Help>
+      )}
+      <Pressable />
+    </Section>
+  );
+}
