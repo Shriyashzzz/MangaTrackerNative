@@ -5,7 +5,7 @@ import { Pressable, View } from "react-native";
 import { StarIcon } from "@/core/components/icons/Icons";
 import { useColors } from "@/lib/colors";
 
-const SIZES = { sm: 14, lg: 30 };
+const SIZES = { sm: 14, md: 20, lg: 30 };
 
 export default function StarRating({
   value,

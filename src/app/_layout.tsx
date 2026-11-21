@@ -20,8 +20,9 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { loadDeviceStore } from "@/lib/deviceStore";
 import { useAuth } from "@/store/auth";
 
 SplashScreen.preventAutoHideAsync();
@@ -41,11 +42,15 @@ export default function RootLayout() {
   const isSignedIn = useAuth((s) => s.isSignedIn);
   const check = useAuth((s) => s.check);
 
+  // what this device remembers (lib/deviceStore.ts): read before any screen
+  const [storeLoaded, setStoreLoaded] = useState(false);
   useEffect(() => {
     void check();
+    void loadDeviceStore().then(() => setStoreLoaded(true));
   }, [check]);
 
-  const ready = (fontsLoaded || fontError) && isSignedIn !== null;
+  const ready =
+    (fontsLoaded || fontError) && isSignedIn !== null && storeLoaded;
   useEffect(() => {
     if (ready) void SplashScreen.hideAsync();
   }, [ready]);
@@ -58,6 +63,7 @@ export default function RootLayout() {
         <Stack.Protected guard={isSignedIn}>
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="details/[id]" />
+          <Stack.Screen name="edit/[id]" />
           <Stack.Screen name="prices/series" />
           <Stack.Screen name="prices/[isbn]" />
         </Stack.Protected>

@@ -62,6 +62,21 @@ const ENTRIES = [
   "pages/Home/useShelfTools.ts",
   // deleting with Undo, Select's Move to (phase 4)
   "lib/restorePieces.ts",
+  // the rest of the series page: their books, reviews, Buy next's rules,
+  // the red bar, the edit form's rules
+  "lib/reviews.ts",
+  "lib/books.ts",
+  "lib/booksApi.ts",
+  "lib/titleKey.ts",
+  "lib/anilist.ts",
+  "lib/formChecks.ts",
+  "lib/seriesFormRules.ts",
+  "lib/content/genres.ts",
+  "pages/Details/yourBooksRows.ts",
+  "pages/Details/useShelfReviews.ts",
+  "pages/Details/useRateVolume.ts",
+  "pages/Details/upcomingClosed.ts",
+  "components/coverPicker/useCoverSearch.ts",
 ];
 
 // browser-only things a copied file may not use

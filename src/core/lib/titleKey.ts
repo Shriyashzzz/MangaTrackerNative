@@ -1,0 +1,21 @@
+// COPIED from inventoryApp/client/src/lib/titleKey.ts by scripts/sync-core.mjs.
+// Do not edit here: change the web app, then run `npm run sync-core`.
+// What makes two titles the same series on a shelf, as the server decides it
+// (server/src/util/shelf/titleKey.ts, kept in step by a test): case, spaces,
+// punctuation and accents aside. Titles with no Latin letters are compared as
+// written, less any spaces. The manga and the light novel are two entries
+const letters = (name: string) =>
+  name
+    .toLowerCase()
+    // "Hunter × Hunter" is "Hunter x Hunter", not "HunterHunter"
+    .replace(/×/g, "x")
+    // a "+" is part of the name: "+Anima" isn't "Anima"
+    .replace(/\+/g, "plus")
+    .normalize("NFKD")
+    .replace(/[^a-z0-9]+/g, "");
+
+export const titleKey = (name: string) =>
+  letters(name) || name.replace(/\s+/g, "").toLowerCase();
+
+export const shelfKey = (name: string, lightNovel = false) =>
+  lightNovel ? `${titleKey(name)} (light novel)` : titleKey(name);

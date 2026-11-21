@@ -23,7 +23,7 @@ import {
   toggleSlot,
   volumesAfterPaint,
 } from "@/core/lib/editionShelf";
-import { ownedOf } from "@/core/lib/ownedVolumes";
+import { ownedOf, ownedVolumes as ownedFrom } from "@/core/lib/ownedVolumes";
 import { priceName } from "@/core/lib/prices";
 import { tracksOf } from "@/core/lib/reading";
 import type { Manga } from "@/core/lib/types";
@@ -46,12 +46,28 @@ function slideText(before: number[], now: number[]) {
 // where it's shown can say more than the series page knows: the newest out
 // from the shelf's release check, and the book the strip opens at (a tap on
 // a Volumes row's bar)
-type Options = { latest?: number | null; opensAt?: number | null };
+type Options = {
+  latest?: number | null;
+  opensAt?: number | null;
+  // ordered and on their way: Buy next and the edition's plan go past them
+  ordered?: number[];
+  // with none owned: the volume their next chapter is in (the series page
+  // knows it from the release check)
+  readingFrom?: number | null;
+  // where each volume starts, by chapter, for their place on the shelf
+  volumeStarts?: { volume: number; firstChapter: number }[];
+};
 
 export function useSeriesShelf(
   manga: Manga | null,
   setManga: Dispatch<SetStateAction<Manga | null>>,
-  { latest = null, opensAt }: Options = {},
+  {
+    latest = null,
+    opensAt,
+    ordered = [],
+    readingFrom = null,
+    volumeStarts = [],
+  }: Options = {},
 ) {
   const trackBy = usePrefs((s) => s.prefs.trackBy ?? "series");
   const [saveFailed, setSaveFailed] = useState(false);
@@ -63,16 +79,24 @@ export function useSeriesShelf(
   const slideStart = useRef<number[] | null>(null);
 
   const owned = manga ? ownedOf(manga) : [];
-  const buyOptions = useBuyOptions(manga ? priceName(manga) : null, {
-    volumesOwned: manga?.volumesOwned ?? null,
-    ownedList: manga?.ownedList,
-  });
+  const buyOptions = useBuyOptions(
+    manga ? priceName(manga) : null,
+    ordered.length
+      ? ownedFrom(null, [...owned, ...ordered])
+      : {
+          volumesOwned: manga?.volumesOwned ?? null,
+          ownedList: manga?.ownedList,
+        },
+    readingFrom,
+  );
   const editions = useEditions(
     manga && !manga.lightNovel ? priceName(manga) : null,
     manga?.id ?? null,
     manga?.edition,
-    owned,
+    // ordered counts as theirs here too: the next book is the one after
+    [...owned, ...ordered],
     buyOptions.volumes.map((v) => v.isbn13),
+    readingFrom,
   );
   const ownedVolumes = useOwnedVolumes({
     manga,
@@ -84,7 +108,7 @@ export function useSeriesShelf(
   const highest = Math.floor(Math.max(0, ...owned));
   const total = shelfSize(highest, latest, buyOptions);
   const place = manga
-    ? placeOnShelf(manga, tracksOf(manga, trackBy), [])
+    ? placeOnShelf(manga, tracksOf(manga, trackBy), volumeStarts)
     : null;
   const gaps = Array.from({ length: highest }, (_, i) => i + 1).filter(
     (v) => !owned.includes(v),

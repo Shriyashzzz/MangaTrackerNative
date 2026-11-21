@@ -1,8 +1,11 @@
 // COPIED from src/native/lib/prefs.ts (the app's own stand-in for the web's) by scripts/sync-core.mjs.
 // Do not edit here: change src/native/lib/prefs.ts, then run `npm run sync-core`.
 // The app's stand-in for the web's lib/prefs.ts: the settings the shared
-// hooks read, from the app's prefs store (store/prefs.ts)
+// hooks read, from the app's prefs store (store/prefs.ts), and what's kept
+// on this device alone (lib/deviceStore.ts)
 import { usePrefs } from "@/store/prefs";
+
+export { readLocal, writeLocal } from "@/lib/deviceStore";
 
 // which to buy first: the next after theirs, or their gaps (Settings, Next
 // in line)
