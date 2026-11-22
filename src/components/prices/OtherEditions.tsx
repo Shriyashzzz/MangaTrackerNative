@@ -2,7 +2,8 @@
 // each line's books as cards, which book holds a volume, the lines to switch
 // between, and what a whole run costs against the singles
 import { useEffect, useState } from "react";
-import { Text, useWindowDimensions, View } from "react-native";
+import { router } from "expo-router";
+import { Pressable, Text, useWindowDimensions, View } from "react-native";
 import Segmented from "../Segmented";
 import { getJson } from "@/core/lib/api";
 import { nextVolumeFor } from "@/core/lib/editionLookup";
@@ -124,7 +125,7 @@ export default function OtherEditions({
               mark={have === book.volumes.length ? "yours" : undefined}
               subtitle={
                 !book.isbn13 && book.knownPriceCents == null
-                  ? "not listed yet"
+                  ? "not listed"
                   : have > 0 && have < book.volumes.length
                     ? `you have ${have} of ${book.volumes.length}`
                     : undefined
@@ -136,6 +137,15 @@ export default function OtherEditions({
           );
         })}
       </View>
+      <Pressable
+        onPress={() => router.push("/editions")}
+        hitSlop={6}
+        className="self-start"
+      >
+        <Text className="font-body-medium text-[14px] text-ink-soft underline">
+          Every series with other editions →
+        </Text>
+      </Pressable>
       {books ? (
         <View className="gap-0.5">
           <Text className="font-body text-[14px] text-ink-soft">

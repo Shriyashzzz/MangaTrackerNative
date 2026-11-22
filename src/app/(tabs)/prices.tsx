@@ -360,13 +360,16 @@ export default function PricesScreen() {
         {!searching ? (
           <Pressable
             onPress={() => router.push("/after-anime")}
-            className="gap-0.5 rounded-[14px] border border-line-soft bg-card px-3 py-2.5 active:bg-accent-wash"
+            className="gap-1 rounded-[14px] border border-line-soft bg-card px-4 py-3.5 active:bg-accent-wash"
           >
             <Text className="font-brand pr-1 text-[18px] tracking-[1px] text-ink uppercase">
-              Watched the anime?
+              Finished the anime?
             </Text>
             <Text className="font-body text-[14px] text-ink-soft">
-              Find the chapter and volume of the manga to start from. →
+              Find the chapter and volume of the manga to start from.
+            </Text>
+            <Text className="pt-1 font-body-semibold text-[14.5px] text-ink underline">
+              Find where to start →
             </Text>
           </Pressable>
         ) : null}

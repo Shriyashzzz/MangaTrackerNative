@@ -1,6 +1,5 @@
 // "Which book has volume 23?" (the web's EditionFinder): the book of each
 // edition that holds the volume typed, each a way to its prices
-import { router } from "expo-router";
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { lookUpVolume, type LookupLine } from "@/core/lib/editionLookup";
@@ -77,15 +76,6 @@ export default function EditionFinder({
             </View>
           ))
         : null}
-      <Pressable
-        onPress={() => router.push("/editions")}
-        hitSlop={6}
-        className="self-start"
-      >
-        <Text className="font-body text-[13px] text-muted underline">
-          Every series with other editions →
-        </Text>
-      </Pressable>
     </View>
   );
 }

@@ -437,7 +437,7 @@ export default function BuyStrip({
                 <NextTicket
                   kind={nextLabel}
                   name={`Vol. ${unlisted}`}
-                  cost="not listed yet"
+                  cost="not listed"
                   pills={
                     onOrdered ? (
                       <GotIt
