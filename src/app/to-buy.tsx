@@ -13,18 +13,17 @@ import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { Alert, ScrollView, Text, View } from "react-native";
 import Svg, { Line } from "react-native-svg";
-import DashedLine from "@/components/DashedLine";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 import AddSeriesModal from "@/components/AddSeriesModal";
 import Button from "@/components/Button";
 import DoubleRule from "@/components/DoubleRule";
 import Mascot from "@/components/Mascot";
+import MenuSheet, { type MenuItem } from "@/components/MenuSheet";
 import PickSheet from "@/components/PickSheet";
 import Toast from "@/components/Toast";
 import {
   ChevronDownIcon,
-  InkCrossIcon,
   ChevronLeftIcon,
 } from "@/core/components/icons/Icons";
 import { coverSrc, formatCents, novelParts } from "@/core/lib/prices";
@@ -189,7 +188,7 @@ function pricesOf(item: ToBuyItem) {
 
 const STUB_HEIGHT = 44;
 
-// the dashed tear between two parts of a ticket
+// the dashed tear between two parts of the summary
 function Tear({ height = STUB_HEIGHT }: { height?: number }) {
   const c = useColors();
   return (
@@ -207,11 +206,13 @@ function Tear({ height = STUB_HEIGHT }: { height?: number }) {
   );
 }
 
-// One book on the list, as a ticket (the Track stub's look on a series'
-// price page): its cover, name, the best price in big figures with the
-// other under it, their note, and a tear-off stub of what can be done with
-// it. The stub's parts share its width, so it never ends ragged
-function Ticket({
+// One book on the list, as a card with one clear way to buy it: the
+// cheapest copy and its store on a single button, the other copy as a line
+// of text, their note and price alert as two chips, and everything else
+// (On my shelf, Ordered, moving it, Remove) behind the ⋯ menu.
+// A preorder with a price is bought the same way; one with none yet opens
+// its own price page, where the preorder links are
+function Card({
   item,
   busy,
   onOwned,
@@ -234,37 +235,50 @@ function Ticket({
   move: { up: (() => void) | null; down: (() => void) | null } | null;
 }) {
   const c = useColors();
+  const [menuOpen, setMenuOpen] = useState(false);
   const name = nameOf(item);
   const { best, other } = pricesOf(item);
   const open = () => router.push(`/prices/${item.isbn13}`);
   const waiting = busy !== null;
-  const word = "font-brand text-[16px] tracking-[1px] uppercase";
-  const arrow = (up: boolean, go: (() => void) | null) => (
-    <>
-      <Tear />
-      <Tap
-        onPress={go ?? undefined}
-        disabled={!go || waiting}
-        accessibilityLabel={`Move ${name} ${up ? "up" : "down"}`}
-        className={`w-[42px] items-center justify-center ${go ? "" : "opacity-30"}`}
-        style={{ height: STUB_HEIGHT }}
-      >
-        <View style={{ transform: [{ rotate: up ? "180deg" : "0deg" }] }}>
-          <ChevronDownIcon color={c.ink} width={18} height={18} />
-        </View>
-      </Tap>
-    </>
-  );
+  const saving = busy === item.isbn13;
+  // the store's own page for a copy, or this book's price page when the
+  // copy has no link
+  const toStore = (url: string | null | undefined) =>
+    url ? openOutside(url) : open();
+  const alertMet =
+    item.alertCents != null && best != null && best.cents <= item.alertCents;
+  const chip = "min-h-[32px] flex-1 justify-center rounded-full border px-3";
+  const menu: MenuItem[] = [
+    ...(!item.outOn ? [{ label: "On my shelf", onPress: onOwned }] : []),
+    ...(item.outOn || item.volumes || item.edition
+      ? [{ label: "Ordered", onPress: onOrdered }]
+      : []),
+    ...(move
+      ? [
+          {
+            label: "Move up",
+            onPress: move.up ?? (() => {}),
+            disabled: !move.up,
+          },
+          {
+            label: "Move down",
+            onPress: move.down ?? (() => {}),
+            disabled: !move.down,
+          },
+        ]
+      : []),
+    { label: "Remove from the list", onPress: onRemove, danger: true },
+  ];
   return (
-    <View className="border-[1.5px] border-line bg-card">
-      <View className="flex-row gap-3 p-3">
+    <View className="gap-2.5 rounded-[16px] border border-line-soft bg-card p-3">
+      <View className="flex-row gap-3">
         <Tap onPress={open}>
           <Image
             source={{
               uri: coverSrc(item.coverUrl ?? item.seriesCoverUrl ?? ""),
             }}
             style={{
-              width: 60,
+              width: 66,
               aspectRatio: 2 / 3,
               borderWidth: 1.5,
               borderColor: c.line,
@@ -281,163 +295,146 @@ function Ticket({
             </View>
           ) : null}
         </Tap>
-        <View className="min-w-0 flex-1 gap-[3px]">
-          <Tap onPress={open}>
-            <Text className="font-body-semibold text-[15.5px] text-ink">
-              {name}
-            </Text>
-          </Tap>
+        <View className="min-w-0 flex-1 gap-1.5">
+          <View className="flex-row items-start gap-2">
+            <Tap onPress={open} className="min-w-0 flex-1">
+              <Text className="font-body-semibold text-[15.5px] leading-[20px] text-ink">
+                {name}
+              </Text>
+            </Tap>
+            <Tap
+              feel="round"
+              onPress={() => setMenuOpen(true)}
+              disabled={waiting}
+              hitSlop={10}
+              accessibilityLabel={`More for ${name}`}
+              className="-mt-1 px-1"
+            >
+              <Text className="font-body-semibold text-[22px] leading-[24px] text-ink-soft">
+                {saving ? "…" : "⋯"}
+              </Text>
+            </Tap>
+          </View>
           {item.shelf?.state ? (
             <Text className="font-mono text-[11px] tracking-[0.5px] text-ok uppercase">
               {item.shelf.state === "owned" ? "Already yours" : "Ordered"}
             </Text>
           ) : null}
-          {/* the cheaper copy in big figures, the other under it: each is
-              the way to that copy at its store, where there's a link */}
-          {best ? (
-            <Tap
-              onPress={() => openOutside(best.url)}
-              disabled={!best.url}
-              feel={best.url ? "ripple" : "none"}
-              accessibilityRole={best.url ? "link" : undefined}
-              accessibilityLabel={`${formatCents(best.cents)} ${best.kind} at ${best.store}${best.url ? ". Open the store" : ""}`}
-              className="flex-row flex-wrap items-baseline gap-x-2 self-start"
-            >
-              <Text className="font-brand pr-[6px] text-[26px] leading-[30px] text-ink">
-                {formatCents(best.cents)}
-                {"\u00A0"}
-              </Text>
-              <Text className="font-mono-medium text-[11px] tracking-[0.8px] text-ok uppercase">
-                {best.kind} · {best.store}
-                {best.url ? " →" : ""}
-              </Text>
-            </Tap>
-          ) : item.outOn ? (
-            <View className="flex-row flex-wrap items-baseline gap-x-2">
-              <Text className="font-brand pr-[6px] text-[26px] leading-[30px] text-ink uppercase">
-                {releaseDay(item.outOn)}
-                {"\u00A0"}
-              </Text>
-              <Text className="font-mono-medium text-[11px] tracking-[0.8px] text-ink-soft uppercase">
-                Preorder
-              </Text>
-            </View>
-          ) : null}
-          {other?.url ? (
-            <Tap
-              onPress={() => openOutside(other.url)}
-              hitSlop={4}
-              accessibilityRole="link"
-              className="self-start"
-            >
-              <Text className="font-mono text-[12.5px] text-ink-soft">
-                {other.kind} {formatCents(other.cents)} at{" "}
-                <Text className="text-ink underline">{other.store}</Text> →
-              </Text>
-            </Tap>
-          ) : (
-            <Text className="font-mono text-[12.5px] text-ink-soft">
-              {other
-                ? `${other.kind} ${formatCents(other.cents)} at ${other.store}`
-                : best
-                  ? `no ${best.kind === "new" ? "used" : "new"} price yet`
-                  : "No price yet"}
-            </Text>
-          )}
           {/* theirs: the note on it and the price to be told at, or the
-              ways to add them, side by side while both are short */}
-          <View className="flex-row flex-wrap items-baseline gap-x-4 gap-y-1 pt-0.5">
+              ways to add them. Two equal chips, so the row never ends short */}
+          <View className="mt-auto flex-row gap-2">
             <Tap
               onPress={onNote}
-              hitSlop={6}
               accessibilityLabel={
                 item.note ? `Note: ${item.note}. Change` : "Add a note"
               }
+              className={`${chip} border-line-soft`}
             >
               {item.note ? (
-                <Text className="font-display-italic text-[14.5px] leading-[20px] text-ink">
+                <Text
+                  numberOfLines={1}
+                  className="font-display-italic text-[13.5px] text-ink"
+                >
                   “{item.note}”
                 </Text>
               ) : (
-                <Text className="font-body text-[13.5px] text-muted">
-                  + Add a note
+                <Text
+                  numberOfLines={1}
+                  className="font-body text-[12.5px] text-ink-soft"
+                >
+                  + Note
                 </Text>
               )}
             </Tap>
             <Tap
               onPress={onAlert}
-              hitSlop={6}
               accessibilityLabel={
                 item.alertCents
                   ? `Alert under ${formatCents(item.alertCents)}. Change`
                   : "Set a price alert"
               }
+              className={`${chip} ${item.alertCents ? "border-accent bg-accent-wash" : "border-line-soft"}`}
             >
-              {item.alertCents ? (
-                // met already: said so, or "Alert under $30" beside an $8
-                // book reads as a mistake
-                <Text className="font-mono-medium text-[12.5px] text-accent-ink">
-                  {best && best.cents <= item.alertCents
-                    ? `Under your ${formatCents(item.alertCents)} now`
-                    : `Alert under ${formatCents(item.alertCents)}`}
-                </Text>
-              ) : (
-                <Text className="font-body text-[13.5px] text-muted">
-                  + Price alert
-                </Text>
-              )}
+              <Text
+                numberOfLines={1}
+                className={`font-body text-[12.5px] ${item.alertCents ? "text-accent-ink" : "text-ink-soft"}`}
+              >
+                {item.alertCents
+                  ? // met already: said so, or "under $30" beside an $8
+                    // book reads as a mistake
+                    alertMet
+                    ? `Under ${formatCents(item.alertCents)} now`
+                    : `Alert under ${formatCents(item.alertCents)}`
+                  : "+ Price alert"}
+              </Text>
             </Tap>
           </View>
         </View>
       </View>
-      <DashedLine soft={false} />
-      <View className="flex-row items-center">
-        {!item.outOn ? (
-          <Tap
-            onPress={onOwned}
-            disabled={waiting}
-            className="flex-1 items-center justify-center"
-            style={{ height: STUB_HEIGHT }}
+      {/* the one way to buy it */}
+      {best ? (
+        <Tap
+          onPress={() => toStore(best.url)}
+          accessibilityRole="link"
+          accessibilityLabel={`${formatCents(best.cents)} ${best.kind} at ${best.store}. Open the store`}
+          className="min-h-[46px] flex-row items-center justify-between gap-3 rounded-[12px] bg-accent px-3.5 py-2"
+        >
+          <Text className="font-brand pr-[6px] text-[23px] leading-[28px] text-on-accent">
+            {formatCents(best.cents)}
+            {"\u00A0"}
+          </Text>
+          <Text
+            numberOfLines={1}
+            className="min-w-0 shrink text-right font-body-semibold text-[13.5px] text-on-accent"
           >
-            <Text className={`${word} text-accent`}>
-              {"\u00A0"}
-              {busy === item.isbn13 ? "Saving…" : "On my shelf"}
+            {item.outOn ? "Preorder" : best.kind === "new" ? "New" : "Used"} at{" "}
+            {best.store} →
+          </Text>
+        </Tap>
+      ) : (
+        <Tap
+          onPress={open}
+          accessibilityRole="link"
+          className="min-h-[46px] flex-row items-center justify-between gap-3 rounded-[12px] bg-ink/10 px-3.5 py-2"
+        >
+          {item.outOn ? (
+            <Text className="font-brand pr-[6px] text-[21px] leading-[28px] text-ink uppercase">
+              Out {releaseDay(item.outOn)}
               {"\u00A0"}
             </Text>
-          </Tap>
-        ) : null}
-        {item.outOn || item.volumes || item.edition ? (
-          <>
-            {!item.outOn ? <Tear /> : null}
-            <Tap
-              onPress={onOrdered}
-              disabled={waiting}
-              className="flex-1 items-center justify-center"
-              style={{ height: STUB_HEIGHT }}
-            >
-              <Text className={`${word} text-ink`}>
-                {"\u00A0"}Ordered{"\u00A0"}
-              </Text>
-            </Tap>
-          </>
-        ) : null}
-        {move ? (
-          <>
-            {arrow(true, move.up)}
-            {arrow(false, move.down)}
-          </>
-        ) : null}
-        <Tear />
-        <Tap
-          onPress={onRemove}
-          disabled={waiting}
-          accessibilityLabel={`Remove ${name} from the list`}
-          className="w-[46px] items-center justify-center"
-          style={{ height: STUB_HEIGHT }}
-        >
-          <InkCrossIcon color={c.muted} width={13} height={13} />
+          ) : null}
+          <Text
+            numberOfLines={1}
+            className="ml-auto min-w-0 shrink text-right font-body-semibold text-[13.5px] text-ink"
+          >
+            {item.outOn ? "See the preorder page →" : "Check prices →"}
+          </Text>
         </Tap>
-      </View>
+      )}
+      {other || (best && item.outOn) ? (
+        <Text className="font-body text-[13px] text-ink-soft">
+          {other ? (
+            <>
+              or {other.kind} for {formatCents(other.cents)} at{" "}
+              <Text
+                className="font-body-semibold text-ink underline"
+                onPress={() => toStore(other.url)}
+              >
+                {other.store} →
+              </Text>
+            </>
+          ) : null}
+          {best && item.outOn
+            ? `${other ? "  ·  " : ""}Out ${releaseDay(item.outOn)}`
+            : null}
+        </Text>
+      ) : null}
+      <MenuSheet
+        open={menuOpen}
+        title={name}
+        items={menu}
+        onClose={() => setMenuOpen(false)}
+      />
     </View>
   );
 }
@@ -676,7 +673,7 @@ export default function ToBuyScreen() {
                 </Tap>
               </View>
               {sorted.map((item, i) => (
-                <Ticket
+                <Card
                   key={item.isbn13}
                   item={item}
                   busy={busy}
