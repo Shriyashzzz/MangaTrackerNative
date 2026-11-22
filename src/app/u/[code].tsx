@@ -5,11 +5,12 @@
 // To read and To get as tabs over a searched, sorted list of rows or
 // covers. A series opens as a sheet with its facts, synopsis, notes, spines
 // and the way to its prices. The rules are the web's (core SharedShelf)
+import TextBox from "@/components/TextBox";
 import Tap from "@/components/Tap";
 import { openOutside } from "@/lib/openOutside";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { ScrollView, Share, Text, TextInput, View } from "react-native";
+import { ScrollView, Share, Text, View } from "react-native";
 import Avatar from "@/components/Avatar";
 import Button from "@/components/Button";
 import Mascot from "@/components/Mascot";
@@ -902,7 +903,7 @@ export default function SharedShelfScreen() {
         <View className="gap-2">
           <View className="flex-row items-center gap-2 rounded-[4px] border-[1.5px] border-line-soft bg-card px-3">
             <SearchIcon color={c.inkSoft} width={16} height={16} />
-            <TextInput
+            <TextBox
               value={query}
               onChangeText={setQuery}
               placeholder={`Search ${shelf.displayName}'s shelf`}

@@ -1,8 +1,9 @@
 // The box a reader writes their review in, as the web's (pages/Prices/
 // reviews/ReviewForm.tsx): stars, a few optional words, and a switch for
 // spoilers. Also how they change one they've written
+import TextBox from "@/components/TextBox";
 import { useState } from "react";
-import { Text, TextInput, View } from "react-native";
+import { Text, View } from "react-native";
 import {
   MOST_WORDS,
   type Review,
@@ -58,7 +59,7 @@ export default function ReviewForm({
       <Text className="mt-1 font-mono text-[12px] text-muted">
         A few words (optional)
       </Text>
-      <TextInput
+      <TextBox
         value={text}
         onChangeText={setText}
         multiline

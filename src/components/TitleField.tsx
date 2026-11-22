@@ -1,9 +1,10 @@
 // The add page's title box with AniList's matches under it (the web's
 // pages/AddManga/TitleField.tsx): a list of covers and names to pick from,
 // "Did you mean" for a typo, and "Add as typed" to keep their own words
+import TextBox from "@/components/TextBox";
 import Tap from "@/components/Tap";
 import { Image } from "expo-image";
-import { ScrollView, Text, TextInput, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { SearchIcon } from "@/core/components/icons/Icons";
 import type { CoverHit } from "@/core/lib/anilist";
 import { DID_YOU_MEAN } from "@/core/lib/nearMatches";
@@ -50,7 +51,7 @@ export default function TitleField({
         className={`flex-row items-center gap-2 rounded-[2px] border-[1.5px] bg-paper px-3 ${error ? "border-accent" : "border-line-soft"}`}
       >
         <SearchIcon color={c.inkSoft} width={18} height={18} />
-        <TextInput
+        <TextBox
           value={value}
           onChangeText={onChange}
           onSubmitEditing={() => typed && onTyped()}
