@@ -79,6 +79,7 @@ export default function VolumeCard({
   bookNumber = null,
   width = 130,
   bare = false,
+  pile = "fan",
 }: {
   isbn13: string | null;
   title: string;
@@ -97,10 +98,20 @@ export default function VolumeCard({
   // a tile in a grid of one series: the number on the cover says which,
   // so only the price sits under it
   bare?: boolean;
+  // how the covers behind a book of several volumes sit: fanned like a
+  // hand of cards, a neat pile (a plain omnibus) or none (one big book:
+  // Deluxe, Definitive, VIZBIG)
+  pile?: "fan" | "neat" | "flat";
 }) {
   const c = useColors();
   const shown = novelParts(title);
-  const fanned = holds ? Math.min(holds.to - holds.from, 3) : 0;
+  const behind =
+    !holds || pile === "flat"
+      ? 0
+      : Math.min(holds.to - holds.from, pile === "neat" ? 2 : 3);
+  const fanned = behind;
+  // a neat pile: each cover behind a few points up and to the right
+  const NEAT_STEP = 4;
   return (
     <PressScale
       onPress={isbn13 ? () => router.push(`/prices/${isbn13}`) : undefined}
@@ -108,7 +119,13 @@ export default function VolumeCard({
       style={{ width }}
       className="gap-1.5"
     >
-      <View style={{ width, aspectRatio: 2 / 3, marginTop: fanned ? 6 : 0 }}>
+      <View
+        style={{
+          width,
+          aspectRatio: 2 / 3,
+          marginTop: fanned ? (pile === "neat" ? NEAT_STEP * fanned : 6) : 0,
+        }}
+      >
         {Array.from({ length: fanned }, (_, i) => (
           <View
             key={i}
@@ -116,11 +133,17 @@ export default function VolumeCard({
               position: "absolute",
               width,
               aspectRatio: 2 / 3,
-              transform: [
-                { rotate: `${3 * (fanned - i)}deg` },
-                { translateX: 5 * (fanned - i) },
-                { translateY: -3 * (fanned - i) },
-              ],
+              transform:
+                pile === "neat"
+                  ? [
+                      { translateX: NEAT_STEP * (fanned - i) },
+                      { translateY: -NEAT_STEP * (fanned - i) },
+                    ]
+                  : [
+                      { rotate: `${3 * (fanned - i)}deg` },
+                      { translateX: 5 * (fanned - i) },
+                      { translateY: -3 * (fanned - i) },
+                    ],
               borderWidth: 1.5,
               borderColor: c.line,
               backgroundColor: c.paper2,

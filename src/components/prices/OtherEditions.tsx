@@ -2,7 +2,8 @@
 // each line's books as cards, which book holds a volume, the lines to switch
 // between, and what a whole run costs against the singles
 import { useEffect, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Text, useWindowDimensions, View } from "react-native";
+import Segmented from "../Segmented";
 import { getJson } from "@/core/lib/api";
 import { nextVolumeFor } from "@/core/lib/editionLookup";
 import {
@@ -14,6 +15,11 @@ import { runTotal, seriesCost, type SeriesCost } from "@/core/lib/finishCost";
 import { formatCents, wholeMoney } from "@/core/lib/prices";
 import EditionFinder from "./EditionFinder";
 import VolumeCard from "./VolumeCard";
+
+// four books a row, as the volumes beside them
+const COLUMNS = 4;
+const GRID_GAP = 12;
+const PAGE_SIDE = 16;
 
 export default function OtherEditions({
   name,
@@ -35,6 +41,7 @@ export default function OtherEditions({
     lines: [],
   });
   const [picked, setPicked] = useState<string | null>(null);
+  const { width: screenWidth } = useWindowDimensions();
   useEffect(() => {
     const controller = new AbortController();
     getJson<{ lines: EditionLine[] }>(
@@ -63,15 +70,20 @@ export default function OtherEditions({
     ),
   );
   const loose = runTotal(singles);
+  // a plain omnibus is a pile of books; a named edition one big book
+  const piled = /omnibus|in-1/i.test(line.label);
+  const tileWidth = Math.floor(
+    (screenWidth - PAGE_SIDE * 2 - GRID_GAP * (COLUMNS - 1)) / COLUMNS,
+  );
   const said = (run: { cents: number; exact: boolean }) =>
     run.exact ? formatCents(run.cents) : `about ${wholeMoney(run.cents)}`;
   return (
     <View className="gap-3">
-      <View className="flex-row items-baseline justify-between gap-3">
+      <View className="flex-row flex-wrap items-baseline justify-between gap-x-3">
         <Text className="font-brand pr-1 text-[22px] tracking-[1px] text-ink uppercase">
           Other editions
         </Text>
-        <Text className="shrink font-mono text-[12px] text-muted">
+        <Text numberOfLines={1} className="font-body text-[13px] text-muted">
           {line.books.length} {line.label} books hold vols.{" "}
           {Math.min(...inside)}–{Math.max(...inside)}
         </Text>
@@ -82,27 +94,16 @@ export default function OtherEditions({
         startAt={nextVolumeFor(lines, owned)}
       />
       {lines.length > 1 ? (
-        <View className="flex-row flex-wrap gap-2">
-          {lines.map((l) => (
-            <Pressable
-              key={l.key}
-              onPress={() => setPicked(l.key)}
-              accessibilityState={{ selected: l.key === line.key }}
-              className={`rounded-[3px] border-[1.5px] px-2.5 py-1.5 ${l.key === line.key ? "border-accent bg-accent-wash" : "border-line"}`}
-            >
-              <Text
-                className={`font-body-medium text-[14px] ${l.key === line.key ? "text-accent-ink" : "text-ink"}`}
-              >
-                {l.label}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
+        <Segmented
+          label="Edition"
+          options={lines.map((l) => ({ value: l.key, label: l.label }))}
+          value={line.key}
+          onChange={setPicked}
+        />
       ) : null}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ gap: 12, paddingBottom: 4 }}
+      <View
+        className="flex-row flex-wrap"
+        style={{ rowGap: 20, columnGap: GRID_GAP }}
       >
         {line.books.map((book) => {
           const have = book.volumes.filter((v) => mine.has(v)).length;
@@ -129,11 +130,12 @@ export default function OtherEditions({
                     : undefined
               }
               plainStandIn
-              width={110}
+              width={tileWidth}
+              pile={piled ? "neat" : "flat"}
             />
           );
         })}
-      </ScrollView>
+      </View>
       {books ? (
         <View className="gap-0.5">
           <Text className="font-body text-[14px] text-ink-soft">

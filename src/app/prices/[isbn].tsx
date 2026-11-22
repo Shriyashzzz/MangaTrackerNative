@@ -231,7 +231,9 @@ export default function PriceVolumeScreen() {
     <ScrollView contentContainerClassName="gap-6 px-4 pt-4 pb-16">
       <DealsStrip />
       <View className="flex-row gap-3.5">
-        <View
+        <Pressable
+          onPress={openSeries}
+          accessibilityLabel={`${shownSeries}: open the series`}
           style={{
             width: 102,
             aspectRatio: 2 / 3,
@@ -267,7 +269,7 @@ export default function PriceVolumeScreen() {
               contentFit="cover"
             />
           ) : null}
-        </View>
+        </Pressable>
         <View className="min-w-0 flex-1 gap-1.5">
           <Text className="font-display text-[21px] leading-[25px] text-ink">
             {shownBook.title}

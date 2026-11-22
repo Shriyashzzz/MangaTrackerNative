@@ -91,7 +91,7 @@ export default function Segmented<T extends string>({
             }}
             accessibilityRole="radio"
             accessibilityState={{ checked: on }}
-            className={`flex-1 items-center justify-center px-2 ${isAndroid ? "min-h-[40px]" : "min-h-[34px] py-1.5"} ${isAndroid && i ? "border-l-[1.5px] border-line-soft" : ""}`}
+            className={`flex-1 items-center justify-center px-2 ${isAndroid ? "min-h-[40px]" : "min-h-[34px] py-1.5"}`}
           >
             <Text
               className={`text-center text-[14.5px] ${on ? "font-body-semibold text-ink" : "font-body-medium text-ink-soft"}`}
