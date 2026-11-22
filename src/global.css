@@ -74,6 +74,7 @@
   --font-body-semibold: "IBMPlexSans_600SemiBold";
   --font-mono: "IBMPlexMono_400Regular";
   --font-mono-medium: "IBMPlexMono_500Medium";
+  --font-mono-bold: "IBMPlexMono_600SemiBold";
   /* comic lettering, for a quoted line (the web's --font-letter) */
   --font-letter: "ComicNeue_700Bold";
 }

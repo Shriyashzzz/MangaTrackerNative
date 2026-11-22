@@ -11,6 +11,7 @@ import {
 import {
   IBMPlexMono_400Regular,
   IBMPlexMono_500Medium,
+  IBMPlexMono_600SemiBold,
 } from "@expo-google-fonts/ibm-plex-mono";
 import {
   IBMPlexSans_400Regular,
@@ -47,6 +48,7 @@ export default function RootLayout() {
     IBMPlexSans_600SemiBold,
     IBMPlexMono_400Regular,
     IBMPlexMono_500Medium,
+    IBMPlexMono_600SemiBold,
   });
   const isSignedIn = useAuth((s) => s.isSignedIn);
   const check = useAuth((s) => s.check);
