@@ -11,6 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 import AppHeader from "@/components/AppHeader";
 import Button from "@/components/Button";
+import PressScale from "@/components/PressScale";
 import Mascot from "@/components/Mascot";
 import SeriesCover from "@/components/SeriesCover";
 import CountrySwitch from "@/components/prices/CountrySwitch";
@@ -353,20 +354,31 @@ export default function PricesScreen() {
         </View>
 
         {!searching ? (
-          <Pressable
+          <PressScale
             onPress={() => router.push("/after-anime")}
-            className="gap-1 rounded-[14px] border border-line-soft bg-card px-4 py-3.5 active:bg-accent-wash"
+            accessibilityRole="link"
+            className="gap-2.5 rounded-[14px] bg-ink px-4 pt-4 pb-3.5"
           >
-            <Text className="font-brand pr-1 text-[18px] tracking-[1px] text-ink uppercase">
-              Finished the anime?
-            </Text>
-            <Text className="font-body text-[14px] text-ink-soft">
+            {/* the door to After the anime, inked the other way round: a
+                stamped title, the words, the way in */}
+            <View
+              className="self-start bg-accent px-1.5 pt-0.5"
+              style={{ transform: [{ rotate: "-2deg" }] }}
+            >
+              <Text className="font-brand pr-1 text-[19px] tracking-[1px] text-on-accent uppercase">
+                Finished the anime?
+              </Text>
+            </View>
+            <Text className="font-body text-[15px] leading-[21px] text-paper">
               Find the chapter and volume of the manga to start from.
             </Text>
-            <Text className="pt-1 font-body-semibold text-[14.5px] text-ink underline">
-              Find where to start →
-            </Text>
-          </Pressable>
+            <View className="self-start">
+              <Text className="font-body-semibold text-[15px] text-paper">
+                Find where to start →
+              </Text>
+              <View className="mt-0.5 h-[2px] bg-accent" />
+            </View>
+          </PressScale>
         ) : null}
 
         {searching && result?.error ? (
