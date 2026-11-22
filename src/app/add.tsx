@@ -66,7 +66,7 @@ const STAGES = [
 ] as const;
 const FORMATS = [
   { value: "manga", label: "Manga" },
-  { value: "novel", label: "Light novel" },
+  { value: "novel", label: "Novel" },
 ] as const;
 
 // the series already on their shelf under this title, said before they fill
@@ -316,11 +316,9 @@ export default function AddScreen() {
   };
 
   const genreName = GENRES.find((g) => g.value === genre)?.label;
-  const meta = [
-    lightNovel ? "Light novel" : "Manga",
-    picked?.year,
-    genreName,
-  ].filter(Boolean);
+  const meta = [lightNovel ? "Novel" : "Manga", picked?.year, genreName].filter(
+    Boolean,
+  );
   const coverShows = Boolean(image) && brokenCover !== image;
   const genreLabel =
     GENRE_OPTIONS.find((g) => g.value === genre)?.label ?? "Select a genre";

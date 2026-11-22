@@ -91,9 +91,7 @@ export default function TitleField({
                   {hit.year || hit.lightNovel ? (
                     <Text className="font-mono text-[12px] text-muted">
                       {hit.year ?? ""}
-                      {hit.lightNovel
-                        ? `${hit.year ? " · " : ""}light novel`
-                        : ""}
+                      {hit.lightNovel ? `${hit.year ? " · " : ""}novel` : ""}
                     </Text>
                   ) : null}
                 </View>

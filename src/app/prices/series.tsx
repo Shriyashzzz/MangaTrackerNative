@@ -269,7 +269,7 @@ export default function PriceSeriesScreen() {
               </Text>
               {named.lightNovel ? (
                 <Text className="self-start rounded-[2px] border-[1.5px] border-line-soft px-1.5 font-body-medium text-[12px] text-ink-soft">
-                  Light novel
+                  Novel
                 </Text>
               ) : null}
               {info ? (

@@ -94,7 +94,7 @@ export default function SeriesCard({
       </Text>
       <Text numberOfLines={2} className="font-mono text-[11px] text-muted">
         {[
-          shown.lightNovel && "Light novel",
+          shown.lightNovel && "Novel",
           series.year,
           volumesText(series, shown.lightNovel),
           series.genre,

@@ -241,10 +241,7 @@ export default function VolumeCard({
       )}
       {!bare && (subtitle || shown.lightNovel) ? (
         <Text numberOfLines={2} className="font-mono text-[11.5px] text-muted">
-          {[
-            shown.lightNovel && "Light novel",
-            subtitle && novelParts(subtitle).title,
-          ]
+          {[shown.lightNovel && "Novel", subtitle && novelParts(subtitle).title]
             .filter(Boolean)
             .join(" · ")}
         </Text>

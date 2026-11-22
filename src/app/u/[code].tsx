@@ -486,7 +486,7 @@ function SeriesSheet({
   if (m.rating)
     facts.push(["Their rating", <StarRating key="rating" value={m.rating} />]);
   if (m.genre && m.genre !== "unlabled") facts.push(["Genre", m.genre]);
-  if (m.lightNovel) facts.push(["Kind", "Light novel"]);
+  if (m.lightNovel) facts.push(["Kind", "Novel"]);
   const link = `${shareUrl(code)}?series=${encodeURIComponent(m.name)}`;
   return (
     <Sheet
@@ -701,7 +701,7 @@ export default function SharedShelfScreen() {
     const mine = comparing ? (isMine(m) ? "have" : "dont") : undefined;
     const more = [
       !m.status && placeText(m, "both", true),
-      m.lightNovel && "light novel",
+      m.lightNovel && "novel",
     ].filter(Boolean);
     const spines = shelfOf(owned);
     const per = Math.ceil(spines.length / 40);

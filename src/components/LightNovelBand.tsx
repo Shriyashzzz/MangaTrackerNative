@@ -1,12 +1,10 @@
-// "Light novel" across the foot of a cover, over the picture: said on the
-// book itself wherever a series or one of its volumes is shown, so a novel
-// is never taken for the manga of the same name. Sits inside the cover's
-// own box (which must cut what overflows). A small cover says "Novel": the
-// two words don't fit it
+// "Novel" across the foot of a cover, over the picture: said on the book
+// itself wherever a series or one of its volumes is shown, so the prose
+// book is never taken for the comic of the same name. One word for every
+// kind (a Japanese light novel, a Chinese or Korean novel): always true,
+// and short enough for a small cover. Sits inside the cover's own box
+// (which must cut what overflows)
 import { Text, View } from "react-native";
-
-// under this width (in points) the short word is used
-const TWO_WORDS_FROM = 60;
 
 export default function LightNovelBand({ width }: { width: number }) {
   const size = Math.min(Math.max(width * 0.13, 7), 11);
@@ -23,7 +21,7 @@ export default function LightNovelBand({ width }: { width: number }) {
         className="font-mono-medium text-paper uppercase"
         style={{ fontSize: size, lineHeight: size * 1.3, letterSpacing: 0.5 }}
       >
-        {width >= TWO_WORDS_FROM ? "Light novel" : "Novel"}
+        Novel
       </Text>
     </View>
   );

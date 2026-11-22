@@ -328,7 +328,7 @@ export default function PriceVolumeScreen() {
               ) : null}
               {shownBook.lightNovel ? (
                 <Text className="rounded-[2px] border-[1.5px] border-line-soft px-1.5 font-body-medium text-[12px] text-ink-soft">
-                  Light novel
+                  Novel
                 </Text>
               ) : null}
             </View>

@@ -289,7 +289,7 @@ export default function PricesScreen() {
                     </Text>
                     <Text className="font-mono text-[12px] text-muted">
                       {[
-                        s.lightNovel && "Light novel",
+                        s.lightNovel && "Novel",
                         s.year,
                         s.volumes ? `${s.volumes} vols` : null,
                         s.score ? `★ ${starsOf(s.score)}` : null,

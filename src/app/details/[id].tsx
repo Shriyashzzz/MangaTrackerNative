@@ -538,7 +538,7 @@ export default function DetailsScreen() {
                 >
                   {statusWord}
                 </Text>
-                {[m.lightNovel ? "Light novel" : null, genre]
+                {[m.lightNovel ? "Novel" : null, genre]
                   .filter(Boolean)
                   .map((chip) => (
                     <Text

@@ -198,7 +198,7 @@ function SeriesRow({
             </Text>
             {m.lightNovel ? (
               <Text className="font-body-medium text-[11px] tracking-[1px] text-muted uppercase">
-                Light novel
+                Novel
               </Text>
             ) : null}
           </View>

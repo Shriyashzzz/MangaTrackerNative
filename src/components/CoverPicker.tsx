@@ -184,7 +184,7 @@ export default function CoverPicker({
                   selected={value === r.cover}
                   label={
                     (r.year ? `${r.title} (${r.year})` : r.title) +
-                    (r.lightNovel ? ", light novel" : "")
+                    (r.lightNovel ? ", novel" : "")
                   }
                   onPress={() => pick(value === r.cover ? "" : r.cover, r)}
                 />

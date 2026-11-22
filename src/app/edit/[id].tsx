@@ -55,7 +55,7 @@ const STAGES = [
 ] as const;
 const FORMATS = [
   { value: "manga", label: "Manga" },
-  { value: "novel", label: "Light novel" },
+  { value: "novel", label: "Novel" },
 ] as const;
 
 export default function EditScreen() {

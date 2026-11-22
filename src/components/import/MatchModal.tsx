@@ -29,7 +29,7 @@ const TYPING_PAUSE_MS = 450;
 
 const FORMATS: Record<string, string> = {
   MANGA: "Manga",
-  NOVEL: "Light novel",
+  NOVEL: "Novel",
   ONE_SHOT: "One shot",
 };
 
