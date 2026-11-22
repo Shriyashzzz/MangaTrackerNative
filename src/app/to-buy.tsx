@@ -517,6 +517,10 @@ export default function ToBuyScreen() {
   };
   // the price to be told at: what's typed, in the money's own units
   const alertCents = alerting ? centsOf(alerting.text) : null;
+  // the book the alert is for, and its cheapest copy now: a price at or
+  // over that is said to be met already
+  const alertingItem = sorted.find((item) => item.isbn13 === alerting?.isbn13);
+  const alertingBest = alertingItem ? pricesOf(alertingItem).best : null;
   const saveAlert = (cents: number | null) => {
     if (!alerting) return;
     const { isbn13 } = alerting;
@@ -718,6 +722,12 @@ export default function ToBuyScreen() {
               if (alertCents) saveAlert(alertCents);
             }}
           />
+          {alertCents && alertingBest && alertingBest.cents <= alertCents ? (
+            <Text className="font-body text-[13.5px] leading-[19px] text-ink-soft">
+              It's {formatCents(alertingBest.cents)} right now, already under
+              that.
+            </Text>
+          ) : null}
           {phoneAlertsOn() ? null : (
             <Text className="font-body text-[13.5px] leading-[19px] text-ink-soft">
               Alerts are off on this phone.{" "}
@@ -737,8 +747,7 @@ export default function ToBuyScreen() {
             </Text>
           )}
           <View className="flex-row items-center justify-end gap-3">
-            {sorted.find((item) => item.isbn13 === alerting?.isbn13)
-              ?.alertCents ? (
+            {alertingItem?.alertCents ? (
               <Tap
                 onPress={() => saveAlert(null)}
                 hitSlop={6}
