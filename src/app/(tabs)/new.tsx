@@ -268,8 +268,10 @@ export default function NewScreen() {
               {viewingHidden ? "Hidden" : "New"}
               {"\u00A0"}
             </Text>
+            {/* the same number as the tab's badge: every series listed here,
+                volumes and chapters together (core releaseMath countNew) */}
             <Text className="font-mono text-[14px] text-muted">
-              {list.length}
+              {viewingHidden ? list.length : counts.new}
             </Text>
           </View>
 

@@ -61,10 +61,9 @@ export function apiFetch(
       clearTimeout(timer);
       // gave up waiting (not the caller's own cancel): said as no answer
       if (limit.signal.aborted && !theirs?.aborted)
-        throw new TypeError(
-          orOffline("The server took too long. Try again."),
-          { cause: e },
-        );
+        throw new TypeError(orOffline("The server took too long. Try again."), {
+          cause: e,
+        });
       if (e instanceof TypeError)
         throw new TypeError(
           orOffline("Couldn't reach the server. Try again."),
