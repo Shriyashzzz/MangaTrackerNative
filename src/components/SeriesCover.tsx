@@ -2,14 +2,15 @@
 // asked of the server at the width it's drawn, for this screen's density
 // (the web's srcSet does this in the browser), the English cover where the
 // server knows it. One that won't load gives way to the series' name
-// lettered on a paper cover, as the web's drawn stand-in. Plain styles, not
+// drawn as a printed cover (DrawnCover), as on the web. Plain styles, not
 // classes: the picture's size has to hold
 import { Image } from "expo-image";
 import { useState } from "react";
-import { PixelRatio, Text, View } from "react-native";
+import { PixelRatio, View } from "react-native";
 import { coverChoices } from "@/core/lib/coverSizes";
 import { coverSrc, priceName } from "@/core/lib/prices";
 import { useColors } from "@/lib/colors";
+import DrawnCover from "./DrawnCover";
 
 type Props = {
   name: string;
@@ -45,20 +46,8 @@ export default function SeriesCover({
   };
   if (!src || failed === src)
     return (
-      <View
-        style={[
-          box,
-          { alignItems: "center", justifyContent: "center", padding: 4 },
-        ]}
-      >
-        <Text
-          numberOfLines={4}
-          className="text-center font-brand pr-[4px] text-[11px] text-ink-soft uppercase"
-        >
-          {"\u00A0"}
-          {name}
-          {"\u00A0"}
-        </Text>
+      <View style={box}>
+        <DrawnCover title={name} width={width - border * 2} />
       </View>
     );
   return (

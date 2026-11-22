@@ -25,7 +25,9 @@ export default function NotesField({
 }) {
   const c = useColors();
   const [text, setText] = useState(initial ?? "");
-  const [status, setStatus] = useState<"" | "saving" | "saved" | "failed">("");
+  const [status, setStatus] = useState<
+    "" | "saving" | "saved" | "kept" | "failed"
+  >("");
   const [failure, setFailure] = useState("");
   const savedText = useRef(initial ?? "");
   const latest = useRef(text);
@@ -36,7 +38,7 @@ export default function NotesField({
     setStatus("saving");
     try {
       let refused = "";
-      await saveOrKeep(
+      const how = await saveOrKeep(
         id,
         "notes",
         savedText.current.trim() || null,
@@ -56,7 +58,7 @@ export default function NotesField({
             m.id === id ? { ...m, description: notes || null } : m,
           ) ?? null,
       }));
-      setStatus("saved");
+      setStatus(how);
     } catch (e) {
       const said = (e as Error).message;
       setFailure(
@@ -91,9 +93,11 @@ export default function NotesField({
             ? "Saving…"
             : status === "saved"
               ? "Saved"
-              : status === "failed"
-                ? failure
-                : ""}
+              : status === "kept"
+                ? "Kept on this phone"
+                : status === "failed"
+                  ? failure
+                  : ""}
         </Text>
       </View>
       <TextInput

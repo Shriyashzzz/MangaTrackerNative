@@ -4,6 +4,7 @@
 // sends it back, as a browser does. While developing it's the local server
 // (the phone's localhost:8080, passed to the Mac by adb reverse); a release
 // build uses the real site. EXPO_PUBLIC_API_URL overrides either
+import { keepAnswer, keptAnswer } from "@/lib/keptAnswers";
 import { withCountry } from "./country";
 import {
   isOffline,
@@ -68,24 +69,29 @@ export function apiFetch(
       setOffline(false);
       noteAnswer(res);
       if (res.status === 401 && !path.startsWith("/api/auth/")) signedOut?.();
+      // kept on the phone, for opening this page with no connection
+      if (method === "GET" && res.ok) void keepAnswer(path, res.clone());
       return res;
     },
-    (e: unknown) => {
+    async (e: unknown) => {
       clearTimeout(timer);
       // gave up waiting (not the caller's own cancel): said as no answer
       if (limit.signal.aborted && !theirs?.aborted)
         throw new TypeError(orOffline("The server took too long. Try again."), {
           cause: e,
         });
-      if (e instanceof TypeError) {
-        // it never reached the server: offline, until something answers
-        setOffline(true);
-        throw new TypeError(
-          orOffline("Couldn't reach the server. Try again."),
-          { cause: e },
-        );
-      }
-      throw e;
+      // the caller's own cancel: theirs to handle
+      if (theirs?.aborted) throw e;
+      // anything else never reached the server (a fetch fails for nothing
+      // else, and Android words it its own way, not always as a TypeError):
+      // offline, until something answers
+      setOffline(true);
+      // a page opened before shows as it last was
+      const kept = method === "GET" ? await keptAnswer(path) : null;
+      if (kept) return kept;
+      throw new TypeError(orOffline("Couldn't reach the server. Try again."), {
+        cause: e,
+      });
     },
   );
 }

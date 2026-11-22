@@ -4,6 +4,7 @@
 // it in), stars, and under "More about it" the volumes they own, the type,
 // genre and notes. The checks and the request are the web's own (core
 // seriesFormRules); AniList's matches come through core useCoverSearch
+import { useIsOffline } from "@/core/lib/offline";
 import { Image } from "expo-image";
 import {
   router,
@@ -93,6 +94,8 @@ function useAlreadyOnShelf(title: string, chosen: boolean) {
 
 export default function AddScreen() {
   const c = useColors();
+  // no connection: the strip at the foot says why the button is off
+  const offline = useIsOffline();
   // from a price page: the title, its format, and a volume or book they own
   const params = useLocalSearchParams<{
     title?: string;
@@ -637,7 +640,7 @@ export default function AddScreen() {
               <Button
                 label={submitting ? "Adding…" : "Put it on the shelf"}
                 kind="primary"
-                disabled={submitting}
+                disabled={submitting || offline}
                 onPress={() => void submit()}
               />
             </View>

@@ -38,7 +38,11 @@ import {
 import { apiFetch } from "@/core/lib/api";
 import { ownEditionBook } from "@/core/lib/booksApi";
 import type { EditionBook, EditionLine } from "@/core/lib/editions";
-import { saveOrKeep } from "@/core/lib/offlineChanges";
+import {
+  saveOrKeep,
+  waitingChanges,
+  withChanges,
+} from "@/core/lib/offlineChanges";
 import {
   ownedOf,
   ownedVolumes as ownedFrom,
@@ -210,7 +214,9 @@ export default function DetailsScreen() {
               : "It didn't load.",
           );
         const data = (await res.json()) as { manga: Manga };
-        if (live) setManga(data.manga);
+        // changes kept on this phone and not sent yet show on it
+        const changes = await waitingChanges();
+        if (live) setManga(withChanges(data.manga, changes));
       })
       .catch((e: Error) => {
         if (!live) return;

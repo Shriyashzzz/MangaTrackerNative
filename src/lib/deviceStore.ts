@@ -5,13 +5,20 @@
 // value without waiting
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+// the start of every key lib/keptAnswers.ts writes
+export const KEPT_ANSWER = "answer:";
+
 const kept = new Map<string, string>();
 let loaded: Promise<void> | null = null;
 
 export function loadDeviceStore() {
   loaded ??= (async () => {
     try {
-      const keys = await AsyncStorage.getAllKeys();
+      // answers kept for offline (lib/keptAnswers.ts) are big and read
+      // only when asked for: not loaded here
+      const keys = (await AsyncStorage.getAllKeys()).filter(
+        (key) => !key.startsWith(KEPT_ANSWER),
+      );
       for (const [key, value] of await AsyncStorage.multiGet(keys))
         if (value !== null) kept.set(key, value);
     } catch {
