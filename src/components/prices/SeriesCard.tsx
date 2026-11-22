@@ -1,6 +1,7 @@
 // A series as a card on the price pages (the web's pages/Prices/
 // SeriesCard.tsx): its cover with its score as stars, the name, and a line
 // of what it is
+import { memo } from "react";
 import { router } from "expo-router";
 import PressScale from "../PressScale";
 import { Text, View } from "react-native";
@@ -51,7 +52,9 @@ export function SeriesScoreBadge({ percent }: { percent?: number | null }) {
   );
 }
 
-export default function SeriesCard({
+// memo'd: a grid that only changes its order (All series' sort) redraws no
+// card whose series is the same object as before
+export default memo(function SeriesCard({
   series,
   width = 110,
   params,
@@ -104,4 +107,4 @@ export default function SeriesCard({
       </Text>
     </PressScale>
   );
-}
+});

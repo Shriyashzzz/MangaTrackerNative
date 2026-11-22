@@ -2,7 +2,7 @@
 // rated or A to Z, by genre, each a way to its prices
 import Tap from "@/components/Tap";
 import { router } from "expo-router";
-import { useEffect, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { Text, View } from "react-native";
 import Mascot from "@/components/Mascot";
 import Page, { H2, P, TextLink } from "@/components/Page";
@@ -72,28 +72,38 @@ export default function SeriesIndexScreen() {
     () => [...new Set((all ?? []).flatMap((s) => s.genres))].sort(),
     [all],
   );
+  // The switch moves the moment it's tapped; the grid of covers follows a
+  // beat later. Drawn in one go, redrawing every cover held the tap up, and
+  // the switch looked stuck. While the grid catches up it's dimmed
+  const listSort = useDeferredValue(sort);
+  const listGenre = useDeferredValue(genre);
+  const catchingUp = listSort !== sort || listGenre !== genre;
   const shown = useMemo(
     () =>
       (all ?? [])
-        .filter((s) => !genre || s.genres.includes(genre))
-        .sort(ORDER[sort]),
-    [all, sort, genre],
+        .filter((s) => !listGenre || s.genres.includes(listGenre))
+        .sort(ORDER[listSort]),
+    [all, listSort, listGenre],
   );
   const page = shown.slice(0, shownCount);
+  // each series as its card takes it, made once: the same object every
+  // draw, so a card already on screen isn't drawn again when the order changes
+  const cardData = useMemo(
+    () =>
+      new Map(
+        (all ?? []).map((s) => [
+          s.name,
+          { ...s, genre: pickGenre(s.genres), englishVolumes: s.knownVolumes },
+        ]),
+      ),
+    [all],
+  );
   const card = (s: SeriesIndexEntry) => (
-    <SeriesCard
-      key={s.name}
-      series={{
-        ...s,
-        genre: pickGenre(s.genres),
-        englishVolumes: s.knownVolumes,
-      }}
-      width={104}
-    />
+    <SeriesCard key={s.name} series={cardData.get(s.name)!} width={104} />
   );
   // A to Z: grouped under their letters
   const groups: [string, SeriesIndexEntry[]][] = [];
-  if (sort === "az")
+  if (listSort === "az")
     for (const s of page) {
       const l = letterOf(s.name);
       const last = groups.at(-1);
@@ -144,9 +154,13 @@ export default function SeriesIndexScreen() {
               : "Series show up here once someone looks them up."}
           </P>
         </View>
-      ) : sort === "az" ? (
+      ) : listSort === "az" ? (
         groups.map(([letter, list]) => (
-          <View key={letter} className="gap-2">
+          <View
+            key={letter}
+            className="gap-2"
+            style={{ opacity: catchingUp ? 0.5 : 1 }}
+          >
             <H2>{letter}</H2>
             <View
               className="flex-row flex-wrap justify-between"
@@ -159,7 +173,7 @@ export default function SeriesIndexScreen() {
       ) : (
         <View
           className="flex-row flex-wrap justify-between"
-          style={{ rowGap: 18 }}
+          style={{ rowGap: 18, opacity: catchingUp ? 0.5 : 1 }}
         >
           {page.map(card)}
         </View>
