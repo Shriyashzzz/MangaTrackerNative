@@ -18,10 +18,14 @@ const TOKEN_KEY = "phoneAlertsToken";
 const CHANNEL = "releases";
 
 // the Expo project the tokens belong to (app.json extra.eas.projectId, put
-// there by `eas init`). None: this build can't get a token
-const projectId = (
-  Constants.expoConfig?.extra as { eas?: { projectId?: string } } | undefined
-)?.eas?.projectId;
+// there by `eas init`), read from wherever this kind of build keeps it.
+// The config is baked in when the app is built: a build made before the
+// project was linked has none, and can't get a token
+type WithEas = { eas?: { projectId?: string } } | undefined;
+const projectId =
+  Constants.easConfig?.projectId ??
+  (Constants.expoConfig?.extra as WithEas)?.eas?.projectId ??
+  (Constants.manifest2?.extra as WithEas)?.eas?.projectId;
 
 export const phoneAlertsAvailable = () => Boolean(projectId);
 export const phoneAlertsOn = () => readLocal(ON_KEY) === "yes";
