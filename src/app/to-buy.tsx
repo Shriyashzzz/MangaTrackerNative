@@ -2,6 +2,7 @@
 // buy, what they'd cost new and used all together, each with its prices,
 // On my shelf, Ordered and Remove, sorted their way, and Clear list.
 // Marking one theirs whose series isn't on the shelf offers to add it
+import { coverAt } from "@/lib/coverAt";
 import Tap from "@/components/Tap";
 import { Input } from "@/components/Field";
 import { H2 } from "@/components/Page";
@@ -31,7 +32,7 @@ import {
   ChevronDownIcon,
   ChevronLeftIcon,
 } from "@/core/components/icons/Icons";
-import { coverSrc, formatCents, novelParts } from "@/core/lib/prices";
+import { formatCents, novelParts } from "@/core/lib/prices";
 import {
   settleToBuy,
   inOwnOrder,
@@ -298,7 +299,7 @@ function Card({
               the series' name on a printed cover, as on the shelf */}
           {coverUrl && !coverFailed ? (
             <Image
-              source={{ uri: coverSrc(coverUrl) }}
+              source={{ uri: coverAt(coverUrl, COVER_WIDTH) }}
               style={coverBox}
               contentFit="cover"
               onError={() => setCoverFailed(true)}

@@ -61,8 +61,14 @@ export default function OfflineBar({ signedIn }: { signedIn: boolean }) {
 
   // the changes waiting, read when the list is opened
   const [listed, setListed] = useState<OfflineChange[] | null>(null);
-  const shelf = useShelf((state) => state.manga);
-  const openList = async () => setListed(inOrder(await waitingChanges()));
+  // the shelf as it is when the list is opened, for each series' name.
+  // Read then, not watched: this strip is on every screen, and watching the
+  // shelf redrew it each time the shelf loaded
+  const [shelf, setShelf] = useState(useShelf.getState().manga);
+  const openList = async () => {
+    setShelf(useShelf.getState().manga);
+    setListed(inOrder(await waitingChanges()));
+  };
   const path = usePathname();
   const here = NEEDS_CONNECTION.find(([start]) => path.startsWith(start));
 

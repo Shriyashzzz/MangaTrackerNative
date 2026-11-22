@@ -4,6 +4,7 @@
 // Canada's), the box-set note, more places to look, the price history,
 // about the series, readers' reviews, and the volumes beside it. Every rule
 // is the web's (core volumePageRules, offerLabels, useVolumeLoad)
+import { coverAt } from "@/lib/coverAt";
 import LightNovelBand from "@/components/LightNovelBand";
 import ToBuyBag from "@/components/ToBuyBag";
 import Tap from "@/components/Tap";
@@ -288,7 +289,7 @@ export default function PriceVolumeScreen() {
               ) : null}
               {book.coverUrl ? (
                 <Image
-                  source={{ uri: coverSrc(book.coverUrl) }}
+                  source={{ uri: coverAt(book.coverUrl, 102) }}
                   style={{ width: "100%", height: "100%" }}
                   contentFit="cover"
                 />

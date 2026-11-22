@@ -1,12 +1,13 @@
 // One volume on a series' price page, as the Android app's cover grid (web
 // pages/Prices/VolumeCard.tsx): its cover with a "Vol. 5" flag, "Yours" when
 // it's on their shelf, and its price under it, or "check price"
+import { coverAt } from "@/lib/coverAt";
 import LightNovelBand from "@/components/LightNovelBand";
 import Tap from "@/components/Tap";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
 import { Text, View } from "react-native";
-import { coverSrc, novelParts, formatCents } from "@/core/lib/prices";
+import { novelParts, formatCents } from "@/core/lib/prices";
 import type { SeriesVolume } from "@/core/lib/types";
 import { useColors } from "@/lib/colors";
 
@@ -26,7 +27,9 @@ export default function VolumeTile({
         <View>
           <Image
             source={
-              volume.coverUrl ? { uri: coverSrc(volume.coverUrl) } : undefined
+              volume.coverUrl
+                ? { uri: coverAt(volume.coverUrl, width) }
+                : undefined
             }
             style={{
               width,

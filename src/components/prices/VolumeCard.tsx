@@ -3,6 +3,7 @@
 // drawn big, "Yours" or "Next", readers' stars, the Vol. tab, the name, a
 // line under it, and its price (with what it was, on a deal). A book of
 // several volumes fans the covers behind it
+import { coverAt } from "@/lib/coverAt";
 import LightNovelBand from "@/components/LightNovelBand";
 import { Image } from "expo-image";
 import { router } from "expo-router";
@@ -158,7 +159,7 @@ export default function VolumeCard({
           >
             {coverUrl ? (
               <Image
-                source={{ uri: coverSrc(coverUrl) }}
+                source={{ uri: coverAt(coverUrl, width) }}
                 style={{ width: "100%", height: "100%" }}
                 contentFit="cover"
               />
@@ -186,7 +187,7 @@ export default function VolumeCard({
           />
           {coverUrl ? (
             <Image
-              source={{ uri: coverSrc(coverUrl) }}
+              source={{ uri: coverAt(coverUrl, width) }}
               style={{ width: "100%", height: "100%" }}
               contentFit="cover"
             />

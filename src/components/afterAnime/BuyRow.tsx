@@ -1,6 +1,7 @@
 // The volume to buy after a season (the web's pages/AfterAnime/BuyRow.tsx):
 // its cover, why this one, the best saved price and the store, or the way
 // to its prices when none is saved
+import { coverAt } from "@/lib/coverAt";
 import LightNovelBand from "@/components/LightNovelBand";
 import Tap from "@/components/Tap";
 import { openOutside } from "@/lib/openOutside";
@@ -10,7 +11,7 @@ import { Text, View } from "react-native";
 import Button from "@/components/Button";
 import { CoverFallback } from "@/components/prices/VolumeCard";
 import type { BuyOffer, UsedOffer } from "@/core/lib/afterAnime";
-import { coverSrc, formatCents, novelParts, timeAgo } from "@/core/lib/prices";
+import { formatCents, novelParts, timeAgo } from "@/core/lib/prices";
 import type { SeriesVolume } from "@/core/lib/types";
 import { bookShort, bookWords } from "@/core/pages/AfterAnime/bookFor";
 
@@ -63,7 +64,7 @@ export default function BuyRow({
           />
           {book.coverUrl ? (
             <Image
-              source={{ uri: coverSrc(book.coverUrl) }}
+              source={{ uri: coverAt(book.coverUrl, COVER_WIDTH) }}
               style={{ width: COVER_WIDTH, aspectRatio: 2 / 3 }}
               contentFit="cover"
             />

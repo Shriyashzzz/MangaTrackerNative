@@ -22,7 +22,15 @@ const worthKeeping = (path: string) =>
   !path.startsWith("/api/manga?") &&
   !path.startsWith("/api/auth/");
 
-type Entry = { path: string; size: number; at: number };
+// `mark`: a number made from the answer's text, to tell whether the next
+// answer for the same path says the same thing
+type Entry = { path: string; size: number; at: number; mark?: number };
+const markOf = (text: string) => {
+  let mark = 5381;
+  for (let i = 0; i < text.length; i++)
+    mark = ((mark << 5) + mark + text.charCodeAt(i)) | 0;
+  return mark;
+};
 let index: Map<string, Entry> | null = null;
 async function entries() {
   if (index) return index;
@@ -47,7 +55,16 @@ export async function keepAnswer(path: string, copy: Response) {
     const text = await copy.text();
     if (text.length > ONE_MOST) return;
     const all = await entries();
-    all.set(path, { path, size: text.length, at: Date.now() });
+    // the same answer as is kept already (most are, page after page):
+    // nothing is written. Writing every answer again to the phone's storage
+    // was work on every request for nothing
+    const mark = markOf(text);
+    const had = all.get(path);
+    if (had && had.size === text.length && had.mark === mark) {
+      had.at = Date.now();
+      return;
+    }
+    all.set(path, { path, size: text.length, at: Date.now(), mark });
     await AsyncStorage.setItem(KEPT_ANSWER + path, text);
     // too much kept: the ones asked for longest ago go
     let total = 0;
