@@ -1,6 +1,7 @@
 // The shelf for someone not signed in (the web's pages/Home/GuestHero.tsx):
 // what a shelf is for, and the two ways in. Prices stay open to them along
 // the bottom
+import { startPractice } from "@/lib/practice";
 import Tap from "@/components/Tap";
 import { router } from "expo-router";
 import type { ReactNode } from "react";
@@ -104,6 +105,24 @@ export default function GuestShelf() {
           wide
           onPress={() => router.navigate("/prices")}
         />
+      </View>
+      {/* try it first: the website's practice shelves, with nothing kept */}
+      <View className="gap-2">
+        <Text className="text-center font-body text-[14.5px] text-ink-soft">
+          Or try it first on a practice shelf, no account needed:
+        </Text>
+        <View className="flex-row gap-2.5">
+          <Button
+            label="A reader's"
+            grow
+            onPress={() => startPractice("reader")}
+          />
+          <Button
+            label="A collector's"
+            grow
+            onPress={() => startPractice("collector")}
+          />
+        </View>
       </View>
       <Text className="text-center font-body text-[14.5px] text-ink-soft">
         Already have a shelf?{"  "}

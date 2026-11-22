@@ -3,6 +3,7 @@
 // Switched on in Settings; the phone's token is given to the server for
 // whoever is signed in, and taken back when they switch it off or sign out.
 // What is sent, and when, is the server's alone
+import { isDemo } from "@/core/lib/demo";
 import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
 import { AndroidImportance } from "expo-notifications";
@@ -105,7 +106,8 @@ export async function forgetThisPhone() {
 // signed in with alerts on from before: the token is given again, in case
 // it changed or the account did. Never asks the phone anything
 export async function refreshPhoneAlerts() {
-  if (!projectId || !phoneAlertsOn()) return;
+  // (nor for the practice shelf, which has no account to alert)
+  if (!projectId || !phoneAlertsOn() || isDemo()) return;
   try {
     const { granted } = await Notifications.getPermissionsAsync();
     if (!granted) return;

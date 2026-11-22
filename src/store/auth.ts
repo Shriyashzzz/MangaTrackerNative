@@ -1,5 +1,6 @@
 // Who's signed in, as the web's store/auth.ts: the session cookie and
 // /api/auth/me decide. null while asking
+import { endDemo, isDemo } from "@/core/lib/demo";
 import { loadDeviceStore, readLocal, writeLocal } from "@/lib/deviceStore";
 import { create } from "zustand";
 import { apiFetch, errorMessages, whenSignedOut } from "@/core/lib/api";
@@ -76,6 +77,9 @@ export const useAuth = create<AuthState>()((set) => ({
   },
 
   logOut: async () => {
+    // "signing out" of the practice shelf is leaving it (lib/practice.ts
+    // hears of it and takes the app back to its front)
+    if (isDemo()) return endDemo("/");
     // while still signed in: the server forgets this phone, so the next
     // person on it gets none of this account's alerts
     await forgetThisPhone();
@@ -89,8 +93,9 @@ export const useAuth = create<AuthState>()((set) => ({
 
 // whether they were signed in is remembered on the phone, for a start with
 // no connection (check, above)
+// (the practice shelf isn't an account: it's never remembered as one)
 useAuth.subscribe((state) => {
-  if (state.isSignedIn !== null)
+  if (state.isSignedIn !== null && !isDemo())
     writeLocal(SIGNED_IN, state.isSignedIn ? "yes" : "no");
 });
 

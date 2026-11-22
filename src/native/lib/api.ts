@@ -6,6 +6,7 @@
 // build uses the real site. EXPO_PUBLIC_API_URL overrides either
 import { keepAnswer, keptAnswer } from "@/lib/keptAnswers";
 import { withCountry } from "./country";
+import { demoResponse, isDemo } from "./demo";
 import {
   isOffline,
   noteAnswer,
@@ -45,6 +46,13 @@ export function apiFetch(
   path: string,
   { body, headers, ...options }: FetchOptions = {},
 ) {
+  // the practice shelf never touches the real server (core lib/demo.ts)
+  if (isDemo())
+    return demoResponse(
+      path,
+      options.method,
+      body !== undefined ? JSON.stringify(body) : undefined,
+    );
   const method = (options.method ?? "GET").toUpperCase();
   if (method !== "GET" && isOffline()) return Promise.resolve(offlineAnswer());
   // the caller's own cancel still works: it stops this one too

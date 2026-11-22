@@ -1,6 +1,7 @@
 // The shelf: every series they have (/api/manga), and what each one's
 // release check found, as the web's store/shelf.ts keeps them. null while
 // the shelf loads
+import { isDemo } from "@/core/lib/demo";
 import { isNetworkError } from "@/core/lib/offline";
 import {
   onChangesSent,
@@ -301,7 +302,8 @@ export const useShelf = create<ShelfState>()((set, get) => ({
     try {
       const data = await getJson<{ manga: Manga[] } | Manga[]>("/api/manga");
       const manga = Array.isArray(data) ? data : data.manga;
-      writeLocal(KEPT_SHELF, JSON.stringify(manga));
+      // (never the practice shelf: it isn't theirs to come back to)
+      if (!isDemo()) writeLocal(KEPT_SHELF, JSON.stringify(manga));
       set({ manga: await shownWith(manga), failed: null });
     } catch (e) {
       const keptShelf = isNetworkError(e) ? readKeptShelf() : null;

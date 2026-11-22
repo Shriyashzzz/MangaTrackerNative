@@ -29,6 +29,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { loadDeviceStore } from "@/lib/deviceStore";
 import OfflineBar from "@/components/OfflineBar";
+import PracticeBar from "@/components/PracticeBar";
 import { forgetAccountData } from "@/lib/forgetAccount";
 import { openTappedAlerts, refreshPhoneAlerts } from "@/lib/phoneAlerts";
 import { useAuth } from "@/store/auth";
@@ -140,6 +141,7 @@ export default function RootLayout() {
             <Stack.Screen name="reset-password/[token]" />
           </Stack>
           {/* no connection, or kept changes just sent: said along the foot */}
+          <PracticeBar signedIn={Boolean(isSignedIn)} />
           <OfflineBar signedIn={Boolean(isSignedIn)} />
         </BottomSheetModalProvider>
       </KeyboardProvider>
