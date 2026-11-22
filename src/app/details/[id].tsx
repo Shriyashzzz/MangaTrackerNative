@@ -64,6 +64,7 @@ import { restoredAs, useShelf } from "@/store/shelf";
 import { H2 } from "@/components/Page";
 import { DEFAULT_TRACK_BY } from "@/lib/trackBy";
 import LoadingQuote from "@/components/LoadingQuote";
+import { lastChapterOf, volumesReadAt } from "@/lib/placeEquivalent";
 
 const Safe = withUniwind(SafeAreaView);
 
@@ -136,6 +137,41 @@ export default function DetailsScreen() {
     volumeStarts: releaseData?.volumeStarts ?? [],
   });
   const { buyOptions, editions } = shelf;
+
+  // both counters kept: saving one moves the other to the same place, when
+  // the volume list is sure where that is (lib/placeEquivalent.ts)
+  const keepTheOtherInStep = async (saved: {
+    bookmark?: number;
+    readVolume?: number;
+  }) => {
+    if (!manga) return;
+    const tracks = tracksOf(manga, trackBy);
+    if (!tracks.chapters || !tracks.volumes) return;
+    const starts = releaseData?.volumeStarts ?? [];
+    if (saved.readVolume != null) {
+      const chapter = lastChapterOf(saved.readVolume, starts);
+      if (chapter == null || chapter === manga.bookmark) return;
+      const res = await apiFetch(`/api/manga/${manga.id}/bookmark`, {
+        method: "PATCH",
+        body: { bookmark: chapter },
+      }).catch(() => null);
+      if (res?.ok) {
+        setManga((now) => (now ? { ...now, bookmark: chapter } : now));
+        setChapterSaves((n) => n + 1);
+      }
+    } else if (saved.bookmark != null) {
+      const volume = volumesReadAt(saved.bookmark, starts);
+      if (volume == null || volume < 1 || volume === manga.readVolume) return;
+      const res = await apiFetch(`/api/manga/${manga.id}/reading`, {
+        method: "PATCH",
+        body: { readVolume: volume },
+      }).catch(() => null);
+      if (res?.ok) {
+        setManga((now) => (now ? { ...now, readVolume: volume } : now));
+        setChapterSaves((n) => n + 1);
+      }
+    }
+  };
 
   // ---------- loading ----------
   useEffect(() => {
@@ -521,7 +557,9 @@ export default function DetailsScreen() {
             onPlaceSaved={(saved) => {
               setManga((now) => (now ? { ...now, ...saved } : now));
               setChapterSaves((n) => n + 1);
-              void useShelf.getState().load();
+              void keepTheOtherInStep(saved).finally(
+                () => void useShelf.getState().load(),
+              );
             }}
           />
           {release ? (
