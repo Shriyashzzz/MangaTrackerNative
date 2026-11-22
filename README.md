@@ -122,6 +122,27 @@ The client IDs live in `.env.local` (copy `.env.example`); nothing is in git.
 Without the IDs the button stays off the sign-in pages. A new `.env.local`
 needs Metro restarted, since the values are read when it starts.
 
+## Phone alerts
+
+A new volume out, one coming within a week, or a price drop on something in
+To buy. The server decides what to send and sends each once
+(`server/src/push` in the web repo); the app only registers the phone.
+
+- `src/lib/phoneAlerts.ts`: the switch (Settings, New releases), the
+  permission, and the phone's Expo push token given to `/api/push/device`.
+- Delivery is Expo's push service, which hands on to Google (FCM). The
+  Firebase service account key is uploaded to the Expo project, never kept
+  here. `firebase/google-services.json` is the app's own config and is safe
+  to commit.
+- The token needs the Expo project ID (`app.json` `extra.eas.projectId`). It
+  is baked in when the app is built, so rebuild after changing it.
+
+## Release builds
+
+`app.config.js` turns plain http off and keeps the session out of Android
+backups. It counts a build as production on the EAS `production` profile, or
+with `APP_ENV=production` set for a release built on this machine.
+
 ## Not done yet
 
 - Google sign-in on iOS: its client ID and the plugin's URL scheme (above)
@@ -131,8 +152,6 @@ needs Metro restarted, since the values are read when it starts.
   this app's package
 - Owner tools (reported reviews, fixes to review, reported books), the
   tour and practice account
-- Alerts on the phone (the server sends web push today; the app needs its
-  own tokens)
 - Linking Google to an account from the app
 - Changes made offline: the website keeps and sends them; the app says they
   didn't save
