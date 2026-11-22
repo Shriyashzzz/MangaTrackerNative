@@ -11,6 +11,7 @@ import { shopName } from "@/core/lib/prices";
 import { isCollection, type Offer } from "@/core/lib/types";
 import { awardsOf } from "@/core/pages/Prices/offerLabels";
 import { useColors } from "@/lib/colors";
+import Segmented from "./Segmented";
 
 const VISIBLE_OFFERS = 5;
 const CONDITION: Record<string, string> = {
@@ -114,27 +115,16 @@ export default function OfferList({
   return (
     <View className="gap-2">
       {usedToo ? (
-        <View className="flex-row overflow-hidden rounded-[4px] border-2 border-line">
-          {(
-            [
-              ["all", "All"],
-              ["new", "New"],
-              ["used", "Used"],
-            ] as const
-          ).map(([value, label], i) => (
-            <Pressable
-              key={value}
-              onPress={() => setCopies(value)}
-              className={`flex-1 items-center py-2.5 ${copies === value ? "bg-ink" : ""} ${i ? "border-l-2 border-line" : ""}`}
-            >
-              <Text
-                className={`font-body-semibold text-[15px] ${copies === value ? "text-paper" : "text-ink"}`}
-              >
-                {label}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
+        <Segmented
+          label="Which copies"
+          options={[
+            { value: "all", label: "All" },
+            { value: "new", label: "New" },
+            { value: "used", label: "Used" },
+          ]}
+          value={copies}
+          onChange={setCopies}
+        />
       ) : null}
       <View className="overflow-hidden rounded-[4px] border-2 border-line">
         {shown.map((o, i) => (

@@ -7,7 +7,14 @@
 // finishCost, useSeriesData)
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import Segmented from "@/components/Segmented";
+import {
+  Pressable,
+  ScrollView,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 import Button from "@/components/Button";
@@ -54,7 +61,12 @@ import { useColors } from "@/lib/colors";
 import { usePrefs } from "@/store/prefs";
 
 const Safe = withUniwind(SafeAreaView);
-const CARD = 104;
+// the volume grid: four covers a row, as the Android app lays them
+const COLUMNS = 4;
+const GRID_GAP = 12;
+const PAGE_SIDE = 16;
+// how near the foot a scroll gets before the next volumes come in
+const GROW_WITHIN_PX = 600;
 
 export default function PriceSeriesScreen() {
   const params = useLocalSearchParams<{
@@ -71,6 +83,7 @@ export default function PriceSeriesScreen() {
   const [tab, setTab] = useState<"volumes" | "editions">(
     params.edition ? "editions" : "volumes",
   );
+  const { width: screenWidth } = useWindowDimensions();
   const [toGetOnly, setToGetOnly] = useState(params.toget === "1");
   // how many rows are shown, for the list they were grown for: a new series
   // or filter starts at the first page again
@@ -165,14 +178,27 @@ export default function PriceSeriesScreen() {
   const list = toGetShown ? toGet : volumes;
   const shown = list.slice(0, grownCount);
   const named = novelParts(info?.name ?? data.name);
+  const tileWidth = Math.floor(
+    (screenWidth - PAGE_SIDE * 2 - GRID_GAP * (COLUMNS - 1)) / COLUMNS,
+  );
 
   return frame(
     named.title,
-    <ScrollView contentContainerClassName="gap-5 px-4 pt-4 pb-16">
+    <ScrollView
+      contentContainerClassName="gap-8 px-4 pt-5 pb-20"
+      scrollEventThrottle={100}
+      onScroll={(e) => {
+        const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
+        const left =
+          contentSize.height - contentOffset.y - layoutMeasurement.height;
+        if (left < GROW_WITHIN_PX && grownCount < list.length)
+          setGrownCount(grownCount + PAGE_SIZE);
+      }}
+    >
       <DealsStrip />
-      <View className="flex-row gap-3.5">
+      <View className="flex-row gap-4">
         {volumes[0]?.coverUrl || info?.coverUrl ? (
-          <View>
+          <View className="self-start">
             <SeriesCover
               name={named.title}
               url={volumes[0]?.coverUrl ?? info?.coverUrl}
@@ -225,30 +251,15 @@ export default function PriceSeriesScreen() {
       ) : null}
 
       {tabbed ? (
-        <View className="flex-row overflow-hidden rounded-[4px] border-2 border-line">
-          {(
-            [
-              ["volumes", "Volumes"],
-              ["editions", "Editions"],
-            ] as const
-          ).map(([value, label], i) => {
-            const on = (value === "editions") === onEditions;
-            return (
-              <Pressable
-                key={value}
-                onPress={() => setTab(value)}
-                accessibilityState={{ selected: on }}
-                className={`flex-1 items-center py-2.5 ${on ? "bg-ink" : ""} ${i ? "border-l-2 border-line" : ""}`}
-              >
-                <Text
-                  className={`font-body-semibold text-[15px] ${on ? "text-paper" : "text-ink"}`}
-                >
-                  {label}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
+        <Segmented
+          label="Show"
+          options={[
+            { value: "volumes", label: "Volumes" },
+            { value: "editions", label: "Editions" },
+          ]}
+          value={onEditions ? "editions" : "volumes"}
+          onChange={setTab}
+        />
       ) : null}
 
       {!onEditions ? (
@@ -295,8 +306,8 @@ export default function PriceSeriesScreen() {
           {volumes.length ? (
             <>
               <View
-                className="flex-row flex-wrap justify-between"
-                style={{ rowGap: 18 }}
+                className="flex-row flex-wrap"
+                style={{ rowGap: 20, columnGap: GRID_GAP }}
               >
                 {cardsOf(shown).map((card) => {
                   const first = card[0]!;
@@ -312,7 +323,8 @@ export default function PriceSeriesScreen() {
                         subtitle={oneVolumeSubtitle(first)}
                         mark={mark}
                         seriesCoverUrl={info?.coverUrl ?? null}
-                        width={CARD}
+                        width={tileWidth}
+                        bare
                       />
                     );
                   const last = card[card.length - 1]!;
@@ -327,21 +339,11 @@ export default function PriceSeriesScreen() {
                       priceCents={first.knownPriceCents}
                       subtitle={bookSubtitle(card)}
                       mark={mark}
-                      width={CARD}
+                      width={tileWidth}
                     />
                   );
                 })}
               </View>
-              {grownCount < list.length ? (
-                <Pressable
-                  onPress={() => setGrownCount(grownCount + PAGE_SIZE)}
-                  className="self-center rounded-[3px] border-[1.5px] border-line px-4 py-2"
-                >
-                  <Text className="font-body-semibold text-[14px] text-ink">
-                    Show {Math.min(PAGE_SIZE, list.length - grownCount)} more
-                  </Text>
-                </Pressable>
-              ) : null}
             </>
           ) : incomplete ? (
             <View className="gap-2">

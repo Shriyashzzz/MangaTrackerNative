@@ -77,6 +77,7 @@ export default function VolumeCard({
   plainStandIn = false,
   bookNumber = null,
   width = 130,
+  bare = false,
 }: {
   isbn13: string | null;
   title: string;
@@ -92,6 +93,9 @@ export default function VolumeCard({
   plainStandIn?: boolean;
   bookNumber?: number | null;
   width?: number;
+  // a tile in a grid of one series: the number on the cover says which,
+  // so only the price sits under it
+  bare?: boolean;
 }) {
   const c = useColors();
   const shown = novelParts(title);
@@ -101,7 +105,7 @@ export default function VolumeCard({
       onPress={isbn13 ? () => router.push(`/prices/${isbn13}`) : undefined}
       disabled={!isbn13}
       style={{ width }}
-      className="gap-1 active:opacity-70"
+      className="gap-1.5 active:opacity-70"
     >
       <View style={{ width, aspectRatio: 2 / 3, marginTop: fanned ? 6 : 0 }}>
         {Array.from({ length: fanned }, (_, i) => (
@@ -139,6 +143,8 @@ export default function VolumeCard({
             borderColor: c.line,
             overflow: "hidden",
             backgroundColor: c.paper2,
+            // lifted off the page, softly
+            boxShadow: "0px 3px 8px rgba(0, 0, 0, 0.35)",
           }}
         >
           <CoverFallback
@@ -189,13 +195,15 @@ export default function VolumeCard({
           ) : null}
         </View>
       </View>
-      <Text
-        numberOfLines={2}
-        className="font-body-semibold text-[13.5px] leading-[17px] text-ink"
-      >
-        {shown.title}
-      </Text>
-      {subtitle || shown.lightNovel ? (
+      {bare ? null : (
+        <Text
+          numberOfLines={2}
+          className="font-body-semibold text-[13.5px] leading-[17px] text-ink"
+        >
+          {shown.title}
+        </Text>
+      )}
+      {!bare && (subtitle || shown.lightNovel) ? (
         <Text numberOfLines={2} className="font-mono text-[11.5px] text-muted">
           {[
             shown.lightNovel && "Light novel",
@@ -204,6 +212,9 @@ export default function VolumeCard({
             .filter(Boolean)
             .join(" · ")}
         </Text>
+      ) : null}
+      {bare && priceCents == null && isbn13 ? (
+        <Text className="font-mono text-[12px] text-muted">See price</Text>
       ) : null}
       {priceCents != null ? (
         <Text className="font-mono-medium text-[13px] text-ink">
