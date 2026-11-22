@@ -1,6 +1,6 @@
 // One series on the shelf, as the Android app's row (web components/mangaCard
-// MangaCard.tsx, its rows): cover, name, their stars under it, the genre,
-// and on the right how far through they are (a bar when the total is known,
+// MangaCard.tsx, its rows): cover, name, their stars under it, the genre
+// with how many books they own, and on the right how far through they are (a bar when the total is known,
 // the place alone when it isn't). The words come from the web's own rules (core cardText,
 // reading), so the two apps always say the same. While selecting, a tick box
 // sits on the cover and a tap picks the row. A long press opens the
@@ -68,7 +68,14 @@ export default memo(function ShelfRow({
   // where they are, said on the right of every row: with its bar when the
   // total is known, on its own when it isn't
   const place = manga.planned ? "to read" : placeText(manga, trackBy);
-  const kindLine = rowKindLine(manga);
+  // what it is, then how many books of it they own: "Action · 12 vols"
+  const ownedCount = ownedOf(manga).length;
+  const kindLine = [
+    rowKindLine(manga),
+    ownedCount ? `${ownedCount} ${ownedCount === 1 ? "vol" : "vols"}` : "",
+  ]
+    .filter(Boolean)
+    .join(" · ");
   const rating = Number(manga.rating) || 0;
 
   const row = (
@@ -121,7 +128,6 @@ export default memo(function ShelfRow({
       <View className="w-[120px] items-end gap-1 pr-2">
         <RowProgress
           finished={manga.status}
-          ownedCount={ownedOf(manga).length}
           unit={unit}
           reading={reading}
           knownTotal={knownTotal}
@@ -236,18 +242,16 @@ function askToDelete(manga: Manga) {
   );
 }
 
-// the right of a row: "Finished", how many books, how far through with a
+// the right of a row, reading only: "Finished", how far through with a
 // bar under it, or just the place when the total isn't known (web MangaCard RowProgress)
 function RowProgress({
   finished,
-  ownedCount,
   unit,
   reading,
   knownTotal,
   place,
 }: {
   finished: boolean;
-  ownedCount: number;
   unit: "ch." | "vol.";
   reading: number;
   knownTotal: number | null;
@@ -256,15 +260,6 @@ function RowProgress({
 }) {
   const text = "font-mono text-[12px] text-ink-soft text-right";
   if (finished) return <Text className={text}>Finished</Text>;
-  if (!reading && ownedCount)
-    return (
-      <>
-        {place ? <Text className={text}>{place}</Text> : null}
-        <Text className={text}>
-          {ownedCount} {ownedCount === 1 ? "vol" : "vols"}
-        </Text>
-      </>
-    );
   if (knownTotal == null || reading <= 0)
     return place ? (
       <Text numberOfLines={1} className={text}>
