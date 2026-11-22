@@ -322,7 +322,7 @@ function Card({
           ) : null}
           {/* theirs: the note on it and the price to be told at, or the
               ways to add them. Two equal chips, so the row never ends short */}
-          <View className="mt-auto flex-row gap-2">
+          <View className="flex-row gap-2 pt-0.5">
             <Tap
               onPress={onNote}
               accessibilityLabel={
