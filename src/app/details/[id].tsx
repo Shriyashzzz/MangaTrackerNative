@@ -489,7 +489,7 @@ export default function DetailsScreen() {
         />
 
         <View className="gap-2">
-          <View className="flex-row items-baseline justify-between">
+          <View className="flex-row items-end justify-between">
             <SectionTitle>Your shelf</SectionTitle>
             <Text className="font-body text-[14px] text-ink-soft">
               {shelf.count}
@@ -498,7 +498,8 @@ export default function DetailsScreen() {
           <ShelfStrip shelf={shelf} />
         </View>
 
-        <View className="gap-3">
+        {/* a rule above each section, as the Android app divides them */}
+        <View className="gap-3 border-t border-line-soft pt-6">
           <SectionTitle>Reading</SectionTitle>
           <ReadingPlace
             manga={m}
@@ -527,7 +528,7 @@ export default function DetailsScreen() {
           ) : null}
         </View>
 
-        <View className="gap-4">
+        <View className="gap-4 border-t border-line-soft pt-6">
           <SectionTitle>Your take</SectionTitle>
           <RatingField
             key={`rating-${m.id}`}

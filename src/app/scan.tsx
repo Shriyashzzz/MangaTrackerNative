@@ -5,6 +5,7 @@
 // the ISBN works when the camera can't. The phone's camera does the reading
 // (expo-camera), and a buzz says a scan landed; what a scan does to the
 // shelf is the web's own (core lib/scan)
+import ScanFrame from "@/components/ScanFrame";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as Haptics from "expo-haptics";
 import { router, useLocalSearchParams } from "expo-router";
@@ -188,9 +189,8 @@ export default function ScanScreen() {
               width: "100%",
               aspectRatio: 1.4,
               overflow: "hidden",
-              borderRadius: 8,
-              borderWidth: 2,
-              borderColor: "#fffaf2",
+              borderRadius: 18,
+              backgroundColor: "#000",
             }}
           >
             {permission?.granted ? (
@@ -211,6 +211,7 @@ export default function ScanScreen() {
                 }}
               />
             ) : null}
+            <ScanFrame looking={cameraOn && !flash} />
             {flash ? (
               <View
                 className={`absolute inset-x-0 bottom-0 flex-row items-center gap-2 px-3 py-2 ${flash.tone === "good" ? "bg-award-new" : flash.tone === "same" ? "bg-award-market" : "bg-accent"}`}
@@ -236,7 +237,7 @@ export default function ScanScreen() {
               : notice || "Point at the barcode on the back"}
           </Text>
           <Text className="text-center font-body text-[13px] text-paper/70">
-            It reads on its own. Keep going for a whole stack
+            Keep going for a whole stack.
           </Text>
         </View>
       ) : (
