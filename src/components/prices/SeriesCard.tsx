@@ -36,7 +36,9 @@ export function SeriesScoreBadge({ percent }: { percent?: number | null }) {
   if (!percent) return null;
   return (
     <View
-      className="absolute -right-1 -bottom-1 flex-row items-center gap-0.5 rounded-[2px] border border-line bg-paper px-1"
+      // the top corner: a light novel's band runs across the cover's foot
+      className="absolute -top-1 -right-1 flex-row items-center gap-0.5 rounded-[2px] border border-line bg-paper px-1"
+      style={{ zIndex: 2 }}
       accessibilityLabel={`Rated ${starsOf(percent)} out of 5`}
     >
       <StarIcon filled color={c.star} width={11} height={11} />
