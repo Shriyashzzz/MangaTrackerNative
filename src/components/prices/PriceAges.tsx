@@ -2,6 +2,7 @@
 // opening to each store's own when they differ
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
+import Sheet from "../Sheet";
 import { shopName, timeAgo } from "@/core/lib/prices";
 import type { Offer } from "@/core/lib/types";
 
@@ -36,25 +37,33 @@ export default function PriceAges({
       </Text>
     );
   return (
-    <View className="items-end">
+    <>
       <Pressable
-        onPress={() => setOpen(!open)}
+        onPress={() => setOpen(true)}
         hitSlop={6}
-        accessibilityState={{ expanded: open }}
+        accessibilityRole="button"
+        accessibilityLabel={`Checked ${timeAgo(newest)}. Each store's last check`}
       >
         <Text className="font-body text-[13px] text-muted underline">
           checked {timeAgo(newest)}
         </Text>
       </Pressable>
-      {open ? (
-        <View className="mt-1 rounded-[3px] border border-line-soft bg-card px-2 py-1">
-          {ages.map(({ store, at }) => (
-            <Text key={store} className="font-mono text-[11.5px] text-ink-soft">
-              {store} · {timeAgo(at)}
+      <Sheet open={open} onClose={() => setOpen(false)}>
+        <Text className="pb-3 font-body-semibold text-[13px] tracking-[1px] text-muted uppercase">
+          Each store, last checked
+        </Text>
+        {ages.map(({ store, at }) => (
+          <View
+            key={store}
+            className="flex-row items-baseline justify-between border-t border-line-soft py-3"
+          >
+            <Text className="font-body text-[15px] text-ink">{store}</Text>
+            <Text className="font-mono text-[13px] text-ink-soft">
+              {timeAgo(at)}
             </Text>
-          ))}
-        </View>
-      ) : null}
-    </View>
+          </View>
+        ))}
+      </Sheet>
+    </>
   );
 }

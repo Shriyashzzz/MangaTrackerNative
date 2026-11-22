@@ -94,6 +94,7 @@ export default function Segmented<T extends string>({
             className={`flex-1 items-center justify-center px-2 ${isAndroid ? "min-h-[40px]" : "min-h-[34px] py-1.5"}`}
           >
             <Text
+              numberOfLines={1}
               className={`text-center text-[14.5px] ${on ? "font-body-semibold text-ink" : "font-body-medium text-ink-soft"}`}
             >
               {o.label}

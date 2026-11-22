@@ -342,7 +342,7 @@ export default function PricesScreen() {
                       })
                     }
                     style={{ flexBasis: "30%", flexGrow: 1 }}
-                    className={`min-h-[40px] items-center justify-center overflow-hidden bg-ink/10 ${look.buttonRadius}`}
+                    className={`min-h-[40px] items-center justify-center overflow-hidden border border-line-soft ${look.buttonRadius}`}
                   >
                     <Text className="font-body-medium text-[14px] text-ink">
                       {name}
@@ -358,27 +358,24 @@ export default function PricesScreen() {
           <PressScale
             onPress={() => router.push("/after-anime")}
             accessibilityRole="link"
-            className="gap-2.5 rounded-[14px] bg-ink px-4 pt-4 pb-3.5"
+            className="gap-2 rounded-[14px] border border-line-soft bg-card px-4 pt-3.5 pb-3.5"
           >
-            {/* the door to After the anime, inked the other way round: a
-                stamped title, the words, the way in */}
+            {/* the door to After the anime: a small stamped title, the
+                words, the way in; a side door, not the main one */}
             <View
               className="self-start bg-accent px-1.5 pt-0.5"
               style={{ transform: [{ rotate: "-2deg" }] }}
             >
-              <Text className="font-brand pr-1 text-[19px] tracking-[1px] text-on-accent uppercase">
+              <Text className="font-brand pr-1 text-[14px] tracking-[1px] text-on-accent uppercase">
                 Finished the anime?
               </Text>
             </View>
-            <Text className="font-body text-[15px] leading-[21px] text-paper">
+            <Text className="font-body text-[14.5px] leading-[20px] text-ink-soft">
               Find the chapter and volume of the manga to start from.
             </Text>
-            <View className="self-start">
-              <Text className="font-body-semibold text-[15px] text-paper">
-                Find where to start →
-              </Text>
-              <View className="mt-0.5 h-[2px] bg-accent" />
-            </View>
+            <Text className="font-body-semibold text-[14.5px] text-ink underline">
+              Find where to start →
+            </Text>
           </PressScale>
         ) : null}
 

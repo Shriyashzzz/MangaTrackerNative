@@ -33,17 +33,37 @@ export default function SeriesCostBox({
   comingSoon: boolean;
 }) {
   const run = runTotal(cost);
-  if (!run && !used) return null;
+  // too few priced for the real estimate: the priced ones' average, times
+  // the run, said as the rough guess it is
+  const rough =
+    !run && cost.priced > 0
+      ? Math.round((cost.cents / cost.priced) * cost.volumes)
+      : 0;
+  if (!run && !used && !rough) return null;
   return (
     <View className="gap-1.5 rounded-[14px] border border-line-soft bg-card p-3">
       <Text className="font-brand pr-1 text-[18px] tracking-[1px] text-ink uppercase">
         Collect every volume
       </Text>
       {!run ? (
-        <Text className="font-body text-[14px] text-ink-soft">
-          New prices found for {cost.priced} of {cost.volumes} so far. A total
-          shows once most have one.
-        </Text>
+        rough ? (
+          <>
+            <Text className="font-body text-[15px] text-ink">
+              About{" "}
+              <Text className="font-brand pr-1 text-[22px]">
+                {wholeMoney(rough)}
+              </Text>{" "}
+              new for all {cost.volumes}
+            </Text>
+            <Text className="font-body text-[13.5px] text-ink-soft">
+              A rough guess from the {cost.priced} priced so far.
+            </Text>
+          </>
+        ) : (
+          <Text className="font-body text-[14px] text-ink-soft">
+            No new prices yet. Open a volume to get its price.
+          </Text>
+        )
       ) : (
         <>
           <Text className="font-body text-[15px] text-ink">

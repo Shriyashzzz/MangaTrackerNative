@@ -13,10 +13,11 @@ import {
 } from "@react-native-menu/menu";
 import * as Haptics from "expo-haptics";
 import { Link, router } from "expo-router";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Alert, Platform, Pressable, Text, View } from "react-native";
 import { useRipple } from "@/lib/press";
 import { useShelf } from "@/store/shelf";
+import MenuSheet from "./MenuSheet";
 import { CheckIcon } from "@/core/components/icons/Icons";
 import { useColors } from "@/lib/colors";
 import { progressOf, rowKindLine } from "@/core/components/mangaCard/cardText";
@@ -46,6 +47,7 @@ export default function ShelfRow({
   // Android's menu is opened from the row's own long press (the row takes
   // the touch before the menu's view sees it); an iPhone's opens itself
   const menu = useRef<MenuComponentRef>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const { unit, reading, knownTotal } = progressOf(
     manga,
     tracksOf(manga, trackBy),
@@ -66,7 +68,10 @@ export default function ShelfRow({
       onLongPress={
         select || Platform.OS !== "android"
           ? undefined
-          : () => menu.current?.show()
+          : () => {
+              void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setSheetOpen(true);
+            }
       }
       delayLongPress={400}
       accessibilityState={select ? { selected: select.checked } : undefined}
@@ -122,23 +127,43 @@ export default function ShelfRow({
       </View>
     </Pressable>
   );
+  const act = (id: string) => {
+    if (id === "edit") router.push(`/edit/${manga.id}`);
+    else if (id === "select") onLongPress?.();
+    else if (id === "delete") askToDelete(manga);
+    else if (id.startsWith("move:"))
+      void useShelf
+        .getState()
+        .moveMany([manga.id], id.slice("move:".length) as ShelfStatus);
+  };
   if (select) return row;
+  if (Platform.OS === "android")
+    return (
+      <>
+        <Link href={`/details/${manga.id}`} asChild>
+          {row}
+        </Link>
+        <MenuSheet
+          open={sheetOpen}
+          title={manga.name}
+          items={menuActions(manga).map((a) => ({
+            label: a.title,
+            danger: a.id === "delete",
+            onPress: () => act(a.id ?? ""),
+          }))}
+          onClose={() => setSheetOpen(false)}
+        />
+      </>
+    );
   return (
     <MenuView
       ref={menu}
       title={manga.name}
-      shouldOpenOnLongPress={Platform.OS === "ios"}
+      shouldOpenOnLongPress
       actions={menuActions(manga)}
       onPressAction={({ nativeEvent }) => {
         void Haptics.selectionAsync();
-        const id = nativeEvent.event;
-        if (id === "edit") router.push(`/edit/${manga.id}`);
-        else if (id === "select") onLongPress?.();
-        else if (id === "delete") askToDelete(manga);
-        else if (id.startsWith("move:"))
-          void useShelf
-            .getState()
-            .moveMany([manga.id], id.slice("move:".length) as ShelfStatus);
+        act(nativeEvent.event ?? "");
       }}
     >
       <Link href={`/details/${manga.id}`} asChild>

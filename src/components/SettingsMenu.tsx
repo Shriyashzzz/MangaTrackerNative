@@ -95,12 +95,7 @@ export default function SettingsMenu({
     router.push(to);
   };
   return (
-    <Sheet
-      open={open}
-      onClose={onClose}
-      maxHeight={0.8}
-      contentClassName="px-2 pt-2 pb-8"
-    >
+    <Sheet open={open} onClose={onClose} contentClassName="px-2 pt-2 pb-8">
       {/* who's signed in, and the way to everything about them */}
       <Pressable
         onPress={() => go("/settings")}

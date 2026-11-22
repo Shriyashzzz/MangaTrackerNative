@@ -52,7 +52,8 @@ export default function Sheet({
   scroll = true,
   // the list opens scrolled to its foot (rows stacked up from it)
   fromTheFoot = false,
-  maxHeight = 0.88,
+  // as tall as the menu sheet at most, so no sheet ever fills the screen
+  maxHeight = 0.7,
   contentClassName = "px-4 pb-8",
 }: {
   open: boolean;

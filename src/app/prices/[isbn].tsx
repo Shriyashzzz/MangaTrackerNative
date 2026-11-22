@@ -345,31 +345,30 @@ export default function PriceVolumeScreen() {
               ) : null}
             </Text>
           ) : null}
+          {unknownBook ? (
+            <Text className="font-body text-[14px] text-ink-soft">
+              We don't know this book as a manga.
+            </Text>
+          ) : (
+            <ShelfAction
+              isbn13={book.isbn13.trim()}
+              series={seriesLabel}
+              alsoCalled={series.name}
+              title={edition ? seriesLabel : seriesTitle(book.title)}
+              volume={volume}
+              editionBook={
+                edition && volume != null
+                  ? {
+                      name: bookName(edition.label, volume),
+                      title: book.title,
+                      holds: edition.volumes,
+                    }
+                  : undefined
+              }
+            />
+          )}
         </View>
       </View>
-
-      {unknownBook ? (
-        <Text className="font-body text-[14px] text-ink-soft">
-          We don't know this book as a manga.
-        </Text>
-      ) : (
-        <ShelfAction
-          isbn13={book.isbn13.trim()}
-          series={seriesLabel}
-          alsoCalled={series.name}
-          title={edition ? seriesLabel : seriesTitle(book.title)}
-          volume={volume}
-          editionBook={
-            edition && volume != null
-              ? {
-                  name: bookName(edition.label, volume),
-                  title: book.title,
-                  holds: edition.volumes,
-                }
-              : undefined
-          }
-        />
-      )}
 
       {/* one country's prices at a time */}
       <View className="gap-3">
@@ -389,7 +388,7 @@ export default function PriceVolumeScreen() {
             ) : (
               <PriceAges offers={offers} checkedAt={checkedAt} />
             )}
-            <View className="w-[132px]">
+            <View className="w-[160px]">
               <CountrySwitch />
             </View>
           </View>

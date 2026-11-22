@@ -6,8 +6,7 @@
 // gaps with what they cost. The rules are the web's (core seriesPageRules,
 // finishCost, useSeriesData)
 import { router, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
-import Animated, { FadeIn } from "react-native-reanimated";
+import { useRef, useState, type ComponentRef } from "react";
 import Segmented from "@/components/Segmented";
 import {
   Pressable,
@@ -22,7 +21,6 @@ import Button from "@/components/Button";
 import DoubleRule from "@/components/DoubleRule";
 import Mascot from "@/components/Mascot";
 import SeriesCover from "@/components/SeriesCover";
-import AfterAnimeBar from "@/components/prices/AfterAnimeBar";
 import { BoxSetSearch } from "@/components/prices/BoxSets";
 import DealsStrip from "@/components/prices/DealsStrip";
 import OtherEditions from "@/components/prices/OtherEditions";
@@ -89,6 +87,9 @@ export default function PriceSeriesScreen() {
   const [toGetOnly, setToGetOnly] = useState(params.toget === "1");
   // how many rows are shown, for the list they were grown for: a new series
   // or filter starts at the first page again
+  // where the Volumes / Editions switch sits in the page, to scroll to
+  const [tabsY, setTabsY] = useState(0);
+  const page = useRef<ComponentRef<typeof ScrollView>>(null);
   const listKey = `${name}|${toGetOnly}`;
   const [grown, setGrown] = useState({ key: listKey, count: PAGE_SIZE });
   const grownCount = grown.key === listKey ? grown.count : PAGE_SIZE;
@@ -187,6 +188,7 @@ export default function PriceSeriesScreen() {
   return frame(
     named.title,
     <ScrollView
+      ref={page}
       contentContainerClassName="gap-8 px-4 pt-5 pb-20"
       scrollEventThrottle={100}
       onScroll={(e) => {
@@ -241,9 +243,6 @@ export default function PriceSeriesScreen() {
           setTab("editions");
         }}
       />
-      {info && data.hasAnimeAnswer ? (
-        <AfterAnimeBar seriesName={info.name} />
-      ) : null}
       {cost ? (
         <SeriesCostBox
           cost={cost}
@@ -253,19 +252,29 @@ export default function PriceSeriesScreen() {
       ) : null}
 
       {tabbed ? (
-        <Segmented
-          label="Show"
-          options={[
-            { value: "volumes", label: "Volumes" },
-            { value: "editions", label: "Editions" },
-          ]}
-          value={onEditions ? "editions" : "volumes"}
-          onChange={setTab}
-        />
+        <View onLayout={(e) => setTabsY(e.nativeEvent.layout.y)}>
+          <Segmented
+            label="Show"
+            options={[
+              { value: "volumes", label: "Volumes" },
+              { value: "editions", label: "Editions" },
+            ]}
+            value={onEditions ? "editions" : "volumes"}
+            onChange={(value) => {
+              setTab(value);
+              // the switch stays under the finger: the page scrolls to the
+              // tabs, not back to the top as the sections change height
+              page.current?.scrollTo({
+                y: Math.max(0, tabsY - 12),
+                animated: false,
+              });
+            }}
+          />
+        </View>
       ) : null}
 
       {!onEditions ? (
-        <Animated.View entering={FadeIn.duration(220)} className="gap-3">
+        <View className="gap-3">
           <View className="flex-row items-end justify-between">
             <H2>Volumes</H2>
             {volumes.length ? (
@@ -370,14 +379,12 @@ export default function PriceSeriesScreen() {
               </Text>
             </Text>
           ) : null}
-        </Animated.View>
+        </View>
       ) : null}
 
       {/* on the Volumes tab it's there, unseen: it fetches the lines the tabs
           and the header box need */}
-      <Animated.View
-        key={onEditions ? "editions" : "hidden"}
-        entering={onEditions ? FadeIn.duration(220) : undefined}
+      <View
         style={
           tabbed && !onEditions ? { height: 0, overflow: "hidden" } : undefined
         }
@@ -390,7 +397,7 @@ export default function PriceSeriesScreen() {
           singles={singles}
           seriesCoverUrl={info?.coverUrl ?? null}
         />
-      </Animated.View>
+      </View>
       {!hasSets && !onEditions ? (
         <BoxSetSearch links={data.boxSetLinks ?? []} />
       ) : null}

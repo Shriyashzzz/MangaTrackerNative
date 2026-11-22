@@ -255,7 +255,7 @@ export default function NewScreen() {
         }
       >
         <View className="flex-row items-baseline gap-2">
-          <Text className="font-brand pr-1 text-[30px] tracking-[1px] text-ink uppercase">
+          <Text className="font-brand pr-2 text-[30px] tracking-[1px] text-ink uppercase">
             {viewingHidden ? "Hidden" : "New"}
           </Text>
           <Text className="font-mono text-[14px] text-muted">
@@ -571,7 +571,7 @@ export default function NewScreen() {
           </Text>
         ) : null}
         {!checking && Number.isFinite(oldestCheck) ? (
-          <Text className="text-center font-mono text-[12px] text-muted">
+          <Text className="font-mono text-[12px] text-muted">
             Checked {checkedAgo(oldestCheck)}
           </Text>
         ) : null}
