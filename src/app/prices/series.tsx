@@ -5,21 +5,12 @@
 // card with its price, Yours and Next, Not on your shelf to see only the
 // gaps with what they cost. The rules are the web's (core seriesPageRules,
 // finishCost, useSeriesData)
-import { router, useLocalSearchParams } from "expo-router";
-import { useRef, useState, type ComponentRef } from "react";
-import Segmented from "@/components/Segmented";
-import {
-  Pressable,
-  ScrollView,
-  Text,
-  useWindowDimensions,
-  View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { withUniwind } from "uniwind";
 import Button from "@/components/Button";
 import DoubleRule from "@/components/DoubleRule";
+import LoadingQuote from "@/components/LoadingQuote";
 import Mascot from "@/components/Mascot";
+import { H2 } from "@/components/Page";
+import Segmented from "@/components/Segmented";
 import SeriesCover from "@/components/SeriesCover";
 import { BoxSetSearch } from "@/components/prices/BoxSets";
 import DealsStrip from "@/components/prices/DealsStrip";
@@ -32,6 +23,7 @@ import SetsBox from "@/components/prices/SetsBox";
 import ToReadButton from "@/components/prices/ToReadButton";
 import VolumeCard from "@/components/prices/VolumeCard";
 import { ChevronLeftIcon } from "@/core/components/icons/Icons";
+import { getJson } from "@/core/lib/api";
 import { headlineLine, type EditionLine } from "@/core/lib/editions";
 import {
   finishCost,
@@ -59,8 +51,17 @@ import {
 } from "@/core/pages/Prices/useSeriesData";
 import { useColors } from "@/lib/colors";
 import { usePrefs } from "@/store/prefs";
-import { H2 } from "@/components/Page";
-import LoadingQuote from "@/components/LoadingQuote";
+import { router, useLocalSearchParams } from "expo-router";
+import { useEffect, useRef, useState, type ComponentRef } from "react";
+import {
+  Pressable,
+  ScrollView,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { withUniwind } from "uniwind";
 
 const Safe = withUniwind(SafeAreaView);
 // the volume grid: four covers a row, as the Android app lays them
@@ -100,6 +101,23 @@ export default function PriceSeriesScreen() {
     name: string;
     lines: EditionLine[];
   }>({ name: "", lines: [] });
+  // asked for with the page, and the page waits for it: the Editions tab,
+  // the box-set box and which sets it lists all hang on the answer, and
+  // drawing before it made them pop in and reshuffle a second later
+  useEffect(() => {
+    const controller = new AbortController();
+    getJson<{ lines: EditionLine[] }>(
+      `/api/prices/editions?${new URLSearchParams({ name })}`,
+      controller.signal,
+    )
+      .then(({ lines }) => setEditions({ name, lines: lines ?? [] }))
+      .catch((e) => {
+        if ((e as Error).name !== "AbortError")
+          setEditions({ name, lines: [] });
+      });
+    return () => controller.abort();
+  }, [name]);
+  const editionsKnown = editions.name === name;
   const [askedEdition, setAskedEdition] = useState<string | null>(
     params.edition ?? null,
   );
@@ -126,7 +144,8 @@ export default function PriceSeriesScreen() {
       {body}
     </Safe>
   );
-  if (series.loading) return frame(name, <LoadingQuote />);
+  if (series.loading || (!series.error && !editionsKnown))
+    return frame(name, <LoadingQuote />);
   if (series.error || !series.data) {
     const notFound = /couldn't find that series/i.test(series.error);
     return frame(
@@ -204,14 +223,17 @@ export default function PriceSeriesScreen() {
       <DealsStrip />
       <View className="flex-row gap-4">
         {volumes[0]?.coverUrl || info?.coverUrl ? (
-          <View className="self-start">
-            <SeriesCover
-              name={named.title}
-              url={volumes[0]?.coverUrl ?? info?.coverUrl}
-              width={94}
-              border={2}
-            />
-            <SeriesScoreBadge percent={info?.score} />
+          <View>
+            <View className="self-start">
+              <SeriesCover
+                name={named.title}
+                url={volumes[0]?.coverUrl ?? info?.coverUrl}
+                width={94}
+                border={2}
+              />
+
+              <SeriesScoreBadge percent={info?.score} />
+            </View>
             <OnShelfChip
               name={info?.name ?? data.name}
               altNames={info?.altNames}
@@ -236,6 +258,7 @@ export default function PriceSeriesScreen() {
           />
         </View>
       </View>
+
       <SetsBox
         key={data.slug}
         series={data.slug}
@@ -268,14 +291,6 @@ export default function PriceSeriesScreen() {
             value={onEditions ? "editions" : "volumes"}
             onChange={(value) => {
               setTab(value);
-              // the switch stays under the finger: the page scrolls to the
-              // tabs, not back to the top as the sections change height
-              requestAnimationFrame(() =>
-                page.current?.scrollTo({
-                  y: Math.max(0, tabsY - 12),
-                  animated: false,
-                }),
-              );
             }}
           />
         </View>
@@ -417,7 +432,7 @@ export default function PriceSeriesScreen() {
             name={name}
             asked={askedEdition}
             owned={mine ? ownedOf(mine) : []}
-            onLines={(lines) => setEditions({ name, lines })}
+            lines={editionLines}
             singles={singles}
             seriesCoverUrl={info?.coverUrl ?? null}
           />

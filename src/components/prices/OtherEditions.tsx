@@ -1,11 +1,7 @@
 // A series' other editions (the web's OtherEditions.tsx, the app's layout):
 // each line's books as cards, which book holds a volume, the lines to switch
 // between, and what a whole run costs against the singles
-import { useEffect, useState } from "react";
-import { router } from "expo-router";
-import { Pressable, Text, useWindowDimensions, View } from "react-native";
-import Segmented from "../Segmented";
-import { getJson } from "@/core/lib/api";
+import { H2 } from "@/components/Page";
 import { nextVolumeFor } from "@/core/lib/editionLookup";
 import {
   editionBookLabel,
@@ -14,9 +10,12 @@ import {
 } from "@/core/lib/editions";
 import { runTotal, seriesCost, type SeriesCost } from "@/core/lib/finishCost";
 import { formatCents, wholeMoney } from "@/core/lib/prices";
+import { router } from "expo-router";
+import { useState } from "react";
+import { Pressable, Text, useWindowDimensions, View } from "react-native";
+import Segmented from "../Segmented";
 import EditionFinder from "./EditionFinder";
 import VolumeCard from "./VolumeCard";
-import { H2 } from "@/components/Page";
 
 // four books a row, as the volumes beside them
 const COLUMNS = 4;
@@ -27,38 +26,20 @@ export default function OtherEditions({
   name,
   asked,
   owned,
-  onLines,
+  lines,
   singles,
   seriesCoverUrl = null,
 }: {
   name: string;
   asked: string | null;
   owned: number[];
-  onLines: (lines: EditionLine[]) => void;
+  // the series' lines, asked for by the page with the rest of it
+  lines: EditionLine[];
   singles: SeriesCost | null;
   seriesCoverUrl?: string | null;
 }) {
-  const [state, setState] = useState<{ name: string; lines: EditionLine[] }>({
-    name: "",
-    lines: [],
-  });
   const [picked, setPicked] = useState<string | null>(null);
   const { width: screenWidth } = useWindowDimensions();
-  useEffect(() => {
-    const controller = new AbortController();
-    getJson<{ lines: EditionLine[] }>(
-      `/api/prices/editions?${new URLSearchParams({ name })}`,
-      controller.signal,
-    )
-      .then(({ lines }) => {
-        setState({ name, lines: lines ?? [] });
-        onLines(lines ?? []);
-      })
-      .catch(() => onLines([]));
-    return () => controller.abort();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [name]);
-  const lines = state.name === name ? state.lines : [];
   if (!lines.length) return null;
   const line = lineFor(lines, picked ?? asked) ?? lines[0]!;
   const mine = new Set(owned);
