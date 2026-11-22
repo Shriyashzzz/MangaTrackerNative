@@ -536,14 +536,15 @@ export default function PriceVolumeScreen() {
             onPress={() => setHistoryOpen(!historyOpen)}
             accessibilityRole="button"
             accessibilityState={{ expanded: historyOpen }}
-            className="flex-row items-end gap-3"
+            className="flex-row items-start gap-3"
           >
             <H2>Price history</H2>
-            <Text className="pb-1 font-mono text-[12.5px] text-muted">
+            {/* level with the heading's words, not the rule under them */}
+            <Text className="font-mono text-[12.5px] leading-[30px] text-muted">
               lowest {formatCents(lowestInHistory)}
             </Text>
             <View
-              className="ml-auto pb-1"
+              className="ml-auto h-[30px] justify-center"
               style={{
                 transform: [{ rotate: historyOpen ? "180deg" : "0deg" }],
               }}
