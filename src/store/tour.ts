@@ -40,8 +40,8 @@ function topToBottom(steps: TourStep[]) {
   return told;
 }
 
-// where the thing he's pointing at is on the screen, top and height
-type Box = { y: number; height: number };
+// where the thing he's pointing at is on the screen
+type Box = { x: number; y: number; width: number; height: number };
 
 type TourState = {
   steps: TourStep[];

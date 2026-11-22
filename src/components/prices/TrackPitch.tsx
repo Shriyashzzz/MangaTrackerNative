@@ -50,7 +50,7 @@ export default function TrackPitch({
         onPress={() => router.push("/sign-up")}
         android_ripple={ripple}
         accessibilityRole="button"
-        accessibilityLabel={`${question} Track this series, free`}
+        accessibilityLabel={`${question} Track this series`}
         className="flex-row overflow-hidden rounded-[12px] border-[1.5px] border-accent bg-card active:opacity-90"
       >
         <View className="min-w-0 flex-1 gap-1 px-3 py-2.5">
@@ -68,9 +68,6 @@ export default function TrackPitch({
           <Text className="font-brand pr-[5px] text-[20px] tracking-[1px] text-accent-ink uppercase">
             Track
             {"\u00A0"}
-          </Text>
-          <Text className="font-mono-medium text-[10.5px] tracking-[1px] text-accent-ink uppercase">
-            free
           </Text>
         </View>
       </Tap>

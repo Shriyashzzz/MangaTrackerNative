@@ -26,6 +26,11 @@ export function tourGo(by: 1 | -1) {
   const { steps, at } = useTour.getState();
   if (at === before) return;
   const page = pageOf(steps[at]!);
+  if (!page) return;
+  // The shelf and New are tabs under whatever pages are open over them:
+  // those pages go first, or the tab changes out of sight behind them
+  const isTab = page === "/" || page === "/new";
+  if (isTab && router.canDismiss()) router.dismissAll();
   // (going to the page already in front does nothing)
-  if (page) router.navigate(page);
+  router.navigate(page);
 }

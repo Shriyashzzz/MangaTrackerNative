@@ -425,11 +425,9 @@ export default function PriceVolumeScreen() {
         )}
 
         {/* one country's prices at a time */}
-        <View className="gap-3">
+        <TourTarget name="prices" className="gap-3">
           <View className="flex-row items-end justify-between gap-3">
-            <TourTarget name="prices" className="self-start">
-              <H2>{inCanada ? "Prices in Canada" : "Prices"}</H2>
-            </TourTarget>
+            <H2>{inCanada ? "Prices in Canada" : "Prices"}</H2>
             <View className="w-[160px]">
               <CountrySwitch />
             </View>
@@ -575,7 +573,7 @@ export default function PriceVolumeScreen() {
               ) : null}
             </>
           )}
-        </View>
+        </TourTarget>
 
         {history ? (
           <View className="gap-3">

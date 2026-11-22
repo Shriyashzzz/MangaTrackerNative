@@ -3,6 +3,7 @@
 // (light or dark), New releases, Your shelf, Prices, Account (email, the
 // weekly email, alerts, export, delete). Every setting is saved on the
 // account (store/prefs save, the web's savePrefs; store/account)
+import { useTourScroll } from "@/lib/tourScroll";
 import Tap from "@/components/Tap";
 import PullPage, { usePullTop } from "@/components/PullRefresh";
 import Backdrop from "@/components/Backdrop";
@@ -74,6 +75,8 @@ export default function SettingsScreen() {
   const load = useAccount((s) => s.load);
   const pull = usePullTop();
   const page = useRef<ComponentRef<typeof ScrollView>>(null);
+  // (the tour scrolls this page to what Kenji points at)
+  useTourScroll(page, pull.top);
   useEffect(() => {
     void load();
   }, [load]);

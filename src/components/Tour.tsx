@@ -29,12 +29,18 @@ const TAB_BAR = 84;
 const GAP = 22;
 // under the header, the highest the bubble goes
 const HEADER = 64;
+// the room at each side of the bubble
+const SIDE = 12;
+// A step about something lower down the screen that has no ring of its own
+// (the + button, Haikyu!!'s row on the Volumes view): the bubble rests at
+// the top, clear of it
+const AT_THE_FOOT = new Set(["scan", "gaps", "gaps-open"]);
 
 export default function Tour({ signedIn }: { signedIn: boolean }) {
   const { steps, at, hidden, box, hide } = useTour();
   const here = usePathname();
   const insets = useSafeAreaInsets();
-  const { height: screen } = useWindowDimensions();
+  const { height: screen, width } = useWindowDimensions();
   const c = useColors();
   const [height, setHeight] = useState(0);
   const step = steps[at];
@@ -89,17 +95,25 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
   // Where the bubble goes: under the thing he points at, with its tail up;
   // over it, tail down, when there's no room under; at the foot, with no
   // tail, when there's nothing to point at (or it's too tall for either)
-  const under = box ? box.y + box.height + GAP : 0;
+  // (under it, a little more room: Kenji's head rises above the bubble)
+  const under = box ? box.y + box.height + GAP + 14 : 0;
   const over = box ? box.y - GAP - height : 0;
   const place: { top?: number; bottom?: number; tail: "up" | "down" | null } =
     box && height && under + height <= screen - foot
       ? { top: under, tail: "up" }
       : box && height && over >= insets.top + HEADER
         ? { top: over, tail: "down" }
-        : { bottom: foot, tail: null };
+        : AT_THE_FOOT.has(step.target ?? "")
+          ? { top: insets.top + HEADER + 46, tail: null }
+          : { bottom: foot, tail: null };
+  // the tail points at the middle of the thing, as far as the bubble's
+  // corners (and Kenji, on its top left) allow
+  const middle = box ? box.x + box.width / 2 - SIDE : 0;
+  const tailAt = Math.min(Math.max(middle, 84), width - 2 * SIDE - 34) - 7;
   const tail = (side: "up" | "down") => (
     <View
-      className={`absolute right-10 h-3.5 w-3.5 rotate-45 border-line bg-card ${side === "up" ? "-top-2 border-t-[1.5px] border-l-[1.5px]" : "-bottom-2 border-r-[1.5px] border-b-[1.5px]"}`}
+      style={{ left: tailAt }}
+      className={`absolute h-3.5 w-3.5 rotate-45 border-line bg-card ${side === "up" ? "-top-2 border-t-[1.5px] border-l-[1.5px]" : "-bottom-2 border-r-[1.5px] border-b-[1.5px]"}`}
     />
   );
   const last = at === steps.length - 1;
@@ -172,9 +186,14 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
 
 // Kenji's line, with the two places where the website's words don't fit
 // the app: there's no "Hide Kenji" button here (it's the ✕ on his bubble),
-// and Berserk's page is told top to bottom, so "Let's open one" isn't how
-// its last step starts
+// Berserk's page is told top to bottom, so "Let's open one" isn't how its
+// last step starts, and the app doesn't say what it costs
 const wordsFor = (said: string) =>
   said
     .replace("Tap Hide Kenji to", "Tap the ✕ on this bubble to")
-    .replace("Let's open one: Berserk", "This is Berserk");
+    .replace(
+      "Let's open one: Berserk, collected in Deluxe.",
+      "This is Berserk.",
+    )
+    // (nothing in the app promises a price: the stores' rules differ)
+    .replace("Your shelf is free: bring", "Bring");

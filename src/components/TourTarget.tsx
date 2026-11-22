@@ -1,6 +1,6 @@
 // Something Kenji points at on his tour (store/tour.ts). While his step is
-// about it, it's ringed in the accent, the page is scrolled so it sits near
-// the top of the screen, and Kenji is told where it is so his bubble can
+// about it, it's ringed in the accent, the page is scrolled to it if it
+// isn't already in sight, and Kenji is told where it is so his bubble can
 // sit beside it and point (components/Tour.tsx). On a step that's about
 // using it (a tap on the chapter counter), using it moves the tour on. The
 // names are the website's own (its data-tour marks), so his script needs no
@@ -11,8 +11,17 @@ import { tourGo } from "@/lib/tourGo";
 import { scrollTourBy } from "@/lib/tourScroll";
 import { useTour, useTourTarget } from "@/store/tour";
 
-// where the top of the thing should sit, as a share of the screen's height
-const SIT_AT = 0.16;
+// The page is only moved when it has to be: the thing is out of sight, or
+// there'd be no room for Kenji's bubble under it or over it. Then it goes
+// to about here, as a share of the screen's height (a tall thing higher, so
+// more of it shows)
+const SIT_AT = 0.26;
+const TALL_SITS_AT = 0.16;
+// under the page's header, and above its foot: what counts as in sight
+const HEADER = 110;
+const FOOT = 100;
+// about what Kenji's bubble takes, with the gap it keeps
+const BUBBLE = 230;
 // a page just opened needs a moment before it can be measured or scrolled
 const SETTLE_MS = 450;
 // after they've used it, a beat to see what it did before Kenji moves on
@@ -34,16 +43,23 @@ export default function TourTarget({
     if (!pointedAt) return;
     const found = () =>
       box.current?.measureInWindow(
-        (_x: number, y: number, _w: number, height: number) =>
-          useTour.getState().point({ y, height }),
+        (x: number, y: number, width: number, height: number) =>
+          useTour.getState().point({ x, y, width, height }),
       );
     let settle: ReturnType<typeof setTimeout>;
     const bring = setTimeout(() => {
-      box.current?.measureInWindow((_x: number, y: number) => {
-        const off = y - screen * SIT_AT;
-        if (Math.abs(off) > 24) scrollTourBy(off);
-        settle = setTimeout(found, SETTLE_MS);
-      });
+      box.current?.measureInWindow(
+        (_x: number, y: number, _w: number, height: number) => {
+          const inSight = y >= HEADER && y + height <= screen - FOOT;
+          const roomUnder = y + height + BUBBLE <= screen - FOOT;
+          const roomOver = y - BUBBLE >= HEADER;
+          // already where it can be seen with Kenji beside it: left alone
+          if (inSight && (roomUnder || roomOver)) return found();
+          const tall = height > screen * 0.35;
+          scrollTourBy(y - screen * (tall ? TALL_SITS_AT : SIT_AT));
+          settle = setTimeout(found, SETTLE_MS);
+        },
+      );
     }, SETTLE_MS);
     return () => {
       clearTimeout(bring);

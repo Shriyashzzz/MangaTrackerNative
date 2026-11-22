@@ -2,6 +2,7 @@
 // people with their link see (with "Surprise me"), the picture from the
 // cast, and Share my list with what it includes and its link, shared
 // through the phone's own share sheet
+import TourTarget from "@/components/TourTarget";
 import Tap from "@/components/Tap";
 import * as Clipboard from "expo-clipboard";
 import {
@@ -203,103 +204,105 @@ export default function ProfileTab({
           (shareY.current = e.nativeEvent.layout.y)
         }
       >
-        <Section title="Share your list">
-          <Help>Anyone with your link sees:</Help>
-          {[
-            "Your name and picture",
-            "Each series, with your chapter and rating",
-            "The volumes you own",
-          ].map((line) => (
-            <Text key={line} className="font-body text-[14px] text-ink-soft">
-              {"  •  "}
-              {line}
-            </Text>
-          ))}
-          <Tick
-            label="Share my list"
-            value={account.shareEnabled}
-            onChange={(on) => {
-              setCopied(false);
-              void save(
-                "share",
-                { shareEnabled: on },
-                on ? "Your list is shared." : "Your list is private again.",
-              );
-            }}
-          />
-          {account.shareEnabled ? (
-            <>
-              <Tick
-                label="Include my notes"
-                value={account.shareNotes}
-                onChange={(on) =>
-                  void save(
-                    "share",
-                    { shareNotes: on },
-                    on ? "Your notes are shared." : "Your notes are private.",
-                  )
-                }
-              />
-              <Tick
-                label="Show my star ratings"
-                value={account.shareRatings}
-                onChange={(on) =>
-                  void save(
-                    "share",
-                    { shareRatings: on },
-                    on
-                      ? "Your ratings are shared."
-                      : "Your ratings are private.",
-                  )
-                }
-              />
-              <Tick
-                label="Show how far I've read"
-                value={account.shareProgress}
-                onChange={(on) =>
-                  void save(
-                    "share",
-                    { shareProgress: on },
-                    on
-                      ? "How far you've read is shared."
-                      : "How far you've read is private.",
-                  )
-                }
-              />
-            </>
-          ) : null}
-          {noteFor("share")}
-          {account.shareEnabled && account.shareCode ? (
-            <View className="gap-2">
-              <Text selectable className="font-mono text-[13px] text-ink">
-                {link}
+        <TourTarget name="share">
+          <Section title="Share your list">
+            <Help>Anyone with your link sees:</Help>
+            {[
+              "Your name and picture",
+              "Each series, with your chapter and rating",
+              "The volumes you own",
+            ].map((line) => (
+              <Text key={line} className="font-body text-[14px] text-ink-soft">
+                {"  •  "}
+                {line}
               </Text>
-              <View className="flex-row flex-wrap gap-3">
-                <Button
-                  label="Share link"
-                  kind="primary"
-                  small
-                  onPress={() => void shareLink()}
-                />
-                <Button
-                  label={copied ? "Copied" : "Copy link"}
-                  small
-                  onPress={() => void copyLink()}
-                />
-                <Button
-                  label="Preview"
-                  small
-                  onPress={() =>
-                    router.push({
-                      pathname: "/u/[code]",
-                      params: { code: account.shareCode! },
-                    })
+            ))}
+            <Tick
+              label="Share my list"
+              value={account.shareEnabled}
+              onChange={(on) => {
+                setCopied(false);
+                void save(
+                  "share",
+                  { shareEnabled: on },
+                  on ? "Your list is shared." : "Your list is private again.",
+                );
+              }}
+            />
+            {account.shareEnabled ? (
+              <>
+                <Tick
+                  label="Include my notes"
+                  value={account.shareNotes}
+                  onChange={(on) =>
+                    void save(
+                      "share",
+                      { shareNotes: on },
+                      on ? "Your notes are shared." : "Your notes are private.",
+                    )
                   }
                 />
+                <Tick
+                  label="Show my star ratings"
+                  value={account.shareRatings}
+                  onChange={(on) =>
+                    void save(
+                      "share",
+                      { shareRatings: on },
+                      on
+                        ? "Your ratings are shared."
+                        : "Your ratings are private.",
+                    )
+                  }
+                />
+                <Tick
+                  label="Show how far I've read"
+                  value={account.shareProgress}
+                  onChange={(on) =>
+                    void save(
+                      "share",
+                      { shareProgress: on },
+                      on
+                        ? "How far you've read is shared."
+                        : "How far you've read is private.",
+                    )
+                  }
+                />
+              </>
+            ) : null}
+            {noteFor("share")}
+            {account.shareEnabled && account.shareCode ? (
+              <View className="gap-2">
+                <Text selectable className="font-mono text-[13px] text-ink">
+                  {link}
+                </Text>
+                <View className="flex-row flex-wrap gap-3">
+                  <Button
+                    label="Share link"
+                    kind="primary"
+                    small
+                    onPress={() => void shareLink()}
+                  />
+                  <Button
+                    label={copied ? "Copied" : "Copy link"}
+                    small
+                    onPress={() => void copyLink()}
+                  />
+                  <Button
+                    label="Preview"
+                    small
+                    onPress={() =>
+                      router.push({
+                        pathname: "/u/[code]",
+                        params: { code: account.shareCode! },
+                      })
+                    }
+                  />
+                </View>
               </View>
-            </View>
-          ) : null}
-        </Section>
+            ) : null}
+          </Section>
+        </TourTarget>
       </View>
     </View>
   );

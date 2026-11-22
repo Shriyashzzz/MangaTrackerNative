@@ -2,6 +2,7 @@
 // their email, export, and deleting (the weekly email is with the alerts,
 // under New releases)
 // the account with its confirmation
+import TourTarget from "@/components/TourTarget";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Share, Text, View } from "react-native";
@@ -162,21 +163,23 @@ export default function AccountTab({ account }: { account: Account }) {
           <Note text={emailNote?.text} failed={emailNote?.failed} />
         </View>
       </Section>
-      <Section title="Export my list">
-        <Help>
-          A spreadsheet file of everything on your shelf, notes included.
-        </Help>
-        <View className="flex-row items-center gap-3">
-          <Button
-            label="Download my list"
-            small
-            onPress={() => void exportList()}
-          />
-          {exportFailed ? (
-            <Note text="That didn't work. Try again." failed />
-          ) : null}
-        </View>
-      </Section>
+      <TourTarget name="export">
+        <Section title="Export my list">
+          <Help>
+            A spreadsheet file of everything on your shelf, notes included.
+          </Help>
+          <View className="flex-row items-center gap-3">
+            <Button
+              label="Download my list"
+              small
+              onPress={() => void exportList()}
+            />
+            {exportFailed ? (
+              <Note text="That didn't work. Try again." failed />
+            ) : null}
+          </View>
+        </Section>
+      </TourTarget>
       <Section title="Delete my account">
         <Help>
           This removes your account and your whole shelf for good. There's no
