@@ -45,7 +45,7 @@ export default function AddToCalendar({
         onPress={() => setOpen(true)}
         accessibilityLabel={label}
         hitSlop={6}
-        className={`flex-row items-center gap-1.5 ${big ? "self-start rounded-[3px] border-[1.5px] border-line px-2.5 py-1.5" : "p-1"}`}
+        className={`flex-row items-center gap-1.5 ${big ? "min-h-[36px] self-start rounded-full bg-ink/10 px-3.5 py-2" : "p-1"}`}
       >
         <CalendarPlusIcon color={c.ink} width={18} height={18} />
         {big ? (

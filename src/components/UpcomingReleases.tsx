@@ -67,8 +67,8 @@ export default function UpcomingReleases() {
         </View>
       </Pressable>
       {open ? (
-        <View className="gap-3 bg-paper px-3 pt-3 pb-2">
-          <MiniMonth month={first.month} volumes={first.volumes} />
+        <View className="mx-[1.5px] mb-[1.5px] gap-4 rounded-b-[13px] bg-card px-4 pt-4 pb-3">
+          <MiniMonth onCard month={first.month} volumes={first.volumes} />
           <View className="flex-row flex-wrap items-center gap-3">
             <AddToCalendar
               big

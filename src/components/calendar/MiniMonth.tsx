@@ -15,9 +15,12 @@ const DOW = ["S", "M", "T", "W", "T", "F", "S"];
 export default function MiniMonth({
   month,
   volumes,
+  onCard = false,
 }: {
   month: string;
   volumes: CalendarVolume[];
+  // it sits on a card already (the New tab's panel): the page colour then
+  onCard?: boolean;
 }) {
   const c = useColors();
   const today = todayIso();
@@ -25,12 +28,14 @@ export default function MiniMonth({
   for (const v of volumes)
     byDay.set(v.published, [...(byDay.get(v.published) ?? []), v]);
   return (
-    <View className="gap-1.5 rounded-[4px] border-[1.5px] border-line bg-card p-2.5">
+    <View
+      className={`gap-2.5 rounded-[14px] border border-line-soft p-4 ${onCard ? "bg-paper" : "bg-card"}`}
+    >
       <View className="flex-row items-baseline justify-between">
-        <Text className="font-brand pr-1 text-[16px] tracking-[1px] text-ink uppercase">
+        <Text className="font-brand pr-2 text-[19px] tracking-[1px] text-ink uppercase">
           {monthName(month)}
         </Text>
-        <Text className="font-mono text-[11.5px] text-muted">
+        <Text className="font-body text-[13px] text-ink-soft">
           {volumes.length} {volumes.length === 1 ? "release" : "releases"}
         </Text>
       </View>
@@ -38,7 +43,7 @@ export default function MiniMonth({
         {DOW.map((d, i) => (
           <Text
             key={i}
-            className="flex-1 text-center font-mono text-[10px] text-muted"
+            className="flex-1 text-center font-body-medium text-[11.5px] text-muted"
           >
             {d}
           </Text>
@@ -52,18 +57,22 @@ export default function MiniMonth({
             <View
               key={d.iso}
               style={{ width: `${100 / 7}%` }}
-              className="h-7 items-center justify-center"
+              className="h-10 items-center justify-center"
             >
+              {/* today: a soft disc under the number */}
+              {isToday && d.inMonth && !out.length ? (
+                <View className="absolute h-8 w-8 rounded-full bg-accent-wash" />
+              ) : null}
               <Text
-                className={`font-mono text-[12px] ${!d.inMonth ? "text-line" : out.length ? "font-mono-medium text-ink" : isToday ? "text-accent" : "text-ink-soft"}`}
+                className={`font-mono text-[13.5px] ${!d.inMonth ? "opacity-0" : out.length ? "font-mono-medium text-ink" : isToday ? "font-mono-medium text-accent" : "text-ink-soft"}`}
               >
                 {d.day}
               </Text>
               {out.length ? (
                 <Svg
                   viewBox="0 0 40 40"
-                  width={26}
-                  height={26}
+                  width={34}
+                  height={34}
                   style={{ position: "absolute" }}
                 >
                   <Path

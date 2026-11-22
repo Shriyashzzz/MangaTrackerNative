@@ -68,7 +68,7 @@ export default function ReleaseList({
         return (
           <View
             key={v.isbn13}
-            className="flex-row items-center gap-3 border-b border-dotted border-line-soft py-2"
+            className="flex-row items-center gap-3 border-b border-line-soft py-3"
           >
             <View className="w-[62px] flex-row items-center gap-1">
               <Text className="flex-1 font-mono-medium text-[12px] text-ink">

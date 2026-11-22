@@ -33,7 +33,10 @@ function Month({ month }: { month: CalendarMonth }) {
           text={`Save these ${month.volumes.length} dates`}
         />
       ) : null}
-      <ReleaseList volumes={month.volumes} limit={MONTH_LIMIT} />
+      {/* the month's books, on their own card under the grid */}
+      <View className="rounded-[14px] border border-line-soft bg-card px-4 pt-1 pb-1">
+        <ReleaseList volumes={month.volumes} limit={MONTH_LIMIT} />
+      </View>
     </View>
   );
 }
