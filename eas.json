@@ -13,7 +13,8 @@
     },
     "production": {
       "env": {
-        "APP_ENV": "production"
+        "APP_ENV": "production",
+        "EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID": "552457597915-mqhe0847l0rs50bfhk27bclo3f76ir4v.apps.googleusercontent.com"
       }
     }
   },
