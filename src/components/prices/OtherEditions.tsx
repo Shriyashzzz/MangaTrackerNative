@@ -81,9 +81,12 @@ export default function OtherEditions({
     run.exact ? formatCents(run.cents) : `about ${wholeMoney(run.cents)}`;
   return (
     <View className="gap-3">
-      <View className="flex-row flex-wrap items-end justify-between gap-x-3">
+      <View className="flex-row items-end justify-between gap-3">
         <H2>Other editions</H2>
-        <Text numberOfLines={1} className="font-body text-[13px] text-muted">
+        <Text
+          numberOfLines={1}
+          className="shrink pb-1 font-body text-[13px] text-muted"
+        >
           {line.books.length} {line.label} books hold vols.{" "}
           {Math.min(...inside)}–{Math.max(...inside)}
         </Text>
