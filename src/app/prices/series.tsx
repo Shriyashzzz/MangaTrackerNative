@@ -272,7 +272,7 @@ export default function PriceSeriesScreen() {
 
       {/* no account: the ticket runs the page's full width, so nothing is
           left empty under the cover */}
-      {!isSignedIn ? <TrackPitch /> : null}
+      {!isSignedIn ? <TrackPitch name={named.title} /> : null}
 
       <SetsBox
         key={data.slug}

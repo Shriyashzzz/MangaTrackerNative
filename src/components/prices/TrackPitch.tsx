@@ -6,8 +6,15 @@ import { router } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 import { useRipple } from "@/lib/press";
 
-export default function TrackPitch() {
+// a long name is cut to its first two words: "Frieren: Beyond.."
+function shortName(name: string) {
+  const words = name.trim().split(/\s+/);
+  return words.length > 2 ? `${words.slice(0, 2).join(" ")}..` : name.trim();
+}
+
+export default function TrackPitch({ name }: { name: string }) {
   const ripple = useRipple();
+  const question = `Want a nudge when the next volume for ${shortName(name)} comes out?`;
   return (
     <View className="gap-2">
       {/* a solid card under the tinted stub, so the page's background
@@ -16,7 +23,7 @@ export default function TrackPitch() {
         onPress={() => router.push("/sign-up")}
         android_ripple={ripple}
         accessibilityRole="button"
-        accessibilityLabel="Want a nudge when the next volume drops? Track this series, free"
+        accessibilityLabel={`${question} Track this series, free`}
         className="flex-row overflow-hidden rounded-[12px] border-[1.5px] border-accent bg-card active:opacity-90"
       >
         <View className="min-w-0 flex-1 gap-1 px-3 py-2.5">
@@ -24,7 +31,7 @@ export default function TrackPitch() {
             Next volume
           </Text>
           <Text className="font-body-semibold text-[15.5px] leading-[21px] text-ink">
-            Want a nudge when the next volume drops?
+            {question}
           </Text>
           <Text className="font-body text-[13px] text-ink-soft">
             Phone alert, New tab, weekly email

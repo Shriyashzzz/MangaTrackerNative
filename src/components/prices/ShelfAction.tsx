@@ -110,7 +110,7 @@ export default function ShelfAction({
     return () => controller.abort();
   }, [isSignedIn, series, alsoCalled, shelfSize]);
   useEffect(() => () => clearTimeout(undoTimer.current), []);
-  if (!isSignedIn) return <TrackPitch />;
+  if (!isSignedIn) return <TrackPitch name={novelParts(series).title} />;
   if (match.series !== series) return <View className="h-[40px]" />;
 
   const manga = match.manga;
