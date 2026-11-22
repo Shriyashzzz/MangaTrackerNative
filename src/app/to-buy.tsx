@@ -11,7 +11,10 @@ import Backdrop from "@/components/Backdrop";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { Alert, ScrollView, Text, View } from "react-native";
+import * as Haptics from "expo-haptics";
+import { Alert, Text, View } from "react-native";
+import Animated, { useAnimatedRef } from "react-native-reanimated";
+import Sortable from "react-native-sortables";
 import Svg, { Line } from "react-native-svg";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
@@ -340,6 +343,19 @@ function Card({
                 {name}
               </Text>
             </Tap>
+            {/* their own order is showing: the grip the card is dragged by */}
+            {move ? (
+              <Sortable.Handle>
+                <View
+                  accessible={false}
+                  className="-mt-1 h-7 w-7 items-center justify-center"
+                >
+                  <Text className="font-body-semibold text-[20px] leading-[22px] text-ink-soft">
+                    ≡
+                  </Text>
+                </View>
+              </Sortable.Handle>
+            ) : null}
             <Tap
               feel="round"
               onPress={() => setMenuOpen(true)}
@@ -521,6 +537,7 @@ export default function ToBuyScreen() {
   );
   const [pickingSort, setPickingSort] = useState(false);
   const pull = usePullTop();
+  const scroller = useAnimatedRef<Animated.ScrollView>();
   useEffect(() => {
     void load();
   }, [load]);
@@ -575,6 +592,38 @@ export default function ToBuyScreen() {
     [items, sort],
   );
   const sortLabel = SORTS.find((s) => s.value === sort)?.label ?? "";
+  // the list in a new order (a card dragged and dropped): saved whole, so
+  // every item has a place from then on
+  const saveOrder = (inOrder: ToBuyItem[]) =>
+    void setOrder(inOrder.map((item) => item.isbn13)).catch(() =>
+      Alert.alert("That didn't save. Try again."),
+    );
+  const cardOf = (item: ToBuyItem, i: number) => (
+    <Card
+      key={item.isbn13}
+      item={item}
+      onOwned={() => void settle(item, "owned")}
+      onOrdered={() => void settle(item, "ordered")}
+      onRemove={() => void takeOff(item)}
+      onNote={() => setNoting({ isbn13: item.isbn13, text: item.note ?? "" })}
+      onAlert={() =>
+        setAlerting({
+          isbn13: item.isbn13,
+          text: item.alertCents ? (item.alertCents / 100).toFixed(2) : "",
+        })
+      }
+      // their own order: a grip to drag by, and up and down in the menu
+      // (for a screen reader, which can't drag)
+      move={
+        sort === "mine"
+          ? {
+              up: i > 0 ? () => move(i, -1) : null,
+              down: i < sorted.length - 1 ? () => move(i, 1) : null,
+            }
+          : null
+      }
+    />
+  );
   // one item a place up or down in their own order: the whole list is saved
   // in its new order, so every item has a place from then on
   const move = (at: number, by: -1 | 1) => {
@@ -642,10 +691,21 @@ export default function ToBuyScreen() {
       </View>
       <DoubleRule />
       <PullPage refresh={load} scrollTop={pull.top}>
-        <ScrollView
+        <Animated.ScrollView
+          // (Reanimated's, with a ref: a card dragged near an edge scrolls
+          // the list along)
+          ref={scroller}
           // nothing to list (empty, or it didn't load): Kenji and his line sit
           // in the middle of the screen, not up under the header
-          contentContainerClassName={`gap-4 px-4 pt-4 pb-24 ${items?.length === 0 || (!items && loadFailed) ? "grow justify-center" : ""}`}
+          contentContainerStyle={{
+            gap: 16,
+            paddingHorizontal: 16,
+            paddingTop: 16,
+            paddingBottom: 96,
+            ...(items?.length === 0 || (!items && loadFailed)
+              ? { flexGrow: 1, justifyContent: "center" as const }
+              : {}),
+          }}
           overScrollMode="never"
           scrollEventThrottle={16}
           onScroll={pull.track}
@@ -725,39 +785,37 @@ export default function ToBuyScreen() {
                   </Text>
                 </Tap>
               </View>
-              {sorted.map((item, i) => (
-                <Card
-                  key={item.isbn13}
-                  item={item}
-                  onOwned={() => void settle(item, "owned")}
-                  onOrdered={() => void settle(item, "ordered")}
-                  onRemove={() => void takeOff(item)}
-                  onNote={() =>
-                    setNoting({ isbn13: item.isbn13, text: item.note ?? "" })
-                  }
-                  onAlert={() =>
-                    setAlerting({
-                      isbn13: item.isbn13,
-                      text: item.alertCents
-                        ? (item.alertCents / 100).toFixed(2)
-                        : "",
-                    })
-                  }
-                  // their own order: up and down, only while it's the order
-                  // shown
-                  move={
-                    sort === "mine"
-                      ? {
-                          up: i > 0 ? () => move(i, -1) : null,
-                          down: i < sorted.length - 1 ? () => move(i, 1) : null,
-                        }
-                      : null
-                  }
-                />
-              ))}
+              {/* their own order: each card has a grip to drag it by, and
+                  dropping it saves the new order. Any other order is a plain
+                  list */}
+              {sort === "mine" ? (
+                <>
+                  {sorted.length > 1 ? (
+                    <Text className="-mt-2 font-mono text-[12px] text-muted">
+                      Drag a book by its ≡ to reorder.
+                    </Text>
+                  ) : null}
+                  <Sortable.Grid
+                    columns={1}
+                    rowGap={16}
+                    data={sorted}
+                    keyExtractor={(item) => item.isbn13}
+                    renderItem={({ item, index }) => cardOf(item, index)}
+                    customHandle
+                    scrollableRef={scroller}
+                    hapticsEnabled={false}
+                    onDragStart={() => void Haptics.selectionAsync()}
+                    onDragEnd={({ data, fromIndex, toIndex }) => {
+                      if (fromIndex !== toIndex) saveOrder(data);
+                    }}
+                  />
+                </>
+              ) : (
+                sorted.map((item, i) => cardOf(item, i))
+              )}
             </>
           ) : null}
-        </ScrollView>
+        </Animated.ScrollView>
       </PullPage>
       <Sheet open={noting !== null} onClose={() => setNoting(null)}>
         <View className="gap-3 pb-4">
