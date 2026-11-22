@@ -57,7 +57,9 @@ export default function MiniMonth({
           return (
             <View
               key={d.iso}
-              style={{ width: `${100 / 7}%` }}
+              // a hair under a seventh: seven of exactly 100/7% add up to a
+              // touch over the row on some screens, and the seventh day wraps
+              style={{ width: "14.28%" }}
               className="h-10 items-center justify-center"
             >
               {/* today: a soft disc under the number */}
