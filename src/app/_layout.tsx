@@ -1,6 +1,5 @@
 // The app's frame: the fonts the web uses, the session checked once, then
 // the tabs for everyone; the pages that need an account only when signed in
-import { pageTouched } from "@/lib/tourGo";
 import { View } from "react-native";
 import "../global.css";
 import { Bangers_400Regular } from "@expo-google-fonts/bangers";
@@ -94,7 +93,7 @@ export default function RootLayout() {
           <StatusBar style="auto" />
           {/* the pages, with Kenji's tour floating over them (never
               pushing them about) */}
-          <View style={{ flex: 1 }} onTouchStart={pageTouched}>
+          <View style={{ flex: 1 }}>
             <Stack
               screenOptions={{
                 headerShown: false,

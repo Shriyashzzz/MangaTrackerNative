@@ -4,8 +4,8 @@
 // (or over it, when there's no room under), with a small tail pointing at
 // it; with nothing to point at, it rests at the foot of the screen, above
 // the tab bar where there is one. Next takes them to the page his next line
-// is about. A touch anywhere else on the page means they want to look
-// around: he steps aside to a small round button at the foot, and comes
+// is about. Pressing a button of the app's means they've started using
+// the page: he steps aside to a small round button at the foot, and comes
 // back on a tap. The bubble
 // (or a pill beside the button) also says it's a practice shelf, with the
 // two ways out. The lines are the website's (core components/tour/

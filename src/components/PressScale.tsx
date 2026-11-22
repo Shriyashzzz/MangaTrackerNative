@@ -16,6 +16,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { look } from "@/lib/platformLook";
 import { useRipple } from "@/lib/press";
+import { controlUsed } from "@/lib/tourGo";
 
 const RELEASE = { damping: 18, stiffness: 340, mass: 0.6 };
 
@@ -41,6 +42,15 @@ export default function PressScale({
     <Animated.View style={[look, style]}>
       <Pressable
         {...pressable}
+        // (Kenji's tour steps aside when something is pressed)
+        onPress={
+          pressable.onPress
+            ? (e) => {
+                controlUsed();
+                pressable.onPress?.(e);
+              }
+            : undefined
+        }
         android_ripple={ripple}
         className={className}
         onPressIn={(e) => {

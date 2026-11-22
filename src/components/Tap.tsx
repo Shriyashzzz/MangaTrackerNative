@@ -10,6 +10,7 @@
 // finger as well (PressScale)
 import { Platform, Pressable, type PressableProps } from "react-native";
 import { useRipple } from "@/lib/press";
+import { controlUsed } from "@/lib/tourGo";
 
 const ANDROID = Platform.OS === "android";
 // how far the round ripple reaches from the icon's middle
@@ -26,6 +27,14 @@ export default function Tap({
   feel?: "ripple" | "round" | "none";
 }) {
   const ripple = useRipple(feel === "round");
+  // (Kenji's tour steps aside when something is pressed: lib/tourGo.ts)
+  const { onPress } = pressable;
+  const pressed: PressableProps["onPress"] = onPress
+    ? (event) => {
+        controlUsed();
+        onPress(event);
+      }
+    : undefined;
   if (ANDROID) {
     const shows = feel !== "none";
     // the ripple is the feedback: the dim and the tint written for a press
@@ -42,6 +51,7 @@ export default function Tap({
     return (
       <Pressable
         {...pressable}
+        onPress={pressed}
         style={style}
         className={clipped}
         android_ripple={
@@ -60,6 +70,7 @@ export default function Tap({
   return (
     <Pressable
       {...pressable}
+      onPress={pressed}
       className={className}
       style={(state) => [
         typeof style === "function" ? style(state) : style,

@@ -31,19 +31,19 @@ function openPageOf(step: TourStep) {
   router.navigate(page);
 }
 
-// A touch anywhere on the page but Kenji's bubble (or the thing he's asking
-// them to use): they want to look around, so he steps aside to his small
-// button at the foot. The bubble and the ringed thing say "that was me"
-// first (their touch is heard before the page's)
-let mine = false;
+// A button of the app's was pressed (anything that does something: a row,
+// a link, a control): they've started using the page, so Kenji steps aside
+// to his small button at the foot and what they opened isn't hidden under
+// him. A stray touch or a scroll isn't that, and he stays. His own buttons
+// don't count: his bubble says "that was me" as the finger lands, just
+// before the press is heard
+const MINE_FOR_MS = 1500;
+let mineAt = 0;
 export const touchIsKenjis = () => {
-  mine = true;
+  mineAt = Date.now();
 };
-export function pageTouched() {
-  if (mine) {
-    mine = false;
-    return;
-  }
+export function controlUsed() {
+  if (Date.now() - mineAt < MINE_FOR_MS) return;
   const { steps, hidden, hide } = useTour.getState();
   if (steps.length && !hidden) hide(true);
 }

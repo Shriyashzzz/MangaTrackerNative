@@ -1,9 +1,9 @@
 // Something Kenji points at on his tour (store/tour.ts). While his step is
 // about it, it's ringed in the accent, the page is scrolled to it if it
 // isn't already in sight, and Kenji is told where it is so his bubble can
-// sit beside it and point (components/Tour.tsx). Using it, like a touch
-// anywhere else on the page, sends Kenji aside so what it opens isn't
-// hidden under him (lib/tourGo.ts pageTouched). The
+// sit beside it and point (components/Tour.tsx). Using it, like pressing
+// anything else in the app, sends Kenji aside so what it opens isn't
+// hidden under him (lib/tourGo.ts controlUsed). The
 // names are the website's own (its data-tour marks), so his script needs no
 // changes. With no tour on, it's just its children
 import { useEffect, useRef, type ComponentRef, type ReactNode } from "react";
