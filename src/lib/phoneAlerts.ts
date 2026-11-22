@@ -62,7 +62,12 @@ export async function turnOnPhoneAlerts(): Promise<TurnedOn> {
     const asked = await Notifications.requestPermissionsAsync();
     if (!asked.granted) return "denied";
     const token = await tokenForThisPhone();
-    const res = await tell("/api/push/device", token);
+    // switched on by hand: the server drops this reader's Chrome alerts,
+    // or the website's Android app on this same phone would ring as well
+    const res = await apiFetch("/api/push/device", {
+      method: "POST",
+      body: { token, replaceChrome: true },
+    });
     if (!res.ok) return "failed";
     writeLocal(ON_KEY, "yes");
     writeLocal(TOKEN_KEY, token);
