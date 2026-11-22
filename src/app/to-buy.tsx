@@ -369,74 +369,75 @@ function Card({
               </Text>
             </Tap>
           </View>
-        </View>
-      </View>
-      {/* the one way to buy it */}
-      {best ? (
-        <Tap
-          onPress={() => toStore(best.url)}
-          accessibilityRole="link"
-          accessibilityLabel={`${formatCents(best.cents)} ${best.kind} at ${best.store}. Open the store`}
-          className="min-h-[46px] flex-row items-center justify-between gap-3 rounded-[12px] bg-accent px-3.5 py-2"
-        >
-          <Text className="font-brand pr-[6px] text-[23px] leading-[28px] text-on-accent">
-            {formatCents(best.cents)}
-            {"\u00A0"}
-          </Text>
-          <Text
-            numberOfLines={1}
-            className="min-w-0 shrink text-right font-body-semibold text-[13.5px] text-on-accent"
-          >
-            {item.outOn ? "Preorder" : best.kind === "new" ? "New" : "Used"} at{" "}
-            {best.store} →
-          </Text>
-        </Tap>
-      ) : (
-        <Tap
-          onPress={open}
-          accessibilityRole="link"
-          className="min-h-[46px] flex-row items-center justify-between gap-3 rounded-[12px] bg-ink/10 px-3.5 py-2"
-        >
-          {item.outOn ? (
-            <Text className="font-brand pr-[6px] text-[21px] leading-[28px] text-ink uppercase">
+          {/* the ways to buy it, beside the cover: the cheaper copy in red,
+              the other the same button, quieter */}
+          {best ? (
+            <Tap
+              onPress={() => toStore(best.url)}
+              accessibilityRole="link"
+              accessibilityLabel={`${formatCents(best.cents)} ${best.kind} at ${best.store}. Open the store`}
+              className="min-h-[44px] flex-row items-center justify-between gap-2 rounded-[12px] bg-accent px-3 py-1.5"
+            >
+              <Text className="font-brand pr-[6px] text-[21px] leading-[26px] text-on-accent">
+                {formatCents(best.cents)}
+                {"\u00A0"}
+              </Text>
+              <Text
+                numberOfLines={2}
+                className="min-w-0 shrink text-right font-body-semibold text-[12.5px] leading-[16px] text-on-accent"
+              >
+                {item.outOn ? "Preorder" : best.kind === "new" ? "New" : "Used"}{" "}
+                at {best.store} →
+              </Text>
+            </Tap>
+          ) : (
+            <Tap
+              onPress={open}
+              accessibilityRole="link"
+              className="min-h-[44px] flex-row items-center justify-between gap-2 rounded-[12px] bg-ink/10 px-3 py-1.5"
+            >
+              {item.outOn ? (
+                <Text className="font-brand pr-[6px] text-[21px] leading-[28px] text-ink uppercase">
+                  Out {releaseDay(item.outOn)}
+                  {"\u00A0"}
+                </Text>
+              ) : null}
+              <Text
+                numberOfLines={2}
+                className="ml-auto min-w-0 shrink text-right font-body-semibold text-[12.5px] leading-[16px] text-ink"
+              >
+                {item.outOn ? "See the preorder page →" : "Check prices →"}
+              </Text>
+            </Tap>
+          )}
+          {/* the other copy: the same button, quieter, so the cheaper one
+              stays the obvious pick */}
+          {other ? (
+            <Tap
+              onPress={() => toStore(other.url)}
+              accessibilityRole="link"
+              accessibilityLabel={`${formatCents(other.cents)} ${other.kind} at ${other.store}. Open the store`}
+              className="min-h-[44px] flex-row items-center justify-between gap-2 rounded-[12px] bg-ink/10 px-3 py-1.5"
+            >
+              <Text className="font-brand pr-[6px] text-[21px] leading-[26px] text-ink">
+                {formatCents(other.cents)}
+                {"\u00A0"}
+              </Text>
+              <Text
+                numberOfLines={2}
+                className="min-w-0 shrink text-right font-body-semibold text-[12.5px] leading-[16px] text-ink"
+              >
+                {other.kind === "new" ? "New" : "Used"} at {other.store} →
+              </Text>
+            </Tap>
+          ) : null}
+          {best && item.outOn ? (
+            <Text className="font-body text-[13px] text-ink-soft">
               Out {releaseDay(item.outOn)}
-              {"\u00A0"}
             </Text>
           ) : null}
-          <Text
-            numberOfLines={1}
-            className="ml-auto min-w-0 shrink text-right font-body-semibold text-[13.5px] text-ink"
-          >
-            {item.outOn ? "See the preorder page →" : "Check prices →"}
-          </Text>
-        </Tap>
-      )}
-      {/* the other copy: the same button, quieter, so the cheaper one
-          stays the obvious pick */}
-      {other ? (
-        <Tap
-          onPress={() => toStore(other.url)}
-          accessibilityRole="link"
-          accessibilityLabel={`${formatCents(other.cents)} ${other.kind} at ${other.store}. Open the store`}
-          className="min-h-[46px] flex-row items-center justify-between gap-3 rounded-[12px] bg-ink/10 px-3.5 py-2"
-        >
-          <Text className="font-brand pr-[6px] text-[23px] leading-[28px] text-ink">
-            {formatCents(other.cents)}
-            {"\u00A0"}
-          </Text>
-          <Text
-            numberOfLines={1}
-            className="min-w-0 shrink text-right font-body-semibold text-[13.5px] text-ink"
-          >
-            {other.kind === "new" ? "New" : "Used"} at {other.store} →
-          </Text>
-        </Tap>
-      ) : null}
-      {best && item.outOn ? (
-        <Text className="font-body text-[13px] text-ink-soft">
-          Out {releaseDay(item.outOn)}
-        </Text>
-      ) : null}
+        </View>
+      </View>
       <MenuSheet
         open={menuOpen}
         title={name}
