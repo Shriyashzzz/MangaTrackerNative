@@ -8,6 +8,12 @@
 // slide reaches. Up and down is the page scrolling, never a slide.
 // An edition's shelf passes `slots`: then each "volume" is a slot, a book of
 // the edition or a single it has no book for, as on the web
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from "@/core/components/icons/Icons";
+import { BOOK } from "@/core/lib/volumeShelf";
+import { useColors } from "@/lib/colors";
 import * as Haptics from "expo-haptics";
 import { useRef, useState } from "react";
 import { Pressable, Text, View, type LayoutChangeEvent } from "react-native";
@@ -17,17 +23,11 @@ import {
   usePanGesture,
   useTapGesture,
 } from "react-native-gesture-handler";
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-} from "@/core/components/icons/Icons";
-import { BOOK } from "@/core/lib/volumeShelf";
-import { useColors } from "@/lib/colors";
 
 // room for each ‹ ›, as the web's NAV
 const NAV = 36;
 // a book's padding either side (web .vshelf-page .vshelf-book)
-const GAP = 3;
+const GAP = 6;
 
 export type StripSlots = {
   // a book at full size: thicker than a single volume

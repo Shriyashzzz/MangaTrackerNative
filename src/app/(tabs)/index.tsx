@@ -13,7 +13,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import { useKenjiRefresh } from "@/components/PullRefresh";
+import PullPage from "@/components/PullRefresh";
 import {
   SafeAreaView,
   useSafeAreaInsets,
@@ -144,9 +144,8 @@ export default function ShelfScreen() {
     await load();
     setRefreshing(false);
   };
-  // where the header ends: the refresh indicator hangs from its rule
-  const [listTop, setListTop] = useState(0);
-  const pull = useKenjiRefresh(load, listTop);
+  // how far the shelf is scrolled: a pull to refresh starts only from 0
+  const scrollTop = useRef(0);
   // the + button: 0 in place, 1 slid away under the tab bar
   const fabAway = useSharedValue(0);
   const fabHidden = useRef(false);
@@ -165,149 +164,156 @@ export default function ShelfScreen() {
 
   return (
     <Safe edges={["top"]} className="flex-1 bg-paper">
-      {/* Kenji drops in from under the header's rule on a refresh */}
-      <View onLayout={(e) => setListTop(e.nativeEvent.layout.height)}>
-        <AppHeader />
-      </View>
-      {/* the shelf's bar: which tab and how many, or the search box; search
+      <AppHeader />
+      {/* everything under the header pulls down to refresh */}
+      <PullPage refresh={load} scrollTop={scrollTop}>
+        {/* the shelf's bar: which tab and how many, or the search box; search
           and sort on the right */}
-      <View className="h-[64px] flex-row items-center gap-2 px-4 pt-3">
-        {searching ? (
-          <View className="flex-1 flex-row items-center gap-2 rounded-[14px] border border-line-soft bg-card px-3">
-            <SearchIcon color={c.inkSoft} width={18} height={18} />
-            <TextInput
-              autoFocus
-              value={query}
-              onChangeText={setQuery}
-              placeholder="Search your shelf"
-              placeholderTextColorClassName="accent-muted"
-              autoCorrect={false}
-              returnKeyType="search"
-              className="flex-1 py-2 font-body text-[16px] text-ink"
-            />
+        <View className="h-[64px] flex-row items-center gap-2 px-4 pt-3">
+          {searching ? (
+            <View className="flex-1 flex-row items-center gap-2 rounded-[14px] border border-line-soft bg-card px-3">
+              <SearchIcon color={c.inkSoft} width={18} height={18} />
+              <TextInput
+                autoFocus
+                value={query}
+                onChangeText={setQuery}
+                placeholder="Search your shelf"
+                placeholderTextColorClassName="accent-muted"
+                autoCorrect={false}
+                returnKeyType="search"
+                className="flex-1 py-2 font-body text-[16px] text-ink"
+              />
+              <Pressable
+                onPress={closeSearch}
+                hitSlop={10}
+                accessibilityLabel="Close search"
+              >
+                <CloseIcon color={c.inkSoft} width={18} height={18} />
+              </Pressable>
+            </View>
+          ) : (
             <Pressable
-              onPress={closeSearch}
-              hitSlop={10}
-              accessibilityLabel="Close search"
+              onPress={() => setPicking("tab")}
+              className="flex-1 flex-row items-baseline gap-2"
+              accessibilityLabel={`Showing ${shown.label}, ${counts[tab]}. Change what's shown`}
             >
-              <CloseIcon color={c.inkSoft} width={18} height={18} />
+              <Text className="font-brand pr-1 text-[30px] tracking-[1px] text-ink uppercase">
+                {shown.label}
+              </Text>
+              <Text className="font-mono text-[14px] text-muted">
+                {counts[tab]}
+              </Text>
+              <ChevronDownIcon color={c.inkSoft} width={18} height={18} />
             </Pressable>
-          </View>
-        ) : (
+          )}
+          {searching ? null : (
+            <Pressable
+              onPress={() => setSearching(true)}
+              hitSlop={8}
+              className="p-2"
+              accessibilityLabel="Search your shelf"
+            >
+              <SearchIcon color={c.ink} width={22} height={22} />
+            </Pressable>
+          )}
           <Pressable
-            onPress={() => setPicking("tab")}
-            className="flex-1 flex-row items-baseline gap-2"
-            accessibilityLabel={`Showing ${shown.label}, ${counts[tab]}. Change what's shown`}
-          >
-            <Text className="font-brand pr-1 text-[30px] tracking-[1px] text-ink uppercase">
-              {shown.label}
-            </Text>
-            <Text className="font-mono text-[14px] text-muted">
-              {counts[tab]}
-            </Text>
-            <ChevronDownIcon color={c.inkSoft} width={18} height={18} />
-          </Pressable>
-        )}
-        {searching ? null : (
-          <Pressable
-            onPress={() => setSearching(true)}
+            onPress={() => setPicking("sort")}
             hitSlop={8}
             className="p-2"
-            accessibilityLabel="Search your shelf"
+            accessibilityLabel={`Sorted by ${sortLabel}. Change the order`}
           >
-            <SearchIcon color={c.ink} width={22} height={22} />
+            <SortIcon
+              color={sortBy ? c.accent : c.ink}
+              width={22}
+              height={22}
+            />
           </Pressable>
-        )}
-        <Pressable
-          onPress={() => setPicking("sort")}
-          hitSlop={8}
-          className="p-2"
-          accessibilityLabel={`Sorted by ${sortLabel}. Change the order`}
-        >
-          <SortIcon color={sortBy ? c.accent : c.ink} width={22} height={22} />
-        </Pressable>
-        {tab !== "volumes" && !select.selectOn && !searching ? (
-          <Pressable
-            // on the way down, not on release: it answers at once
-            onPressIn={select.start}
-            hitSlop={8}
-            className="py-2 pl-1"
-            accessibilityLabel="Select several"
-          >
-            <Text className="font-body-semibold text-[14.5px] text-ink">
-              Select
-            </Text>
-          </Pressable>
-        ) : null}
-      </View>
-      <View className="mx-4 h-px bg-line" />
-      {failed && !manga ? (
-        <Text className="px-4 pt-6 font-body text-[15px] text-ink-soft">
-          {failed}
-        </Text>
-      ) : tab === "volumes" ? (
-        <VolumesView manga={list} refreshing={refreshing} onRefresh={refresh} />
-      ) : (
-        <LayoutAnimationConfig skipEntering>
-          <Animated.FlatList
-            data={list}
-            // a series moved or deleted: the rows close up rather than jump
-            itemLayoutAnimation={LinearTransition.duration(220)}
-            keyExtractor={(m) => String(m.id)}
-            keyboardShouldPersistTaps="handled"
-            renderItem={({ item }) => (
-              <Animated.View exiting={FadeOut.duration(160)}>
-                <ShelfRow
-                  manga={item}
-                  trackBy={trackBy}
-                  latestChapter={releases[item.id]?.latestChapter}
-                  latestVolume={releases[item.id]?.latestVolume}
-                  select={
-                    select.selectOn
-                      ? {
-                          checked: select.picked.has(item.id),
-                          onToggle: () => select.toggle(item.id),
-                        }
-                      : undefined
-                  }
-                  onLongPress={() => {
-                    select.start();
-                    select.toggle(item.id);
-                  }}
-                />
-              </Animated.View>
-            )}
-            ItemSeparatorComponent={DashedLine}
-            // room under the last row for the floating +
-            contentContainerClassName="px-4 pb-28"
-            refreshControl={pull.refreshControl}
-            scrollEventThrottle={32}
-            onScroll={(e) => {
-              // the + leaves as they read down the shelf, and comes back
-              // the moment they scroll up, as the Android app's does
-              const y = e.nativeEvent.contentOffset.y;
-              const moved = y - lastY.current;
-              if (Math.abs(moved) < 6) return;
-              lastY.current = y;
-              const hide = moved > 0 && y > 40;
-              if (hide !== fabHidden.current) {
-                fabHidden.current = hide;
-                fabAway.set(withTiming(hide ? 1 : 0, { duration: 200 }));
-              }
-            }}
-            ListEmptyComponent={
-              manga ? (
-                <Text className="pt-6 font-body text-[15px] text-ink-soft">
-                  {query.trim()
-                    ? "Nothing on your shelf matches that."
-                    : "Nothing here yet."}
-                </Text>
-              ) : undefined
-            }
+          {tab !== "volumes" && !select.selectOn && !searching ? (
+            <Pressable
+              // on the way down, not on release: it answers at once
+              onPressIn={select.start}
+              hitSlop={8}
+              className="py-2 pl-1"
+              accessibilityLabel="Select several"
+            >
+              <Text className="font-body-semibold text-[14.5px] text-ink">
+                Select
+              </Text>
+            </Pressable>
+          ) : null}
+        </View>
+        <View className="mx-4 h-px bg-line" />
+        {failed && !manga ? (
+          <Text className="px-4 pt-6 font-body text-[15px] text-ink-soft">
+            {failed}
+          </Text>
+        ) : tab === "volumes" ? (
+          <VolumesView
+            manga={list}
+            refreshing={refreshing}
+            onRefresh={refresh}
           />
-        </LayoutAnimationConfig>
-      )}
-      {tab !== "volumes" ? pull.indicator : null}
+        ) : (
+          <LayoutAnimationConfig skipEntering>
+            <Animated.FlatList
+              data={list}
+              // a series moved or deleted: the rows close up rather than jump
+              itemLayoutAnimation={LinearTransition.duration(220)}
+              keyExtractor={(m) => String(m.id)}
+              keyboardShouldPersistTaps="handled"
+              renderItem={({ item }) => (
+                <Animated.View exiting={FadeOut.duration(160)}>
+                  <ShelfRow
+                    manga={item}
+                    trackBy={trackBy}
+                    latestChapter={releases[item.id]?.latestChapter}
+                    latestVolume={releases[item.id]?.latestVolume}
+                    select={
+                      select.selectOn
+                        ? {
+                            checked: select.picked.has(item.id),
+                            onToggle: () => select.toggle(item.id),
+                          }
+                        : undefined
+                    }
+                    onLongPress={() => {
+                      select.start();
+                      select.toggle(item.id);
+                    }}
+                  />
+                </Animated.View>
+              )}
+              ItemSeparatorComponent={DashedLine}
+              // room under the last row for the floating +
+              contentContainerClassName="px-4 pb-28"
+              scrollEventThrottle={32}
+              onScroll={(e) => {
+                // the + leaves as they read down the shelf, and comes back
+                // the moment they scroll up, as the Android app's does
+                const y = e.nativeEvent.contentOffset.y;
+                scrollTop.current = y;
+                const moved = y - lastY.current;
+                if (Math.abs(moved) < 6) return;
+                lastY.current = y;
+                const hide = moved > 0 && y > 40;
+                if (hide !== fabHidden.current) {
+                  fabHidden.current = hide;
+                  fabAway.set(withTiming(hide ? 1 : 0, { duration: 200 }));
+                }
+              }}
+              ListEmptyComponent={
+                manga ? (
+                  <Text className="pt-6 font-body text-[15px] text-ink-soft">
+                    {query.trim()
+                      ? "Nothing on your shelf matches that."
+                      : "Nothing here yet."}
+                  </Text>
+                ) : undefined
+              }
+            />
+          </LayoutAnimationConfig>
+        )}
+      </PullPage>
       {/* the floating +: type a title or scan a barcode. Not over Volumes */}
       {tab !== "volumes" && !select.selectOn ? (
         <Animated.View

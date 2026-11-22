@@ -13,7 +13,8 @@ export default function Mascot({
   width = 120,
 }: {
   mood?: Mood;
-  width?: number;
+  // points, or "100%" to fill the box he's put in
+  width?: number | `${number}%`;
 }) {
   setSvgPalette(PRINTED);
   return (
