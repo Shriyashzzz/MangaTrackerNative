@@ -118,7 +118,7 @@ export default memo(function ShelfRow({
           </Text>
         ) : null}
       </View>
-      <View className="w-[120px] items-end gap-1 pr-2">
+      <View className="w-[132px] items-end gap-1 pr-2">
         <RowProgress
           finished={manga.status}
           unit={unit}
@@ -262,7 +262,14 @@ function RowProgress({
   const percent = knownTotal ? Math.min((reading / knownTotal) * 100, 100) : 0;
   return (
     <>
-      <Text className={text}>
+      {/* one line always: a long count ("ch. 1100 of 1199") shrinks a
+          little to fit, it never wraps */}
+      <Text
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.8}
+        className={`${text} w-full`}
+      >
         {unit} {reading} of {knownTotal}
       </Text>
       <View className="h-1.5 w-full overflow-hidden rounded-full border border-line bg-card">

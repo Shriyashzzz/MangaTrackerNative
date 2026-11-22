@@ -2,6 +2,7 @@
 // My shelf, Prices, Sign in for someone without an account). The
 // tab bar is the platform's own (Expo Router's native tabs): Material 3 on
 // Android, UIKit's on an iPhone, with the system's icons for each
+import { useTour } from "@/store/tour";
 import { router, usePathname } from "expo-router";
 import { NativeTabs } from "expo-router/native-tabs";
 import { useEffect } from "react";
@@ -18,6 +19,7 @@ let openedOnce = false;
 
 export default function TabsLayout() {
   const c = useColors();
+  const touring = useTour((tour) => tour.steps.length > 0);
   // the account's settings, once they're signed in
   const loadPrefs = usePrefs((s) => s.load);
   const isSignedIn = Boolean(useAuth((s) => s.isSignedIn));
@@ -78,7 +80,9 @@ export default function TabsLayout() {
           </NativeTabs.Trigger.Badge>
         ) : null}
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="prices">
+      {/* while Kenji's tour is on, only he opens price pages: wandering into
+          Prices mid-tour loses the thread (pressing the tab does nothing) */}
+      <NativeTabs.Trigger name="prices" disabled={touring}>
         <NativeTabs.Trigger.Icon
           sf={{ default: "tag", selected: "tag.fill" }}
           md="sell"
