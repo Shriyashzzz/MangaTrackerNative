@@ -5,7 +5,7 @@ import Tap from "@/components/Tap";
 import { openOutside } from "@/lib/openOutside";
 import { useState } from "react";
 import { Text, View } from "react-native";
-import { novelParts } from "@/core/lib/prices";
+import { comicKind, novelParts, originPlace } from "@/core/lib/prices";
 import type { SeriesInfo } from "@/core/lib/types";
 import { starsOf } from "@/core/pages/Prices/reviews/reviewText";
 
@@ -61,13 +61,18 @@ export default function SeriesFacts({
   // false where the page draws SeriesDescription itself
   withDescription?: boolean;
 }) {
+  const novel = novelParts(info.name).lightNovel;
+  // a Korean comic is a manhwa, a Chinese one a manhua: said with the
+  // genres, as one more fact about it. A novel is a novel wherever it's from
+  const kind = novel ? null : comicKind(info.origin);
+  const chips = [...(kind ? [kind] : []), ...info.genres];
   const facts = [
     info.score != null ? `Rated ★ ${starsOf(info.score)}` : null,
     info.popularityRank != null
       ? `#${info.popularityRank} most popular on AniList`
       : null,
     info.volumes != null
-      ? `${info.volumes} volumes${novelParts(info.name).lightNovel ? "" : " in Japan"}${info.status === "FINISHED" ? ", finished" : ""}`
+      ? `${info.volumes} volumes${novel ? "" : ` in ${originPlace(info.origin)}`}${info.status === "FINISHED" ? ", finished" : ""}`
       : null,
   ].filter(Boolean);
   return (
@@ -83,9 +88,9 @@ export default function SeriesFacts({
           </Text>
         ) : null}
       </Text>
-      {info.genres.length ? (
+      {chips.length ? (
         <View className="flex-row flex-wrap gap-1.5">
-          {info.genres.map((g) => (
+          {chips.map((g) => (
             <Text
               key={g}
               className="rounded-[2px] border-[1.5px] border-line-soft px-2 py-0.5 font-body-medium text-[12px] text-ink-soft"
