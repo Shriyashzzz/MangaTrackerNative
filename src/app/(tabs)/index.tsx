@@ -144,7 +144,7 @@ export default function ShelfScreen() {
     await load();
     setRefreshing(false);
   };
-  // where the list begins, under the header and the shelf's bar
+  // where the header ends: the refresh indicator hangs from its rule
   const [listTop, setListTop] = useState(0);
   const pull = useKenjiRefresh(load, listTop);
   // the + button: 0 in place, 1 slid away under the tab bar
@@ -165,7 +165,10 @@ export default function ShelfScreen() {
 
   return (
     <Safe edges={["top"]} className="flex-1 bg-paper">
-      <AppHeader />
+      {/* Kenji drops in from under the header's rule on a refresh */}
+      <View onLayout={(e) => setListTop(e.nativeEvent.layout.height)}>
+        <AppHeader />
+      </View>
       {/* the shelf's bar: which tab and how many, or the search box; search
           and sort on the right */}
       <View className="h-[64px] flex-row items-center gap-2 px-4 pt-3">
@@ -237,10 +240,7 @@ export default function ShelfScreen() {
           </Pressable>
         ) : null}
       </View>
-      <View
-        className="mx-4 h-px bg-line"
-        onLayout={(e) => setListTop(e.nativeEvent.layout.y + 1)}
-      />
+      <View className="mx-4 h-px bg-line" />
       {failed && !manga ? (
         <Text className="px-4 pt-6 font-body text-[15px] text-ink-soft">
           {failed}
