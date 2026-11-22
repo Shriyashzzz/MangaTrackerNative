@@ -199,6 +199,14 @@ export default function ShelfScreen() {
             <SearchIcon color={c.ink} width={22} height={22} />
           </Pressable>
         )}
+        <Pressable
+          onPress={() => setPicking("sort")}
+          hitSlop={8}
+          className="p-2"
+          accessibilityLabel={`Sorted by ${sortLabel}. Change the order`}
+        >
+          <SortIcon color={sortBy ? c.accent : c.ink} width={22} height={22} />
+        </Pressable>
         {tab !== "volumes" && !select.selectOn && !searching ? (
           <Pressable
             onPress={select.start}
@@ -211,14 +219,6 @@ export default function ShelfScreen() {
             </Text>
           </Pressable>
         ) : null}
-        <Pressable
-          onPress={() => setPicking("sort")}
-          hitSlop={8}
-          className="p-2"
-          accessibilityLabel={`Sorted by ${sortLabel}. Change the order`}
-        >
-          <SortIcon color={sortBy ? c.accent : c.ink} width={22} height={22} />
-        </Pressable>
       </View>
       <View className="mx-4 h-px bg-line" />
       {failed && !manga ? (
