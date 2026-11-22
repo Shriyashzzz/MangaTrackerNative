@@ -6,13 +6,17 @@
 import { useEffect, useState } from "react";
 import {
   Alert,
-  FlatList,
   Pressable,
   RefreshControl,
   Text,
   TextInput,
   View,
 } from "react-native";
+import Animated, {
+  FadeOut,
+  LayoutAnimationConfig,
+  LinearTransition,
+} from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 import AppHeader from "@/components/AppHeader";
@@ -224,49 +228,55 @@ export default function ShelfScreen() {
       ) : tab === "volumes" ? (
         <VolumesView manga={list} refreshing={refreshing} onRefresh={refresh} />
       ) : (
-        <FlatList
-          data={list}
-          keyExtractor={(m) => String(m.id)}
-          keyboardShouldPersistTaps="handled"
-          renderItem={({ item }) => (
-            <ShelfRow
-              manga={item}
-              trackBy={trackBy}
-              latestChapter={releases[item.id]?.latestChapter}
-              latestVolume={releases[item.id]?.latestVolume}
-              select={
-                select.selectOn
-                  ? {
-                      checked: select.picked.has(item.id),
-                      onToggle: () => select.toggle(item.id),
-                    }
-                  : undefined
-              }
-              onLongPress={() => {
-                select.start();
-                select.toggle(item.id);
-              }}
-            />
-          )}
-          ItemSeparatorComponent={DashedLine}
-          contentContainerClassName="px-4 pb-6"
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={refresh}
-              colors={[c.accent]}
-            />
-          }
-          ListEmptyComponent={
-            manga ? (
-              <Text className="pt-6 font-body text-[15px] text-ink-soft">
-                {query.trim()
-                  ? "Nothing on your shelf matches that."
-                  : "Nothing here yet."}
-              </Text>
-            ) : undefined
-          }
-        />
+        <LayoutAnimationConfig skipEntering>
+          <Animated.FlatList
+            data={list}
+            // a series moved or deleted: the rows close up rather than jump
+            itemLayoutAnimation={LinearTransition.duration(220)}
+            keyExtractor={(m) => String(m.id)}
+            keyboardShouldPersistTaps="handled"
+            renderItem={({ item }) => (
+              <Animated.View exiting={FadeOut.duration(160)}>
+                <ShelfRow
+                  manga={item}
+                  trackBy={trackBy}
+                  latestChapter={releases[item.id]?.latestChapter}
+                  latestVolume={releases[item.id]?.latestVolume}
+                  select={
+                    select.selectOn
+                      ? {
+                          checked: select.picked.has(item.id),
+                          onToggle: () => select.toggle(item.id),
+                        }
+                      : undefined
+                  }
+                  onLongPress={() => {
+                    select.start();
+                    select.toggle(item.id);
+                  }}
+                />
+              </Animated.View>
+            )}
+            ItemSeparatorComponent={DashedLine}
+            contentContainerClassName="px-4 pb-6"
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={refresh}
+                colors={[c.accent]}
+              />
+            }
+            ListEmptyComponent={
+              manga ? (
+                <Text className="pt-6 font-body text-[15px] text-ink-soft">
+                  {query.trim()
+                    ? "Nothing on your shelf matches that."
+                    : "Nothing here yet."}
+                </Text>
+              ) : undefined
+            }
+          />
+        </LayoutAnimationConfig>
       )}
       {/* the floating +: type a title or scan a barcode. Not over Volumes */}
       {tab !== "volumes" && !select.selectOn ? (

@@ -2,7 +2,8 @@
 // SeriesCard.tsx): its cover with its score as stars, the name, and a line
 // of what it is
 import { router } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import PressScale from "../PressScale";
+import { Text, View } from "react-native";
 import { StarIcon } from "@/core/components/icons/Icons";
 import { novelParts } from "@/core/lib/prices";
 import { starsOf } from "@/core/pages/Prices/reviews/reviewText";
@@ -60,7 +61,7 @@ export default function SeriesCard({
 }) {
   const shown = novelParts(series.name);
   return (
-    <Pressable
+    <PressScale
       onPress={
         onPress ??
         (() =>
@@ -70,7 +71,7 @@ export default function SeriesCard({
           }))
       }
       style={{ width }}
-      className="gap-1.5 active:opacity-70"
+      className="gap-1.5"
     >
       <View>
         <SeriesCover
@@ -97,6 +98,6 @@ export default function SeriesCard({
           .filter(Boolean)
           .join(" · ")}
       </Text>
-    </Pressable>
+    </PressScale>
   );
 }

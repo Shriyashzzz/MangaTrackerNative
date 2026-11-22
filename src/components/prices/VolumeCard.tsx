@@ -5,7 +5,8 @@
 // several volumes fans the covers behind it
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import PressScale from "../PressScale";
+import { Text, View } from "react-native";
 import { StarIcon } from "@/core/components/icons/Icons";
 import { coverSrc, formatCents, novelParts } from "@/core/lib/prices";
 import { scoreText } from "@/core/pages/Prices/reviews/reviewText";
@@ -101,11 +102,11 @@ export default function VolumeCard({
   const shown = novelParts(title);
   const fanned = holds ? Math.min(holds.to - holds.from, 3) : 0;
   return (
-    <Pressable
+    <PressScale
       onPress={isbn13 ? () => router.push(`/prices/${isbn13}`) : undefined}
       disabled={!isbn13}
       style={{ width }}
-      className="gap-1.5 active:opacity-70"
+      className="gap-1.5"
     >
       <View style={{ width, aspectRatio: 2 / 3, marginTop: fanned ? 6 : 0 }}>
         {Array.from({ length: fanned }, (_, i) => (
@@ -227,6 +228,6 @@ export default function VolumeCard({
           ) : null}
         </Text>
       ) : null}
-    </Pressable>
+    </PressScale>
   );
 }

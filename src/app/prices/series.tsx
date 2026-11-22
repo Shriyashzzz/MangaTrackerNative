@@ -7,6 +7,7 @@
 // finishCost, useSeriesData)
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
+import Animated, { FadeIn } from "react-native-reanimated";
 import Segmented from "@/components/Segmented";
 import {
   Pressable,
@@ -263,7 +264,7 @@ export default function PriceSeriesScreen() {
       ) : null}
 
       {!onEditions ? (
-        <View className="gap-3">
+        <Animated.View entering={FadeIn.duration(220)} className="gap-3">
           <View className="flex-row items-baseline justify-between">
             <Text className="font-brand pr-1 text-[22px] tracking-[1px] text-ink uppercase">
               Volumes
@@ -370,12 +371,14 @@ export default function PriceSeriesScreen() {
               </Text>
             </Text>
           ) : null}
-        </View>
+        </Animated.View>
       ) : null}
 
       {/* on the Volumes tab it's there, unseen: it fetches the lines the tabs
           and the header box need */}
-      <View
+      <Animated.View
+        key={onEditions ? "editions" : "hidden"}
+        entering={onEditions ? FadeIn.duration(220) : undefined}
         style={
           tabbed && !onEditions ? { height: 0, overflow: "hidden" } : undefined
         }
@@ -388,7 +391,7 @@ export default function PriceSeriesScreen() {
           singles={singles}
           seriesCoverUrl={info?.coverUrl ?? null}
         />
-      </View>
+      </Animated.View>
       {!hasSets && !onEditions ? (
         <BoxSetSearch links={data.boxSetLinks ?? []} />
       ) : null}
