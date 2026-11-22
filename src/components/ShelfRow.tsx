@@ -6,9 +6,14 @@
 // sits on the cover and a tap picks the row. A long press opens the
 // platform's own menu: Edit, Move to, Select several, Delete
 import SeriesCover from "@/components/SeriesCover";
-import { MenuView, type MenuAction } from "@react-native-menu/menu";
+import {
+  MenuView,
+  type MenuAction,
+  type MenuComponentRef,
+} from "@react-native-menu/menu";
 import * as Haptics from "expo-haptics";
 import { Link, router } from "expo-router";
+import { useRef } from "react";
 import { Alert, Platform, Pressable, Text, View } from "react-native";
 import { useRipple } from "@/lib/press";
 import { useShelf } from "@/store/shelf";
@@ -38,6 +43,9 @@ export default function ShelfRow({
 }) {
   const c = useColors();
   const ripple = useRipple();
+  // Android's menu is opened from the row's own long press (the row takes
+  // the touch before the menu's view sees it); an iPhone's opens itself
+  const menu = useRef<MenuComponentRef>(null);
   const { unit, reading, knownTotal } = progressOf(
     manga,
     tracksOf(manga, trackBy),
@@ -55,6 +63,12 @@ export default function ShelfRow({
     <Pressable
       android_ripple={ripple}
       onPress={select?.onToggle}
+      onLongPress={
+        select || Platform.OS !== "android"
+          ? undefined
+          : () => menu.current?.show()
+      }
+      delayLongPress={400}
       accessibilityState={select ? { selected: select.checked } : undefined}
       className={`flex-row items-center gap-3 py-1.5 active:opacity-70 ${select?.checked ? "bg-accent-wash" : ""}`}
     >
@@ -111,8 +125,9 @@ export default function ShelfRow({
   if (select) return row;
   return (
     <MenuView
+      ref={menu}
       title={manga.name}
-      shouldOpenOnLongPress
+      shouldOpenOnLongPress={Platform.OS === "ios"}
       actions={menuActions(manga)}
       onPressAction={({ nativeEvent }) => {
         void Haptics.selectionAsync();

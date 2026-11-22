@@ -34,15 +34,15 @@ npm run lint
 
 ## Where things are
 
-| Folder | What's in it |
-|---|---|
-| `src/app/` | Screens. Every file is a route (Expo Router). |
+| Folder            | What's in it                                                           |
+| ----------------- | ---------------------------------------------------------------------- |
+| `src/app/`        | Screens. Every file is a route (Expo Router).                          |
 | `src/components/` | The app's own building blocks (rows, the bottom bar, the spine strip). |
-| `src/store/` | Who's signed in, the shelf, the account's settings. |
-| `src/lib/` | Small app-only helpers (theme colours, polyfills). |
-| `src/core/` | **Copied from the website. Never edit.** |
-| `src/native/` | The app's own versions of website files that need a browser. |
-| `src/global.css` | The theme: the website's colours (light and dark) and fonts. |
+| `src/store/`      | Who's signed in, the shelf, the account's settings.                    |
+| `src/lib/`        | Small app-only helpers (theme colours, polyfills).                     |
+| `src/core/`       | **Copied from the website. Never edit.**                               |
+| `src/native/`     | The app's own versions of website files that need a browser.           |
+| `src/global.css`  | The theme: the website's colours (light and dark) and fonts.           |
 
 ## The shared logic (`src/core`)
 
@@ -119,3 +119,13 @@ control the app uses it:
 - Live price checks (the website proves a person is there first; the app
   gets stored prices)
 - Before release: allow plain http to localhost only, not everywhere
+
+## License
+
+Copyright © 2026 Shriyash Ghimire. All rights reserved.
+
+This app is part of [Manga Tracker](https://github.com/Shriyashzzz/inventoryApp)
+and is licensed on the same terms as the web version: the source is public
+so you can read and learn from it. No license is granted to copy, modify,
+distribute or host it, in whole or in part, without written permission.
+See [LICENSE](LICENSE).

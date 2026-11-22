@@ -70,5 +70,6 @@
     "sync-core": "node scripts/sync-core.mjs",
     "typecheck": "tsc --noEmit"
   },
-  "private": true
+  "private": true,
+  "license": "UNLICENSED"
 }

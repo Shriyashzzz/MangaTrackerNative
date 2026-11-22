@@ -1,7 +1,7 @@
 // Prices, as the web's pages/Prices/PriceSearch.tsx on the phone: search a
 // series or an ISBN (the box opens full screen with suggestions and recent
 // searches, as the app's does), a few to try, the way to After the anime,
-// What's new, and the highlights: Popular this season, Latest deals, Prices
+// and the highlights: Popular this season, Latest deals, Prices
 // just checked. A search lists the series found, with Did you mean for a
 // typo. The rules are the web's (core findSeries, nearMatches, askedEdition)
 import { router } from "expo-router";
@@ -35,20 +35,6 @@ const Safe = withUniwind(SafeAreaView);
 const TRY = ["One Piece", "Frieren", "Berserk", "Dandadan", "Bleach", "Naruto"];
 const SHOWN = 5;
 const DEBOUNCE_MS = 250;
-const WHATS_NEW = [
-  {
-    name: "Read by volume",
-    body: "Keep your place by chapter, by volume, or both.",
-  },
-  {
-    name: "Deluxe and omnibus editions",
-    body: "Pick the edition you collect and see the next book to buy.",
-  },
-  {
-    name: "What you've spent",
-    body: "Note what each book cost and see the total for your shelf.",
-  },
-];
 
 const H2 = ({ children }: { children: string }) => (
   <Text className="font-brand pr-1 text-[22px] tracking-[1px] text-ink uppercase">
@@ -208,12 +194,6 @@ export default function PricesScreen() {
       setResult({ query: askedEdition(q).series, items: [], error: "" });
   };
   const searching = query.length >= 2;
-  const loading =
-    searching &&
-    result !== null &&
-    result.items.length === 0 &&
-    !result.error &&
-    false;
   const fresh = found.q === q;
   const shown = fresh ? found.items.slice(0, SHOWN) : [];
   const recent = full && q.length < 2 ? recentSearches() : [];
@@ -449,45 +429,7 @@ export default function PricesScreen() {
           </View>
         ) : null}
 
-        {!searching ? (
-          <>
-            <View className="gap-2 rounded-[4px] border-2 border-dashed border-line p-3">
-              <Text className="self-start bg-accent px-1.5 font-brand pr-1 text-[13px] tracking-[1px] text-on-accent uppercase">
-                New!
-              </Text>
-              <H2>What's new</H2>
-              <Text className="font-body-semibold text-[15px] text-ink">
-                After the anime
-              </Text>
-              <Text className="font-body text-[14px] text-ink-soft">
-                Finished a season? See which chapter and volume of the manga to
-                start from.
-              </Text>
-              {WHATS_NEW.map((item) => (
-                <Text
-                  key={item.name}
-                  className="font-body text-[14px] text-ink-soft"
-                >
-                  <Text className="font-body-semibold text-ink">
-                    {item.name}.
-                  </Text>{" "}
-                  {item.body}
-                </Text>
-              ))}
-              <Pressable
-                onPress={() => router.push("/updates")}
-                hitSlop={6}
-                className="self-start"
-              >
-                <Text className="font-body-medium text-[14px] text-ink underline">
-                  All updates →
-                </Text>
-              </Pressable>
-            </View>
-            <HighlightsStrip />
-          </>
-        ) : null}
-        {loading ? null : null}
+        {!searching ? <HighlightsStrip /> : null}
       </ScrollView>
     </Safe>
   );

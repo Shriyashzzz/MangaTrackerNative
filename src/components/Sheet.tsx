@@ -15,7 +15,7 @@ import {
   type BottomSheetScrollViewMethods,
 } from "@gorhom/bottom-sheet";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { useWindowDimensions } from "react-native";
+import { BackHandler, useWindowDimensions } from "react-native";
 import { useColors } from "@/lib/colors";
 
 // the few paddings sheets ask for, as Tailwind classes ("px-4 pb-8"), in
@@ -78,6 +78,15 @@ export default function Sheet({
   }, [open]);
   useEffect(() => {
     if (mounted) sheet.current?.present();
+  }, [mounted]);
+  // Android's back closes the sheet, not the page under it
+  useEffect(() => {
+    if (!mounted) return;
+    const back = BackHandler.addEventListener("hardwareBackPress", () => {
+      sheet.current?.dismiss();
+      return true;
+    });
+    return () => back.remove();
   }, [mounted]);
   if (!mounted) return null;
 
