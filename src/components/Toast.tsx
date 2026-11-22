@@ -28,7 +28,7 @@ export default function Toast({
     <Animated.View
       entering={FadeInDown.duration(220)}
       exiting={FadeOutDown.duration(180)}
-      style={{ bottom: insets.bottom + 24 }}
+      style={{ bottom: insets.bottom + 72 }}
       className="absolute inset-x-3 flex-row items-center gap-4 rounded-lg bg-ink px-4 py-3.5"
     >
       <Text className="min-w-0 flex-1 font-body text-[15px] text-paper">

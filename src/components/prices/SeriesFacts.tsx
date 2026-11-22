@@ -47,7 +47,7 @@ export default function SeriesFacts({ info }: { info: SeriesInfo }) {
       {info.description ? (
         <View>
           <Text
-            numberOfLines={expanded ? undefined : 5}
+            numberOfLines={expanded ? undefined : 3}
             className="font-body text-[14px] leading-[21px] text-ink"
           >
             {info.description}
