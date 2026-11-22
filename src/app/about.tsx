@@ -30,6 +30,31 @@ const STRIP = [
   },
 ] as const;
 
+// the story behind the app, a chapter at a time
+const STORY: { title: string; words: string; priceCheck?: boolean }[] = [
+  {
+    title: "Hey, I'm Shriyash",
+    words:
+      "I'm the solo developer behind Manga Tracker and, like you, I love collecting and reading manga.",
+  },
+  {
+    title: "The problem",
+    words:
+      "Keeping up with a pile of series isn't easy. I kept forgetting which chapter I was on, missing new volumes, and spending more than I should on physical manga.",
+  },
+  {
+    title: "So I built this",
+    words:
+      "Your collection, your place in each series, upcoming releases and price comparisons, all in one place.",
+  },
+  {
+    title: "On a student budget",
+    words:
+      "I'm a college student, so a good deal matters. Price Check compares manga prices across US and Canadian stores before you buy.",
+    priceCheck: true,
+  },
+];
+
 export default function AboutScreen() {
   const [priced, setPriced] = useState(0);
 
@@ -55,36 +80,52 @@ export default function AboutScreen() {
         </Text>
       </View>
 
-      {/* The story behind Manga Tracker */}
-      <P>
-        Hey, I'm Shriyash! I'm the solo developer behind Manga Tracker and, like
-        you, I love collecting and reading manga.
-      </P>
-
-      <P>
-        But keeping up with multiple series isn't always easy. I found myself
-        constantly forgetting which chapter I was on, missing new volume
-        releases, and spending more than I probably should on physical manga.
-      </P>
-
-      <P>
-        So I decided to build something to make all of that easier. Manga
-        Tracker brings your collection, reading progress, upcoming releases, and
-        price comparisons together in one place.
-      </P>
-
-      <P>
-        I'm also a college student on a budget, so finding a good deal matters.
-        That's why I built{" "}
-        <TextLink onPress={() => router.push("/prices")}>Price Check</TextLink>,
-        which helps you compare manga prices across US and Canadian stores
-        before buying.
-      </P>
-
-      <P>
-        And if you're wondering, one of my all-time favourite series is
-        Vagabond. It's a series that genuinely changed the way I look at life.
-      </P>
+      {/* the story, told as the chapters of a short manga: one idea a box,
+          each with its number, the way a volume's contents page reads */}
+      <View className="gap-3">
+        {STORY.map((part, i) => (
+          // a solid card under the tinted ones, so the page's background
+          // drawing never shows through the words
+          <View
+            key={part.title}
+            className="overflow-hidden rounded-[14px] bg-card"
+          >
+            <View
+              className={`gap-1.5 rounded-[14px] border p-4 ${i % 2 ? "border-accent/30 bg-accent-wash" : "border-line-soft"}`}
+            >
+              <Text className="font-mono-medium text-[11.5px] tracking-[1.5px] text-accent-ink uppercase">
+                Ch. {String(i + 1).padStart(2, "0")}
+              </Text>
+              <Text className="font-brand pr-1 text-[21px] leading-[25px] tracking-[1px] text-ink uppercase">
+                {part.title}
+              </Text>
+              <Text className="font-body text-[15.5px] leading-[23px] text-ink">
+                {part.words}
+              </Text>
+              {part.priceCheck ? (
+                <Button
+                  label="Try Price Check →"
+                  small
+                  onPress={() => router.push("/prices")}
+                />
+              ) : null}
+            </View>
+          </View>
+        ))}
+        {/* the author's note at the back of the volume */}
+        <View className="flex-row items-center gap-3 rounded-[14px] border border-dashed border-line bg-paper-2 p-4">
+          <Mascot mood="reading" width={64} />
+          <View className="min-w-0 flex-1 gap-1">
+            <Text className="font-mono-medium text-[11.5px] tracking-[1.5px] text-ink-soft uppercase">
+              Author's note
+            </Text>
+            <Text className="font-display-italic text-[16px] leading-[23px] text-ink">
+              One of my all-time favourites is Vagabond. It genuinely changed
+              the way I look at life.
+            </Text>
+          </View>
+        </View>
+      </View>
 
       {/* The problems */}
       <Rule />

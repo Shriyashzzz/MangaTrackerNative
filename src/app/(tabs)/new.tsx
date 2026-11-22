@@ -304,9 +304,8 @@ export default function NewScreen() {
           label="What's new"
           options={KINDS.map((k) => ({
             value: k,
-            label: allFailed
-              ? RELEASE_KINDS[k].label
-              : `${RELEASE_KINDS[k].label} ${kindCounts[k]}`,
+            label: RELEASE_KINDS[k].label,
+            count: allFailed ? undefined : kindCounts[k],
           }))}
           value={kind}
           onChange={pickKind}

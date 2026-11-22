@@ -31,7 +31,7 @@ export default function BuyRow({
   seriesCoverUrl: string | null;
   // the page's main answer: bigger words
   lead?: boolean;
-  // "Chapters 53–61 are in this volume.", along the box's foot
+  // "Chapters 53–61 are in this volume.", under the volume's name
   chapters?: string | null;
 }) {
   const words = bookWords(book, volume);
@@ -72,8 +72,9 @@ export default function BuyRow({
           >
             {heading}
           </Text>
+          {/* which chapters it holds when that's known, else why this one */}
           <Text className="font-body text-[13.5px] leading-[19px] text-ink-soft">
-            {why}
+            {chapters ?? why}
           </Text>
           {main ? (
             <Text className="font-body text-[14px] text-ink">
@@ -122,11 +123,6 @@ export default function BuyRow({
           ) : null}
         </View>
       </View>
-      {chapters ? (
-        <Text className="mt-3 border-t border-line-soft pt-2.5 font-mono text-[12.5px] text-ink-soft">
-          {chapters}
-        </Text>
-      ) : null}
     </View>
   );
 }

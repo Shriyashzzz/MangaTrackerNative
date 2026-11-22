@@ -5,7 +5,7 @@ import Segmented from "../Segmented";
 
 const COUNTRIES = [
   { value: "us", label: "US" },
-  { value: "ca", label: "Canada" },
+  { value: "ca", label: "CA" },
 ] as const;
 
 export default function CountrySwitch() {

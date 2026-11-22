@@ -24,7 +24,9 @@ export default function Segmented<T extends string>({
   onChange,
   label,
 }: {
-  options: readonly { value: T; label: string }[];
+  // count: how many are under it, shown as a small badge and only when
+  // there are some (a row of zeros says nothing)
+  options: readonly { value: T; label: string; count?: number }[];
   value: T;
   onChange: (value: T) => void;
   label: string;
@@ -93,12 +95,21 @@ export default function Segmented<T extends string>({
             accessibilityState={{ checked: on }}
             className={`flex-1 items-center justify-center px-2 ${isAndroid ? "min-h-[40px]" : "min-h-[34px] py-1.5"}`}
           >
-            <Text
-              numberOfLines={1}
-              className={`text-center text-[14.5px] ${on ? "font-body-semibold text-ink" : "font-body-medium text-ink-soft"}`}
-            >
-              {o.label}
-            </Text>
+            <View className="flex-row items-center justify-center gap-1.5">
+              <Text
+                numberOfLines={1}
+                className={`shrink text-center text-[14.5px] ${on ? "font-body-semibold text-ink" : "font-body-medium text-ink-soft"}`}
+              >
+                {o.label}
+              </Text>
+              {o.count ? (
+                <View className="min-w-[20px] items-center rounded-full bg-accent px-1.5 py-px">
+                  <Text className="font-mono-medium text-[11px] text-on-accent">
+                    {o.count}
+                  </Text>
+                </View>
+              ) : null}
+            </View>
           </Pressable>
         );
       })}
