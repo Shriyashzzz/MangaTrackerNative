@@ -210,7 +210,6 @@ export default function ReadingStepper({
           }}
           className="h-11 border-x border-line-soft px-1.5 text-center font-brand text-[24px]"
         />
-        {"\u00A0"}
         {button(1, `One ${counted} on`, "+", current >= max)}
       </View>
       {said ? (
