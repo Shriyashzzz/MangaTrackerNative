@@ -288,7 +288,9 @@ function Card({
   return (
     <View className="gap-2.5 rounded-[16px] border border-line-soft bg-card p-3">
       <View className="flex-row gap-3">
-        <Tap onPress={open}>
+        {/* as tall as the cover and no taller: stretched to the row's
+            height, the band at its foot hung below the picture */}
+        <Tap onPress={open} className="self-start">
           {/* no picture for it (or it won't load, as with no connection):
               the series' name on a printed cover, as on the shelf */}
           {coverUrl && !coverFailed ? (
