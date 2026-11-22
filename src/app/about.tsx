@@ -1,6 +1,6 @@
 import Button from "@/components/Button";
 import Mascot from "@/components/Mascot";
-import Page, { H2, H3, P, TextLink } from "@/components/Page";
+import Page, { H2, H3, P, Rule, TextLink } from "@/components/Page";
 import { CONTACT_EMAIL } from "@/core/lib/contact";
 import { getPricedCount } from "@/core/lib/prices";
 import { router } from "expo-router";
@@ -87,6 +87,7 @@ export default function AboutScreen() {
       </P>
 
       {/* The problems */}
+      <Rule />
       <H2>Sound familiar?</H2>
 
       <View className="flex-row flex-wrap gap-3">
@@ -109,6 +110,7 @@ export default function AboutScreen() {
       </View>
 
       {/* Features */}
+      <Rule />
       <H2>What it can do</H2>
 
       <View className="gap-2 rounded-[4px] border-[1.5px] border-line-soft p-3">
@@ -145,6 +147,7 @@ export default function AboutScreen() {
       </View>
 
       {/* Contact */}
+      <Rule />
       <H2>Contact</H2>
 
       <P>

@@ -114,7 +114,7 @@ function Section({
   entries?: Entry[];
 }) {
   return (
-    <View className="gap-2">
+    <View className="gap-2 border-t border-line-soft pt-6">
       <H2>{title}</H2>
       {lines.map((line) => (
         <P key={line}>{line}</P>
@@ -163,7 +163,7 @@ export default function PrivacyScreen() {
           "Manga Tracker isn't meant for children under 13, and doesn't knowingly keep anything about them. If you think a child has an account, email and it'll be removed.",
         ]}
       />
-      <View className="gap-2">
+      <View className="gap-2 border-t border-line-soft pt-6">
         <H2>Questions and changes</H2>
         <P>
           Ask anything at{" "}

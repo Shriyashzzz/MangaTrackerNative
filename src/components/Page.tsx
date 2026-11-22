@@ -85,6 +85,9 @@ export default function Page({
   );
 }
 
+// the line between a page's sections, as the Android app rules them off
+export const Rule = () => <View className="h-px bg-line-soft" />;
+
 // a section's title: the lettering with a short accent rule under it
 export const H2 = ({ children }: { children: ReactNode }) => (
   <View className="gap-1 self-start w-fit ">
