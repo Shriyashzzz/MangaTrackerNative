@@ -7,6 +7,25 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:788599309893:android:0a2fe11b24bb1668ee852c",
+        "android_client_info": {
+          "package_name": "xyz.mangatracker.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD769eV4Dy23py2cmJA_ByCK13roc7aUTE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:788599309893:android:3942fd4cee3a6debee852c",
         "android_client_info": {
           "package_name": "xyz.mangatracker.app.rn"
