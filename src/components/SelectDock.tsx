@@ -4,6 +4,7 @@
 // with its Undo
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { CloseIcon } from "@/core/components/icons/Icons";
 import type { Manga } from "@/core/lib/types";
 import { MOVE_LABELS } from "@/core/pages/Home/shelfViews";
@@ -51,12 +52,16 @@ export default function SelectDock({
   tab: string;
 }) {
   const c = useColors();
+  const insets = useSafeAreaInsets();
   const [movePicking, setMovePicking] = useState(false);
   const count = select.pickedShown.length;
   const word = (on: boolean) =>
     `font-body-semibold text-[14.5px] ${on ? "text-ink" : "text-muted"}`;
   return (
-    <View className="absolute inset-x-3 bottom-4 items-center gap-2.5">
+    <View
+      className="absolute inset-x-3 items-center gap-2.5"
+      style={{ bottom: insets.bottom + 16 }}
+    >
       <MovedNote select={select} />
       <View className="w-full flex-row flex-wrap items-center gap-x-4 gap-y-2 rounded-[6px] border-[2.5px] border-line bg-card px-4 py-3">
         <Text className="font-brand pr-1 text-[22px] text-ink">{count}</Text>

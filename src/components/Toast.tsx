@@ -3,6 +3,7 @@
 // after 7 seconds. No action word: a note alone
 import { useEffect } from "react";
 import { Pressable, Text } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
 
 const SHOWN_MS = 7000;
@@ -18,6 +19,7 @@ export default function Toast({
   onAction: () => void;
   onGone: () => void;
 }) {
+  const insets = useSafeAreaInsets();
   useEffect(() => {
     const timer = setTimeout(onGone, SHOWN_MS);
     return () => clearTimeout(timer);
@@ -26,7 +28,8 @@ export default function Toast({
     <Animated.View
       entering={FadeInDown.duration(220)}
       exiting={FadeOutDown.duration(180)}
-      className="absolute inset-x-3 bottom-6 flex-row items-center gap-4 rounded-lg bg-ink px-4 py-3.5"
+      style={{ bottom: insets.bottom + 24 }}
+      className="absolute inset-x-3 flex-row items-center gap-4 rounded-lg bg-ink px-4 py-3.5"
     >
       <Text className="min-w-0 flex-1 font-body text-[15px] text-paper">
         {text}

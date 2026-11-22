@@ -9,7 +9,8 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon",
-      "bundleIdentifier": "xyz.mangatracker.app.rn"
+      "bundleIdentifier": "xyz.mangatracker.app.rn",
+      "supportsTablet": false
     },
     "android": {
       "adaptiveIcon": {
@@ -44,7 +45,26 @@
           }
         }
       ],
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Manga Tracker reads a book's barcode with the camera. The picture never leaves your phone."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Manga Tracker uses a photo you pick as a cover.",
+          "cameraPermission": "Manga Tracker takes a photo to use as a cover."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#b14a3c"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

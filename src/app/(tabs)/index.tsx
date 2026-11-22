@@ -17,7 +17,10 @@ import Animated, {
   LayoutAnimationConfig,
   LinearTransition,
 } from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 import AppHeader from "@/components/AppHeader";
 import DashedLine from "@/components/DashedLine";
@@ -58,6 +61,7 @@ const isTab = (tab: unknown): tab is TabId => TABS.some((t) => t.value === tab);
 
 export default function ShelfScreen() {
   const c = useColors();
+  const insets = useSafeAreaInsets();
   const manga = useShelf((s) => s.manga);
   const failed = useShelf((s) => s.failed);
   const load = useShelf((s) => s.load);
@@ -283,7 +287,8 @@ export default function ShelfScreen() {
         <Pressable
           onPress={() => setAdding(true)}
           accessibilityLabel="Add manga"
-          className="absolute right-4 bottom-5 h-14 w-14 items-center justify-center rounded-full border-2 border-paper bg-accent active:opacity-90"
+          style={{ bottom: insets.bottom + 20 }}
+          className="absolute right-4 h-14 w-14 items-center justify-center rounded-full border-2 border-paper bg-accent active:opacity-90"
         >
           <PlusIcon color={c.onAccent} width={26} height={26} />
         </Pressable>
@@ -308,7 +313,10 @@ export default function ShelfScreen() {
           tab={tab}
         />
       ) : (
-        <View className="absolute inset-x-3 bottom-4">
+        <View
+          className="absolute inset-x-3"
+          style={{ bottom: insets.bottom + 16 }}
+        >
           <MovedNote select={select} />
         </View>
       )}
