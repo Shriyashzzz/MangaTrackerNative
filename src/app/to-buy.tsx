@@ -118,17 +118,51 @@ function settledNote(
   };
 }
 
-// the band over the list: "$56.97 new · $27.98 used", each said for how
-// many of the books have a price of that kind when it isn't all of them
-function totalsLine(totals: ToBuyList["totals"], of: number) {
-  const part = (label: string, sum: ToBuyList["totals"]["new"]) =>
-    sum.volumes
-      ? `${formatCents(sum.cents)} ${label}${sum.volumes === of ? "" : ` (${sum.volumes} of ${of})`}`
-      : null;
-  const parts = [part("new", totals.new), part("used", totals.used)].filter(
-    Boolean,
+// The ticket over the list: how many books, and what they'd cost new and
+// used. A sum is said for how many of the books have a price of that kind
+// when it isn't all of them ("Used · 1 of 2"); a dash when none has
+type Sum = ToBuyList["totals"]["new"];
+const sumLabel = (label: string, sum: Sum, of: number) =>
+  sum.volumes && sum.volumes !== of
+    ? `${label} · ${sum.volumes} of ${of}`
+    : label;
+const sumValue = (sum: Sum) => (sum.volumes ? formatCents(sum.cents) : "—");
+
+const SUM_HEIGHT = 58;
+
+function SumCell({
+  label,
+  value,
+  first = false,
+}: {
+  label: string;
+  value: string;
+  first?: boolean;
+}) {
+  return (
+    <>
+      {first ? null : <Tear height={SUM_HEIGHT} />}
+      <View
+        className="flex-1 justify-center px-2.5"
+        style={{ height: SUM_HEIGHT }}
+      >
+        <Text
+          numberOfLines={1}
+          className="font-mono-medium text-[10.5px] tracking-[1px] text-ink-soft uppercase"
+        >
+          {label}
+        </Text>
+        <Text
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          className="font-brand pr-[6px] text-[22px] leading-[27px] text-ink uppercase"
+        >
+          {value}
+          {"\u00A0"}
+        </Text>
+      </View>
+    </>
   );
-  return parts.length ? parts.join(" · ") : "No prices found for these yet.";
 }
 
 // the cheaper of a book's two prices, and the other one
@@ -143,16 +177,16 @@ function pricesOf(item: ToBuyItem) {
 
 const STUB_HEIGHT = 44;
 
-// the dashed tear between two parts of a ticket's stub
-function Tear() {
+// the dashed tear between two parts of a ticket
+function Tear({ height = STUB_HEIGHT }: { height?: number }) {
   const c = useColors();
   return (
-    <Svg width={1.5} height={STUB_HEIGHT}>
+    <Svg width={1.5} height={height}>
       <Line
         x1={0.75}
         y1={0}
         x2={0.75}
-        y2={STUB_HEIGHT}
+        y2={height}
         stroke={c.line}
         strokeWidth={1.5}
         strokeDasharray="4 3"
@@ -520,14 +554,22 @@ export default function ToBuyScreen() {
           ) : null}
           {items && items.length > 0 && list ? (
             <>
-              <View className="flex-row flex-wrap items-baseline gap-x-2.5 gap-y-1 rounded-[14px] border border-line-soft bg-card px-3 py-2.5">
-                <Text className="font-brand pr-[5px] text-[20px] tracking-[1px] text-ink uppercase">
-                  {items.length === 1 ? "1 volume" : `${items.length} volumes`}
-                  {"\u00A0"}
-                </Text>
-                <Text className="font-mono text-[13px] text-ink-soft">
-                  {totalsLine(list.totals, items.length)}
-                </Text>
+              <View className="flex-row border-[1.5px] border-line bg-card">
+                <SumCell
+                  label="On the list"
+                  value={
+                    items.length === 1 ? "1 volume" : `${items.length} volumes`
+                  }
+                  first
+                />
+                <SumCell
+                  label={sumLabel("New", list.totals.new, items.length)}
+                  value={sumValue(list.totals.new)}
+                />
+                <SumCell
+                  label={sumLabel("Used", list.totals.used, items.length)}
+                  value={sumValue(list.totals.used)}
+                />
               </View>
               <View className="flex-row items-center justify-between gap-3">
                 <Tap
