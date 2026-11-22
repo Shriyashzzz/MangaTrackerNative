@@ -598,7 +598,7 @@ export default function PriceVolumeScreen() {
 
       {nearby.length ? (
         <View className="gap-2">
-          <View className="flex-row items-baseline justify-between">
+          <View className="flex-row items-end justify-between">
             <H2>From the same series</H2>
             <Pressable onPress={openSeries} hitSlop={6}>
               <Text className="font-body-medium text-[14px] text-ink underline">

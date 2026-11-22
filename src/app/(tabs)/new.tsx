@@ -472,7 +472,7 @@ export default function NewScreen() {
             (p) => piles[p].length && (!openPile || openPile === p),
           ).map((p) => (
             <View key={p} className="gap-2 border-t border-line pt-3">
-              <View className="flex-row items-baseline justify-between">
+              <View className="flex-row items-end justify-between">
                 <H2>
                   {PILE_TEXT[kind][p].name}{" "}
                   <Text className="font-mono text-[14px] text-muted">

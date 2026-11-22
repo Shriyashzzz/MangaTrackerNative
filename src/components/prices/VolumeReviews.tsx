@@ -192,7 +192,7 @@ export default function VolumeReviews({
   };
   return (
     <View className="gap-3">
-      <View className="flex-row items-baseline justify-between">
+      <View className="flex-row items-end justify-between">
         <H2>What readers say</H2>
         {data.count > 0 && !yours && !writing ? (
           <Button

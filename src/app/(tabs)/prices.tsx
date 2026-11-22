@@ -61,7 +61,7 @@ function HighlightsStrip() {
     <>
       {data.trending.length ? (
         <View className="gap-2">
-          <View className="flex-row items-baseline justify-between">
+          <View className="flex-row items-end justify-between">
             <H2>Popular this season</H2>
             <Pressable onPress={() => router.push("/series")} hitSlop={6}>
               <Text className="font-body-medium text-[14px] text-ink underline">
@@ -76,7 +76,7 @@ function HighlightsStrip() {
       ) : null}
       {!canada && data.deals.length ? (
         <View className="gap-2">
-          <View className="flex-row items-baseline justify-between">
+          <View className="flex-row items-end justify-between">
             <H2>Latest deals</H2>
             <Pressable onPress={() => router.push("/deals")} hitSlop={6}>
               <Text className="font-body-medium text-[14px] text-ink underline">

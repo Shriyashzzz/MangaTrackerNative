@@ -266,7 +266,7 @@ export default function PriceSeriesScreen() {
 
       {!onEditions ? (
         <Animated.View entering={FadeIn.duration(220)} className="gap-3">
-          <View className="flex-row items-baseline justify-between">
+          <View className="flex-row items-end justify-between">
             <H2>Volumes</H2>
             {volumes.length ? (
               <Text className="font-mono text-[12.5px] text-muted">
