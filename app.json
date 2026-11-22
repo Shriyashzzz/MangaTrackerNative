@@ -21,7 +21,11 @@
       },
       "predictiveBackGestureEnabled": true,
       "package": "xyz.mangatracker.app.rn",
-      "googleServicesFile": "./firebase/google-services.json"
+      "googleServicesFile": "./firebase/google-services.json",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "output": "server",
@@ -70,6 +74,17 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "f249f256-28a5-43f5-a2b1-cfa8f25aceca"
+      }
+    },
+    "owner": "manga-tracker"
   }
 }
