@@ -54,55 +54,46 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
   // just leaving. Always within reach, in the bubble or beside Kenji's button
   const waysOut = (
     <>
-      <Tap onPress={() => leavePractice("/sign-up")} hitSlop={8}>
-        <Text className="font-body-semibold text-[13px] text-accent-ink">
+      <Tap onPress={() => leavePractice("/sign-up")} hitSlop={14}>
+        <Text className="font-body-semibold text-[14px] text-accent-ink">
           Start mine
         </Text>
       </Tap>
-      <Tap onPress={() => leavePractice("/")} hitSlop={8}>
-        <Text className="font-body-semibold text-[13px] text-ink-soft">
+      <Tap onPress={() => leavePractice("/")} hitSlop={14}>
+        <Text className="font-body-semibold text-[14px] text-ink-soft">
           Leave
         </Text>
       </Tap>
     </>
   );
 
+  // Aside: one big button to come back by (Kenji and "Back to the tour"),
+  // big enough to hit without aiming, and the two ways out beside it
   if (hidden)
     return (
       <View
         pointerEvents="box-none"
-        className="absolute left-3 flex-row items-center gap-2"
+        className="absolute right-3 left-3 flex-row items-center gap-2"
         style={{ bottom: foot }}
         onTouchStart={touchIsKenjis}
       >
         <Tap
           feel="none"
           onPress={tourBack}
-          accessibilityLabel="Bring Kenji back"
-          className="h-[52px] w-[52px] items-center justify-center rounded-full border-[1.5px] border-line bg-card"
+          accessibilityRole="button"
+          accessibilityLabel="Back to the tour"
+          className="min-h-[58px] flex-row items-center gap-2.5 rounded-full border-[1.5px] border-accent bg-card py-1.5 pr-5 pl-2"
           style={{ elevation: 6 }}
         >
-          <Mascot mood="happy" width={38} />
+          <Mascot mood="happy" width={44} />
+          <Text className="font-body-semibold text-[15.5px] text-ink">
+            Back to the tour
+          </Text>
         </Tap>
         <View
-          className="flex-row items-center gap-3 rounded-full border-[1.5px] border-line bg-card px-3.5 py-2"
+          className="min-h-[58px] flex-row items-center gap-4 rounded-full border-[1.5px] border-line bg-card px-4"
           style={{ elevation: 6 }}
         >
-          {/* the tour goes on from here too: Next brings him back, on
-              his next step */}
-          {at < steps.length - 1 ? (
-            <Tap
-              onPress={() => {
-                hide(false);
-                tourGo(1);
-              }}
-              hitSlop={8}
-            >
-              <Text className="font-body-semibold text-[13px] text-ink">
-                Next ›
-              </Text>
-            </Tap>
-          ) : null}
           {waysOut}
         </View>
       </View>
