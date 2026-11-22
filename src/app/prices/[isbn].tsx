@@ -60,6 +60,7 @@ const Safe = withUniwind(SafeAreaView);
 // a history kind's name: the offer labels' words for new print and ebooks
 const KIND_LABEL: Record<string, string> = {
   new: TYPE_LABEL.newPrint.label,
+  used: "Used & marketplace",
   ebook: TYPE_LABEL.ebook.label,
 };
 const AFFILIATE_NOTE =
@@ -348,30 +349,31 @@ export default function PriceVolumeScreen() {
               ) : null}
             </Text>
           ) : null}
-          {unknownBook ? (
-            <Text className="font-body text-[14px] text-ink-soft">
-              We don't know this book as a manga.
-            </Text>
-          ) : (
-            <ShelfAction
-              isbn13={book.isbn13.trim()}
-              series={seriesLabel}
-              alsoCalled={series.name}
-              title={edition ? seriesLabel : seriesTitle(book.title)}
-              volume={volume}
-              editionBook={
-                edition && volume != null
-                  ? {
-                      name: bookName(edition.label, volume),
-                      title: book.title,
-                      holds: edition.volumes,
-                    }
-                  : undefined
-              }
-            />
-          )}
         </View>
       </View>
+
+      {unknownBook ? (
+        <Text className="font-body text-[14px] text-ink-soft">
+          We don't know this book as a manga.
+        </Text>
+      ) : (
+        <ShelfAction
+          isbn13={book.isbn13.trim()}
+          series={seriesLabel}
+          alsoCalled={series.name}
+          title={edition ? seriesLabel : seriesTitle(book.title)}
+          volume={volume}
+          editionBook={
+            edition && volume != null
+              ? {
+                  name: bookName(edition.label, volume),
+                  title: book.title,
+                  holds: edition.volumes,
+                }
+              : undefined
+          }
+        />
+      )}
 
       {/* one country's prices at a time */}
       <View className="gap-3">
@@ -454,14 +456,18 @@ export default function PriceVolumeScreen() {
         ) : (
           <>
             {preorder ? (
-              <View className="gap-2">
-                <Text className="font-body text-[15px] text-ink">
-                  <Text className="font-body-semibold">Preorder</Text>: out{" "}
-                  <Text className="font-body-semibold">
-                    {releaseDay(preorder)}
+              <View className="gap-3">
+                <View className="gap-1 rounded-[14px] bg-accent-wash px-4 py-3.5">
+                  <Text className="self-start bg-accent px-1.5 pt-0.5 font-brand pr-2 text-[13px] tracking-[1px] text-on-accent uppercase">
+                    Preorder
                   </Text>
-                  . Order it now and it ships on release day.
-                </Text>
+                  <Text className="font-display text-[20px] text-ink">
+                    Out {releaseDay(preorder)}
+                  </Text>
+                  <Text className="font-body text-[14px] text-ink-soft">
+                    Order now, it ships on release day.
+                  </Text>
+                </View>
                 {preorderAt.length ? (
                   <StoreButtons links={preorderAt} lead />
                 ) : null}
@@ -516,54 +522,56 @@ export default function PriceVolumeScreen() {
       </View>
 
       {history ? (
-        <View className="gap-2 border-y border-dashed border-line-soft py-2">
+        <View className="gap-3">
           <Pressable
             onPress={() => setHistoryOpen(!historyOpen)}
+            accessibilityRole="button"
             accessibilityState={{ expanded: historyOpen }}
-            className="flex-row items-center gap-3"
+            className="flex-row items-end gap-3"
           >
-            <Text className="font-body-semibold text-[15px] text-ink">
-              Price history
-            </Text>
-            <Text className="font-mono text-[12.5px] text-muted">
+            <H2>Price history</H2>
+            <Text className="pb-1 font-mono text-[12.5px] text-muted">
               lowest {formatCents(lowestInHistory)}
             </Text>
             <View
-              className="ml-auto"
+              className="ml-auto pb-1"
               style={{
                 transform: [{ rotate: historyOpen ? "180deg" : "0deg" }],
               }}
             >
-              <ChevronDownIcon color={c.muted} width={18} height={18} />
+              <ChevronDownIcon color={c.muted} width={20} height={20} />
             </View>
           </Pressable>
           {historyOpen ? (
-            <View className="gap-3 pb-1">
+            <View className="gap-3">
               {history.kinds.map((k) => (
-                <View key={k.kind} className="gap-1">
-                  <Text className="font-mono text-[11.5px] tracking-[1px] text-muted uppercase">
+                <View
+                  key={k.kind}
+                  className="gap-3 rounded-[14px] border border-line-soft bg-card p-4"
+                >
+                  <Text
+                    className={`self-start px-1.5 pt-0.5 font-brand pr-2 text-[13px] tracking-[1px] uppercase ${k.kind === "new" ? "bg-award-new text-on-award-new" : "bg-award-market text-stamp-ink"}`}
+                  >
                     {KIND_LABEL[k.kind] ?? k.kind}
                   </Text>
                   <View className="flex-row gap-3">
-                    {[
-                      ["Lowest", k.lowCents, k.lowStore],
-                      ["Highest", k.highCents, k.highStore],
+                    {(
                       [
-                        "Median",
-                        k.medianCents,
-                        `${k.listings} price${k.listings === 1 ? "" : "s"} seen`,
-                      ],
-                    ].map(([label, cents, note]) => (
-                      <View key={String(label)} className="flex-1">
-                        <Text className="font-body text-[12px] text-muted">
+                        ["Lowest", k.lowCents, k.lowStore],
+                        ["Highest", k.highCents, k.highStore],
+                        ["Median", k.medianCents, `${k.listings} seen`],
+                      ] as const
+                    ).map(([label, cents, note]) => (
+                      <View key={label} className="flex-1 gap-0.5">
+                        <Text className="font-body text-[12.5px] text-muted">
                           {label}
                         </Text>
-                        <Text className="font-brand pr-1 text-[18px] text-ink">
-                          {formatCents(cents as number)}
+                        <Text className="font-mono-medium text-[17px] text-ink">
+                          {formatCents(cents)}
                         </Text>
                         <Text
                           numberOfLines={1}
-                          className="font-mono text-[11px] text-muted"
+                          className="font-body text-[12px] text-ink-soft"
                         >
                           {note}
                         </Text>
@@ -573,8 +581,7 @@ export default function PriceVolumeScreen() {
                 </View>
               ))}
               <Text className="font-body text-[12.5px] text-muted">
-                Every in-stock price at the stores we check, across{" "}
-                {history.checks} check{history.checks === 1 ? "" : "s"},{" "}
+                Across {history.checks} check{history.checks === 1 ? "" : "s"},{" "}
                 {shortDate(history.since)}
                 {history.checks > 1 ? ` to ${shortDate(history.lastSeen)}` : ""}
               </Text>

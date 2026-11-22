@@ -79,8 +79,9 @@ export default function ToReadButton({
     }
   };
   return (
-    <View className="flex-row flex-wrap items-center gap-3">
+    <View className="gap-2">
       <Button
+        wide
         label={saving ? "Adding…" : "+ Add to my to-read"}
         small
         disabled={saving || !shelf}

@@ -500,7 +500,6 @@ export default function DetailsScreen() {
 
         {/* a rule above each section, as the Android app divides them */}
         <View className="gap-3 border-t border-line-soft pt-6">
-          <SectionTitle>Reading</SectionTitle>
           <ReadingPlace
             manga={m}
             finished={finished}
@@ -529,7 +528,6 @@ export default function DetailsScreen() {
         </View>
 
         <View className="gap-4 border-t border-line-soft pt-6">
-          <SectionTitle>Your take</SectionTitle>
           <RatingField
             key={`rating-${m.id}`}
             mangaId={m.id}

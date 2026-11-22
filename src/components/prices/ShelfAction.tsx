@@ -2,6 +2,8 @@
 // pages/Prices/ShelfAction.tsx): On your shelf with "I own Vol. 7" (and its
 // Undo), or for a series not on the shelf yet, Add to my to-read and "I own
 // Vol. 7" through the add form, and the To buy button
+import PressScale from "@/components/PressScale";
+import { look } from "@/lib/platformLook";
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, Text, View } from "react-native";
@@ -44,26 +46,22 @@ export function ToBuyButton({ isbn13 }: { isbn13: string }) {
     }
   };
   return (
-    <View className="flex-row flex-wrap items-center gap-3">
-      <Pressable
+    <View className="flex-1 gap-1">
+      <PressScale
         onPress={() => void toggle()}
         disabled={saving || !list}
+        accessibilityRole="button"
         accessibilityState={{ selected: onList }}
-        className={`rounded-[3px] border-[1.5px] px-3 py-2 ${onList ? "border-award-new bg-card" : "border-line bg-award-new"} ${saving ? "opacity-60" : ""}`}
+        style={{ opacity: saving ? 0.6 : 1 }}
+        className={`min-h-[36px] items-center justify-center overflow-hidden px-3.5 py-2 ${look.buttonRadius} ${onList ? "border border-award-new bg-award-new/15" : "bg-award-new"}`}
       >
         <Text
-          className={`font-body-semibold text-[14px] ${onList ? "text-ink" : "text-stamp-ink"}`}
+          numberOfLines={1}
+          className={`font-body-semibold text-[14px] ${onList ? "text-award-new" : "text-on-award-new"}`}
         >
-          {onList ? "On your To buy list" : "+ To buy"}
+          {onList ? "On To buy" : "+ To buy"}
         </Text>
-      </Pressable>
-      {onList ? (
-        <Pressable onPress={() => router.push("/to-buy")} hitSlop={6}>
-          <Text className="font-body-medium text-[14px] text-ink underline">
-            See the list
-          </Text>
-        </Pressable>
-      ) : null}
+      </PressScale>
       {error ? (
         <Text className="font-body text-[13px] text-accent">{error}</Text>
       ) : null}
@@ -119,9 +117,10 @@ export default function ShelfAction({
     return (
       <View className="gap-2">
         <ToReadButton name={title} cover={null} />
-        <View className="flex-row flex-wrap items-center gap-3">
+        <View className="flex-row gap-2.5">
           {volume != null && !editionBook ? (
             <Button
+              grow
               label={`I own Vol. ${volume}`}
               small
               onPress={() => router.push({ pathname: "/add", params })}
@@ -129,6 +128,7 @@ export default function ShelfAction({
           ) : null}
           {editionBook?.holds?.length ? (
             <Button
+              grow
               label={`I own ${editionBook.name}`}
               small
               onPress={() =>
@@ -195,9 +195,10 @@ export default function ShelfAction({
           On your shelf
         </Text>
       </Pressable>
-      <View className="flex-row flex-wrap items-center gap-3">
+      <View className="flex-row gap-2.5">
         {holds?.length && thing && !ownsThis ? (
           <Button
+            grow
             label={saving ? "Saving…" : `I own ${thing}`}
             kind="primary"
             small
@@ -213,6 +214,7 @@ export default function ShelfAction({
           />
         ) : (
           <Button
+            grow
             label={ownsThis && thing ? `You own ${thing}` : "On your shelf"}
             small
             onPress={openSeries}

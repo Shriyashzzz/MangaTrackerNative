@@ -23,6 +23,8 @@ export default function Button({
   wide = false,
   // in a centred empty state, under its words
   center = false,
+  // shares its row equally with the buttons beside it
+  grow = false,
   disabled = false,
 }: {
   label: string;
@@ -31,6 +33,7 @@ export default function Button({
   small?: boolean;
   wide?: boolean;
   center?: boolean;
+  grow?: boolean;
   disabled?: boolean;
 }) {
   const look = KINDS[kind];
@@ -41,12 +44,14 @@ export default function Button({
       accessibilityRole="button"
       accessibilityState={{ disabled }}
       style={{
-        alignSelf: wide ? "stretch" : center ? "center" : "flex-start",
+        alignSelf: wide || grow ? "stretch" : center ? "center" : "flex-start",
+        ...(grow ? { flex: 1 } : {}),
         opacity: disabled ? 0.45 : 1,
       }}
       className={`items-center justify-center overflow-hidden ${platform.buttonRadius} ${look.box} ${small ? "min-h-[36px] px-3.5 py-2" : "min-h-[48px] px-5 py-3"}`}
     >
       <Text
+        numberOfLines={1}
         className={`font-body-semibold ${small ? "text-[14px]" : "text-[16px]"} ${look.text}`}
       >
         {label}
