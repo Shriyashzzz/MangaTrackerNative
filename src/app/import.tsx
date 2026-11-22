@@ -1,6 +1,7 @@
 // Import your list, as the web's pages/Import/Import.tsx: where it comes
 // from (MyAnimeList's export file, an AniList or Kitsu username, or a book
 // app's files), what was found, which lists to add, then adding them
+import ListRows from "@/components/import/ListRows";
 import { openOutside } from "@/lib/openOutside";
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
@@ -208,6 +209,16 @@ export default function ImportScreen() {
                       </CheckRow>
                     ))}
                   </View>
+
+                  {/* every series, to check before it goes in */}
+                  <ListRows
+                    items={items}
+                    unticked={unticked}
+                    left={list.left}
+                    disabled={importing}
+                    onToggleOne={list.toggleOne}
+                    onRename={list.rename}
+                  />
 
                   <Note>
                     Anything already on your shelf gets skipped. Volumes you've

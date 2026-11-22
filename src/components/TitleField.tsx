@@ -26,6 +26,7 @@ export default function TitleField({
   status,
   onPick,
   onTyped,
+  focusFirst = true,
 }: {
   value: string;
   error?: string;
@@ -35,6 +36,9 @@ export default function TitleField({
   status: SearchStatus;
   onPick: (hit: CoverHit) => void;
   onTyped: () => void;
+  // false where the name is filled in already and the matches should show
+  // without the keyboard over them (an import's Edit)
+  focusFirst?: boolean;
 }) {
   const c = useColors();
   const typed = value.trim();
@@ -53,7 +57,7 @@ export default function TitleField({
           placeholderTextColor={c.muted}
           maxLength={150}
           autoCorrect={false}
-          autoFocus
+          autoFocus={focusFirst}
           returnKeyType="next"
           className="min-h-[46px] flex-1 font-body text-[16px] text-ink"
         />
