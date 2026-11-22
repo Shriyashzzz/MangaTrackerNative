@@ -19,7 +19,7 @@ function Panel({
 }) {
   return (
     <View className="min-w-[46%] flex-1 overflow-hidden rounded-[4px] border-[1.5px] border-line bg-card">
-      <View className="h-[66px] justify-end bg-paper-2 px-2.5 pb-2">
+      <View className="h-[72px] items-center justify-end bg-paper-2 px-2.5 pb-2">
         {children}
       </View>
       <Text
@@ -28,7 +28,7 @@ function Panel({
       >
         {shout}
       </Text>
-      <Text className="border-t-[1.5px] border-line px-2 py-1.5 font-body-medium text-[13px] text-ink">
+      <Text className="border-t-[1.5px] border-line px-2 py-1.5 text-center font-body-medium text-[13px] text-ink">
         {caption}
       </Text>
     </View>
