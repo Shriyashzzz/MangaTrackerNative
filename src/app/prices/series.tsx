@@ -5,6 +5,7 @@
 // card with its price, Yours and Next, Not on your shelf to see only the
 // gaps with what they cost. The rules are the web's (core seriesPageRules,
 // finishCost, useSeriesData)
+import { todayOf } from "@/core/lib/editionNews";
 import ToBuyBag from "@/components/ToBuyBag";
 import Tap from "@/components/Tap";
 import PullPage, { pause, usePullTop } from "@/components/PullRefresh";
@@ -180,6 +181,15 @@ export default function PriceSeriesScreen() {
 
   const data = series.data;
   const { info, volumes, incomplete } = data;
+  // Nothing more is coming: the series has ended, every volume it had is
+  // listed in English, and none of those is still to be released. Only
+  // then is a "next volume" not promised (TrackPitch)
+  const today = todayOf();
+  const everyVolumeOut =
+    info?.status === "FINISHED" &&
+    info.volumes != null &&
+    volumes.length >= info.volumes &&
+    volumes.every((v) => !v.published || v.published <= today);
   const unlisted = unlistedNumbers(volumes);
   const editionLines = editions.name === name ? editions.lines : [];
   const boxSets = scannedSets ?? data.boxSets ?? [];
@@ -288,7 +298,9 @@ export default function PriceSeriesScreen() {
 
         {/* no account: the ticket runs the page's full width, so nothing is
           left empty under the cover */}
-        {!isSignedIn ? <TrackPitch name={named.title} /> : null}
+        {!isSignedIn ? (
+          <TrackPitch name={named.title} finished={everyVolumeOut} />
+        ) : null}
 
         <SetsBox
           key={data.slug}

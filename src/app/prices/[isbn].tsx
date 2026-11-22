@@ -391,6 +391,9 @@ export default function PriceVolumeScreen() {
         ) : (
           <ShelfAction
             isbn13={book.isbn13.trim()}
+            // this page can't tell whether every English volume is out, so
+            // a series that has ended is never promised a next one
+            finished={series.info?.status === "FINISHED"}
             series={seriesLabel}
             alsoCalled={series.name}
             title={edition ? seriesLabel : seriesTitle(book.title)}

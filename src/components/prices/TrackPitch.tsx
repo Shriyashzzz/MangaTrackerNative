@@ -13,9 +13,35 @@ function shortName(name: string) {
   return words.length > 2 ? `${words.slice(0, 2).join(" ")}..` : name.trim();
 }
 
-export default function TrackPitch({ name }: { name: string }) {
+// Two things to offer, and only the true one is said. A series with more
+// to come: a nudge when its next volume is out. One with every volume out
+// (`finished`): there's no next volume to promise, so it's the shelf itself
+const PITCH = {
+  coming: {
+    label: "Next volume",
+    question: (name: string) =>
+      `Want a nudge when the next volume for ${name} comes out?`,
+    how: "Phone alert, New tab, weekly email",
+  },
+  finished: {
+    label: "Your shelf",
+    question: (name: string) =>
+      `Collecting ${name}? Keep track of the volumes you own.`,
+    how: "What's left to get, price alerts, your place",
+  },
+};
+
+export default function TrackPitch({
+  name,
+  finished = false,
+}: {
+  name: string;
+  // nothing more is coming: every volume is out
+  finished?: boolean;
+}) {
   const ripple = useRipple();
-  const question = `Want a nudge when the next volume for ${shortName(name)} comes out?`;
+  const pitch = PITCH[finished ? "finished" : "coming"];
+  const question = pitch.question(shortName(name));
   return (
     <View className="gap-2">
       {/* a solid card under the tinted stub, so the page's background
@@ -29,13 +55,13 @@ export default function TrackPitch({ name }: { name: string }) {
       >
         <View className="min-w-0 flex-1 gap-1 px-3 py-2.5">
           <Text className="font-mono-medium text-[11.5px] tracking-[1.5px] text-accent-ink uppercase">
-            Next volume
+            {pitch.label}
           </Text>
           <Text className="font-body-semibold text-[15.5px] leading-[21px] text-ink">
             {question}
           </Text>
           <Text className="font-body text-[13px] text-ink-soft">
-            Phone alert, New tab, weekly email
+            {pitch.how}
           </Text>
         </View>
         <View className="w-[84px] items-center justify-center border-l-[1.5px] border-dashed border-accent bg-accent-wash">
@@ -48,7 +74,8 @@ export default function TrackPitch({ name }: { name: string }) {
           </Text>
         </View>
       </Tap>
-      <Text className="font-body text-[13px] text-ink-soft">
+      {/* in line with the ticket's own words, not the ticket's edge */}
+      <Text className="px-3 font-body text-[13px] text-ink-soft">
         <Text
           onPress={() => router.push("/sign-in")}
           className="font-body-semibold text-ink"

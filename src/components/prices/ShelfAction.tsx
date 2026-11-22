@@ -78,6 +78,7 @@ export default function ShelfAction({
   volume,
   editionBook,
   alsoCalled,
+  finished = false,
 }: {
   isbn13: string;
   series: string;
@@ -85,6 +86,9 @@ export default function ShelfAction({
   volume: number | null;
   editionBook?: { name: string; title: string; holds: number[] | null };
   alsoCalled?: string;
+  // the series has ended: someone not signed in is offered the shelf, not
+  // a nudge for a next volume that may never come (TrackPitch)
+  finished?: boolean;
 }) {
   const [match, setMatch] = useState<{
     series: string | null;
@@ -110,7 +114,8 @@ export default function ShelfAction({
     return () => controller.abort();
   }, [isSignedIn, series, alsoCalled, shelfSize]);
   useEffect(() => () => clearTimeout(undoTimer.current), []);
-  if (!isSignedIn) return <TrackPitch name={novelParts(series).title} />;
+  if (!isSignedIn)
+    return <TrackPitch name={novelParts(series).title} finished={finished} />;
   if (match.series !== series) return <View className="h-[40px]" />;
 
   const manga = match.manga;
