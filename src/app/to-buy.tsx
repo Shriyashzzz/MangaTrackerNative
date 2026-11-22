@@ -245,6 +245,8 @@ function Card({
   const c = useColors();
   const [menuOpen, setMenuOpen] = useState(false);
   const coverUrl = item.coverUrl ?? item.seriesCoverUrl;
+  const lightNovel =
+    novelParts(item.title).lightNovel || novelParts(item.series).lightNovel;
   const [coverFailed, setCoverFailed] = useState(false);
   const coverBox = {
     width: COVER_WIDTH,
@@ -323,6 +325,23 @@ function Card({
                   .filter((part) => part != null && part !== "")
                   .join(" ")}
                 {"\u00A0"}
+              </Text>
+            </View>
+          ) : null}
+          {/* a light novel says so across the foot of its cover, over
+              the picture: its name is shown without the words */}
+          {lightNovel ? (
+            <View
+              className="absolute inset-x-0 bottom-0 items-center bg-ink px-1 py-[2px]"
+              style={{ zIndex: 1 }}
+            >
+              <Text
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.7}
+                className="font-mono-medium text-[8.5px] tracking-[0.5px] text-paper uppercase"
+              >
+                Light novel
               </Text>
             </View>
           ) : null}
