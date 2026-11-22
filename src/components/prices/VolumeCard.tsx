@@ -3,6 +3,7 @@
 // drawn big, "Yours" or "Next", readers' stars, the Vol. tab, the name, a
 // line under it, and its price (with what it was, on a deal). A book of
 // several volumes fans the covers behind it
+import LightNovelBand from "@/components/LightNovelBand";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import PressScale from "../PressScale";
@@ -81,8 +82,12 @@ export default function VolumeCard({
   width = 130,
   bare = false,
   pile = "fan",
+  lightNovel = false,
 }: {
   isbn13: string | null;
+  // a light novel's volume, when the page knows it and the title doesn't
+  // say ("Vol. 3" on a novel series' page): the band goes on its cover
+  lightNovel?: boolean;
   title: string;
   volume?: number | null;
   coverUrl?: string | null;
@@ -185,6 +190,9 @@ export default function VolumeCard({
               style={{ width: "100%", height: "100%" }}
               contentFit="cover"
             />
+          ) : null}
+          {lightNovel || shown.lightNovel ? (
+            <LightNovelBand width={width} />
           ) : null}
           {holds || volume != null ? (
             <View className="absolute top-0 left-0 flex-row items-baseline gap-0.5 bg-ink px-1.5 pb-0.5">

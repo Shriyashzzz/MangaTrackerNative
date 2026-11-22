@@ -249,6 +249,7 @@ export default function PriceSeriesScreen() {
                 <View className="self-start">
                   <SeriesCover
                     name={named.title}
+                    lightNovel={named.lightNovel}
                     url={volumes[0]?.coverUrl ?? info?.coverUrl}
                     width={94}
                     border={2}
@@ -385,6 +386,7 @@ export default function PriceSeriesScreen() {
                     if (card.length === 1)
                       return (
                         <VolumeCard
+                          lightNovel={named.lightNovel}
                           key={first.volume}
                           plainStandIn
                           {...first}
@@ -400,6 +402,7 @@ export default function PriceSeriesScreen() {
                     const last = card[card.length - 1]!;
                     return (
                       <VolumeCard
+                        lightNovel={named.lightNovel}
                         key={first.volume}
                         plainStandIn
                         {...first}

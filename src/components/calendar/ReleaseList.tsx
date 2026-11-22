@@ -1,13 +1,14 @@
 // Upcoming volumes, one a row (the web's components/calendar/ReleaseList.tsx):
 // the day, the cover (the series' with the volume's on top), the name, and
 // Preorder for one not on the shelf yet; each saves to a calendar
+import LightNovelBand from "@/components/LightNovelBand";
 import Tap from "@/components/Tap";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Text, View } from "react-native";
 import { dayName, type CalendarVolume } from "@/core/lib/collector";
-import { coverSrc } from "@/core/lib/prices";
+import { coverSrc, novelParts } from "@/core/lib/prices";
 import { useColors } from "@/lib/colors";
 import AddToCalendar from "./AddToCalendar";
 
@@ -44,6 +45,10 @@ export function VolumeCover({
           style={{ width: "100%", height: "100%" }}
           contentFit="cover"
         />
+      ) : null}
+      {novelParts(volume.title).lightNovel ||
+      novelParts(volume.name).lightNovel ? (
+        <LightNovelBand width={w} />
       ) : null}
     </View>
   );

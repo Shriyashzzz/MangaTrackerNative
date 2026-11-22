@@ -4,6 +4,7 @@
 // Canada's), the box-set note, more places to look, the price history,
 // about the series, readers' reviews, and the volumes beside it. Every rule
 // is the web's (core volumePageRules, offerLabels, useVolumeLoad)
+import LightNovelBand from "@/components/LightNovelBand";
 import ToBuyBag from "@/components/ToBuyBag";
 import Tap from "@/components/Tap";
 import PullPage, { pause, usePullTop } from "@/components/PullRefresh";
@@ -292,6 +293,7 @@ export default function PriceVolumeScreen() {
                   contentFit="cover"
                 />
               ) : null}
+              {shownBook.lightNovel ? <LightNovelBand width={102} /> : null}
             </Tap>
           </View>
           <View className="min-w-0 flex-1 gap-1.5">
@@ -662,6 +664,7 @@ export default function PriceVolumeScreen() {
               {nearby.map((v) => (
                 <VolumeCard
                   key={v.isbn13}
+                  lightNovel={shownBook.lightNovel}
                   {...v}
                   title={
                     v.inBook ? `Book ${v.inBook.book}` : `Vol. ${v.volume}`

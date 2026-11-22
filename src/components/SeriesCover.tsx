@@ -8,9 +8,10 @@ import { Image } from "expo-image";
 import { useState } from "react";
 import { PixelRatio, View } from "react-native";
 import { coverChoices } from "@/core/lib/coverSizes";
-import { coverSrc, priceName } from "@/core/lib/prices";
+import { coverSrc, novelParts, priceName } from "@/core/lib/prices";
 import { useColors } from "@/lib/colors";
 import DrawnCover from "./DrawnCover";
+import LightNovelBand from "./LightNovelBand";
 
 type Props = {
   name: string;
@@ -44,19 +45,24 @@ export default function SeriesCover({
     backgroundColor: c.paper,
     overflow: "hidden" as const,
   };
-  if (!src || failed === src)
-    return (
-      <View style={box}>
-        <DrawnCover title={name} width={width - border * 2} />
-      </View>
-    );
+  // a light novel says so on its cover: told by the caller, or by a name
+  // that says it ("Spice and Wolf Light Novel")
+  const novel = lightNovel || novelParts(name).lightNovel;
+  const drawn = !src || failed === src;
   return (
-    <Image
-      source={{ uri: src }}
-      style={box}
-      contentFit="cover"
-      transition={180}
-      onError={() => setFailed(src)}
-    />
+    <View style={box}>
+      {drawn ? (
+        <DrawnCover title={name} width={width - border * 2} />
+      ) : (
+        <Image
+          source={{ uri: src }}
+          style={{ width: "100%", height: "100%" }}
+          contentFit="cover"
+          transition={180}
+          onError={() => setFailed(src)}
+        />
+      )}
+      {novel ? <LightNovelBand width={width} /> : null}
+    </View>
   );
 }

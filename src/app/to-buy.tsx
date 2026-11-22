@@ -19,6 +19,7 @@ import AddSeriesModal from "@/components/AddSeriesModal";
 import Button from "@/components/Button";
 import DoubleRule from "@/components/DoubleRule";
 import DrawnCover from "@/components/DrawnCover";
+import LightNovelBand from "@/components/LightNovelBand";
 import Mascot from "@/components/Mascot";
 import MenuSheet, { type MenuItem } from "@/components/MenuSheet";
 import PickSheet from "@/components/PickSheet";
@@ -330,21 +331,7 @@ function Card({
           ) : null}
           {/* a light novel says so across the foot of its cover, over
               the picture: its name is shown without the words */}
-          {lightNovel ? (
-            <View
-              className="absolute inset-x-0 bottom-0 items-center bg-ink px-1 py-[2px]"
-              style={{ zIndex: 1 }}
-            >
-              <Text
-                numberOfLines={1}
-                adjustsFontSizeToFit
-                minimumFontScale={0.7}
-                className="font-mono-medium text-[8.5px] tracking-[0.5px] text-paper uppercase"
-              >
-                Light novel
-              </Text>
-            </View>
-          ) : null}
+          {lightNovel ? <LightNovelBand width={COVER_WIDTH} /> : null}
         </Tap>
         <View className="min-w-0 flex-1 gap-1.5">
           <View className="flex-row items-start gap-2">
