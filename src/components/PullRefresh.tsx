@@ -42,7 +42,7 @@ const BURST = Array.from({ length: 28 }, (_, i) => {
   return `${(50 + r * Math.cos(a)).toFixed(1)},${(50 + r * Math.sin(a)).toFixed(1)}`;
 }).join(" ");
 
-function Indicator({ look }: { look: Look }) {
+function Indicator({ look, top }: { look: Look; top: number }) {
   const c = useColors();
   const turn = useSharedValue(0);
   useEffect(() => {
@@ -75,7 +75,8 @@ function Indicator({ look }: { look: Look }) {
       pointerEvents="none"
       accessibilityRole="progressbar"
       accessibilityLabel="Refreshing"
-      className="absolute inset-x-0 top-0 z-10 items-center"
+      style={{ top }}
+      className="absolute inset-x-0 z-10 items-center"
     >
       {look === "kenji" ? (
         <Animated.View style={[{ alignItems: "center" }, moving]}>
@@ -105,7 +106,8 @@ function Indicator({ look }: { look: Look }) {
 
 // refresh: what the pull asks for again. Gives the list its refresh control
 // and the indicator to draw over the list's top
-export function useKenjiRefresh(refresh: () => Promise<unknown>) {
+// top: where the list starts, so he drops in from under the header
+export function useKenjiRefresh(refresh: () => Promise<unknown>, top = 0) {
   const [busy, setBusy] = useState(false);
   const [look, setLook] = useState<Look>("kenji");
   const onRefresh = useCallback(async () => {
@@ -127,6 +129,6 @@ export function useKenjiRefresh(refresh: () => Promise<unknown>) {
         tintColor="transparent"
       />
     ),
-    indicator: busy ? <Indicator look={look} /> : null,
+    indicator: busy ? <Indicator look={look} top={top} /> : null,
   };
 }

@@ -144,7 +144,9 @@ export default function ShelfScreen() {
     await load();
     setRefreshing(false);
   };
-  const pull = useKenjiRefresh(load);
+  // where the list begins, under the header and the shelf's bar
+  const [listTop, setListTop] = useState(0);
+  const pull = useKenjiRefresh(load, listTop);
   // the + button: 0 in place, 1 slid away under the tab bar
   const fabAway = useSharedValue(0);
   const fabHidden = useRef(false);
@@ -235,7 +237,10 @@ export default function ShelfScreen() {
           </Pressable>
         ) : null}
       </View>
-      <View className="mx-4 h-px bg-line" />
+      <View
+        className="mx-4 h-px bg-line"
+        onLayout={(e) => setListTop(e.nativeEvent.layout.y + 1)}
+      />
       {failed && !manga ? (
         <Text className="px-4 pt-6 font-body text-[15px] text-ink-soft">
           {failed}
