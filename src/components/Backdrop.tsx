@@ -45,12 +45,7 @@ function isDark(hex: string) {
   );
 }
 
-export default function Backdrop({
-  soft = false,
-}: {
-  // behind a list read line by line (the shelf): fainter, so it stays back
-  soft?: boolean;
-}) {
+export default function Backdrop() {
   const c = useColors();
   const { width, height } = useWindowDimensions();
   const picked = usePrefs((s) => s.prefs.background ?? DEFAULT_BACKGROUND);
@@ -223,7 +218,9 @@ export default function Backdrop({
         right: 0,
         bottom: 0,
         left: 0,
-        opacity: soft ? 0.45 : 1,
+        // the lettering sits behind words on most pages: drawn faint, so it
+        // stays in the background. The other drawings are faint already
+        opacity: picked === "sfx" ? 0.5 : 1,
       }}
     >
       {drawing}

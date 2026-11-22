@@ -220,7 +220,7 @@ export default function ToBuyScreen() {
 
   return (
     <Safe edges={["top"]} className="flex-1 bg-paper">
-      <Backdrop soft />
+      <Backdrop />
       <View className="h-[62px] flex-row items-center gap-3 px-2">
         <Pressable
           onPress={() => router.back()}
