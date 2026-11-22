@@ -8,10 +8,17 @@ const production =
   process.env.EAS_BUILD_PROFILE === "production" ||
   process.env.APP_ENV === "production";
 
+const PLAY_PACKAGE = "xyz.mangatracker.app";
+
 module.exports = ({ config }) => ({
   ...config,
   android: {
     ...config.android,
+    // On Play the app is the same listing the Chrome app had, so a
+    // production build carries its package name (and Play's version codes
+    // go on from there: app.json android.versionCode). A development build
+    // keeps its own name, so it installs beside the one from Play
+    package: production ? PLAY_PACKAGE : config.android.package,
     // the session cookie stays out of Android's cloud backups
     allowBackup: false,
   },
