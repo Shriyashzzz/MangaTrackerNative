@@ -21,6 +21,7 @@ import {
 import Button from "../Button";
 import ReviewForm from "../ReviewForm";
 import StarRating from "../StarRating";
+import { H2 } from "@/components/Page";
 
 const FIRST = 5;
 const STEP = 10;
@@ -192,9 +193,7 @@ export default function VolumeReviews({
   return (
     <View className="gap-3">
       <View className="flex-row items-baseline justify-between">
-        <Text className="font-brand pr-1 text-[22px] tracking-[1px] text-ink uppercase">
-          What readers say
-        </Text>
+        <H2>What readers say</H2>
         {data.count > 0 && !yours && !writing ? (
           <Button
             label="Write a review"

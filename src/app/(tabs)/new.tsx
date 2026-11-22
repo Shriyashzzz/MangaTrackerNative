@@ -60,6 +60,7 @@ import { readLocal, writeLocal } from "@/lib/deviceStore";
 import { useHideActions } from "@/lib/useHideActions";
 import { usePrefs } from "@/store/prefs";
 import { useShelf } from "@/store/shelf";
+import { H2 } from "@/components/Page";
 
 const Safe = withUniwind(SafeAreaView);
 
@@ -472,12 +473,12 @@ export default function NewScreen() {
           ).map((p) => (
             <View key={p} className="gap-2 border-t border-line pt-3">
               <View className="flex-row items-baseline justify-between">
-                <Text className="font-brand pr-1 text-[22px] tracking-[1px] text-ink uppercase">
+                <H2>
                   {PILE_TEXT[kind][p].name}{" "}
                   <Text className="font-mono text-[14px] text-muted">
                     {piles[p].length}
                   </Text>
-                </Text>
+                </H2>
                 <Pressable
                   onPress={() => setOpenPile(openPile === p ? null : p)}
                   hitSlop={8}

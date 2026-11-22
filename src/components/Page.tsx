@@ -78,10 +78,14 @@ export default function Page({
   );
 }
 
+// a section's title: the lettering with a short accent rule under it
 export const H2 = ({ children }: { children: ReactNode }) => (
-  <Text className="font-brand pr-1 text-[22px] tracking-[1px] text-ink uppercase">
-    {children}
-  </Text>
+  <View className="gap-1 self-start">
+    <Text className="font-brand pr-1 text-[22px] tracking-[1px] text-ink uppercase">
+      {children}
+    </Text>
+    <View className="h-[3px] w-9 bg-accent" />
+  </View>
 );
 export const H3 = ({ children }: { children: ReactNode }) => (
   <Text className="font-body-semibold text-[16px] text-ink">{children}</Text>

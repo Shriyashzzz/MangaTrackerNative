@@ -16,6 +16,7 @@ import { runTotal, seriesCost, type SeriesCost } from "@/core/lib/finishCost";
 import { formatCents, wholeMoney } from "@/core/lib/prices";
 import EditionFinder from "./EditionFinder";
 import VolumeCard from "./VolumeCard";
+import { H2 } from "@/components/Page";
 
 // four books a row, as the volumes beside them
 const COLUMNS = 4;
@@ -81,9 +82,7 @@ export default function OtherEditions({
   return (
     <View className="gap-3">
       <View className="flex-row flex-wrap items-baseline justify-between gap-x-3">
-        <Text className="font-brand pr-1 text-[22px] tracking-[1px] text-ink uppercase">
-          Other editions
-        </Text>
+        <H2>Other editions</H2>
         <Text numberOfLines={1} className="font-body text-[13px] text-muted">
           {line.books.length} {line.label} books hold vols.{" "}
           {Math.min(...inside)}–{Math.max(...inside)}

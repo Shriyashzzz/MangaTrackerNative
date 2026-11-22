@@ -52,9 +52,11 @@ export default function TabsLayout() {
           md="notifications"
         />
         <NativeTabs.Trigger.Label>New</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Badge hidden={newCount === 0}>
-          {String(newCount)}
-        </NativeTabs.Trigger.Badge>
+        {newCount > 0 ? (
+          <NativeTabs.Trigger.Badge>
+            {String(newCount)}
+          </NativeTabs.Trigger.Badge>
+        ) : null}
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="prices">
         <NativeTabs.Trigger.Icon

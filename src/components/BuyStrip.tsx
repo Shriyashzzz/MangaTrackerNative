@@ -26,6 +26,7 @@ import { useColors } from "@/lib/colors";
 import { openWebPath } from "@/lib/webRoutes";
 import GotIt from "./GotIt";
 import PickSheet from "./PickSheet";
+import { H2 } from "@/components/Page";
 
 type Props = {
   options: BuyOptions;
@@ -334,9 +335,7 @@ export default function BuyStrip({
         accessibilityState={{ expanded: open }}
         className="min-h-[44px] flex-row items-center gap-3"
       >
-        <Text className="font-brand pr-1 text-[22px] tracking-[1px] text-ink uppercase">
-          {title}
-        </Text>
+        <H2>{title}</H2>
         {!open ? (
           <Text
             numberOfLines={1}

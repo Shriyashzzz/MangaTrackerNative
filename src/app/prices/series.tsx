@@ -60,6 +60,7 @@ import {
 } from "@/core/pages/Prices/useSeriesData";
 import { useColors } from "@/lib/colors";
 import { usePrefs } from "@/store/prefs";
+import { H2 } from "@/components/Page";
 
 const Safe = withUniwind(SafeAreaView);
 // the volume grid: four covers a row, as the Android app lays them
@@ -266,9 +267,7 @@ export default function PriceSeriesScreen() {
       {!onEditions ? (
         <Animated.View entering={FadeIn.duration(220)} className="gap-3">
           <View className="flex-row items-baseline justify-between">
-            <Text className="font-brand pr-1 text-[22px] tracking-[1px] text-ink uppercase">
-              Volumes
-            </Text>
+            <H2>Volumes</H2>
             {volumes.length ? (
               <Text className="font-mono text-[12.5px] text-muted">
                 {volumes.length} {volumes.length === 1 ? "volume" : "volumes"}{" "}

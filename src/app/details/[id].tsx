@@ -61,6 +61,7 @@ import { useColors } from "@/lib/colors";
 import { useSeriesShelf } from "@/lib/useSeriesShelf";
 import { usePrefs } from "@/store/prefs";
 import { restoredAs, useShelf } from "@/store/shelf";
+import { H2 } from "@/components/Page";
 
 const Safe = withUniwind(SafeAreaView);
 
@@ -69,11 +70,7 @@ const DIDNT_SAVE = "That didn't save. Try again.";
 const TITLE_GONE_AT = 110;
 
 function SectionTitle({ children }: { children: string }) {
-  return (
-    <Text className="font-brand pr-1 text-[22px] tracking-[1px] text-ink uppercase">
-      {children}
-    </Text>
-  );
+  return <H2>{children}</H2>;
 }
 
 export default function DetailsScreen() {

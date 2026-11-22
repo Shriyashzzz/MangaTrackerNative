@@ -5,7 +5,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Text, View } from "react-native";
 import Button from "@/components/Button";
-import { TextLink } from "@/components/Page";
+import { H2, TextLink } from "@/components/Page";
 import {
   editOf,
   mergeSameSeries,
@@ -237,9 +237,7 @@ export default function BookImport({ source }: { source: BookSource }) {
 
       {found ? (
         <View className="gap-4 border-t-2 border-line pt-5">
-          <Text className="font-brand pr-1 text-[22px] tracking-[1px] text-ink uppercase">
-            {foundLine(rows!)}
-          </Text>
+          <H2>{foundLine(rows!)}</H2>
           <FilesInImport names={fileNames} />
 
           {lookingUp ? (

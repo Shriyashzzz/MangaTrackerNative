@@ -54,6 +54,7 @@ import {
 } from "@/core/pages/Prices/volumePageRules";
 import { useColors } from "@/lib/colors";
 import { usePrefs } from "@/store/prefs";
+import { H2 } from "@/components/Page";
 
 const Safe = withUniwind(SafeAreaView);
 // a history kind's name: the offer labels' words for new print and ebooks
@@ -73,11 +74,6 @@ const WHY_NONE_CA: Record<string, string> = {
   error: "Canadian prices aren't available right now. Try the stores below.",
 };
 
-const H2 = ({ children }: { children: string }) => (
-  <Text className="font-brand pr-1 text-[22px] tracking-[1px] text-ink uppercase">
-    {children}
-  </Text>
-);
 export default function PriceVolumeScreen() {
   const { isbn } = useLocalSearchParams<{ isbn: string }>();
   const c = useColors();

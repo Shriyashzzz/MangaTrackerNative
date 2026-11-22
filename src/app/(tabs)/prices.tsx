@@ -28,6 +28,7 @@ import type { Highlights, SeriesHit } from "@/core/lib/types";
 import { starsOf } from "@/core/pages/Prices/reviews/reviewText";
 import { useColors } from "@/lib/colors";
 import { usePrefs } from "@/store/prefs";
+import { H2 } from "@/components/Page";
 
 const Safe = withUniwind(SafeAreaView);
 
@@ -35,12 +36,6 @@ const Safe = withUniwind(SafeAreaView);
 const TRY = ["One Piece", "Frieren", "Berserk", "Dandadan", "Bleach", "Naruto"];
 const SHOWN = 5;
 const DEBOUNCE_MS = 250;
-
-const H2 = ({ children }: { children: string }) => (
-  <Text className="font-brand pr-1 text-[22px] tracking-[1px] text-ink uppercase">
-    {children}
-  </Text>
-);
 
 function HighlightsStrip() {
   const [data, setData] = useState<Highlights | null>(null);

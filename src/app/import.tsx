@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Linking, Pressable, Text, View } from "react-native";
 import Button from "@/components/Button";
 import { Field, Input } from "@/components/Field";
-import Page from "@/components/Page";
+import Page, { H2 } from "@/components/Page";
 import BookImport from "@/components/import/BookImport";
 import CheckRow from "@/components/import/CheckRow";
 import ImportDone from "@/components/import/ImportDone";
@@ -175,9 +175,7 @@ export default function ImportScreen() {
               {items ? (
                 <View className="gap-4 border-t-2 border-line pt-5">
                   <View>
-                    <Text className="font-brand pr-1 text-[22px] tracking-[1px] text-ink uppercase">
-                      {series(items.length)} found
-                    </Text>
+                    <H2>{series(items.length)} found</H2>
                     {list.fileName ? (
                       <Text className="font-mono text-[13px] text-ink-soft">
                         from {list.fileName}
