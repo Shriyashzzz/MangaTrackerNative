@@ -530,7 +530,7 @@ function SeriesSheet({
       {topPick ? <TopPick m={m} {...topPick} /> : <AddToShelf m={m} />}
       {m.notes ? (
         <View className="gap-1">
-          <Text className="font-brand pr-1 text-[16px] tracking-[1px] text-ink uppercase">
+          <Text className="font-brand pr-[4px] text-[16px] tracking-[1px] text-ink uppercase">
             Notes
           </Text>
           <Text className="font-body text-[14.5px] leading-[21px] text-ink">
@@ -539,7 +539,7 @@ function SeriesSheet({
         </View>
       ) : null}
       <View className="gap-2">
-        <Text className="font-brand pr-1 text-[16px] tracking-[1px] text-ink uppercase">
+        <Text className="font-brand pr-[4px] text-[16px] tracking-[1px] text-ink uppercase">
           On {owner}'s shelf
         </Text>
         {owned.length ? (
@@ -553,7 +553,7 @@ function SeriesSheet({
                 className={`h-9 w-[22px] items-center justify-end border-[1.5px] pb-0.5 ${mine ? "border-line bg-ink" : "border-dashed border-line-soft bg-paper"}`}
               >
                 <Text
-                  className={`font-brand pr-1 text-[11px] ${mine ? "text-paper" : "text-muted"}`}
+                  className={`font-brand pr-[4px] text-[11px] ${mine ? "text-paper" : "text-muted"}`}
                 >
                   {v}
                 </Text>

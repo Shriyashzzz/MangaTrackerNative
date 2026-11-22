@@ -130,7 +130,7 @@ export default function SetsBox({
   return (
     <View className="gap-2 rounded-[14px] border border-line-soft bg-card p-3">
       <View className="flex-row items-center justify-between gap-3">
-        <Text className="shrink font-brand pr-1 text-[18px] tracking-[1px] text-ink uppercase">
+        <Text className="shrink font-brand pr-[4px] text-[18px] tracking-[1px] text-ink uppercase">
           {title}
         </Text>
         {!alone ? (

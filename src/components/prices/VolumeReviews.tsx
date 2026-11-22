@@ -38,7 +38,7 @@ function ReviewScore({
   return (
     <View className="flex-row items-center gap-5">
       <View className="items-center">
-        <Text className="font-brand pr-1 text-[34px] leading-[36px] text-ink">
+        <Text className="font-brand pr-[8px] text-[34px] leading-[36px] text-ink">
           {scoreText(average)}
           <Text className="text-[16px] text-muted"> / 5</Text>
         </Text>

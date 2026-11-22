@@ -34,7 +34,7 @@ export default function MoreShows({ notThis }: { notThis: string }) {
   if (!others.length) return null;
   return (
     <View className="gap-3">
-      <Text className="font-brand pr-1 text-[20px] tracking-[1px] text-ink uppercase">
+      <Text className="font-brand pr-[5px] text-[20px] tracking-[1px] text-ink uppercase">
         More shows
       </Text>
       <ScrollView

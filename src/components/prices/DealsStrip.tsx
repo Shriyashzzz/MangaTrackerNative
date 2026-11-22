@@ -41,7 +41,7 @@ export default function DealsStrip() {
   return (
     <View className="gap-2 rounded-[14px] border border-line-soft bg-card px-3 py-2.5">
       <View className="flex-row items-center justify-between">
-        <Text className="font-brand pr-1 text-[16px] tracking-[1px] text-ink uppercase">
+        <Text className="font-brand pr-[4px] text-[16px] tracking-[1px] text-ink uppercase">
           Sales right now
         </Text>
         <Pressable

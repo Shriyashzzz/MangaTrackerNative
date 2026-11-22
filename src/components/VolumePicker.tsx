@@ -533,7 +533,7 @@ export default function VolumePicker({
                   }}
                   className="flex-row items-center justify-between px-4"
                 >
-                  <Text className="font-brand pr-1 text-[20px] tracking-[1px] text-paper uppercase">
+                  <Text className="font-brand pr-[5px] text-[20px] tracking-[1px] text-paper uppercase">
                     Vols. {row.run[0] * MORE + 1}–{(row.run[1] + 1) * MORE}
                   </Text>
                   <Text className="font-body text-[13px] text-paper/75">

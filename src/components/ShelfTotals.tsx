@@ -49,7 +49,7 @@ function Total({
       <Text className="font-body-semibold text-[12.5px] tracking-[1px] text-ink-soft uppercase">
         {label}
       </Text>
-      <Text className="font-brand pr-1 text-[26px] leading-[30px] text-ink">
+      <Text className="font-brand pr-[6px] text-[26px] leading-[30px] text-ink">
         {value}
       </Text>
       {notes.map((line) => (

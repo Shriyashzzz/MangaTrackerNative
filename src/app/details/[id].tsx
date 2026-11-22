@@ -434,7 +434,7 @@ export default function DetailsScreen() {
         </Pressable>
         <Text
           numberOfLines={1}
-          className="flex-1 font-brand pr-1 text-[24px] tracking-[1px] text-ink uppercase"
+          className="flex-1 font-brand pr-[6px] text-[24px] tracking-[1px] text-ink uppercase"
         >
           {titleShown ? m.name : ""}
         </Text>
@@ -470,7 +470,7 @@ export default function DetailsScreen() {
             />
             {finished ? (
               <View className="absolute right-[-6px] bottom-2 -rotate-6 border-2 border-accent bg-paper px-1.5">
-                <Text className="font-brand pr-1 text-[16px] tracking-[1px] text-accent uppercase">
+                <Text className="font-brand pr-[4px] text-[16px] tracking-[1px] text-accent uppercase">
                   Done
                 </Text>
               </View>

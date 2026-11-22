@@ -197,7 +197,7 @@ export default function ImportList({
                   accessibilityState={{ expanded: !closedIds.has(g.id) }}
                   className="flex-1 flex-row items-center gap-2 py-1"
                 >
-                  <Text className="font-brand pr-1 text-[17px] tracking-[0.5px] text-ink uppercase">
+                  <Text className="font-brand pr-[4px] text-[17px] tracking-[0.5px] text-ink uppercase">
                     {g.title}
                   </Text>
                   <Text className="font-mono text-[13px] text-muted">

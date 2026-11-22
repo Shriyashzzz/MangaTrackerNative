@@ -114,7 +114,7 @@ export default function ProfileTab({
         <Avatar id={account.avatar} size={52} />
         <Text
           numberOfLines={2}
-          className="min-w-0 flex-1 font-brand pr-2 text-[26px] leading-[30px] tracking-[1px] text-ink uppercase"
+          className="min-w-0 flex-1 font-brand pr-[6px] text-[26px] leading-[30px] tracking-[1px] text-ink uppercase"
         >
           {account.displayName || account.defaultName}
         </Text>

@@ -141,7 +141,7 @@ export default function PriceSeriesScreen() {
         </Pressable>
         <Text
           numberOfLines={1}
-          className="flex-1 font-brand pr-1 text-[24px] tracking-[1px] text-ink uppercase"
+          className="flex-1 font-brand pr-[6px] text-[24px] tracking-[1px] text-ink uppercase"
         >
           {title}
         </Text>

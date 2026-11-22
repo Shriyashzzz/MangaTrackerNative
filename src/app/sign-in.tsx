@@ -100,7 +100,7 @@ export default function SignIn() {
           disabled={loading}
           className="items-center rounded-[4px] border-2 border-line bg-accent py-3.5 active:opacity-80 disabled:opacity-60"
         >
-          <Text className="font-brand pr-1 text-[22px] tracking-[1px] text-on-accent uppercase">
+          <Text className="font-brand pr-[5px] text-[22px] tracking-[1px] text-on-accent uppercase">
             {loading ? "Signing in…" : "Sign in"}
           </Text>
         </Pressable>

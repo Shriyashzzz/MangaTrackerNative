@@ -329,7 +329,7 @@ export default function PricesScreen() {
         {!searching ? <DealsStrip /> : null}
         {/* Price check, from its name to the names to try, in one box */}
         <View className="gap-3 rounded-[16px] border border-line-soft bg-card p-4">
-          <Text className="font-brand pr-2 text-[30px] tracking-[1px] text-ink uppercase">
+          <Text className="font-brand pr-[7px] text-[30px] tracking-[1px] text-ink uppercase">
             Price check
           </Text>
           <Text className="font-body text-[14.5px] text-ink-soft">
@@ -390,7 +390,7 @@ export default function PricesScreen() {
               className="self-start bg-accent px-1.5 pt-0.5"
               style={{ transform: [{ rotate: "-2deg" }] }}
             >
-              <Text className="font-brand pr-1 text-[14px] tracking-[1px] text-on-accent uppercase">
+              <Text className="font-brand pr-[4px] text-[14px] tracking-[1px] text-on-accent uppercase">
                 Finished the anime?
               </Text>
             </View>

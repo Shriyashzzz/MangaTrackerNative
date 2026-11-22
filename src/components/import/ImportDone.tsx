@@ -27,7 +27,7 @@ export default function ImportDone({
   return (
     <View className="items-center gap-4 pt-4">
       <Mascot mood="happy" width={120} />
-      <Text className="text-center font-brand pr-1 text-[30px] tracking-[1px] text-ink uppercase">
+      <Text className="text-center font-brand pr-[7px] text-[30px] tracking-[1px] text-ink uppercase">
         {doneTitle(totals)}
       </Text>
       <Text className="text-center font-body text-[14.5px] leading-[21px] text-ink-soft">

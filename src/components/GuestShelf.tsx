@@ -23,7 +23,7 @@ function Panel({
         {children}
       </View>
       <Text
-        className="absolute top-1 right-1 bg-accent px-1.5 font-brand pr-2 text-[12px] tracking-[0.5px] text-on-accent uppercase"
+        className="absolute top-1 right-1 bg-accent px-1.5 font-brand pr-[4px] text-[12px] tracking-[0.5px] text-on-accent uppercase"
         style={{ transform: [{ rotate: "4deg" }] }}
       >
         {shout}
@@ -54,8 +54,10 @@ export default function GuestShelf() {
       >
         <Panel shout="Bookmarked!" caption="Keep your place">
           <View className="flex-row items-baseline gap-1">
-            <Text className="font-brand pr-1 text-[15px] text-ink">ch.</Text>
-            <Text className="font-brand pr-1 text-[28px] leading-[34px] text-ink">
+            <Text className="font-brand pr-[4px] text-[15px] text-ink">
+              ch.
+            </Text>
+            <Text className="font-brand pr-[7px] text-[28px] leading-[34px] text-ink">
               374
             </Text>
           </View>
@@ -71,7 +73,7 @@ export default function GuestShelf() {
           </View>
         </Panel>
         <Panel shout="It's out!" caption="See what's out">
-          <Text className="font-brand pr-1 text-[24px] leading-[30px] text-ink">
+          <Text className="font-brand pr-[6px] text-[24px] leading-[30px] text-ink">
             Vol. 114
           </Text>
         </Panel>

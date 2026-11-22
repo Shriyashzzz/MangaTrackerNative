@@ -13,7 +13,7 @@ const UsedLine = ({
   volumes: number;
 }) => (
   <Text className="font-body text-[14.5px] text-ink">
-    <Text className="font-brand pr-1 text-[18px]">
+    <Text className="font-brand pr-[4px] text-[18px]">
       {wholeMoney(used.cents)}
     </Text>{" "}
     <Text className="font-body-semibold text-award-market">used</Text>
@@ -37,7 +37,7 @@ const NewLine = ({
 }) => (
   <Text className="font-body text-[14.5px] text-ink">
     {exact ? "" : "About "}
-    <Text className="font-brand pr-1 text-[22px]">
+    <Text className="font-brand pr-[5px] text-[22px]">
       {exact ? formatCents(cents) : wholeMoney(cents)}
     </Text>{" "}
     <Text className="font-body-semibold text-award-new">new</Text> for all{" "}
@@ -71,7 +71,7 @@ export default function SeriesCostBox({
   if (!run && !used && !rough) return null;
   return (
     <View className="gap-1.5 rounded-[14px] border border-line-soft bg-card p-3">
-      <Text className="font-brand pr-1 text-[18px] tracking-[1px] text-ink uppercase">
+      <Text className="font-brand pr-[4px] text-[18px] tracking-[1px] text-ink uppercase">
         Collect every volume
       </Text>
       {run ? (

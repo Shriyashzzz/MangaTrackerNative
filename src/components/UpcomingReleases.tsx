@@ -54,7 +54,7 @@ export default function UpcomingReleases() {
           ))}
         </View>
         <View className="min-w-0 flex-1">
-          <Text className="font-brand pr-1 text-[18px] tracking-[1px] text-on-accent uppercase">
+          <Text className="font-brand pr-[4px] text-[18px] tracking-[1px] text-on-accent uppercase">
             Upcoming Releases
           </Text>
           <Text className="font-body text-[13.5px] text-on-accent">

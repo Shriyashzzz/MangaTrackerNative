@@ -297,7 +297,7 @@ function Book({
         <Text
           numberOfLines={1}
           style={{ width: 120 }}
-          className="absolute -top-4 left-0 font-brand pr-1 text-[11px] tracking-[1px] text-ink-soft uppercase"
+          className="absolute -top-4 left-0 font-brand pr-[4px] text-[11px] tracking-[1px] text-ink-soft uppercase"
         >
           {runName}
         </Text>
@@ -313,7 +313,9 @@ function Book({
             style={{ height: `${20 + share * 35}%` }}
           />
         ) : null}
-        <Text className={`font-brand pr-1 text-[13px] ${ink}`}>{spine}</Text>
+        <Text className={`font-brand pr-[4px] text-[13px] ${ink}`}>
+          {spine}
+        </Text>
       </View>
     </View>
   );

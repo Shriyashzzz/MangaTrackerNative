@@ -64,7 +64,9 @@ export default function SelectDock({
     >
       <MovedNote select={select} />
       <View className="w-full flex-row items-center justify-between rounded-[18px] border border-line-soft bg-card px-4 py-1.5">
-        <Text className="font-brand pr-1 text-[22px] text-ink">{count}</Text>
+        <Text className="font-brand pr-[5px] text-[22px] text-ink">
+          {count}
+        </Text>
         <Pressable
           onPress={select.toggleAll}
           className="min-h-[44px] justify-center px-1"

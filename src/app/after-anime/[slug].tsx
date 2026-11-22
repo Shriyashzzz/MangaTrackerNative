@@ -184,7 +184,7 @@ export default function AfterAnimeShowScreen() {
     <Page title={name}>
       {/* the series inked in, then what the page is for */}
       <View className="gap-3">
-        <Text className="font-brand pr-1 text-[28px] leading-[34px] tracking-[1px] text-ink uppercase">
+        <Text className="font-brand pr-[7px] text-[28px] leading-[34px] tracking-[1px] text-ink uppercase">
           {hasAnswer ? "Where to start the manga" : "No answer yet"}
         </Text>
         {answer ? (
@@ -280,7 +280,7 @@ export default function AfterAnimeShowScreen() {
         <>
           {left ? (
             <View className="gap-2 rounded-[14px] border border-dashed border-line-soft px-3 py-3">
-              <Text className="font-brand pr-1 text-[18px] tracking-[1px] text-ink uppercase">
+              <Text className="font-brand pr-[4px] text-[18px] tracking-[1px] text-ink uppercase">
                 What's left to read
               </Text>
               <P>{keepNumbers(left)}</P>
@@ -312,7 +312,7 @@ export default function AfterAnimeShowScreen() {
           ) : null}
           {earlier.length > 0 ? (
             <View className="gap-2">
-              <Text className="font-brand pr-1 text-[20px] tracking-[1px] text-ink uppercase">
+              <Text className="font-brand pr-[5px] text-[20px] tracking-[1px] text-ink uppercase">
                 Earlier seasons
               </Text>
               {earlier.map((stop) => (
@@ -339,7 +339,7 @@ export default function AfterAnimeShowScreen() {
           </View>
           {questions.length > 0 ? (
             <View>
-              <Text className="pb-1 font-brand pr-1 text-[20px] tracking-[1px] text-ink uppercase">
+              <Text className="pb-1 font-brand pr-[5px] text-[20px] tracking-[1px] text-ink uppercase">
                 Questions
               </Text>
               {questions.map(({ q, shown, a, list }) => (

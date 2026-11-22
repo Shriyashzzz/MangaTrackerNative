@@ -273,7 +273,7 @@ export default function NewScreen() {
         }
       >
         <View className="flex-row items-baseline gap-2">
-          <Text className="font-brand pr-2 text-[30px] tracking-[1px] text-ink uppercase">
+          <Text className="font-brand pr-[7px] text-[30px] tracking-[1px] text-ink uppercase">
             {viewingHidden ? "Hidden" : "New"}
           </Text>
           <Text className="font-mono text-[14px] text-muted">
@@ -329,7 +329,7 @@ export default function NewScreen() {
             className="flex-row items-center gap-1.5"
           >
             <View className="h-5 w-5 items-center justify-center rounded-full bg-accent">
-              <Text className="font-brand pr-1 text-[12px] text-on-accent">
+              <Text className="font-brand pr-[4px] text-[12px] text-on-accent">
                 ?
               </Text>
             </View>
@@ -511,7 +511,7 @@ export default function NewScreen() {
                           />
                           {stampFor(found, kind) ? (
                             <View className="absolute -top-2 -left-1 bg-accent px-1">
-                              <Text className="font-brand pr-1 text-[12px] tracking-[0.5px] text-on-accent uppercase">
+                              <Text className="font-brand pr-[4px] text-[12px] tracking-[0.5px] text-on-accent uppercase">
                                 {stampFor(found, kind)}
                               </Text>
                             </View>

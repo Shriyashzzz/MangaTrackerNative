@@ -104,7 +104,7 @@ export default function PriceVolumeScreen() {
         </Pressable>
         <Text
           numberOfLines={1}
-          className="flex-1 font-brand pr-1 text-[24px] tracking-[1px] text-ink uppercase"
+          className="flex-1 font-brand pr-[6px] text-[24px] tracking-[1px] text-ink uppercase"
         >
           {title}
         </Text>
@@ -259,7 +259,7 @@ export default function PriceVolumeScreen() {
               />
             ) : null}
             {!book.coverUrl ? (
-              <Text className="font-brand pr-1 text-[40px] text-ink">
+              <Text className="font-brand pr-[10px] text-[40px] text-ink">
                 {volume ?? "?"}
               </Text>
             ) : null}
@@ -283,12 +283,12 @@ export default function PriceVolumeScreen() {
           </Text>
           <View className="flex-row flex-wrap gap-1.5">
             {preorder ? (
-              <Text className="rounded-[2px] bg-accent px-1.5 font-brand pr-1 text-[12px] tracking-[1px] text-on-accent uppercase">
+              <Text className="rounded-[2px] bg-accent px-1.5 font-brand pr-[4px] text-[12px] tracking-[1px] text-on-accent uppercase">
                 Preorder · out {releaseDay(preorder)}
               </Text>
             ) : null}
             {volume != null ? (
-              <Text className="rounded-[2px] border-[1.5px] border-line px-1.5 font-brand pr-1 text-[12px] tracking-[1px] text-ink uppercase">
+              <Text className="rounded-[2px] border-[1.5px] border-line px-1.5 font-brand pr-[4px] text-[12px] tracking-[1px] text-ink uppercase">
                 Vol. {volume}
               </Text>
             ) : null}
@@ -463,7 +463,7 @@ export default function PriceVolumeScreen() {
             {preorder ? (
               <View className="gap-3">
                 <View className="gap-1 rounded-[14px] bg-accent-wash px-4 py-3.5">
-                  <Text className="self-start bg-accent px-1.5 pt-0.5 font-brand pr-2 text-[13px] tracking-[1px] text-on-accent uppercase">
+                  <Text className="self-start bg-accent px-1.5 pt-0.5 font-brand pr-[4px] text-[13px] tracking-[1px] text-on-accent uppercase">
                     Preorder
                   </Text>
                   <Text className="font-display text-[20px] text-ink">
@@ -560,7 +560,7 @@ export default function PriceVolumeScreen() {
                   className="gap-3 rounded-[14px] border border-line-soft bg-card p-4"
                 >
                   <Text
-                    className={`self-start px-1.5 pt-0.5 font-brand pr-2 text-[13px] tracking-[1px] uppercase ${k.kind === "new" ? "bg-award-new text-on-award-new" : "bg-award-market text-stamp-ink"}`}
+                    className={`self-start px-1.5 pt-0.5 font-brand pr-[4px] text-[13px] tracking-[1px] uppercase ${k.kind === "new" ? "bg-award-new text-on-award-new" : "bg-award-market text-stamp-ink"}`}
                   >
                     {KIND_LABEL[k.kind] ?? k.kind}
                   </Text>

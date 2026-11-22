@@ -100,7 +100,7 @@ export default function CalendarScreen() {
                 className="flex-row items-center gap-3 border-t border-dashed border-line-soft pt-3"
               >
                 <View className="min-w-0 flex-1">
-                  <Text className="font-brand pr-1 text-[20px] tracking-[1px] text-ink uppercase">
+                  <Text className="font-brand pr-[5px] text-[20px] tracking-[1px] text-ink uppercase">
                     {monthName(m.month)}
                   </Text>
                   <Text className="font-mono text-[12px] text-muted">

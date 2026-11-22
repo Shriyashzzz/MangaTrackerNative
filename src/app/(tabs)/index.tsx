@@ -220,7 +220,7 @@ function SignedInShelf() {
               className="flex-1 flex-row items-baseline gap-2"
               accessibilityLabel={`Showing ${shown.label}, ${counts[tab]}. Change what's shown`}
             >
-              <Text className="font-brand pr-1 text-[30px] tracking-[1px] text-ink uppercase">
+              <Text className="font-brand pr-[7px] text-[30px] tracking-[1px] text-ink uppercase">
                 {shown.label}
               </Text>
               <Text className="font-mono text-[14px] text-muted">

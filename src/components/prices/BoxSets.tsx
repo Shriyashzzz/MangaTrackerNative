@@ -135,7 +135,7 @@ export default function BoxSets({
   if (bare) return body;
   return (
     <View className="gap-2">
-      <Text className="font-brand pr-1 text-[18px] tracking-[1px] text-ink uppercase">
+      <Text className="font-brand pr-[4px] text-[18px] tracking-[1px] text-ink uppercase">
         {setsTitle(sets)}
       </Text>
       {body}

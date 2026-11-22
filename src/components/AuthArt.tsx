@@ -46,7 +46,7 @@ export default function AuthArt({
           </Text>
         ) : null}
         <Text
-          className="font-brand pr-1 text-[44px] leading-[50px] tracking-[1px] text-ink uppercase"
+          className="font-brand pr-[11px] text-[44px] leading-[50px] tracking-[1px] text-ink uppercase"
           style={{ transform: [{ rotate: "-2deg" }] }}
         >
           {sfx}
@@ -78,7 +78,7 @@ export function Spread({
     <View className="gap-5">
       <AuthArt sfx={sfx} line={line} chapter={chapter} />
       <View className="gap-4 rounded-[14px] border border-line-soft bg-card p-4">
-        <Text className="font-brand pr-1 text-[24px] tracking-[1px] text-ink uppercase">
+        <Text className="font-brand pr-[6px] text-[24px] tracking-[1px] text-ink uppercase">
           {title}
         </Text>
         {children}

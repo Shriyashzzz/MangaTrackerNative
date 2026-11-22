@@ -140,7 +140,7 @@ const Total = ({
   sum.volumes ? (
     <Text className="font-body text-[15px] text-ink">
       {label}:{" "}
-      <Text className="font-brand pr-1 text-[20px]">
+      <Text className="font-brand pr-[5px] text-[20px]">
         {formatCents(sum.cents)}
       </Text>{" "}
       for {sum.volumes === of ? `all ${of}` : `${sum.volumes} of ${of}`}
@@ -235,7 +235,7 @@ export default function ToBuyScreen() {
         >
           <ChevronLeftIcon color={c.ink} width={24} height={24} />
         </Pressable>
-        <Text className="flex-1 font-brand pr-1 text-[24px] tracking-[1px] text-ink uppercase">
+        <Text className="flex-1 font-brand pr-[6px] text-[24px] tracking-[1px] text-ink uppercase">
           To buy
         </Text>
       </View>
@@ -294,7 +294,7 @@ export default function ToBuyScreen() {
         {items && items.length > 0 && list ? (
           <>
             <View className="gap-1 rounded-[14px] border border-line-soft bg-card p-3">
-              <Text className="font-brand pr-1 text-[20px] tracking-[1px] text-ink uppercase">
+              <Text className="font-brand pr-[5px] text-[20px] tracking-[1px] text-ink uppercase">
                 {items.length === 1 ? "1 volume" : `${items.length} volumes`} to
                 buy
               </Text>
@@ -353,7 +353,7 @@ export default function ToBuyScreen() {
                       />
                       {item.volume != null && !item.edition ? (
                         <View className="absolute top-0 left-0 bg-ink px-1.5">
-                          <Text className="font-brand pr-1 text-[13px] text-paper">
+                          <Text className="font-brand pr-[4px] text-[13px] text-paper">
                             {item.volume}
                           </Text>
                         </View>

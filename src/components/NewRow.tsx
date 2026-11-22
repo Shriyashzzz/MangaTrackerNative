@@ -43,12 +43,12 @@ export default function NewRow({
           {manga.name}
         </Text>
         <Text
-          className={`font-brand pr-1 text-[17px] tracking-[1px] uppercase ${news.behind ? "text-ink-soft" : "text-accent"}`}
+          className={`font-brand pr-[4px] text-[17px] tracking-[1px] uppercase ${news.behind ? "text-ink-soft" : "text-accent"}`}
         >
           {news.text}
         </Text>
         {news.behind ? (
-          <Text className="font-brand pr-1 text-[14px] tracking-[1px] text-ink-soft uppercase">
+          <Text className="font-brand pr-[4px] text-[14px] tracking-[1px] text-ink-soft uppercase">
             {news.behind}
           </Text>
         ) : null}

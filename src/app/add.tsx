@@ -292,7 +292,7 @@ export default function AddScreen() {
         >
           <ChevronLeftIcon color={c.ink} width={24} height={24} />
         </Pressable>
-        <Text className="flex-1 font-brand pr-1 text-[24px] tracking-[1px] text-ink uppercase">
+        <Text className="flex-1 font-brand pr-[6px] text-[24px] tracking-[1px] text-ink uppercase">
           Add a manga
         </Text>
       </View>

@@ -21,7 +21,7 @@ export default function EditionFinder({
   return (
     <View className="gap-3 rounded-[14px] border border-line-soft bg-card px-4 py-3">
       <View className="flex-row items-center gap-2.5">
-        <Text className="font-brand pr-1 text-[19px] tracking-[0.5px] text-ink uppercase">
+        <Text className="font-brand pr-[5px] text-[19px] tracking-[0.5px] text-ink uppercase">
           Which book has volume
         </Text>
         <Input
@@ -34,7 +34,7 @@ export default function EditionFinder({
           placeholder="23"
           className="min-h-[40px] w-[70px] text-center font-mono"
         />
-        <Text className="font-brand pr-1 text-[19px] text-ink">?</Text>
+        <Text className="font-brand pr-[5px] text-[19px] text-ink">?</Text>
         {startAt != null && volume === startAt ? (
           <Text className="font-mono text-[11.5px] text-muted">your next</Text>
         ) : null}

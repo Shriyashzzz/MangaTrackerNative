@@ -72,7 +72,7 @@ const Kenji = ({ says }: { says: string }) => (
 const Big = ({ children }: { children: ReactNode }) => (
   <Text
     style={{ color: INK_ON }}
-    className="font-brand pr-1 text-[44px] leading-[46px]"
+    className="font-brand pr-[11px] text-[44px] leading-[46px]"
   >
     {children}
   </Text>

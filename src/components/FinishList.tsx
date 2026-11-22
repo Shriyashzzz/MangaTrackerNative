@@ -106,7 +106,9 @@ export default function FinishList({
           To finish it
         </Text>
         {total ? (
-          <Text className="font-brand pr-1 text-[20px] text-ink">{total}</Text>
+          <Text className="font-brand pr-[5px] text-[20px] text-ink">
+            {total}
+          </Text>
         ) : null}
       </View>
       {unpriced.length > 0 && row.estimateCents === null ? (

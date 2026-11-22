@@ -74,7 +74,7 @@ export default function AboutScreen() {
       <View className="items-center gap-3 rounded-[14px] border border-line-soft bg-card p-5">
         <Mascot mood="happy" width={120} />
 
-        <Text className="text-center font-brand pr-1 text-[30px] leading-[34px] tracking-[1px] text-ink uppercase">
+        <Text className="text-center font-brand pr-[7px] text-[30px] leading-[34px] tracking-[1px] text-ink uppercase">
           <Text className="bg-accent text-on-accent"> Never lose </Text> your
           place again.
         </Text>
@@ -96,7 +96,7 @@ export default function AboutScreen() {
               <Text className="font-mono-medium text-[11.5px] tracking-[1.5px] text-accent-ink uppercase">
                 Ch. {String(i + 1).padStart(2, "0")}
               </Text>
-              <Text className="font-brand pr-1 text-[21px] leading-[25px] tracking-[1px] text-ink uppercase">
+              <Text className="font-brand pr-[5px] text-[21px] leading-[25px] tracking-[1px] text-ink uppercase">
                 {part.title}
               </Text>
               <Text className="font-body text-[15.5px] leading-[23px] text-ink">

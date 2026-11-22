@@ -209,7 +209,7 @@ function SeriesRow({
               worth {worth}
             </Text>
           ) : null}
-          <Text className="font-brand pr-1 text-[21px] leading-[24px] text-ink">
+          <Text className="font-brand pr-[5px] text-[21px] leading-[24px] text-ink">
             {owned.length}
           </Text>
         </View>

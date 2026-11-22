@@ -27,14 +27,16 @@ function CardSketch({
     <View className="mt-2 gap-1">
       <View className="flex-row gap-3 rounded-[4px] border-[1.5px] border-line bg-card p-2.5">
         <View className="h-[54px] w-[36px] items-center justify-center border-[1.5px] border-line bg-paper-2">
-          <Text className="font-brand pr-1 text-[16px] text-ink">{cover}</Text>
+          <Text className="font-brand pr-[4px] text-[16px] text-ink">
+            {cover}
+          </Text>
         </View>
         <View className="min-w-0 flex-1 justify-center">
-          <Text className="font-brand pr-1 text-[15px] tracking-[1px] text-accent uppercase">
+          <Text className="font-brand pr-[4px] text-[15px] tracking-[1px] text-accent uppercase">
             {news}
           </Text>
           {behind ? (
-            <Text className="font-brand pr-1 text-[13px] tracking-[1px] text-ink-soft uppercase">
+            <Text className="font-brand pr-[4px] text-[13px] tracking-[1px] text-ink-soft uppercase">
               {behind}
             </Text>
           ) : null}
@@ -179,7 +181,7 @@ export default function NewReleasesScreen() {
               className={`h-10 w-7 items-center justify-center border-[1.5px] border-line ${i === 2 ? "rounded-full bg-accent" : "bg-paper-2"}`}
             >
               <Text
-                className={`font-brand pr-1 text-[14px] ${i === 2 ? "text-on-accent" : "text-ink"}`}
+                className={`font-brand pr-[4px] text-[14px] ${i === 2 ? "text-on-accent" : "text-ink"}`}
               >
                 {mark}
               </Text>

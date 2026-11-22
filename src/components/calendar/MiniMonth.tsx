@@ -32,7 +32,7 @@ export default function MiniMonth({
       className={`gap-2.5 rounded-[14px] border border-line-soft p-4 ${onCard ? "bg-paper" : "bg-card"}`}
     >
       <View className="flex-row items-baseline justify-between">
-        <Text className="font-brand pr-2 text-[19px] tracking-[1px] text-ink uppercase">
+        <Text className="font-brand pr-[5px] text-[19px] tracking-[1px] text-ink uppercase">
           {monthName(month)}
         </Text>
         <Text className="font-body text-[13px] text-ink-soft">

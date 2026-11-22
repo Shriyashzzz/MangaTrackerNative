@@ -93,7 +93,7 @@ export const Rule = () => <View className="h-px bg-line-soft" />;
 // a section's title: the lettering with a short accent rule under it
 export const H2 = ({ children }: { children: ReactNode }) => (
   <View className="gap-1 self-start w-fit ">
-    <Text className="font-brand min-w-fit pr-1 text-[22px] tracking-[1px] text-ink uppercase">
+    <Text className="font-brand min-w-fit pr-[5px] text-[22px] tracking-[1px] text-ink uppercase">
       {children}
     </Text>
     <View className="h-[3px] w-10 bg-accent" />

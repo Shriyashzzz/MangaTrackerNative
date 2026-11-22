@@ -145,7 +145,7 @@ export default function OfferList({
                     className={`rounded-[2px] border-[1.5px] border-line px-1.5 ${s.look} ${s.tilt}`}
                   >
                     <Text
-                      className={`font-brand pr-1 text-[13px] tracking-[1px] uppercase ${s.ink}`}
+                      className={`font-brand pr-[4px] text-[13px] tracking-[1px] uppercase ${s.ink}`}
                     >
                       {s.label}
                     </Text>

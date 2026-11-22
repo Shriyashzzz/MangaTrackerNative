@@ -39,7 +39,7 @@ export default function BookTiles({
               className={`min-w-[56px] items-center rounded-[3px] border-[1.5px] px-2 py-1.5 ${ownsAll ? "border-line bg-ink" : book.coming ? "border-dashed border-line-soft" : "border-line bg-card"} ${answer ? "border-2 border-accent" : ""}`}
             >
               <Text
-                className={`font-brand pr-1 text-[18px] ${ownsAll ? "text-paper" : "text-ink"}`}
+                className={`font-brand pr-[4px] text-[18px] ${ownsAll ? "text-paper" : "text-ink"}`}
               >
                 {book.number}
               </Text>

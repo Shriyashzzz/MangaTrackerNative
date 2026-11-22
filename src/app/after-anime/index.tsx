@@ -66,7 +66,7 @@ export default function AfterAnimeIndex() {
   return (
     <Page title="After the anime">
       <View className="gap-2">
-        <Text className="font-brand pr-1 text-[30px] leading-[36px] tracking-[1px] text-ink uppercase">
+        <Text className="font-brand pr-[7px] text-[30px] leading-[36px] tracking-[1px] text-ink uppercase">
           Where does the <Text className="text-accent">anime</Text> leave off?
         </Text>
         <P muted>
@@ -136,7 +136,7 @@ export default function AfterAnimeIndex() {
       ) : null}
       {shows && shows.length > 0 ? (
         <View className="gap-3">
-          <Text className="font-brand pr-1 text-[20px] tracking-[1px] text-ink uppercase">
+          <Text className="font-brand pr-[5px] text-[20px] tracking-[1px] text-ink uppercase">
             Pick a show
           </Text>
           <View className="flex-row flex-wrap gap-3">

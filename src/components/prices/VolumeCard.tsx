@@ -187,10 +187,10 @@ export default function VolumeCard({
           ) : null}
           {holds || volume != null ? (
             <View className="absolute top-0 left-0 flex-row items-baseline gap-0.5 bg-ink px-1.5 pb-0.5">
-              <Text className="font-brand pr-1 text-[10px] tracking-[0.5px] text-paper uppercase">
+              <Text className="font-brand pr-[4px] text-[10px] tracking-[0.5px] text-paper uppercase">
                 {holds ? "Vols." : "Vol."}
               </Text>
-              <Text className="font-brand pr-1 text-[15px] text-paper">
+              <Text className="font-brand pr-[4px] text-[15px] text-paper">
                 {holds ? `${holds.from}–${holds.to}` : volume}
               </Text>
             </View>
@@ -200,7 +200,7 @@ export default function VolumeCard({
               className={`absolute bottom-1 left-1 rounded-[2px] border-[1.5px] border-line px-1 ${mark === "next" ? "bg-accent" : "bg-card"}`}
             >
               <Text
-                className={`font-brand pr-1 text-[11px] tracking-[1px] uppercase ${mark === "next" ? "text-on-accent" : "text-ink"}`}
+                className={`font-brand pr-[4px] text-[11px] tracking-[1px] uppercase ${mark === "next" ? "text-on-accent" : "text-ink"}`}
               >
                 {mark === "next" ? "Next" : "Yours"}
               </Text>
