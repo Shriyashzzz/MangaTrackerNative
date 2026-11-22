@@ -68,7 +68,7 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
   );
 
   // Aside: Kenji as a round button to come back by, and a pill beside him
-  // with Next and the two ways out. Both tall enough to hit without aiming
+  // with the two ways out and "Back to the tour". Both tall enough to hit without aiming
   if (hidden)
     return (
       <View
@@ -90,22 +90,23 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
           className="min-h-[54px] flex-row items-center gap-4 rounded-full border-[1.5px] border-line bg-card px-4"
           style={{ elevation: 6 }}
         >
-          {/* the tour goes on from here too: Next brings him back, on
-              his next step */}
-          {at < steps.length - 1 ? (
-            <Tap
-              onPress={() => {
-                hide(false);
-                tourGo(1);
-              }}
-              hitSlop={14}
-            >
-              <Text className="font-body-semibold text-[14px] text-ink">
-                Next ›
-              </Text>
-            </Tap>
-          ) : null}
-          {waysOut}
+          {/* leaving first, coming back last: the way back to the tour
+              sits where the thumb ends up */}
+          <Tap onPress={() => leavePractice("/")} hitSlop={14}>
+            <Text className="font-body-semibold text-[14px] text-ink-soft">
+              Leave
+            </Text>
+          </Tap>
+          <Tap onPress={() => leavePractice("/sign-up")} hitSlop={14}>
+            <Text className="font-body-semibold text-[14px] text-accent-ink">
+              Start mine
+            </Text>
+          </Tap>
+          <Tap onPress={tourBack} hitSlop={14}>
+            <Text className="font-body-semibold text-[14px] text-ink">
+              Back to the tour
+            </Text>
+          </Tap>
         </View>
       </View>
     );
