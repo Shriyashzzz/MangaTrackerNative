@@ -185,8 +185,12 @@ export default function ReadingStepper({
             ? books.inside(current)
             : null);
 
+  // counted in an edition's books: what the book holds ("vols. 16–18") goes
+  // under the counter, so the label and the counter still share a line
   return (
-    <View className="flex-row items-center gap-2.5">
+    <View
+      className={books ? "items-start gap-1" : "flex-row items-center gap-2.5"}
+    >
       <View className="flex-row items-center overflow-hidden rounded-[12px] bg-ink/10">
         {button(-1, `One ${counted} back`, "−", current <= 0)}
         <TextInput

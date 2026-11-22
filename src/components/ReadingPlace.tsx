@@ -141,8 +141,12 @@ export default function ReadingPlace({
       {showVolumes && inBooks && edition ? (
         // the same place counted in the edition's books: "Definitive 4" is
         // saved as the last volume that book holds
-        <View className="flex-row flex-wrap items-center gap-x-3 gap-y-2">
-          <Line>Read up to {edition.line.label}</Line>
+        // the counter has its note under it here: the label is level with
+        // the counter, not with the two together
+        <View className="flex-row flex-wrap items-start gap-x-3 gap-y-2">
+          <View className="h-11 justify-center">
+            <Line>Read up to {edition.line.label}</Line>
+          </View>
           <ReadingStepper
             key={`${manga.id}-${edition.line.key}-${volumeSets}`}
             mangaId={manga.id}

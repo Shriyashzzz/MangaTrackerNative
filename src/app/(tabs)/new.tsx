@@ -26,13 +26,14 @@ import { ownsAny } from "@/core/lib/ownedVolumes";
 import { checkedAgo } from "@/core/lib/releaseCache";
 import { behindOf } from "@/core/lib/releaseMath";
 import { CHECKED_BEFORE_KEY, LAST_NEW_COUNT_KEY } from "@/core/lib/shelf";
-import type { Manga } from "@/core/lib/types";
+import type { Manga, ReleaseStatus } from "@/core/lib/types";
 import {
   FAR_BEHIND_NAMED,
   standing,
   type FarBehindSeries,
 } from "@/core/pages/Home/farBehind";
-import { stampFor } from "@/core/pages/Home/newTabLinks";
+import { buyLinkFor, stampFor } from "@/core/pages/Home/newTabLinks";
+import { hrefOf } from "@/lib/webRoutes";
 import {
   catchUpText,
   COUNT_WORD,
@@ -231,6 +232,12 @@ export default function NewScreen() {
     void hideActions.hideAll();
   };
   const openManga = all.find((m) => m.id === openList);
+  // the next volume leads straight to its prices, as on the web: there's
+  // nothing to do with it but buy it. Null: the series' page, as usual
+  const buyHref = (found: ReleaseStatus | null | undefined) => {
+    const to = buyLinkFor(found, kind);
+    return to ? hrefOf(to) : null;
+  };
   const rowOf = (m: Manga) => {
     const found = releases[m.id];
     const opens = !viewingHidden && opensAList(found, kind);
@@ -241,6 +248,7 @@ export default function NewScreen() {
         kind={kind}
         onHide={() => void hideActions.hide(m)}
         hideWord={viewingHidden ? "Show" : "Hide"}
+        href={buyHref(found)}
         onOpenList={
           kind === "japan" && !viewingHidden
             ? () => setJapanOf(m.id)
@@ -542,7 +550,11 @@ export default function NewScreen() {
                       return opens ? (
                         <View key={m.id}>{inside}</View>
                       ) : (
-                        <Link key={m.id} href={`/details/${m.id}`} asChild>
+                        <Link
+                          key={m.id}
+                          href={buyHref(found) ?? `/details/${m.id}`}
+                          asChild
+                        >
                           {inside}
                         </Link>
                       );

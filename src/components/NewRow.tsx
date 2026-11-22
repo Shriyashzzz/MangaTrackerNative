@@ -2,7 +2,7 @@
 // news): its cover, name, what's out in the accent ("Vol. 15 next"), how far
 // behind under it, what they have, and Hide. The words are the web's own
 // (core shelfViews newsFor)
-import { Link } from "expo-router";
+import { Link, type Href } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 import { newsFor, type ReleaseKind } from "@/core/pages/Home/shelfViews";
 import type { Manga, ReleaseStatus } from "@/core/lib/types";
@@ -16,6 +16,7 @@ export default function NewRow({
   onHide,
   hideWord = "Hide",
   onOpenList,
+  href,
 }: {
   manga: Manga;
   found: ReleaseStatus | null | undefined;
@@ -25,6 +26,9 @@ export default function NewRow({
   hideWord?: string;
   // several behind: a tap opens the list of them instead of the series
   onOpenList?: () => void;
+  // where a tap leads when it isn't the series' page: the next volume's
+  // prices (core newTabLinks buyLinkFor)
+  href?: Href | null;
 }) {
   const news = newsFor(manga, found, kind);
   const body = (
@@ -70,7 +74,7 @@ export default function NewRow({
       {onOpenList ? (
         body
       ) : (
-        <Link href={`/details/${manga.id}`} asChild>
+        <Link href={href ?? `/details/${manga.id}`} asChild>
           {body}
         </Link>
       )}
