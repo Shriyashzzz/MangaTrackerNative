@@ -1,5 +1,6 @@
 // The account (the web's AccountTab): who's signed in, how they sign in,
-// their email, the weekly email, export, and deleting
+// their email, export, and deleting (the weekly email is with the alerts,
+// under New releases)
 // the account with its confirmation
 import { router } from "expo-router";
 import { useState } from "react";
@@ -15,7 +16,7 @@ import { useShelf } from "@/store/shelf";
 import Button from "../Button";
 import { Input } from "../Field";
 import PasswordInput from "../PasswordInput";
-import { Help, Note, Section, Tick } from "./parts";
+import { Help, Note, Section } from "./parts";
 
 const LINK_NOT_SENT = "We couldn't send the link. Try again in a minute.";
 type NoteOf = { text: string; failed?: boolean } | null;
@@ -74,9 +75,6 @@ function SignInSection({ account }: { account: Account }) {
 export default function AccountTab({ account }: { account: Account }) {
   const logOut = useAuth((s) => s.logOut);
   const saveAccount = useAccount((s) => s.save);
-  const setWeeklyEmail = useAccount((s) => s.weeklyEmail);
-  const [weeklyNote, setWeeklyNote] = useState<NoteOf>(null);
-  const [weeklySaving, setWeeklySaving] = useState(false);
   const [email, setEmail] = useState(account.recoveryEmail ?? "");
   const [emailNote, setEmailNote] = useState<NoteOf>(null);
   const [exportFailed, setExportFailed] = useState(false);
@@ -85,29 +83,13 @@ export default function AccountTab({ account }: { account: Account }) {
   const [deleteError, setDeleteError] = useState("");
   const [deleting, setDeleting] = useState(false);
 
-  const switchWeekly = async (on: boolean, said: string) => {
-    setWeeklyNote(null);
-    setWeeklySaving(true);
-    try {
-      await setWeeklyEmail(on);
-      if (useAccount.getState().account?.confirmNotSent)
-        setWeeklyNote({ text: LINK_NOT_SENT, failed: true });
-      else setWeeklyNote({ text: said });
-    } catch (error) {
-      setWeeklyNote({ text: (error as Error).message, failed: true });
-    } finally {
-      setWeeklySaving(false);
-    }
-  };
-  const waitingToConfirm =
-    account.weeklyEmail && !account.emailConfirmed && !account.confirmNotSent;
   const saveEmail = async () => {
     setEmailNote(null);
     try {
       await saveAccount({ recoveryEmail: email.trim() || null });
       setEmailNote({ text: email.trim() ? "Saved." : "Removed." });
       if (useAccount.getState().account?.confirmNotSent)
-        setWeeklyNote({ text: LINK_NOT_SENT, failed: true });
+        setEmailNote({ text: LINK_NOT_SENT, failed: true });
     } catch (error) {
       setEmailNote({ text: (error as Error).message, failed: true });
     }
@@ -167,7 +149,9 @@ export default function AccountTab({ account }: { account: Account }) {
           autoCorrect={false}
           placeholder="Email (optional)"
         />
-        <Help>For password resets and the weekly email.</Help>
+        <Help>
+          For password resets and the weekly email (Settings, New releases).
+        </Help>
         <View className="flex-row items-center gap-3">
           <Button
             label="Save email"
@@ -178,63 +162,6 @@ export default function AccountTab({ account }: { account: Account }) {
           <Note text={emailNote?.text} failed={emailNote?.failed} />
         </View>
       </Section>
-      <Section title="Weekly email">
-        <Help>
-          New volumes for your shelf, and price drops on your To buy list. Only
-          sent when there's news.
-        </Help>
-        {account.recoveryEmail ? (
-          <>
-            <Tick
-              label="Send me the weekly email"
-              value={account.weeklyEmail}
-              onChange={(on) =>
-                void switchWeekly(
-                  on,
-                  on
-                    ? account.emailConfirmed
-                      ? "It's on."
-                      : "Check your inbox."
-                    : "It's off.",
-                )
-              }
-            />
-            {waitingToConfirm ? (
-              <Help>
-                Almost there: press Start my weekly email in the email to{" "}
-                <Text className="font-body-semibold text-ink">
-                  {account.recoveryEmail}
-                </Text>
-                . No email? Send the link again.
-              </Help>
-            ) : null}
-            {account.weeklyEmail && account.emailConfirmed ? (
-              <Help>
-                Sent to{" "}
-                <Text className="font-body-semibold text-ink">
-                  {account.recoveryEmail}
-                </Text>
-                .
-              </Help>
-            ) : null}
-            <View className="flex-row flex-wrap items-center gap-3">
-              {account.weeklyEmail && !account.emailConfirmed ? (
-                <Button
-                  label="Send the link again"
-                  small
-                  disabled={weeklySaving}
-                  onPress={() => void switchWeekly(true, "Sent again.")}
-                />
-              ) : null}
-              <Note text={weeklyNote?.text} failed={weeklyNote?.failed} />
-            </View>
-          </>
-        ) : (
-          <Help>Add an email above to get it.</Help>
-        )}
-      </Section>
-      {/* Alerts on this device: back once the server sends to the app's own
-          push tokens (README, Not done yet) */}
       <Section title="Export my list">
         <Help>
           A spreadsheet file of everything on your shelf, notes included.

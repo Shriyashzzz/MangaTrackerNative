@@ -1,5 +1,7 @@
 // New releases (the web's NewReleasesTab): checks on or off, and what New
 // lists when they're on
+import { useAccount } from "@/store/account";
+import WeeklyEmail from "./WeeklyEmail";
 import PhoneAlerts from "./PhoneAlerts";
 import { router } from "expo-router";
 import { Pressable, Text } from "react-native";
@@ -8,38 +10,45 @@ import ReleaseControls from "./ReleaseControls";
 import { Help, Section, Tick } from "./parts";
 
 export default function NewReleasesTab() {
+  const account = useAccount((st) => st.account);
   const checksOn = usePrefs((s) => s.prefs.releaseChecks !== "off");
   const save = usePrefs((s) => s.save);
   return (
-    <Section first title="New releases">
-      <Tick
-        label="Check for new volumes and chapters"
-        value={checksOn}
-        onChange={(on) =>
-          void save({ releaseChecks: on ? "on" : "off" }).catch(() => {})
-        }
-      />
-      {checksOn ? (
-        <>
+    <>
+      <Section first title="New releases">
+        <Tick
+          label="Check for new volumes and chapters"
+          value={checksOn}
+          onChange={(on) =>
+            void save({ releaseChecks: on ? "on" : "off" }).catch(() => {})
+          }
+        />
+        {checksOn ? (
+          <>
+            <Help>
+              What your shelf's New tab lists.{" "}
+              <Text
+                className="font-body-semibold text-ink underline"
+                onPress={() => router.push("/new-releases")}
+              >
+                How this works
+              </Text>
+            </Help>
+            <ReleaseControls />
+          </>
+        ) : (
           <Help>
-            What your shelf's New tab lists.{" "}
-            <Text
-              className="font-body-semibold text-ink underline"
-              onPress={() => router.push("/new-releases")}
-            >
-              How this works
-            </Text>
+            Off. Your shelf has no New tab, and manga pages don't show new
+            releases or next chapter dates. Prices still work.
           </Help>
-          <PhoneAlerts />
-          <ReleaseControls />
-        </>
-      ) : (
-        <Help>
-          Off. Your shelf has no New tab, and manga pages don't show new
-          releases or next chapter dates. Prices still work.
-        </Help>
-      )}
-      <Pressable />
-    </Section>
+        )}
+        <Pressable />
+      </Section>
+      {/* how they're told: on this phone, and by email */}
+      <Section title="Alerts">
+        <PhoneAlerts />
+        {account ? <WeeklyEmail account={account} /> : null}
+      </Section>
+    </>
   );
 }
