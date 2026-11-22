@@ -60,6 +60,8 @@ import { readLocal, writeLocal } from "@/lib/deviceStore";
 import { useHideActions } from "@/lib/useHideActions";
 import { usePrefs } from "@/store/prefs";
 import { useShelf } from "@/store/shelf";
+import Segmented from "@/components/Segmented";
+import { look } from "@/lib/platformLook";
 import { H2 } from "@/components/Page";
 
 const Safe = withUniwind(SafeAreaView);
@@ -282,33 +284,17 @@ export default function NewScreen() {
         {!viewingHidden && !openPile ? <UpcomingReleases /> : null}
 
         {/* Volumes, Chapters, In Japan: one segmented switch */}
-        <View className="flex-row overflow-hidden rounded-[4px] border-2 border-line">
-          {KINDS.map((k, i) => {
-            const on = k === kind;
-            const nothingNew = !allFailed && kindCounts[k] === 0;
-            return (
-              <Pressable
-                key={k}
-                onPress={() => pickKind(k)}
-                accessibilityState={{ selected: on }}
-                className={`flex-1 flex-row items-baseline justify-center gap-1.5 py-2.5 ${on ? "bg-accent" : ""} ${i ? "border-l-2 border-line" : ""}`}
-              >
-                <Text
-                  className={`font-brand pr-1 text-[17px] tracking-[1px] uppercase ${on ? "text-on-accent" : nothingNew ? "text-muted" : "text-ink-soft"}`}
-                >
-                  {RELEASE_KINDS[k].label}
-                </Text>
-                {!allFailed ? (
-                  <Text
-                    className={`font-mono text-[13px] ${on ? "text-on-accent" : "text-muted"}`}
-                  >
-                    {kindCounts[k]}
-                  </Text>
-                ) : null}
-              </Pressable>
-            );
-          })}
-        </View>
+        <Segmented
+          label="What's new"
+          options={KINDS.map((k) => ({
+            value: k,
+            label: allFailed
+              ? RELEASE_KINDS[k].label
+              : `${RELEASE_KINDS[k].label} ${kindCounts[k]}`,
+          }))}
+          value={kind}
+          onChange={pickKind}
+        />
         {viewingHidden ? (
           <Text className="font-body text-[14px] text-ink-soft">
             What you've hidden under {RELEASE_KINDS[kind].label}. Show one to
@@ -353,7 +339,7 @@ export default function NewScreen() {
             <Pressable
               onPress={hideAll}
               hitSlop={6}
-              className="ml-auto rounded-[3px] border-[1.5px] border-line px-2.5 py-1"
+              className={`ml-auto bg-ink/10 px-3.5 py-2 ${look.buttonRadius}`}
             >
               <Text className="font-body-medium text-[13.5px] text-ink">
                 {askingHideAll

@@ -6,6 +6,7 @@ import { Link } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 import { newsFor, type ReleaseKind } from "@/core/pages/Home/shelfViews";
 import type { Manga, ReleaseStatus } from "@/core/lib/types";
+import { look } from "@/lib/platformLook";
 import SeriesCover from "./SeriesCover";
 
 export default function NewRow({
@@ -74,7 +75,7 @@ export default function NewRow({
       <Pressable
         onPress={onHide}
         hitSlop={6}
-        className="rounded-[3px] border-[1.5px] border-line px-3 py-1.5 active:bg-accent-wash"
+        className={`bg-ink/10 px-3.5 py-2 active:opacity-70 ${look.buttonRadius}`}
         accessibilityLabel={`${hideWord} ${manga.name}`}
       >
         <Text className="font-body-medium text-[14px] text-ink">
