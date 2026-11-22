@@ -578,7 +578,7 @@ export default function NewScreen() {
           {list.length > 0 ? (
             <View className="flex-row items-baseline justify-between gap-3 pt-1">
               <Tap onPress={toSettings} hitSlop={8}>
-                <Text className="font-body-semibold text-[14px] text-ink underline">
+                <Text className="font-mono text-[12px] text-ink-soft underline">
                   Change what New shows
                 </Text>
               </Tap>
