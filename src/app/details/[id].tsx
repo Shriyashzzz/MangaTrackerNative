@@ -5,6 +5,7 @@
 // finished. Edit and Delete are in the ⋮ menu. This file loads the series
 // and saves changes to it; each part of the page is its own component, and
 // every rule is the web's own (core pages/Details, core lib)
+import Backdrop from "@/components/Backdrop";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Alert, Pressable, ScrollView, Text, View } from "react-native";
@@ -420,6 +421,7 @@ export default function DetailsScreen() {
 
   return (
     <Safe edges={["top"]} className="flex-1 bg-paper">
+      <Backdrop />
       {/* the app bar: back, the name once scrolled past it, and the menu */}
       <View className="h-[62px] flex-row items-center gap-2 px-2">
         <Pressable

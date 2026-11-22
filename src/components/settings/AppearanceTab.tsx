@@ -1,5 +1,6 @@
-// Light, dark, or the device's own (the web's AppearanceTab). The website
-// also picks a background drawing; the app's screens have none
+// Light, dark, or the device's own, and the drawing behind the pages (the
+// web's AppearanceTab; the drawings are components/Backdrop.tsx)
+import { BACKGROUNDS, DEFAULT_BACKGROUND } from "@/components/Backdrop";
 import { usePrefs } from "@/store/prefs";
 import { Radios, Section } from "./parts";
 
@@ -11,15 +12,26 @@ const THEMES = [
 
 export default function AppearanceTab() {
   const theme = usePrefs((s) => s.prefs.theme ?? "system");
+  const background = usePrefs((s) => s.prefs.background ?? DEFAULT_BACKGROUND);
   const save = usePrefs((s) => s.save);
   return (
-    <Section first title="Theme">
-      <Radios
-        label="Theme"
-        options={THEMES}
-        value={theme}
-        onChange={(value) => void save({ theme: value }).catch(() => {})}
-      />
-    </Section>
+    <>
+      <Section first title="Theme">
+        <Radios
+          label="Theme"
+          options={THEMES}
+          value={theme}
+          onChange={(value) => void save({ theme: value }).catch(() => {})}
+        />
+      </Section>
+      <Section title="Background">
+        <Radios
+          label="Background"
+          options={BACKGROUNDS}
+          value={background}
+          onChange={(value) => void save({ background: value }).catch(() => {})}
+        />
+      </Section>
+    </>
   );
 }

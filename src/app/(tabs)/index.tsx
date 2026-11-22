@@ -3,6 +3,7 @@
 // a row per series. Pull down to load it again. Volumes is its own view
 // (VolumesView). Who's in each tab, the search and the sort are the web's own
 // rules (core filterShelf); it opens on the tab and sort the account chose
+import Backdrop from "@/components/Backdrop";
 import GuestShelf from "@/components/GuestShelf";
 import { useAuth } from "@/store/auth";
 import { useEffect, useState } from "react";
@@ -185,6 +186,7 @@ function SignedInShelf() {
 
   return (
     <Safe edges={["top"]} className="flex-1 bg-paper">
+      <Backdrop />
       <AppHeader />
       {/* everything under the header pulls down to refresh */}
       <PullPage refresh={load} scrollTop={scrollTop}>
@@ -406,6 +408,7 @@ export default function ShelfScreen() {
   if (isSignedIn) return <SignedInShelf />;
   return (
     <View className="flex-1 bg-paper" style={{ paddingTop: insets.top }}>
+      <Backdrop />
       <AppHeader />
       <GuestShelf />
     </View>

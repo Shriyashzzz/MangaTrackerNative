@@ -5,6 +5,7 @@
 // one, or any far behind, is sorted into piles, each a fan of covers that
 // opens to all of them. Nothing new says why. Who's in, where, and the
 // words are all the web's own (core shelfViews, piles, farBehind, newTabLinks)
+import Backdrop from "@/components/Backdrop";
 import { Link, router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -263,6 +264,7 @@ export default function NewScreen() {
     ) : null;
   return (
     <Safe edges={["top"]} className="flex-1 bg-paper">
+      <Backdrop />
       <AppHeader />
       <ScrollView
         contentContainerClassName="gap-4 px-4 pt-5 pb-10"

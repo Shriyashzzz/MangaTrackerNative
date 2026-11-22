@@ -5,6 +5,7 @@
 // card with its price, Yours and Next, Not on your shelf to see only the
 // gaps with what they cost. The rules are the web's (core seriesPageRules,
 // finishCost, useSeriesData)
+import Backdrop from "@/components/Backdrop";
 import Button from "@/components/Button";
 import DoubleRule from "@/components/DoubleRule";
 import LoadingQuote from "@/components/LoadingQuote";
@@ -124,6 +125,7 @@ export default function PriceSeriesScreen() {
 
   const frame = (title: string, body: React.ReactNode) => (
     <Safe edges={["top"]} className="flex-1 bg-paper">
+      <Backdrop />
       <View className="h-[62px] flex-row items-center gap-3 px-2">
         <Pressable
           onPress={() => router.back()}

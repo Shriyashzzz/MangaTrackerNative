@@ -4,6 +4,7 @@
 // Canada's), the box-set note, more places to look, the price history,
 // about the series, readers' reviews, and the volumes beside it. Every rule
 // is the web's (core volumePageRules, offerLabels, useVolumeLoad)
+import Backdrop from "@/components/Backdrop";
 import Button from "@/components/Button";
 import DoubleRule from "@/components/DoubleRule";
 import LoadingQuote from "@/components/LoadingQuote";
@@ -91,6 +92,7 @@ export default function PriceVolumeScreen() {
 
   const frame = (title: string, body: React.ReactNode) => (
     <Safe edges={["top"]} className="flex-1 bg-paper">
+      <Backdrop />
       <View className="h-[62px] flex-row items-center gap-3 px-2">
         <Pressable
           onPress={() => router.back()}

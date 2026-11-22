@@ -3,6 +3,7 @@
 // (light or dark), New releases, Your shelf, Prices, Account (email, the
 // weekly email, alerts, export, delete). Every setting is saved on the
 // account (store/prefs save, the web's savePrefs; store/account)
+import Backdrop from "@/components/Backdrop";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState, type ComponentRef } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
@@ -77,6 +78,7 @@ export default function SettingsScreen() {
 
   return (
     <Safe edges={["top"]} className="flex-1 bg-paper">
+      <Backdrop />
       <View className="h-[62px] flex-row items-center gap-3 px-2">
         <Pressable
           onPress={() => router.back()}

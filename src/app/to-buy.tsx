@@ -2,6 +2,7 @@
 // buy, what they'd cost new and used all together, each with its prices,
 // On my shelf, Ordered and Remove, sorted their way, and Clear list.
 // Marking one theirs whose series isn't on the shelf offers to add it
+import Backdrop from "@/components/Backdrop";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
@@ -224,6 +225,7 @@ export default function ToBuyScreen() {
 
   return (
     <Safe edges={["top"]} className="flex-1 bg-paper">
+      <Backdrop />
       <View className="h-[62px] flex-row items-center gap-3 px-2">
         <Pressable
           onPress={() => router.back()}

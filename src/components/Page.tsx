@@ -3,6 +3,7 @@
 // on an iPhone, Material's bar on Android), and its words in a scroll. A
 // page that searches gets the header's own search bar. The pieces the
 // content pages are set in: a heading, a paragraph, a list line
+import Backdrop from "@/components/Backdrop";
 import { useColors } from "@/lib/colors";
 import { Stack } from "expo-router";
 import type { ReactNode } from "react";
@@ -32,6 +33,7 @@ export default function Page({
   const ios = Platform.OS === "ios";
   return (
     <View className="flex-1 bg-paper">
+      <Backdrop />
       <Stack.Screen
         options={{
           headerShown: true,

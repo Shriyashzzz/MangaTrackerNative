@@ -4,6 +4,7 @@
 // and the highlights: Popular this season, Latest deals, Prices
 // just checked. A search lists the series found, with Did you mean for a
 // typo. The rules are the web's (core findSeries, nearMatches, askedEdition)
+import Backdrop from "@/components/Backdrop";
 import AppHeader from "@/components/AppHeader";
 import Button from "@/components/Button";
 import Mascot from "@/components/Mascot";
@@ -222,6 +223,7 @@ export default function PricesScreen() {
   if (full)
     return (
       <Safe edges={["top"]} className="flex-1 bg-paper">
+        <Backdrop />
         <View className="flex-row items-center gap-2 px-2 pt-2 pb-2">
           <Pressable
             onPress={() => setFull(false)}
@@ -318,6 +320,7 @@ export default function PricesScreen() {
 
   return (
     <Safe edges={["top"]} className="flex-1 bg-paper">
+      <Backdrop />
       <AppHeader />
       <ScrollView
         contentContainerClassName="gap-5 px-4 pt-5 pb-10"
