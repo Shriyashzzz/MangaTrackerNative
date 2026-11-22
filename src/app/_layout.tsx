@@ -27,6 +27,7 @@ import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { loadDeviceStore } from "@/lib/deviceStore";
+import OfflineBar from "@/components/OfflineBar";
 import { forgetAccountData } from "@/lib/forgetAccount";
 import { openTappedAlerts, refreshPhoneAlerts } from "@/lib/phoneAlerts";
 import { useAuth } from "@/store/auth";
@@ -136,6 +137,8 @@ export default function RootLayout() {
             {/* from a reset link, signed in or not */}
             <Stack.Screen name="reset-password/[token]" />
           </Stack>
+          {/* no connection, or kept changes just sent: said along the foot */}
+          <OfflineBar signedIn={Boolean(isSignedIn)} />
         </BottomSheetModalProvider>
       </KeyboardProvider>
     </GestureHandlerRootView>

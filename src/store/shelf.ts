@@ -1,6 +1,13 @@
 // The shelf: every series they have (/api/manga), and what each one's
 // release check found, as the web's store/shelf.ts keeps them. null while
 // the shelf loads
+import { isNetworkError } from "@/core/lib/offline";
+import {
+  onChangesSent,
+  waitingChanges,
+  withChanges,
+} from "@/core/lib/offlineChanges";
+import { readLocal, writeLocal } from "@/lib/deviceStore";
 import { checkOrder, laneOf } from "@/core/lib/releaseOrder";
 import { create } from "zustand";
 import { apiFetch, getJson } from "@/core/lib/api";
@@ -100,6 +107,18 @@ async function askAbout(m: Manga) {
     return null;
   } finally {
     clearTimeout(timer);
+  }
+}
+
+// the last shelf the server sent, kept on the phone for when there's no
+// connection (forgotten at sign-out: lib/forgetAccount.ts)
+export const KEPT_SHELF = "keptShelf";
+function readKeptShelf(): Manga[] | null {
+  try {
+    const kept = JSON.parse(readLocal(KEPT_SHELF) ?? "null") as unknown;
+    return Array.isArray(kept) ? (kept as Manga[]) : null;
+  } catch {
+    return null;
   }
 }
 
@@ -271,11 +290,25 @@ export const useShelf = create<ShelfState>()((set, get) => ({
       undoMessage: "",
     }),
 
+  // The shelf, with any changes still waiting to be sent drawn on it, so it
+  // shows as it is on this phone. Each good answer is kept on the phone;
+  // with no connection that kept shelf is what's shown, not an error
   load: async () => {
+    const shownWith = async (manga: Manga[]) => {
+      const changes = await waitingChanges();
+      return changes.length ? manga.map((m) => withChanges(m, changes)) : manga;
+    };
     try {
       const data = await getJson<{ manga: Manga[] } | Manga[]>("/api/manga");
-      set({ manga: Array.isArray(data) ? data : data.manga, failed: null });
+      const manga = Array.isArray(data) ? data : data.manga;
+      writeLocal(KEPT_SHELF, JSON.stringify(manga));
+      set({ manga: await shownWith(manga), failed: null });
     } catch (e) {
+      const keptShelf = isNetworkError(e) ? readKeptShelf() : null;
+      if (keptShelf) {
+        set({ manga: await shownWith(keptShelf), failed: null });
+        return;
+      }
       set({
         failed: e instanceof Error ? e.message : "The shelf didn't load.",
       });
@@ -367,3 +400,7 @@ export const useShelf = create<ShelfState>()((set, get) => ({
 
   recheckReleases: () => set({ releases: {}, outcomes: {}, checkedAt: {} }),
 }));
+
+// kept changes just went to the server: the shelf is asked for again, so
+// it shows what the server now has
+onChangesSent(() => void useShelf.getState().load());

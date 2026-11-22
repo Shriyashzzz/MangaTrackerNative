@@ -5,6 +5,7 @@
 // finished. Edit and Delete are in the ⋮ menu. This file loads the series
 // and saves changes to it; each part of the page is its own component, and
 // every rule is the web's own (core pages/Details, core lib)
+import { isNetworkError } from "@/core/lib/offline";
 import PullPage, { usePullTop } from "@/components/PullRefresh";
 import Backdrop from "@/components/Backdrop";
 import { router, useLocalSearchParams } from "expo-router";
@@ -211,7 +212,16 @@ export default function DetailsScreen() {
         const data = (await res.json()) as { manga: Manga };
         if (live) setManga(data.manga);
       })
-      .catch((e: Error) => live && setFailed(e.message));
+      .catch((e: Error) => {
+        if (!live) return;
+        // no connection: the series as the kept shelf has it, so it can be
+        // read and changed (the changes go when the connection is back)
+        const onShelf = isNetworkError(e)
+          ? useShelf.getState().manga?.find((m) => String(m.id) === String(id))
+          : undefined;
+        if (onShelf) setManga(onShelf);
+        else setFailed(e.message);
+      });
     return () => {
       live = false;
     };

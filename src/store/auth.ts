@@ -1,5 +1,6 @@
 // Who's signed in, as the web's store/auth.ts: the session cookie and
 // /api/auth/me decide. null while asking
+import { loadDeviceStore, readLocal, writeLocal } from "@/lib/deviceStore";
 import { create } from "zustand";
 import { apiFetch, errorMessages, whenSignedOut } from "@/core/lib/api";
 import { forgetGoogle } from "@/lib/googleSignIn";
@@ -21,16 +22,23 @@ type AuthState = {
   logOut: () => Promise<void>;
 };
 
+const SIGNED_IN = "signedInBefore";
+
 export const useAuth = create<AuthState>()((set) => ({
   isSignedIn: null,
 
   check: async () => {
+    // what this phone remembers must be read first (it's asked below)
+    await loadDeviceStore();
     try {
       const res = await apiFetch("/api/auth/me");
       set({ isSignedIn: res.ok });
     } catch {
-      // the server didn't answer, which says nothing about their session
-      set({ isSignedIn: false });
+      // The server didn't answer, which says nothing about their session:
+      // they're taken as they were last time. Signed in before, they get
+      // their kept shelf and can go on offline; calling it signed out here
+      // would throw that shelf and their unsent changes away
+      set({ isSignedIn: readLocal(SIGNED_IN) === "yes" });
     }
   },
 
@@ -78,6 +86,13 @@ export const useAuth = create<AuthState>()((set) => ({
     }
   },
 }));
+
+// whether they were signed in is remembered on the phone, for a start with
+// no connection (check, above)
+useAuth.subscribe((state) => {
+  if (state.isSignedIn !== null)
+    writeLocal(SIGNED_IN, state.isSignedIn ? "yes" : "no");
+});
 
 // the server says the session is gone (it lapsed, or the account was signed
 // out everywhere): the app goes back to its signed-out screens, where a

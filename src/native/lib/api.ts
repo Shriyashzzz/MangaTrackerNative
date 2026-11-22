@@ -5,7 +5,14 @@
 // (the phone's localhost:8080, passed to the Mac by adb reverse); a release
 // build uses the real site. EXPO_PUBLIC_API_URL overrides either
 import { withCountry } from "./country";
-import { isOffline, noteAnswer, offlineAnswer, orOffline } from "./offline";
+import {
+  isOffline,
+  noteAnswer,
+  offlineAnswer,
+  orOffline,
+  setOffline,
+  setProbe,
+} from "./offline";
 import type { ApiError } from "./types";
 
 export const API_URL: string =
@@ -13,6 +20,12 @@ export const API_URL: string =
   (__DEV__ ? "http://localhost:8080" : "https://mangatracker.xyz");
 
 type FetchOptions = Omit<RequestInit, "body"> & { body?: unknown };
+
+// while offline, lib/offline.ts asks this now and then: any answer from the
+// server, whatever it says, means the connection is back
+setProbe(() =>
+  fetch(`${API_URL}/api/auth/me`, { credentials: "include" }).then(() => true),
+);
 
 // a request that hasn't answered in this long is given up on, so a screen
 // never waits for ever on a bad connection (the slowest answers, a live
@@ -51,6 +64,8 @@ export function apiFetch(
   }).then(
     (res) => {
       clearTimeout(timer);
+      // any answer at all: there's a connection
+      setOffline(false);
       noteAnswer(res);
       if (res.status === 401 && !path.startsWith("/api/auth/")) signedOut?.();
       return res;
@@ -62,11 +77,14 @@ export function apiFetch(
         throw new TypeError(orOffline("The server took too long. Try again."), {
           cause: e,
         });
-      if (e instanceof TypeError)
+      if (e instanceof TypeError) {
+        // it never reached the server: offline, until something answers
+        setOffline(true);
         throw new TypeError(
           orOffline("Couldn't reach the server. Try again."),
           { cause: e },
         );
+      }
       throw e;
     },
   );

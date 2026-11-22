@@ -65,10 +65,11 @@ export default function ReadingStepper({
     toSaveNow.current = toSave;
   });
   const [draft, setDraft] = useState(String(value ?? 0));
-  const [note, setNote] = useState<"saved" | "failed" | null>(null);
+  // "kept": no connection, so it's on this phone until there is one
+  const [note, setNote] = useState<"saved" | "kept" | "failed" | null>(null);
   const [problem, setProblem] = useState<string | null>(null);
   useEffect(() => {
-    if (note !== "saved") return;
+    if (note !== "saved" && note !== "kept") return;
     const hide = setTimeout(() => setNote(null), SAVED_SHOWN_MS);
     return () => clearTimeout(hide);
   }, [note]);
@@ -87,10 +88,10 @@ export default function ReadingStepper({
     );
     queue.current = save.catch(() => {});
     try {
-      await save;
+      const how = await save;
       saved.current = shown;
       savedPlace.current = toSave(shown);
-      setNote("saved");
+      setNote(how);
       onSaved(shown);
     } catch {
       // a newer change is on its way: that one decides
@@ -176,11 +177,13 @@ export default function ReadingStepper({
     problem ??
     (note === "saved"
       ? "Saved"
-      : note === "failed"
-        ? "That didn't save. Try again."
-        : books
-          ? books.inside(current)
-          : null);
+      : note === "kept"
+        ? "Kept on this phone"
+        : note === "failed"
+          ? "That didn't save. Try again."
+          : books
+            ? books.inside(current)
+            : null);
 
   return (
     <View className="flex-row items-center gap-2.5">
