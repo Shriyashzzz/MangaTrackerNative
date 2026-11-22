@@ -411,22 +411,30 @@ function Card({
           </Text>
         </Tap>
       )}
-      {other || (best && item.outOn) ? (
+      {/* the other copy: the same button, quieter, so the cheaper one
+          stays the obvious pick */}
+      {other ? (
+        <Tap
+          onPress={() => toStore(other.url)}
+          accessibilityRole="link"
+          accessibilityLabel={`${formatCents(other.cents)} ${other.kind} at ${other.store}. Open the store`}
+          className="min-h-[46px] flex-row items-center justify-between gap-3 rounded-[12px] bg-ink/10 px-3.5 py-2"
+        >
+          <Text className="font-brand pr-[6px] text-[23px] leading-[28px] text-ink">
+            {formatCents(other.cents)}
+            {"\u00A0"}
+          </Text>
+          <Text
+            numberOfLines={1}
+            className="min-w-0 shrink text-right font-body-semibold text-[13.5px] text-ink"
+          >
+            {other.kind === "new" ? "New" : "Used"} at {other.store} →
+          </Text>
+        </Tap>
+      ) : null}
+      {best && item.outOn ? (
         <Text className="font-body text-[13px] text-ink-soft">
-          {other ? (
-            <>
-              or {other.kind} for {formatCents(other.cents)} at{" "}
-              <Text
-                className="font-body-semibold text-ink underline"
-                onPress={() => toStore(other.url)}
-              >
-                {other.store} →
-              </Text>
-            </>
-          ) : null}
-          {best && item.outOn
-            ? `${other ? "  ·  " : ""}Out ${releaseDay(item.outOn)}`
-            : null}
+          Out {releaseDay(item.outOn)}
         </Text>
       ) : null}
       <MenuSheet
@@ -560,6 +568,14 @@ export default function ToBuyScreen() {
     const { isbn13, text } = noting;
     setNoting(null);
     void setNoteOf(isbn13, text).catch(() =>
+      Alert.alert("That didn't save. Try again."),
+    );
+  };
+  const removeNote = () => {
+    if (!noting) return;
+    const { isbn13 } = noting;
+    setNoting(null);
+    void setNoteOf(isbn13, "").catch(() =>
       Alert.alert("That didn't save. Try again."),
     );
   };
@@ -721,7 +737,15 @@ export default function ToBuyScreen() {
             returnKeyType="done"
             onSubmitEditing={saveNote}
           />
-          <View className="flex-row justify-end gap-3">
+          <View className="flex-row items-center justify-end gap-3">
+            {/* only when there's one saved to remove */}
+            {sorted.find((item) => item.isbn13 === noting?.isbn13)?.note ? (
+              <Tap onPress={removeNote} hitSlop={6} className="mr-auto">
+                <Text className="font-body text-[14px] text-ink-soft underline">
+                  Remove note
+                </Text>
+              </Tap>
+            ) : null}
             <Button small label="Cancel" onPress={() => setNoting(null)} />
             <Button small kind="primary" label="Save" onPress={saveNote} />
           </View>
