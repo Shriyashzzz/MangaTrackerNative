@@ -102,10 +102,30 @@ control the app uses it:
 - Sign in with Google is not in the app yet; the account pages (sign up,
   forgot and reset password) are.
 
+## Google sign-in
+
+The app signs in through the same server route as the website
+(`/api/auth/google`): Google's sheet on the phone hands back an ID token made
+out to the website's web client, which is the client the server checks.
+The client IDs live in `.env.local` (copy `.env.example`); nothing is in git.
+
+- `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`: the website's web client.
+- `EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID`: an Android client in Google Cloud
+  for package `xyz.mangatracker.app.rn` and the signing key's SHA-1. The
+  debug keystore (`android/app/debug.keystore`) has one; a Play build needs a
+  second client with the SHA-1 from Play app signing.
+- `EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID`: an iOS client for bundle
+  `xyz.mangatracker.app.rn`. When it exists, add the library's config plugin
+  to `app.json` with its reversed ID as `iosUrlScheme`
+  (`com.googleusercontent.apps.<id>`), then prebuild iOS.
+
+Without the IDs the button stays off the sign-in pages. A new `.env.local`
+needs Metro restarted, since the values are read when it starts.
+
 ## Not done yet
 
-- Sign in with Google (the website has it; the app needs Google's own
-  sign-in and the server to take its token)
+- Google sign-in on iOS: its client ID and the plugin's URL scheme (above)
+- Google sign-in on a Play build: the second Android client (above)
 - The reset-password screen exists, but a reset email's link opens the
   website: for the app to open it, the site needs an `assetlinks.json` for
   this app's package

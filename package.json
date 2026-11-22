@@ -15,6 +15,7 @@
     "@gorhom/bottom-sheet": "^5.2.14",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-community/datetimepicker": "9.2.1",
+    "@react-native-google-signin/google-signin": "^17.0.0",
     "@react-native-menu/menu": "^2.2.1",
     "@react-navigation/bottom-tabs": "^7.22.0",
     "@shopify/flash-list": "2.3.2",

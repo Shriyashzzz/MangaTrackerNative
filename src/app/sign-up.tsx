@@ -8,6 +8,7 @@ import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 import AuthArt from "@/components/AuthArt";
+import GoogleButton from "@/components/GoogleButton";
 import Button from "@/components/Button";
 import { Field, Input } from "@/components/Field";
 import PasswordInput from "@/components/PasswordInput";
@@ -77,6 +78,10 @@ export default function SignUp() {
             sfx="A new series begins!"
             chapter="1"
             line="Volume 1 of your shelf starts here."
+          />
+          <GoogleButton
+            onBusy={setLoading}
+            onError={(message) => setErrors(message ? [message] : [])}
           />
           <Field
             label="Username"

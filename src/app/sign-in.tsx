@@ -6,6 +6,7 @@ import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 import AuthArt from "@/components/AuthArt";
+import GoogleButton from "@/components/GoogleButton";
 import { useAuth } from "@/store/auth";
 import { router } from "expo-router";
 
@@ -49,6 +50,7 @@ export default function SignIn() {
           chapter="374"
           line="Your shelf is right where you left it."
         />
+        <GoogleButton onBusy={setLoading} onError={setError} />
         <View className="gap-1.5">
           <Text className="font-body-medium text-[15px] text-ink">
             Username

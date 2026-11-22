@@ -2,6 +2,7 @@
 // /api/auth/me decide. null while asking
 import { create } from "zustand";
 import { apiFetch, errorMessages } from "@/core/lib/api";
+import { forgetGoogle } from "@/lib/googleSignIn";
 
 type AuthState = {
   isSignedIn: boolean | null;
@@ -14,6 +15,8 @@ type AuthState = {
     password: string,
     email: string,
   ) => Promise<string[]>;
+  // Google's token for the server to check; the response, for its words
+  signInWithGoogle: (credential: string) => Promise<Response>;
   logOut: () => Promise<void>;
 };
 
@@ -54,8 +57,20 @@ export const useAuth = create<AuthState>()((set) => ({
     return errorMessages(res);
   },
 
+  signInWithGoogle: async (credential) => {
+    const res = await apiFetch("/api/auth/google", {
+      method: "POST",
+      body: { credential },
+    });
+    if (res.ok) set({ isSignedIn: true });
+    return res;
+  },
+
   logOut: async () => {
     const res = await apiFetch("/api/auth/logout", { method: "POST" });
-    if (res.ok) set({ isSignedIn: false });
+    if (res.ok) {
+      set({ isSignedIn: false });
+      void forgetGoogle();
+    }
   },
 }));
