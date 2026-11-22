@@ -573,21 +573,18 @@ export default function NewScreen() {
             ))
           )}
 
-          {/* a list their setting has shortened says so, under it */}
-          {!viewingHidden && !openPile && heldBack > 0 && list.length > 0 ? (
-            <Text className="text-center font-body text-[13.5px] text-ink-soft">
-              {heldBack === 1
-                ? "1 series is further behind than your setting shows. "
-                : `${heldBack} series are further behind than your setting shows. `}
-              <Text
-                className="font-body-semibold text-ink underline"
-                onPress={toSettings}
-              >
-                Change what New shows
-              </Text>
-            </Text>
+          {/* the foot: the one way to change the list, and when it was
+              last looked for */}
+          {list.length > 0 ? (
+            <View className="flex-row items-center justify-between gap-3 pt-1">
+              <Tap onPress={toSettings} hitSlop={8}>
+                <Text className="font-body-semibold text-[14px] text-ink underline">
+                  Change what New shows
+                </Text>
+              </Tap>
+              {checkedLine}
+            </View>
           ) : null}
-          {list.length > 0 ? checkedLine : null}
         </ScrollView>
       </PullPage>
 
