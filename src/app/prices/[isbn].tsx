@@ -55,6 +55,7 @@ import {
 import { useColors } from "@/lib/colors";
 import { usePrefs } from "@/store/prefs";
 import { H2 } from "@/components/Page";
+import LoadingQuote from "@/components/LoadingQuote";
 
 const Safe = withUniwind(SafeAreaView);
 // a history kind's name: the offer labels' words for new print and ebooks
@@ -138,7 +139,7 @@ export default function PriceVolumeScreen() {
         "Search by name, or type the 13 digits from the back of a volume.",
       ),
     );
-  if (page.loading) return frame("Prices", null);
+  if (page.loading) return frame("Prices", <LoadingQuote />);
   if (page.error || !page.data)
     return frame(
       "Prices",

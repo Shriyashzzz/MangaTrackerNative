@@ -138,6 +138,8 @@ const ENTRIES = [
   // after the anime: which book is volume N, and the pages' shared words
   "pages/AfterAnime/bookFor.ts",
   "pages/AfterAnime/words.ts",
+  // the lines read while something slow loads
+  "lib/content/quotes.ts",
 ];
 
 // browser-only things a copied file may not use

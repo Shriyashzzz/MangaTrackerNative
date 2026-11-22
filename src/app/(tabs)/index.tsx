@@ -3,20 +3,17 @@
 // a row per series. Pull down to load it again. Volumes is its own view
 // (VolumesView). Who's in each tab, the search and the sort are the web's own
 // rules (core filterShelf); it opens on the tab and sort the account chose
-import { useEffect, useState } from "react";
-import {
-  Alert,
-  Pressable,
-  RefreshControl,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { Alert, Pressable, Text, TextInput, View } from "react-native";
 import Animated, {
   FadeOut,
   LayoutAnimationConfig,
   LinearTransition,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
 } from "react-native-reanimated";
+import { useKenjiRefresh } from "@/components/PullRefresh";
 import {
   SafeAreaView,
   useSafeAreaInsets,
@@ -147,6 +144,18 @@ export default function ShelfScreen() {
     await load();
     setRefreshing(false);
   };
+  const pull = useKenjiRefresh(load);
+  // the + button: 0 in place, 1 slid away under the tab bar
+  const fabAway = useSharedValue(0);
+  const fabHidden = useRef(false);
+  const lastY = useRef(0);
+  const fabStyle = useAnimatedStyle(() => ({
+    opacity: 1 - fabAway.value,
+    transform: [
+      { translateY: fabAway.value * 90 },
+      { scale: 1 - fabAway.value * 0.2 },
+    ],
+  }));
   const closeSearch = () => {
     setQuery("");
     setSearching(false);
@@ -265,13 +274,21 @@ export default function ShelfScreen() {
             ItemSeparatorComponent={DashedLine}
             // room under the last row for the floating +
             contentContainerClassName="px-4 pb-28"
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={refresh}
-                colors={[c.accent]}
-              />
-            }
+            refreshControl={pull.refreshControl}
+            scrollEventThrottle={32}
+            onScroll={(e) => {
+              // the + leaves as they read down the shelf, and comes back
+              // the moment they scroll up, as the Android app's does
+              const y = e.nativeEvent.contentOffset.y;
+              const moved = y - lastY.current;
+              if (Math.abs(moved) < 6) return;
+              lastY.current = y;
+              const hide = moved > 0 && y > 40;
+              if (hide !== fabHidden.current) {
+                fabHidden.current = hide;
+                fabAway.set(withTiming(hide ? 1 : 0, { duration: 200 }));
+              }
+            }}
             ListEmptyComponent={
               manga ? (
                 <Text className="pt-6 font-body text-[15px] text-ink-soft">
@@ -284,16 +301,24 @@ export default function ShelfScreen() {
           />
         </LayoutAnimationConfig>
       )}
+      {tab !== "volumes" ? pull.indicator : null}
       {/* the floating +: type a title or scan a barcode. Not over Volumes */}
       {tab !== "volumes" && !select.selectOn ? (
-        <Pressable
-          onPress={() => setAdding(true)}
-          accessibilityLabel="Add manga"
-          style={{ bottom: insets.bottom + 20 }}
-          className="absolute right-4 h-14 w-14 items-center justify-center rounded-full border-2 border-paper bg-accent active:opacity-90"
+        <Animated.View
+          style={[
+            { position: "absolute", right: 16, bottom: insets.bottom + 20 },
+            fabStyle,
+          ]}
         >
-          <PlusIcon color={c.onAccent} width={26} height={26} />
-        </Pressable>
+          <Pressable
+            onPress={() => setAdding(true)}
+            accessibilityLabel="Add manga"
+            className="h-14 w-14 items-center justify-center rounded-full bg-accent active:opacity-90"
+            style={{ boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.35)" }}
+          >
+            <PlusIcon color={c.onAccent} width={26} height={26} />
+          </Pressable>
+        </Animated.View>
       ) : null}
       {adding ? (
         <AddChoice

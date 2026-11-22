@@ -63,6 +63,7 @@ import { usePrefs } from "@/store/prefs";
 import { restoredAs, useShelf } from "@/store/shelf";
 import { H2 } from "@/components/Page";
 import { DEFAULT_TRACK_BY } from "@/lib/trackBy";
+import LoadingQuote from "@/components/LoadingQuote";
 
 const Safe = withUniwind(SafeAreaView);
 
@@ -186,7 +187,12 @@ export default function DetailsScreen() {
         />
       </Safe>
     );
-  if (!manga) return <Safe className="flex-1 bg-paper" />;
+  if (!manga)
+    return (
+      <Safe className="flex-1 bg-paper">
+        <LoadingQuote />
+      </Safe>
+    );
 
   const m = manga;
   const finished = m.status;

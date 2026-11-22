@@ -59,6 +59,7 @@ import {
 import { useColors } from "@/lib/colors";
 import { usePrefs } from "@/store/prefs";
 import { H2 } from "@/components/Page";
+import LoadingQuote from "@/components/LoadingQuote";
 
 const Safe = withUniwind(SafeAreaView);
 // the volume grid: four covers a row, as the Android app lays them
@@ -124,7 +125,7 @@ export default function PriceSeriesScreen() {
       {body}
     </Safe>
   );
-  if (series.loading) return frame(name, null);
+  if (series.loading) return frame(name, <LoadingQuote />);
   if (series.error || !series.data) {
     const notFound = /couldn't find that series/i.test(series.error);
     return frame(
