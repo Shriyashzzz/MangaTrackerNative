@@ -559,24 +559,30 @@ export default function DetailsScreen() {
                 it is, the value is the tap. The shelf, the counter and Buy
                 next all follow it */}
               {editions.lines.length ? (
-                <Tap
-                  onPress={() => setPickingEdition(true)}
-                  hitSlop={8}
-                  accessibilityRole="button"
-                  accessibilityLabel={`Edition: ${editions.line?.label ?? "Single volumes"}. Change`}
-                  className="flex-row items-center gap-1 self-start active:opacity-70"
-                >
-                  <Text className="font-body text-[13.5px] text-ink-soft">
-                    Edition
-                  </Text>
-                  <Text
-                    numberOfLines={1}
-                    className="shrink font-body-semibold text-[13.5px] text-accent-ink"
+                <TourTarget name="edition" className="self-start">
+                  <Tap
+                    onPress={() => setPickingEdition(true)}
+                    hitSlop={8}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Edition: ${editions.line?.label ?? "Single volumes"}. Change`}
+                    className="flex-row items-center gap-1 self-start active:opacity-70"
                   >
-                    {editions.line?.label ?? "Single volumes"}
-                  </Text>
-                  <ChevronDownIcon color={c.accentInk} width={14} height={14} />
-                </Tap>
+                    <Text className="font-body text-[13.5px] text-ink-soft">
+                      Edition
+                    </Text>
+                    <Text
+                      numberOfLines={1}
+                      className="shrink font-body-semibold text-[13.5px] text-accent-ink"
+                    >
+                      {editions.line?.label ?? "Single volumes"}
+                    </Text>
+                    <ChevronDownIcon
+                      color={c.accentInk}
+                      width={14}
+                      height={14}
+                    />
+                  </Tap>
+                </TourTarget>
               ) : null}
             </View>
           </View>

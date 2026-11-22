@@ -5,6 +5,7 @@
 // card with its price, Yours and Next, Not on your shelf to see only the
 // gaps with what they cost. The rules are the web's (core seriesPageRules,
 // finishCost, useSeriesData)
+import { useTourScroll } from "@/lib/tourScroll";
 import { todayOf } from "@/core/lib/editionNews";
 import ToBuyBag from "@/components/ToBuyBag";
 import Tap from "@/components/Tap";
@@ -61,7 +62,7 @@ import {
 import { useColors } from "@/lib/colors";
 import { usePrefs } from "@/store/prefs";
 import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useRef, useState, type ComponentRef } from "react";
+import { type ComponentRef, useEffect, useRef, useState } from "react";
 import { ScrollView, Text, useWindowDimensions, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
@@ -121,6 +122,9 @@ export default function PriceSeriesScreen() {
   }, [name]);
   const editionsKnown = editions.name === name;
   const pull = usePullTop();
+  // (the tour scrolls this page to what Kenji points at)
+  useTourScroll(page, pull.top);
+
   const isSignedIn = useAuth((st) => st.isSignedIn);
   const [askedEdition, setAskedEdition] = useState<string | null>(
     params.edition ?? null,

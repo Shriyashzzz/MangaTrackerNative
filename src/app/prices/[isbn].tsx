@@ -4,7 +4,9 @@
 // Canada's), the box-set note, more places to look, the price history,
 // about the series, readers' reviews, and the volumes beside it. Every rule
 // is the web's (core volumePageRules, offerLabels, useVolumeLoad)
-import { coverAt } from "@/lib/coverAt";
+import { useTourScroll } from "@/lib/tourScroll";
+import TourTarget from "@/components/TourTarget";
+import { coverAt, isNotACover } from "@/lib/coverAt";
 import LightNovelBand from "@/components/LightNovelBand";
 import ToBuyBag from "@/components/ToBuyBag";
 import Tap from "@/components/Tap";
@@ -58,7 +60,7 @@ import { useColors } from "@/lib/colors";
 import { usePrefs } from "@/store/prefs";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
+import { type ComponentRef, useRef, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
@@ -89,6 +91,10 @@ export default function PriceVolumeScreen() {
   const hideEbooks = usePrefs((s) => s.prefs.hideEbooks === "yes");
   const page = useVolumeLoad(isbn, country);
   const pull = usePullTop();
+  // (the tour scrolls this page to what Kenji points at)
+  const scroller = useRef<ComponentRef<typeof ScrollView>>(null);
+  useTourScroll(scroller, pull.top);
+  const [coverGone, setCoverGone] = useState(false);
   const loadedBook = page.data?.book ?? null;
   const canada = useCanadaPrices(
     country === "ca" ? (loadedBook?.isbn13 ?? null) : null,
@@ -178,6 +184,7 @@ export default function PriceVolumeScreen() {
     storeLinks,
   } = page.data;
   const seriesLabel = series.info?.name ?? series.name;
+  const noCover = !book.coverUrl || coverGone;
   const shownSeries = novelParts(seriesLabel).title;
   const shownBook = novelParts(page.data.heading ?? book.title);
   const inCanada = country === "ca";
@@ -247,6 +254,7 @@ export default function PriceVolumeScreen() {
       scrollTop={pull.top}
     >
       <ScrollView
+        ref={scroller}
         contentContainerClassName="gap-6 px-4 pt-4 pb-16"
         overScrollMode="never"
         scrollEventThrottle={16}
@@ -269,29 +277,35 @@ export default function PriceVolumeScreen() {
                 justifyContent: "center",
               }}
             >
-              {!book.coverUrl && series.info?.coverUrl ? (
+              {noCover && series.info?.coverUrl ? (
                 <Image
                   source={{ uri: coverSrc(series.info.coverUrl) }}
                   style={{
                     position: "absolute",
                     width: "100%",
                     height: "100%",
-                    opacity: 0.35,
+                    opacity: 0.55,
                   }}
                   contentFit="cover"
                 />
               ) : null}
-              {!book.coverUrl ? (
+              {noCover ? (
                 <Text className="font-brand pr-[10px] text-[40px] text-ink">
                   {volume ?? "?"}
                   {"\u00A0"}
                 </Text>
               ) : null}
-              {book.coverUrl ? (
+              {!noCover ? (
                 <Image
                   source={{ uri: coverAt(book.coverUrl, 102) }}
                   style={{ width: "100%", height: "100%" }}
                   contentFit="cover"
+                  // none for this edition, or a store's "no image" picture:
+                  // the series' cover stands in, dimmed, with the number
+                  onLoad={(e) => {
+                    if (isNotACover(e.source)) setCoverGone(true);
+                  }}
+                  onError={() => setCoverGone(true)}
                 />
               ) : null}
               {shownBook.lightNovel ? <LightNovelBand width={102} /> : null}
@@ -413,7 +427,9 @@ export default function PriceVolumeScreen() {
         {/* one country's prices at a time */}
         <View className="gap-3">
           <View className="flex-row items-end justify-between gap-3">
-            <H2>{inCanada ? "Prices in Canada" : "Prices"}</H2>
+            <TourTarget name="prices" className="self-start">
+              <H2>{inCanada ? "Prices in Canada" : "Prices"}</H2>
+            </TourTarget>
             <View className="w-[160px]">
               <CountrySwitch />
             </View>

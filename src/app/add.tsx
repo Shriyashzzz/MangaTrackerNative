@@ -4,11 +4,17 @@
 // it in), stars, and under "More about it" the volumes they own, the type,
 // genre and notes. The checks and the request are the web's own (core
 // seriesFormRules); AniList's matches come through core useCoverSearch
+import { isDemo } from "@/core/lib/demo";
 import TourTarget from "@/components/TourTarget";
 import Tap from "@/components/Tap";
 import { useIsOffline } from "@/core/lib/offline";
 import { Image } from "expo-image";
-import { router, useLocalSearchParams, usePreventRemove } from "expo-router";
+import {
+  router,
+  useLocalSearchParams,
+  useNavigation,
+  usePreventRemove,
+} from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Alert, BackHandler, Keyboard, Text, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
@@ -169,12 +175,17 @@ export default function AddScreen() {
   const [leaving, setLeaving] = useState(false);
   const entered =
     title.trim() !== (fromPrices ?? "").trim() || picked !== null || rating > 0;
-  const guarded = entered && savedId === null && !leaving;
+  // (never on the practice shelf: nothing there is theirs to lose)
+  const navigation = useNavigation();
+  const guarded = entered && savedId === null && !leaving && !isDemo();
   const leave = () => (guarded ? askToLeave(setLeaving) : router.back());
   usePreventRemove(guarded, () => askToLeave(setLeaving));
   useEffect(() => {
     if (!guarded) return;
     const back = BackHandler.addEventListener("hardwareBackPress", () => {
+      // only while this form is the page in front: with another page over
+      // it (the series just opened from here), back is that page's
+      if (!navigation.isFocused()) return false;
       askToLeave(setLeaving);
       return true;
     });

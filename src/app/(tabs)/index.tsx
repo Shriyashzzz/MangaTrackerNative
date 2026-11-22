@@ -3,6 +3,7 @@
 // a row per series. Pull down to load it again. Volumes is its own view
 // (VolumesView). Who's in each tab, the search and the sort are the web's own
 // rules (core filterShelf); it opens on the tab and sort the account chose
+import { useTour } from "@/store/tour";
 import Tap from "@/components/Tap";
 import Backdrop from "@/components/Backdrop";
 import GuestShelf from "@/components/GuestShelf";
@@ -74,9 +75,21 @@ function SignedInShelf() {
   const checksOn = prefs.releaseChecks !== "off";
   const trackBy = prefs.trackBy ?? DEFAULT_TRACK_BY;
   // what the account chose until they pick here
-  const [tabPicked, setTab] = useState<TabId | null>(null);
+  // Kenji's tour: a step about the shelf's Volumes view opens the shelf on
+  // it (and one about the list, on All). Their own pick wins again as soon
+  // as they make one on that step
+  const tourAt = useTour((t) => (t.steps.length ? t.at : -1));
+  const tourTab = useTour((t) => {
+    const its = t.steps[t.at]?.tab;
+    return its === "volumes" || its === "all" ? its : null;
+  });
+  const [picked, setPicked] = useState<{ tab: TabId; at: number } | null>(null);
+  const setTab = (to: TabId) => setPicked({ tab: to, at: tourAt });
+  const tabPicked =
+    picked && (tourTab === null || picked.at === tourAt) ? picked.tab : null;
   const [sortPicked, setSort] = useState<ShelfSort | null>(null);
-  const tab = tabPicked ?? (isTab(prefs.shelfTab) ? prefs.shelfTab : "all");
+  const tab =
+    tabPicked ?? tourTab ?? (isTab(prefs.shelfTab) ? prefs.shelfTab : "all");
   const sortBy = sortPicked ?? prefs.shelfSort ?? "";
   const [query, setQuery] = useState("");
   const [searching, setSearching] = useState(false);
