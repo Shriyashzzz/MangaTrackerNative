@@ -15,6 +15,7 @@ import { withUniwind } from "uniwind";
 import AppHeader from "@/components/AppHeader";
 import DashedLine from "@/components/DashedLine";
 import Mascot from "@/components/Mascot";
+import JapanSheet from "@/components/JapanSheet";
 import NewRow from "@/components/NewRow";
 import ReleaseModal from "@/components/ReleaseModal";
 import SeriesCover from "@/components/SeriesCover";
@@ -110,6 +111,8 @@ export default function NewScreen() {
   const [openPile, setOpenPile] = useState<Pile | null>(null);
   const [wantHidden, setWantHidden] = useState(false);
   const [openList, setOpenList] = useState<number | null>(null);
+  // the In Japan row tapped: its sheet says where each edition is
+  const [japanOf, setJapanOf] = useState<number | null>(null);
   const [askingHideAll, setAskingHideAll] = useState(false);
   const pull = usePullTop();
   useEffect(() => {
@@ -238,7 +241,13 @@ export default function NewScreen() {
         kind={kind}
         onHide={() => void hideActions.hide(m)}
         hideWord={viewingHidden ? "Show" : "Hide"}
-        onOpenList={opens ? () => setOpenList(m.id) : undefined}
+        onOpenList={
+          kind === "japan" && !viewingHidden
+            ? () => setJapanOf(m.id)
+            : opens
+              ? () => setOpenList(m.id)
+              : undefined
+        }
       />
     );
   };
@@ -490,10 +499,18 @@ export default function NewScreen() {
                   <View className="flex-row gap-2.5">
                     {piles[p].slice(0, FAN).map((m) => {
                       const found = releases[m.id];
-                      const opens = opensAList(found, kind);
+                      // In Japan: a tap says where each edition is
+                      const japan = kind === "japan";
+                      const opens = japan || opensAList(found, kind);
                       const inside = (
                         <Pressable
-                          onPress={opens ? () => setOpenList(m.id) : undefined}
+                          onPress={
+                            japan
+                              ? () => setJapanOf(m.id)
+                              : opens
+                                ? () => setOpenList(m.id)
+                                : undefined
+                          }
                           className="w-[58px] gap-1 active:opacity-70"
                         >
                           <View>
@@ -573,6 +590,11 @@ export default function NewScreen() {
           onGone={hideActions.dismiss}
         />
       ) : null}
+      <JapanSheet
+        manga={all.find((m) => m.id === japanOf) ?? null}
+        found={japanOf === null ? null : releases[japanOf]}
+        onClose={() => setJapanOf(null)}
+      />
       {openManga && releases[openManga.id] ? (
         <ReleaseModal
           manga={openManga}
