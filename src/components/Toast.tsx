@@ -1,8 +1,9 @@
 // A note pinned to the foot of the screen, with an action: "6 volumes taken
 // off your shelf · UNDO", as the web's components/toast. It goes by itself
 // after 7 seconds. No action word: a note alone
+import Tap from "@/components/Tap";
 import { useEffect } from "react";
-import { Pressable, Text } from "react-native";
+import { Text } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
 
@@ -35,11 +36,11 @@ export default function Toast({
         {text}
       </Text>
       {action ? (
-        <Pressable onPress={onAction} hitSlop={10}>
+        <Tap onPress={onAction} hitSlop={10}>
           <Text className="font-body-semibold text-[15px] tracking-[0.5px] text-accent uppercase">
             {action}
           </Text>
-        </Pressable>
+        </Tap>
       ) : null}
     </Animated.View>
   );

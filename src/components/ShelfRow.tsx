@@ -5,6 +5,7 @@
 // reading), so the two apps always say the same. While selecting, a tick box
 // sits on the cover and a tap picks the row. A long press opens the
 // platform's own menu: Edit, Move to, Select several, Delete
+import Tap from "@/components/Tap";
 import SeriesCover from "@/components/SeriesCover";
 import {
   MenuView,
@@ -14,7 +15,7 @@ import {
 import * as Haptics from "expo-haptics";
 import { Link, router } from "expo-router";
 import { memo, useRef, useState } from "react";
-import { Alert, Platform, Pressable, Text, View } from "react-native";
+import { Alert, Platform, Text, View } from "react-native";
 import { useRipple } from "@/lib/press";
 import { useShelf } from "@/store/shelf";
 import MenuSheet from "./MenuSheet";
@@ -71,7 +72,7 @@ export default memo(function ShelfRow({
   const rating = Number(manga.rating) || 0;
 
   const row = (
-    <Pressable
+    <Tap
       android_ripple={ripple}
       onPress={select?.onToggle}
       onLongPress={
@@ -126,7 +127,7 @@ export default memo(function ShelfRow({
           place={place}
         />
       </View>
-    </Pressable>
+    </Tap>
   );
   const act = (id: string) => {
     if (id === "edit") router.push(`/edit/${manga.id}`);

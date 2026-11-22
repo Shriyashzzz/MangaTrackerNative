@@ -1,10 +1,11 @@
 // Import your list, as the web's pages/Import/Import.tsx: where it comes
 // from (MyAnimeList's export file, an AniList or Kitsu username, or a book
 // app's files), what was found, which lists to add, then adding them
+import Tap from "@/components/Tap";
 import ListRows from "@/components/import/ListRows";
 import { openOutside } from "@/lib/openOutside";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import Button from "@/components/Button";
 import { Field, Input } from "@/components/Field";
 import Page, { H2 } from "@/components/Page";
@@ -96,7 +97,7 @@ export default function ImportScreen() {
                 const on = source === s.id;
                 const off = busySource !== null && s.id !== busySource;
                 return (
-                  <Pressable
+                  <Tap
                     key={s.id}
                     onPress={() => s.id !== source && pickSource(s.id)}
                     disabled={off}
@@ -112,7 +113,7 @@ export default function ImportScreen() {
                     >
                       {s.label}
                     </Text>
-                  </Pressable>
+                  </Tap>
                 );
               })}
             </View>

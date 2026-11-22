@@ -1,9 +1,10 @@
 // The shelf for someone not signed in (the web's pages/Home/GuestHero.tsx):
 // what a shelf is for, and the two ways in. Prices stay open to them along
 // the bottom
+import Tap from "@/components/Tap";
 import { router } from "expo-router";
 import type { ReactNode } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import AuthArt from "./AuthArt";
 import Button from "./Button";
 
@@ -121,11 +122,11 @@ export default function GuestShelf() {
             ["Privacy", "/privacy"],
           ] as const
         ).map(([label, href]) => (
-          <Pressable key={href} onPress={() => router.push(href)} hitSlop={8}>
+          <Tap key={href} onPress={() => router.push(href)} hitSlop={8}>
             <Text className="font-body-medium text-[14px] text-ink-soft">
               {label}
             </Text>
-          </Pressable>
+          </Tap>
         ))}
       </View>
     </ScrollView>

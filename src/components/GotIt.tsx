@@ -1,7 +1,8 @@
 // Buy next's "I've got this one", as the Android app's (web pages/Details/
 // GotIt.tsx): two pills on the ticket, one tap each. On my shelf records it
 // (and its volumes); Ordered keeps it on its way, so Buy next moves past it
-import { Pressable, Text, View } from "react-native";
+import Tap from "@/components/Tap";
+import { Text, View } from "react-native";
 
 export default function GotIt({
   name,
@@ -36,7 +37,7 @@ export default function GotIt({
   return (
     <View className="flex-row gap-1.5">
       {choices.map((c) => (
-        <Pressable
+        <Tap
           key={c.said}
           onPress={c.run}
           disabled={c.busy}
@@ -46,7 +47,7 @@ export default function GotIt({
           <Text className="font-mono-medium text-[11px] tracking-[0.5px] text-accent-ink uppercase">
             {c.label}
           </Text>
-        </Pressable>
+        </Tap>
       ))}
     </View>
   );

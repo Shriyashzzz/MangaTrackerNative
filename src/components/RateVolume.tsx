@@ -8,7 +8,8 @@
 //                    the volume's number on an inked stub and smaller
 //                    stars. About the last volume they've read, until it's
 //                    rated; its cross hides it until they read on
-import { Pressable, Text, View } from "react-native";
+import Tap from "@/components/Tap";
+import { Text, View } from "react-native";
 import { InkCrossIcon } from "@/core/components/icons/Icons";
 import type { ShelfVolume } from "@/core/lib/reviews";
 import type { VolumeRating } from "@/core/pages/Details/useRateVolume";
@@ -22,11 +23,11 @@ function WaysOn({ volume, onWrite }: Props) {
   const { asked, rating, hasWords } = volume;
   if (!asked || rating === 0) return null;
   return (
-    <Pressable onPress={() => onWrite(asked)} hitSlop={6}>
+    <Tap onPress={() => onWrite(asked)} hitSlop={6}>
       <Text className="font-body-medium text-[13.5px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
         {hasWords ? "Edit your review" : "Add a few words"}
       </Text>
-    </Pressable>
+    </Tap>
   );
 }
 
@@ -73,14 +74,15 @@ export default function RateVolume({ volume, onWrite }: Props) {
           </Text>
         ) : null}
       </View>
-      <Pressable
+      <Tap
+        feel="round"
         onPress={hideTicket}
         hitSlop={12}
         accessibilityLabel={`Don't ask about vol. ${asked.volume}`}
         className="absolute top-2 right-2.5"
       >
         <InkCrossIcon color={c.inkSoft} width={14} height={14} />
-      </Pressable>
+      </Tap>
     </View>
   );
 }
@@ -115,14 +117,15 @@ export function RateVolumeCard({ volume, onWrite }: Props) {
         size="lg"
         onChange={(stars) => void rate(stars)}
       />
-      <Pressable
+      <Tap
+        feel="round"
         onPress={() => void closeBanner()}
         hitSlop={12}
         accessibilityLabel="Hide this"
         className="absolute top-3 right-3"
       >
         <InkCrossIcon color={c.inkSoft} width={16} height={16} />
-      </Pressable>
+      </Tap>
     </View>
   );
 }

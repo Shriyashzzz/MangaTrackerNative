@@ -1,8 +1,9 @@
 // The same series on the shelf twice: said on its page, with one button
 // that makes them one (the web's pages/Details/TwiceNote.tsx). The server
 // keeps everything either had (POST /api/manga/:id/merge)
+import Tap from "@/components/Tap";
 import { useEffect, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { apiFetch } from "@/core/lib/api";
 import { titleKey } from "@/core/lib/titleKey";
 import type { Manga } from "@/core/lib/types";
@@ -53,11 +54,11 @@ export default function TwiceNote({
         <Text className="font-body text-[14.5px] text-ink">
           This series is on your shelf twice.
         </Text>
-        <Pressable onPress={() => void merge()} disabled={merging} hitSlop={6}>
+        <Tap onPress={() => void merge()} disabled={merging} hitSlop={6}>
           <Text className="font-body-semibold text-[14.5px] text-accent border-b pb-[2px] border-accent self-start">
             {merging ? "Merging…" : "Merge them"}
           </Text>
-        </Pressable>
+        </Tap>
       </View>
       <Text className="font-body text-[13px] text-ink-soft">
         Every volume, the further chapter, notes and rating are kept.

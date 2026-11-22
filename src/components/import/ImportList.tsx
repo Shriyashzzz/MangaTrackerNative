@@ -2,8 +2,9 @@
 // web's pages/Import/ImportList.tsx): Not on AniList, Couldn't check,
 // Omnibus editions, Found. Each row a tick, its name and what the file says
 // of it, "Did you mean", and Edit, which opens the match sheet
+import Tap from "@/components/Tap";
 import { useEffect, useMemo, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import Button from "@/components/Button";
 import { ChevronDownIcon, InfoIcon } from "@/core/components/icons/Icons";
 import { editOf, type BookSeries } from "@/core/lib/imports/bookImport";
@@ -191,7 +192,7 @@ export default function ImportList({
           g.title ? (
             <View key={g.id} className="gap-1">
               <View className="flex-row items-center gap-2 border-t border-line-soft pt-3">
-                <Pressable
+                <Tap
                   onPress={() => toggleGroup(g.id)}
                   accessibilityRole="button"
                   accessibilityState={{ expanded: !closedIds.has(g.id) }}
@@ -213,16 +214,17 @@ export default function ImportList({
                   >
                     <ChevronDownIcon color={c.inkSoft} width={18} height={18} />
                   </View>
-                </Pressable>
+                </Tap>
                 {g.id === "omnibus" ? (
-                  <Pressable
+                  <Tap
+                    feel="round"
                     onPress={() => setOmnibusInfo(!omnibusInfo)}
                     hitSlop={8}
                     accessibilityLabel="What's an omnibus?"
                     accessibilityState={{ expanded: omnibusInfo }}
                   >
                     <InfoIcon color={c.inkSoft} width={18} height={18} />
-                  </Pressable>
+                  </Tap>
                 ) : null}
               </View>
               {g.id === "omnibus" && omnibusInfo ? (

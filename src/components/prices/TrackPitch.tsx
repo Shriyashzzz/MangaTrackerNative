@@ -2,8 +2,9 @@
 // ShelfAction pitch): a ticket like Buy next's, with a tear-off stub to tap.
 // It promises a phone alert: push must be set up before this ships (the
 // owner's call, 2026-11-21)
+import Tap from "@/components/Tap";
 import { router } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { useRipple } from "@/lib/press";
 
 // a long name is cut to its first two words: "Frieren: Beyond.."
@@ -19,7 +20,7 @@ export default function TrackPitch({ name }: { name: string }) {
     <View className="gap-2">
       {/* a solid card under the tinted stub, so the page's background
           drawing never shows through */}
-      <Pressable
+      <Tap
         onPress={() => router.push("/sign-up")}
         android_ripple={ripple}
         accessibilityRole="button"
@@ -46,7 +47,7 @@ export default function TrackPitch({ name }: { name: string }) {
             free
           </Text>
         </View>
-      </Pressable>
+      </Tap>
       <Text className="font-body text-[13px] text-ink-soft">
         <Text
           onPress={() => router.push("/sign-in")}

@@ -1,6 +1,7 @@
 // "Add manga": type its name, or scan the barcode on the back of a volume
 // (the web's components/scanSheet/AddChoice.tsx), as a sheet
-import { Pressable, Text, View } from "react-native";
+import Tap from "@/components/Tap";
+import { Text, View } from "react-native";
 import { BarcodeIcon, TypeIcon } from "@/core/components/icons/Icons";
 import { useColors } from "@/lib/colors";
 import Sheet from "./Sheet";
@@ -21,7 +22,7 @@ export default function AddChoice({
     note: string,
     run: () => void,
   ) => (
-    <Pressable
+    <Tap
       onPress={() => {
         onClose();
         run();
@@ -33,7 +34,7 @@ export default function AddChoice({
         <Text className="font-body-semibold text-[16px] text-ink">{title}</Text>
         <Text className="font-body text-[13.5px] text-ink-soft">{note}</Text>
       </View>
-    </Pressable>
+    </Tap>
   );
   return (
     <Sheet open onClose={onClose} contentClassName="gap-3 px-4 pb-8">
@@ -53,11 +54,11 @@ export default function AddChoice({
         "Point at the back of a volume, scan a stack in a row",
         onScan,
       )}
-      <Pressable onPress={onClose} className="self-center py-2">
+      <Tap onPress={onClose} className="self-center py-2">
         <Text className="font-body-medium text-[15px] text-ink-soft">
           Cancel
         </Text>
-      </Pressable>
+      </Tap>
     </Sheet>
   );
 }

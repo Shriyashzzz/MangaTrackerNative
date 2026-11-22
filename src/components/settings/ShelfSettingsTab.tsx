@@ -1,8 +1,9 @@
 // Your shelf's settings (the web's ShelfSettingsTab): how the shelf lists
 // series, how they keep their place, To buy's offer to add, which volume to
 // collect next, the first tab, and the sort
+import Tap from "@/components/Tap";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { ChevronDownIcon } from "@/core/components/icons/Icons";
 import { SHELF_TABS } from "@/core/lib/account";
 import { SORT_OPTIONS } from "@/core/lib/shelf";
@@ -37,14 +38,14 @@ export default function ShelfSettingsTab() {
     SORT_OPTIONS.find((o) => o.value === (prefs.shelfSort ?? ""))?.label ??
     "Last updated";
   const pick = (label: string, value: string, open: () => void) => (
-    <Pressable
+    <Tap
       onPress={open}
       className="min-h-[46px] flex-row items-center justify-between rounded-[2px] border-[1.5px] border-line-soft bg-paper px-3"
       accessibilityLabel={`${label}: ${value}. Change`}
     >
       <Text className="font-body text-[15px] text-ink">{value}</Text>
       <ChevronDownIcon color={c.inkSoft} width={18} height={18} />
-    </Pressable>
+    </Tap>
   );
   return (
     <>

@@ -2,9 +2,10 @@
 // UpcomingReleases.tsx): the next release day and this month's count, with
 // three covers; opened, the month at a glance, the dates to save, the first
 // few releases, and the way to the full calendar
+import Tap from "@/components/Tap";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { ChevronDownIcon } from "@/core/components/icons/Icons";
 import {
   dayName,
@@ -35,7 +36,7 @@ export default function UpcomingReleases() {
   const count = first.volumes.length;
   return (
     <View className="overflow-hidden rounded-[14px] bg-accent">
-      <Pressable
+      <Tap
         onPress={() => setOpen(!open)}
         accessibilityState={{ expanded: open }}
         className="flex-row items-center gap-3 px-3 py-2.5"
@@ -66,7 +67,7 @@ export default function UpcomingReleases() {
         <View style={{ transform: [{ rotate: open ? "180deg" : "0deg" }] }}>
           <ChevronDownIcon color="#fffaf2" width={20} height={20} />
         </View>
-      </Pressable>
+      </Tap>
       {open ? (
         <View className="mx-[1.5px] mb-[1.5px] gap-4 rounded-b-[13px] bg-card px-4 pt-4 pb-3">
           <MiniMonth onCard month={first.month} volumes={first.volumes} />
@@ -77,11 +78,11 @@ export default function UpcomingReleases() {
               label={`Save ${monthName(first.month)}'s release dates to your calendar`}
               text={`Save ${first.volumes.length > 1 ? `${first.volumes.length} dates` : "the date"}`}
             />
-            <Pressable onPress={() => router.push("/calendar")} hitSlop={6}>
+            <Tap onPress={() => router.push("/calendar")} hitSlop={6}>
               <Text className="font-body-semibold text-[14px] text-ink border-b pb-[2px] border-ink self-start">
                 Full calendar
               </Text>
-            </Pressable>
+            </Tap>
           </View>
           <ReleaseList volumes={first.volumes.slice(0, SHOWN)} />
         </View>

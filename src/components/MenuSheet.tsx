@@ -1,8 +1,9 @@
 // The ⋮ menu's actions, as an Android sheet (the web's AppBarMenu and
 // .app-sheet): what they're about said quietly above, then each action a
 // row, with its icon when it has one, a dangerous one in the accent colour
+import Tap from "@/components/Tap";
 import type { ComponentType } from "react";
-import { Pressable, Text } from "react-native";
+import { Text } from "react-native";
 import { useColors } from "@/lib/colors";
 import { useRipple } from "@/lib/press";
 import Sheet from "./Sheet";
@@ -40,7 +41,7 @@ export default function MenuSheet({
         </Text>
       ) : null}
       {items.map((item) => (
-        <Pressable
+        <Tap
           android_ripple={ripple}
           key={item.label}
           disabled={item.disabled}
@@ -62,7 +63,7 @@ export default function MenuSheet({
           >
             {item.label}
           </Text>
-        </Pressable>
+        </Tap>
       ))}
     </Sheet>
   );

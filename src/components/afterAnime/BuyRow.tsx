@@ -1,10 +1,11 @@
 // The volume to buy after a season (the web's pages/AfterAnime/BuyRow.tsx):
 // its cover, why this one, the best saved price and the store, or the way
 // to its prices when none is saved
+import Tap from "@/components/Tap";
 import { openOutside } from "@/lib/openOutside";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import Button from "@/components/Button";
 import { CoverFallback } from "@/components/prices/VolumeCard";
 import type { BuyOffer, UsedOffer } from "@/core/lib/afterAnime";
@@ -48,7 +49,7 @@ export default function BuyRow({
   return (
     <View className="rounded-[4px] border-[1.5px] border-line bg-card p-3">
       <View className="flex-row gap-3">
-        <Pressable
+        <Tap
           onPress={openPrices}
           accessibilityLabel={`${heading} prices`}
           style={{ width: COVER_WIDTH, aspectRatio: 2 / 3 }}
@@ -66,7 +67,7 @@ export default function BuyRow({
               contentFit="cover"
             />
           ) : null}
-        </Pressable>
+        </Tap>
         <View className="min-w-0 flex-1 gap-1.5">
           <Text
             className={`font-display text-ink ${lead ? "text-[20px]" : "text-[17px]"}`}

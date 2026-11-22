@@ -5,11 +5,12 @@
 // one, or any far behind, is sorted into piles, each a fan of covers that
 // opens to all of them. Nothing new says why. Who's in, where, and the
 // words are all the web's own (core shelfViews, piles, farBehind, newTabLinks)
+import Tap from "@/components/Tap";
 import PullPage, { usePullTop } from "@/components/PullRefresh";
 import Backdrop from "@/components/Backdrop";
 import { Link, router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 import AppHeader from "@/components/AppHeader";
@@ -87,13 +88,13 @@ const Word = ({
   onPress: () => void;
   accent?: boolean;
 }) => (
-  <Pressable onPress={onPress} hitSlop={6}>
+  <Tap onPress={onPress} hitSlop={6}>
     <Text
       className={`font-body-semibold text-[14px] underline ${accent ? "text-accent" : "text-ink"}`}
     >
       {children}
     </Text>
-  </Pressable>
+  </Tap>
 );
 
 export default function NewScreen() {
@@ -334,7 +335,7 @@ export default function NewScreen() {
 
           {/* How New works, Hidden, Hide all */}
           <View className="flex-row flex-wrap items-center gap-x-4 gap-y-2">
-            <Pressable
+            <Tap
               onPress={() => router.push("/new-releases")}
               hitSlop={6}
               className="flex-row items-center gap-1.5"
@@ -347,7 +348,7 @@ export default function NewScreen() {
               <Text className="font-body-medium text-[14px] text-ink">
                 How New works
               </Text>
-            </Pressable>
+            </Tap>
             {hiddenCount > 0 && !viewingHidden ? (
               <Word
                 onPress={() => setWantHidden(true)}
@@ -362,7 +363,7 @@ export default function NewScreen() {
               </>
             ) : null}
             {list.length > 0 && !viewingHidden ? (
-              <Pressable
+              <Tap
                 onPress={hideAll}
                 hitSlop={6}
                 className={`ml-auto bg-ink/10 px-3.5 py-2 ${look.buttonRadius}`}
@@ -372,7 +373,7 @@ export default function NewScreen() {
                     ? `Hide all ${list.length}? Press again`
                     : `Hide all ${list.length}`}
                 </Text>
-              </Pressable>
+              </Tap>
             ) : null}
           </View>
           {list.length === 0 ? checkedLine : null}
@@ -482,14 +483,14 @@ export default function NewScreen() {
                       {piles[p].length}
                     </Text>
                   </H2>
-                  <Pressable
+                  <Tap
                     onPress={() => setOpenPile(openPile === p ? null : p)}
                     hitSlop={8}
                   >
                     <Text className="font-body-semibold text-[14px] text-ink">
                       {openPile === p ? "Back" : "See all"}
                     </Text>
-                  </Pressable>
+                  </Tap>
                 </View>
                 <Text className="pb-3 font-body text-[13.5px] text-ink-soft">
                   {PILE_TEXT[kind][p].why}
@@ -511,7 +512,7 @@ export default function NewScreen() {
                       const japan = kind === "japan";
                       const opens = japan || opensAList(found, kind);
                       const inside = (
-                        <Pressable
+                        <Tap
                           onPress={
                             japan
                               ? () => setJapanOf(m.id)
@@ -545,7 +546,7 @@ export default function NewScreen() {
                               {behindOf(found, kind)} {COUNT_WORD[kind]}
                             </Text>
                           ) : null}
-                        </Pressable>
+                        </Tap>
                       );
                       return opens ? (
                         <View key={m.id}>{inside}</View>

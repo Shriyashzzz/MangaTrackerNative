@@ -1,9 +1,10 @@
 // "Save the date" (the web's components/calendar/AddToCalendar.tsx): one
 // release into Google Calendar, or the dates as a calendar file handed to
 // the phone's share sheet for Apple, Outlook and the rest
+import Tap from "@/components/Tap";
 import { openOutside } from "@/lib/openOutside";
 import { useState } from "react";
-import { Pressable, Share, Text } from "react-native";
+import { Share, Text } from "react-native";
 import { CalendarPlusIcon } from "@/core/components/icons/Icons";
 import { buildIcs, googleCalendarLink, hasDay } from "@/core/lib/addToCalendar";
 import type { CalendarVolume } from "@/core/lib/collector";
@@ -42,7 +43,7 @@ export default function AddToCalendar({
     );
   return (
     <>
-      <Pressable
+      <Tap
         onPress={() => setOpen(true)}
         accessibilityLabel={label}
         hitSlop={6}
@@ -52,7 +53,7 @@ export default function AddToCalendar({
         {big ? (
           <Text className="font-body-medium text-[14px] text-ink">{word}</Text>
         ) : null}
-      </Pressable>
+      </Tap>
       <MenuSheet
         open={open}
         onClose={() => setOpen(false)}

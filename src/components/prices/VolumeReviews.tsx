@@ -2,8 +2,9 @@
 // ReviewScore and ReviewItem): the score and its spread, their own review
 // with Edit and Delete, the others with spoilers inked out until tapped,
 // Spoiler? and Report, and the way to write one (if they've read it)
+import Tap from "@/components/Tap";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { timeAgo } from "@/core/lib/prices";
 import {
   deleteReview,
@@ -113,14 +114,14 @@ function ReviewItem({
         </Text>
       </View>
       {inkedOut ? (
-        <Pressable
+        <Tap
           onPress={() => setRevealed(true)}
           className="self-start rounded-[3px] bg-ink px-3 py-2"
         >
           <Text className="font-body-semibold text-[13px] text-paper">
             Spoiler · tap to read
           </Text>
-        </Pressable>
+        </Tap>
       ) : review.text ? (
         <Text className="font-body text-[14.5px] leading-[21px] text-ink">
           {review.text}
@@ -134,17 +135,17 @@ function ReviewItem({
                 Thanks, noted
               </Text>
             ) : (
-              <Pressable onPress={() => void flag("spoiler")} hitSlop={6}>
+              <Tap onPress={() => void flag("spoiler")} hitSlop={6}>
                 <Text className={link}>Spoiler?</Text>
-              </Pressable>
+              </Tap>
             )
           ) : null}
           {sent.report ? (
             <Text className="font-body text-[12.5px] text-muted">Reported</Text>
           ) : (
-            <Pressable onPress={() => void flag("report")} hitSlop={6}>
+            <Tap onPress={() => void flag("report")} hitSlop={6}>
               <Text className={link}>Report</Text>
-            </Pressable>
+            </Tap>
           )}
           {failed ? (
             <Text className="font-body text-[12.5px] text-accent">
@@ -240,16 +241,16 @@ export default function VolumeReviews({
             </Text>
           ) : null}
           <View className="flex-row items-center gap-4">
-            <Pressable onPress={() => setWriting(true)} hitSlop={6}>
+            <Tap onPress={() => setWriting(true)} hitSlop={6}>
               <Text className="font-body-medium text-[14px] text-ink border-b pb-[2px] border-ink self-start">
                 Edit
               </Text>
-            </Pressable>
-            <Pressable onPress={() => void remove()} hitSlop={6}>
+            </Tap>
+            <Tap onPress={() => void remove()} hitSlop={6}>
               <Text className="font-body-medium text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
                 Delete
               </Text>
-            </Pressable>
+            </Tap>
             {deleteFailed ? (
               <Text className="font-body text-[13px] text-accent">
                 That didn't delete. Try again.
@@ -300,11 +301,11 @@ export default function VolumeReviews({
             ))
           )}
           {left > 0 ? (
-            <Pressable onPress={() => setMost(most + STEP)} className="py-1">
+            <Tap onPress={() => setMost(most + STEP)} className="py-1">
               <Text className="font-body-semibold text-[14px] text-ink border-b pb-[2px] border-ink self-start">
                 Show {Math.min(STEP, left)} more
               </Text>
-            </Pressable>
+            </Tap>
           ) : null}
         </View>
       )}

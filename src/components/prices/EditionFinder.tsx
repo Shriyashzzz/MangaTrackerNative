@@ -1,7 +1,8 @@
 // "Which book has volume 23?" (the web's EditionFinder): the book of each
 // edition that holds the volume typed, each a way to its prices
+import Tap from "@/components/Tap";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { lookUpVolume, type LookupLine } from "@/core/lib/editionLookup";
 import { openWebPath } from "@/lib/webRoutes";
 import { Input } from "../Field";
@@ -52,7 +53,7 @@ export default function EditionFinder({
                 {line.label}:
               </Text>
               {book ? (
-                <Pressable
+                <Tap
                   onPress={
                     book.path ? () => openWebPath(book.path!) : undefined
                   }
@@ -70,7 +71,7 @@ export default function EditionFinder({
                       </Text>
                     ) : null}
                   </Text>
-                </Pressable>
+                </Tap>
               ) : (
                 <Text className="font-body text-[14px] text-ink-soft">
                   No {line.label} book holds vol. {volume}

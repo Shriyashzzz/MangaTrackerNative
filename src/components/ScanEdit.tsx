@@ -1,9 +1,10 @@
 // A scan put right (the web's components/scanSheet/ScanEdit.tsx): which
 // series it is (AniList's matches for a name) and which volumes the book
 // holds. Also the question when the app couldn't tell the volumes itself
+import Tap from "@/components/Tap";
 import { Image } from "expo-image";
 import { useEffect, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { aniListGapMs, searchSeries, type SeriesHit } from "@/core/lib/anilist";
 import { volumesFrom } from "@/core/lib/barcode";
 import { knownNamesNear } from "@/core/lib/knownNames";
@@ -117,7 +118,7 @@ export default function ScanEdit({
           ? results.hits.slice(0, 6).map((hit) => {
               const on = picked === hit.name;
               return (
-                <Pressable
+                <Tap
                   key={hit.anilistId}
                   onPress={() => setPicked(hit.name)}
                   accessibilityState={{ selected: on }}
@@ -151,7 +152,7 @@ export default function ScanEdit({
                       </Text>
                     ) : null}
                   </View>
-                </Pressable>
+                </Tap>
               );
             })
           : null}
@@ -197,11 +198,11 @@ export default function ScanEdit({
       {seriesField}
       {!asking ? volumesField : null}
       {onOpenSeries ? (
-        <Pressable onPress={onOpenSeries} hitSlop={6}>
+        <Tap onPress={onOpenSeries} hitSlop={6}>
           <Text className="font-body-medium text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
             Chapter, status or notes? Open the series' edit page
           </Text>
-        </Pressable>
+        </Tap>
       ) : null}
       {problem ? (
         <Text className="font-body-medium text-[14px] text-accent">

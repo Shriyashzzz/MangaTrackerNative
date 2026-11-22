@@ -1,8 +1,9 @@
 // A row that opens to more under it ("Your books 2 ›"), as the Android app
 // folds a series page's lists (the web's .app-row-fold): the name with its
 // count, something quiet on the right, and a chevron that turns when open
+import Tap from "@/components/Tap";
 import { useState, type ReactNode } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
 import { useRipple } from "@/lib/press";
 import { ChevronRightIcon } from "@/core/components/icons/Icons";
@@ -31,7 +32,7 @@ export default function FoldRow({
       layout={LinearTransition}
       className="border-t border-line-soft"
     >
-      <Pressable
+      <Tap
         android_ripple={ripple}
         onPress={() => setOpen(!open)}
         accessibilityRole="button"
@@ -53,7 +54,7 @@ export default function FoldRow({
         >
           <ChevronRightIcon color={c.muted} width={18} height={18} />
         </View>
-      </Pressable>
+      </Tap>
       {open ? (
         <Animated.View entering={FadeIn.duration(180)} className="pb-4">
           {children}

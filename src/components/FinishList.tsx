@@ -3,9 +3,10 @@
 // page for the rest. In Buy next's order (core toGetLines, their Next in line
 // setting). As the web's (pages/Home/FinishList.tsx). A price opens the
 // store; one not checked yet says "check price" and opens the volume's page
+import Tap from "@/components/Tap";
 import { openOutside } from "@/lib/openOutside";
 import { router } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import {
   money,
   totalText,
@@ -47,14 +48,14 @@ function Link({
   children: React.ReactNode;
 }) {
   return (
-    <Pressable onPress={onPress} hitSlop={6} className="min-w-0 shrink">
+    <Tap onPress={onPress} hitSlop={6} className="min-w-0 shrink">
       <Text
         numberOfLines={1}
         className="text-right font-body text-[14px] text-ink-soft underline"
       >
         {children}
       </Text>
-    </Pressable>
+    </Tap>
   );
 }
 
@@ -170,11 +171,11 @@ export default function FinishList({
             <Text className="font-body text-ink-soft">{`${shown.length ? `${rest} more` : rest} ${unit}${rest === 1 ? "" : "s"}`}</Text>
           }
         >
-          <Pressable onPress={() => openSeries(series)} hitSlop={6}>
+          <Tap onPress={() => openSeries(series)} hitSlop={6}>
             <Text className="font-body-medium text-[14px] text-ink border-b pb-[2px] border-ink self-start decoration-accent">
               Check the series page
             </Text>
-          </Pressable>
+          </Tap>
         </Row>
       ) : null}
     </View>

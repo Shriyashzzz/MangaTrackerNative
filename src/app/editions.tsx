@@ -2,9 +2,10 @@
 // which volumes are in each book. Search a series, or every series with
 // editions A to Z, each opening to its lines' tiles; a picked series gets
 // the lookup ("Which book has volume 23?") and Missing a book?
+import Tap from "@/components/Tap";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import Mascot from "@/components/Mascot";
 import Page, { H2, H3, P } from "@/components/Page";
 import SeriesCover from "@/components/SeriesCover";
@@ -69,11 +70,11 @@ function Picked({
         <P muted>
           Its series page looks for them; once found they show here too.
         </P>
-        <Pressable onPress={() => openWebPath(seriesPath(asked))} hitSlop={6}>
+        <Tap onPress={() => openWebPath(seriesPath(asked))} hitSlop={6}>
           <Text className="font-body-semibold text-[14.5px] text-ink border-b pb-[2px] border-ink self-start">
             Open {asked}
           </Text>
-        </Pressable>
+        </Tap>
       </View>
     );
   return (
@@ -99,7 +100,7 @@ function Picked({
             </Text>
           </View>
           <BookTiles line={line} volume={volume} owned={owned} />
-          <Pressable
+          <Tap
             onPress={() =>
               openWebPath(
                 `${seriesPath(entry.name)}&edition=${encodeURIComponent(line.key)}`,
@@ -111,7 +112,7 @@ function Picked({
             <Text className="font-body-medium text-[14px] text-ink border-b pb-[2px] border-ink self-start">
               {line.label} prices →
             </Text>
-          </Pressable>
+          </Tap>
         </View>
       ))}
       <ReportBook seriesName={entry.name} lines={lines} />
@@ -132,7 +133,7 @@ function SeriesFold({
   const [open, setOpen] = useState(false);
   return (
     <View className="border-b border-dashed border-line-soft pb-3">
-      <Pressable
+      <Tap
         onPress={() => setOpen(!open)}
         accessibilityState={{ expanded: open }}
         className="flex-row items-center gap-3 py-2"
@@ -154,7 +155,7 @@ function SeriesFold({
         <View style={{ transform: [{ rotate: open ? "180deg" : "0deg" }] }}>
           <ChevronDownIcon color={c.muted} width={18} height={18} />
         </View>
-      </Pressable>
+      </Tap>
       {open ? (
         <View className="gap-3 pt-1">
           {lines.map((line) => (
@@ -169,19 +170,19 @@ function SeriesFold({
             </View>
           ))}
           <View className="flex-row flex-wrap gap-4">
-            <Pressable onPress={onPick} hitSlop={6}>
+            <Tap onPress={onPick} hitSlop={6}>
               <Text className="font-body-medium text-[14px] text-ink border-b pb-[2px] border-ink self-start">
                 Which book has my volume?
               </Text>
-            </Pressable>
-            <Pressable
+            </Tap>
+            <Tap
               onPress={() => openWebPath(seriesPath(entry.name))}
               hitSlop={6}
             >
               <Text className="font-body-medium text-[14px] text-ink border-b pb-[2px] border-ink self-start">
                 Prices
               </Text>
-            </Pressable>
+            </Tap>
           </View>
         </View>
       ) : null}
@@ -247,7 +248,7 @@ export default function EditionsScreen() {
         {matches.length ? (
           <View className="rounded-[4px] border-[1.5px] border-line bg-card">
             {matches.map((e) => (
-              <Pressable
+              <Tap
                 key={e.slug}
                 onPress={() => {
                   setAsked(e.name);
@@ -258,7 +259,7 @@ export default function EditionsScreen() {
                 <Text className="font-body-medium text-[15px] text-ink">
                   {e.name}
                 </Text>
-              </Pressable>
+              </Tap>
             ))}
           </View>
         ) : null}
@@ -266,15 +267,11 @@ export default function EditionsScreen() {
       {entries === null ? null : asked ? (
         <>
           <Picked asked={asked} entry={picked} />
-          <Pressable
-            onPress={() => setAsked("")}
-            hitSlop={6}
-            className="self-start"
-          >
+          <Tap onPress={() => setAsked("")} hitSlop={6} className="self-start">
             <Text className="font-body-medium text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
               Every series with editions
             </Text>
-          </Pressable>
+          </Tap>
         </>
       ) : entries.length === 0 ? (
         <View className="items-center gap-3 py-6">

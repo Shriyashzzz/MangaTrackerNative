@@ -1,10 +1,11 @@
 // Upcoming volumes, one a row (the web's components/calendar/ReleaseList.tsx):
 // the day, the cover (the series' with the volume's on top), the name, and
 // Preorder for one not on the shelf yet; each saves to a calendar
+import Tap from "@/components/Tap";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { dayName, type CalendarVolume } from "@/core/lib/collector";
 import { coverSrc } from "@/core/lib/prices";
 import { useColors } from "@/lib/colors";
@@ -77,7 +78,7 @@ export default function ReleaseList({
               </Text>
               <AddToCalendar volumes={[v]} label={`Add ${named} to calendar`} />
             </View>
-            <Pressable
+            <Tap
               onPress={() => router.push(`/prices/${v.isbn13}`)}
               className="min-w-0 flex-1 flex-row items-center gap-3 active:opacity-70"
               accessibilityLabel={`${named}: out ${dayName(v.published)}${v.owned ? ", on your shelf" : ""}`}
@@ -97,26 +98,26 @@ export default function ReleaseList({
                   {v.volume !== null ? `Vol. ${v.volume}` : v.title}
                 </Text>
               </View>
-            </Pressable>
+            </Tap>
             {v.owned ? null : (
-              <Pressable
+              <Tap
                 onPress={() => router.push(`/prices/${v.isbn13}`)}
                 hitSlop={6}
               >
                 <Text className="font-body-semibold text-[13.5px] text-accent border-b pb-[2px] border-accent self-start">
                   Preorder →
                 </Text>
-              </Pressable>
+              </Tap>
             )}
           </View>
         );
       })}
       {limit && volumes.length > limit ? (
-        <Pressable onPress={() => setAll(!all)} className="py-2">
+        <Tap onPress={() => setAll(!all)} className="py-2">
           <Text className="font-body-semibold text-[14px] text-ink border-b pb-[2px] border-ink self-start">
             {all ? "Show fewer" : `Show all ${volumes.length}`}
           </Text>
-        </Pressable>
+        </Tap>
       ) : null}
     </View>
   );

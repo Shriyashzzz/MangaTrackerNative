@@ -1,7 +1,8 @@
 // An on/off setting, as Android's switch (the web's .app-switch): a row with
 // its words and the switch on the right
+import Tap from "@/components/Tap";
 import * as Haptics from "expo-haptics";
-import { Pressable, Switch as NativeSwitch, Text } from "react-native";
+import { Switch as NativeSwitch, Text } from "react-native";
 import { useColors } from "@/lib/colors";
 import { PRINTED } from "@/lib/printed";
 
@@ -20,7 +21,7 @@ export default function Switch({
     onChange(on);
   };
   return (
-    <Pressable
+    <Tap
       onPress={() => flip(!value)}
       accessibilityRole="switch"
       accessibilityState={{ checked: value }}
@@ -36,6 +37,6 @@ export default function Switch({
         thumbColor={PRINTED.paper}
         ios_backgroundColor={c.lineSoft}
       />
-    </Pressable>
+    </Tap>
   );
 }

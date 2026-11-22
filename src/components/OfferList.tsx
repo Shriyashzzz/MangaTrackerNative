@@ -4,9 +4,10 @@
 // first, then box sets, then ebooks, five shown until "Show all". A row opens
 // the store. Which copy gets which stamp is the web's own rule (core
 // offerLabels awardsOf)
+import Tap from "@/components/Tap";
 import { openOutside } from "@/lib/openOutside";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { ChevronRightIcon } from "@/core/components/icons/Icons";
 import { shopName } from "@/core/lib/prices";
 import { isCollection, type Offer } from "@/core/lib/types";
@@ -129,7 +130,7 @@ export default function OfferList({
       ) : null}
       <View className="overflow-hidden rounded-[14px] border border-line-soft bg-card">
         {shown.map((o, i) => (
-          <Pressable
+          <Tap
             key={`${o.store}-${o.priceCents}-${i}`}
             disabled={!o.url}
             onPress={() => o.url && openOutside(o.url)}
@@ -167,15 +168,15 @@ export default function OfferList({
             {o.url ? (
               <ChevronRightIcon color={c.inkSoft} width={18} height={18} />
             ) : null}
-          </Pressable>
+          </Tap>
         ))}
       </View>
       {listed.length > VISIBLE_OFFERS ? (
-        <Pressable onPress={() => setOpen(!open)} className="self-start py-1">
+        <Tap onPress={() => setOpen(!open)} className="self-start py-1">
           <Text className="font-body-semibold text-[14px] text-ink border-b pb-[2px] border-ink self-start">
             {open ? "Show fewer" : `Show all ${listed.length}`}
           </Text>
-        </Pressable>
+        </Tap>
       ) : null}
     </View>
   );

@@ -4,6 +4,7 @@
 // Canada's), the box-set note, more places to look, the price history,
 // about the series, readers' reviews, and the volumes beside it. Every rule
 // is the web's (core volumePageRules, offerLabels, useVolumeLoad)
+import Tap from "@/components/Tap";
 import PullPage, { pause, usePullTop } from "@/components/PullRefresh";
 import Backdrop from "@/components/Backdrop";
 import Button from "@/components/Button";
@@ -55,7 +56,7 @@ import { usePrefs } from "@/store/prefs";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 
@@ -96,14 +97,15 @@ export default function PriceVolumeScreen() {
     <Safe edges={["top"]} className="flex-1 bg-paper">
       <Backdrop />
       <View className="h-[62px] flex-row items-center gap-3 px-2">
-        <Pressable
+        <Tap
+          feel="round"
           onPress={() => router.back()}
           hitSlop={8}
           className="p-2"
           accessibilityLabel="Back"
         >
           <ChevronLeftIcon color={c.ink} width={24} height={24} />
-        </Pressable>
+        </Tap>
         <Text
           numberOfLines={1}
           className="flex-1 font-brand pr-[6px] text-[24px] tracking-[1px] text-ink uppercase"
@@ -247,7 +249,7 @@ export default function PriceVolumeScreen() {
         <DealsStrip />
         <View className="flex-row gap-3.5">
           <View>
-            <Pressable
+            <Tap
               onPress={openSeries}
               accessibilityLabel={`${shownSeries}: open the series`}
               style={{
@@ -286,7 +288,7 @@ export default function PriceVolumeScreen() {
                   contentFit="cover"
                 />
               ) : null}
-            </Pressable>
+            </Tap>
           </View>
           <View className="min-w-0 flex-1 gap-1.5">
             <Text className="font-display text-[21px] leading-[25px] text-ink">
@@ -324,14 +326,14 @@ export default function PriceVolumeScreen() {
                 </Text>
               ) : null}
             </View>
-            <Pressable onPress={openSeries} hitSlop={4}>
+            <Tap onPress={openSeries} hitSlop={4}>
               <Text className="font-body text-[14px] text-ink-soft">
                 Part of{" "}
                 <Text className="font-body-semibold text-ink border-b pb-[2px] border-ink self-start">
                   {shownSeries}
                 </Text>
               </Text>
-            </Pressable>
+            </Tap>
             {best ? (
               <Text className="font-body text-[14px] text-ink">
                 {preorder ? "Preorder from" : "New from"}{" "}
@@ -551,7 +553,7 @@ export default function PriceVolumeScreen() {
 
         {history ? (
           <View className="gap-3">
-            <Pressable
+            <Tap
               onPress={() => setHistoryOpen(!historyOpen)}
               accessibilityRole="button"
               accessibilityState={{ expanded: historyOpen }}
@@ -570,7 +572,7 @@ export default function PriceVolumeScreen() {
               >
                 <ChevronDownIcon color={c.muted} width={20} height={20} />
               </View>
-            </Pressable>
+            </Tap>
             {historyOpen ? (
               <View className="gap-3">
                 {history.kinds.map((k) => (
@@ -642,11 +644,11 @@ export default function PriceVolumeScreen() {
           <View className="gap-2">
             <View className="flex-row items-end justify-between">
               <H2>From the same series</H2>
-              <Pressable onPress={openSeries} hitSlop={6}>
+              <Tap onPress={openSeries} hitSlop={6}>
                 <Text className="font-body-medium text-[14px] text-ink border-b pb-[2px] border-ink self-start">
                   See them all
                 </Text>
-              </Pressable>
+              </Tap>
             </View>
             <ScrollView
               horizontal

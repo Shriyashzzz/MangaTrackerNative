@@ -1,9 +1,10 @@
 // Choosing which AniList series a book is, and how many volumes of it they
 // own (the web's pages/Import/MatchModal.tsx), in a sheet: search AniList as
 // they type, the hits as a pick-one list, "None of these", then the volumes
+import Tap from "@/components/Tap";
 import { Image } from "expo-image";
 import { useEffect, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import Button from "@/components/Button";
 import { Field, Input } from "@/components/Field";
 import Sheet from "@/components/Sheet";
@@ -227,7 +228,7 @@ export default function MatchModal({
                 />
               ))
             : null}
-          <Pressable
+          <Tap
             onPress={() => setPicked(null)}
             accessibilityRole="radio"
             accessibilityState={{ checked: noneChosen }}
@@ -236,7 +237,7 @@ export default function MatchModal({
             <Text className="font-body text-[14.5px] text-ink">
               None of these: not on AniList, leave it off my shelf
             </Text>
-          </Pressable>
+          </Tap>
         </View>
 
         <Field label="Volumes owned" error={countOk ? undefined : volumesHint}>
@@ -295,7 +296,7 @@ function Hit({
     .filter(Boolean)
     .join(" · ");
   return (
-    <Pressable
+    <Tap
       onPress={onPress}
       accessibilityRole="radio"
       accessibilityState={{ checked: chosen }}
@@ -323,6 +324,6 @@ function Hit({
           <Text className="font-mono text-[12.5px] text-ink-soft">{meta}</Text>
         ) : null}
       </View>
-    </Pressable>
+    </Tap>
   );
 }

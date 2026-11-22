@@ -3,11 +3,12 @@
 // (light or dark), New releases, Your shelf, Prices, Account (email, the
 // weekly email, alerts, export, delete). Every setting is saved on the
 // account (store/prefs save, the web's savePrefs; store/account)
+import Tap from "@/components/Tap";
 import PullPage, { usePullTop } from "@/components/PullRefresh";
 import Backdrop from "@/components/Backdrop";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState, type ComponentRef } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -82,14 +83,15 @@ export default function SettingsScreen() {
     <Safe edges={["top"]} className="flex-1 bg-paper">
       <Backdrop />
       <View className="h-[62px] flex-row items-center gap-3 px-2">
-        <Pressable
+        <Tap
+          feel="round"
           onPress={() => router.back()}
           hitSlop={8}
           className="p-2"
           accessibilityLabel="Back"
         >
           <ChevronLeftIcon color={c.ink} width={24} height={24} />
-        </Pressable>
+        </Tap>
         <Text className="flex-1 font-brand pr-[6px] text-[24px] tracking-[1px] text-ink uppercase">
           Settings
           {"\u00A0"}
@@ -104,7 +106,7 @@ export default function SettingsScreen() {
           contentContainerClassName="px-2"
         >
           {TABS.map((t) => (
-            <Pressable
+            <Tap
               key={t.id}
               onPress={() => {
                 setTab(t.id);
@@ -124,7 +126,7 @@ export default function SettingsScreen() {
               >
                 {t.label}
               </Text>
-            </Pressable>
+            </Tap>
           ))}
           <Animated.View
             pointerEvents="none"

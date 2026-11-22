@@ -1,7 +1,8 @@
 // An edition's books as tiles (the web's pages/Prices/BookTiles.tsx): each
 // book's number and the volumes it holds, inked in when on their shelf,
 // dashed when still coming, ringed when it answers "which book has vol. N"
-import { Pressable, Text, View } from "react-native";
+import Tap from "@/components/Tap";
+import { Text, View } from "react-native";
 import {
   bookPath,
   shownBooks,
@@ -31,7 +32,7 @@ export default function BookTiles({
           const path = bookPath(book);
           const answer = volume != null && book.volumes.includes(volume);
           return (
-            <Pressable
+            <Tap
               key={book.number}
               onPress={path ? () => openWebPath(path) : undefined}
               disabled={!path}
@@ -54,7 +55,7 @@ export default function BookTiles({
                   {book.coming.replace(/ \d+,/, "")}
                 </Text>
               ) : null}
-            </Pressable>
+            </Tap>
           );
         })}
       </View>

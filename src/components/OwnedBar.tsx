@@ -3,7 +3,8 @@
 // so a gap is a break in the bar. An edition's books and the singles after
 // them are pills of their own (core lib/ownedBar). Opened, the bar is a map:
 // a tap on it moves the shelf under it to that spot (`onPick`)
-import { Pressable, View } from "react-native";
+import Tap from "@/components/Tap";
+import { View } from "react-native";
 import { barRuns, shareOf, type BarSlot } from "@/core/lib/ownedBar";
 
 export default function OwnedBar({
@@ -41,7 +42,7 @@ export default function OwnedBar({
           {run.slots.map((slot) => {
             const size = { flexGrow: slot.volumes.length, flexBasis: 0 };
             return onPick ? (
-              <Pressable
+              <Tap
                 key={slot.volumes[0]}
                 onPress={() => onPick(slot.volumes[0]!)}
                 hitSlop={{ top: 12, bottom: 12 }}
@@ -49,7 +50,7 @@ export default function OwnedBar({
                 className="h-full"
               >
                 {fill(slot)}
-              </Pressable>
+              </Tap>
             ) : (
               <View key={slot.volumes[0]} style={size} className="h-full">
                 {fill(slot)}

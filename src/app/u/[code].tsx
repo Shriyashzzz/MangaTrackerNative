@@ -5,17 +5,11 @@
 // To read and To get as tabs over a searched, sorted list of rows or
 // covers. A series opens as a sheet with its facts, synopsis, notes, spines
 // and the way to its prices. The rules are the web's (core SharedShelf)
+import Tap from "@/components/Tap";
 import { openOutside } from "@/lib/openOutside";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import {
-  Pressable,
-  ScrollView,
-  Share,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { ScrollView, Share, Text, TextInput, View } from "react-native";
 import Avatar from "@/components/Avatar";
 import Button from "@/components/Button";
 import Mascot from "@/components/Mascot";
@@ -115,7 +109,7 @@ function CoverFan({
   return (
     <View className="flex-row justify-center">
       {top.map((m, i) => (
-        <Pressable
+        <Tap
           key={`${m.name}-${i}`}
           onPress={() => onOpen(m)}
           style={{
@@ -130,7 +124,7 @@ function CoverFan({
             url={m.image}
             width={56}
           />
-        </Pressable>
+        </Tap>
       ))}
     </View>
   );
@@ -162,7 +156,7 @@ function CoverRow({
         contentContainerStyle={{ gap: 10 }}
       >
         {manga.slice(0, MOST_IN_ROW).map((m, i) => (
-          <Pressable
+          <Tap
             key={`${m.name}-${i}`}
             onPress={() => onOpen(m)}
             className="w-[80px] gap-1"
@@ -193,7 +187,7 @@ function CoverRow({
             >
               {m.name}
             </Text>
-          </Pressable>
+          </Tap>
         ))}
       </ScrollView>
     </View>
@@ -359,11 +353,11 @@ function Synopsis({ m }: { m: SharedManga }) {
         {found.text}
       </Text>
       {found.text.length > 220 ? (
-        <Pressable onPress={() => setExpanded(!expanded)} hitSlop={6}>
+        <Tap onPress={() => setExpanded(!expanded)} hitSlop={6}>
           <Text className="font-body-medium text-[13.5px] text-ink border-b pb-[2px] border-ink self-start">
             {expanded ? "Show less" : "Read more"}
           </Text>
-        </Pressable>
+        </Tap>
       ) : null}
     </View>
   );
@@ -381,7 +375,7 @@ function AddToShelf({ m }: { m: SharedManga }) {
   );
   if (onShelf)
     return (
-      <Pressable
+      <Tap
         onPress={() =>
           router.push({
             pathname: "/details/[id]",
@@ -393,7 +387,7 @@ function AddToShelf({ m }: { m: SharedManga }) {
         <Text className="font-body-semibold text-[14.5px] text-ink border-b pb-[2px] border-ink self-start decoration-accent">
           {onShelf.planned ? "On your To read list" : "On your shelf too"} →
         </Text>
-      </Pressable>
+      </Tap>
     );
   const add = async () => {
     setSaving(true);
@@ -579,7 +573,7 @@ function SeriesSheet({
             openWebPath(seriesPath(priceName(m)));
           }}
         />
-        <Pressable
+        <Tap
           onPress={() =>
             void Share.share({ message: link, url: link }).catch(() => {})
           }
@@ -590,7 +584,7 @@ function SeriesSheet({
           <Text className="font-body-medium text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
             Share link
           </Text>
-        </Pressable>
+        </Tap>
       </View>
     </Sheet>
   );
@@ -720,7 +714,7 @@ export default function SharedShelfScreen() {
         key={`${m.name}-${j}`}
         className="flex-row items-center gap-3 border-b border-dotted border-line-soft py-2"
       >
-        <Pressable
+        <Tap
           onPress={() => setOpenName(m.name)}
           className="min-w-0 flex-1 flex-row items-center gap-3 active:opacity-70"
           accessibilityLabel={`${m.name}: ${owned.length ? `owns ${plural(owned.length, "volume")}` : "no volumes yet"}. Open`}
@@ -771,7 +765,7 @@ export default function SharedShelfScreen() {
               {m.rating ? <StarRating value={m.rating} /> : null}
             </View>
           </View>
-        </Pressable>
+        </Tap>
         {mine === "dont" ? (
           <QuickAdd m={m} onAdded={() => void loadMyShelf()} />
         ) : null}
@@ -801,7 +795,7 @@ export default function SharedShelfScreen() {
             <Text className="font-body-semibold">{shelf.displayName}</Text>.
             Open a series to add it to your top picks.
           </Text>
-          <Pressable
+          <Tap
             onPress={() =>
               router.push({ pathname: "/settings", params: { tab: "profile" } })
             }
@@ -810,7 +804,7 @@ export default function SharedShelfScreen() {
             <Text className="font-body-medium text-[14px] text-ink border-b pb-[2px] border-ink self-start">
               Change name or what's shared
             </Text>
-          </Pressable>
+          </Tap>
         </View>
       ) : null}
       <View className="items-center gap-2">
@@ -884,7 +878,7 @@ export default function SharedShelfScreen() {
           contentContainerStyle={{ gap: 8 }}
         >
           {tabs.map(({ name, count }) => (
-            <Pressable
+            <Tap
               key={name}
               onPress={() => setPicked(name)}
               accessibilityState={{ selected: name === tab }}
@@ -900,7 +894,7 @@ export default function SharedShelfScreen() {
               >
                 {count}
               </Text>
-            </Pressable>
+            </Tap>
           ))}
         </ScrollView>
       ) : null}
@@ -917,7 +911,7 @@ export default function SharedShelfScreen() {
             />
           </View>
           <View className="flex-row flex-wrap items-center gap-2">
-            <Pressable
+            <Tap
               onPress={() => setPickingSort(true)}
               className="flex-row items-center gap-1 rounded-[3px] border-[1.5px] border-line-soft px-2.5 py-1.5"
             >
@@ -925,9 +919,9 @@ export default function SharedShelfScreen() {
                 {SORTS[sort].label}
               </Text>
               <ChevronDownIcon color={c.inkSoft} width={14} height={14} />
-            </Pressable>
+            </Tap>
             {genres.length > 1 ? (
-              <Pressable
+              <Tap
                 onPress={() => setPickingGenre(true)}
                 className="flex-row items-center gap-1 rounded-[3px] border-[1.5px] border-line-soft px-2.5 py-1.5"
               >
@@ -935,7 +929,7 @@ export default function SharedShelfScreen() {
                   {genre || "All genres"}
                 </Text>
                 <ChevronDownIcon color={c.inkSoft} width={14} height={14} />
-              </Pressable>
+              </Tap>
             ) : null}
             <View className="ml-auto w-[150px]">
               <Segmented
@@ -969,7 +963,7 @@ export default function SharedShelfScreen() {
           {toGet.slice(0, showing).map((m, i) => {
             const next = m.next!;
             return (
-              <Pressable
+              <Tap
                 key={`${m.name}-${i}`}
                 onPress={() => openWebPath(volumePath(next.isbn13, next.title))}
                 className="flex-row items-center gap-3 border-b border-dotted border-line-soft py-2 active:opacity-70"
@@ -999,7 +993,7 @@ export default function SharedShelfScreen() {
                 <Text className="font-body-semibold text-[13.5px] text-accent border-b pb-[2px] border-accent self-start">
                   {next.comingOut ? "Preorder" : "See prices"}
                 </Text>
-              </Pressable>
+              </Tap>
             );
           })}
         </View>
@@ -1009,14 +1003,14 @@ export default function SharedShelfScreen() {
       ) : null}
       {listed > showing ? (
         <View className="flex-row items-baseline justify-between">
-          <Pressable
+          <Tap
             onPress={() => setMore({ key: listKey, count: showing + PAGE })}
             hitSlop={6}
           >
             <Text className="font-body-semibold text-[14px] text-ink border-b pb-[2px] border-ink self-start">
               Show {Math.min(PAGE, listed - showing)} more
             </Text>
-          </Pressable>
+          </Tap>
           <Text className="font-mono text-[12px] text-muted">
             {showing} of {listed}
           </Text>

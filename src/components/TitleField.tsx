@@ -1,8 +1,9 @@
 // The add page's title box with AniList's matches under it (the web's
 // pages/AddManga/TitleField.tsx): a list of covers and names to pick from,
 // "Did you mean" for a typo, and "Add as typed" to keep their own words
+import Tap from "@/components/Tap";
 import { Image } from "expo-image";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { ScrollView, Text, TextInput, View } from "react-native";
 import { SearchIcon } from "@/core/components/icons/Icons";
 import type { CoverHit } from "@/core/lib/anilist";
 import { DID_YOU_MEAN } from "@/core/lib/nearMatches";
@@ -70,7 +71,7 @@ export default function TitleField({
             nestedScrollEnabled
           >
             {hits.map((hit) => (
-              <Pressable
+              <Tap
                 key={hit.id}
                 onPress={() => onPick(hit)}
                 className="flex-row items-center gap-3 border-b border-line-soft px-3 py-2 active:bg-accent-wash"
@@ -96,7 +97,7 @@ export default function TitleField({
                     </Text>
                   ) : null}
                 </View>
-              </Pressable>
+              </Tap>
             ))}
             {!hits.length ? (
               <Text className="px-3 py-3 font-body text-[14px] text-ink-soft">
@@ -112,11 +113,11 @@ export default function TitleField({
                   : `${hits.length} from AniList`
                 : ""}
             </Text>
-            <Pressable onPress={onTyped} hitSlop={6}>
+            <Tap onPress={onTyped} hitSlop={6}>
               <Text className="font-body-semibold text-[14px] text-ink border-b pb-[2px] border-ink self-start">
                 Add “{typed}” as typed
               </Text>
-            </Pressable>
+            </Tap>
           </View>
         </View>
       ) : null}

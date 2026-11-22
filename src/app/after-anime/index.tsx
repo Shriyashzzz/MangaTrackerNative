@@ -1,8 +1,9 @@
 // After the anime, as the web's pages/AfterAnime/AfterAnimeIndex.tsx: search
 // an anime or manga, or pick a show from the list, to find the chapter and
 // volume to read next
+import Tap from "@/components/Tap";
 import { useEffect, useState } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import { Text, TextInput, View } from "react-native";
 import Mascot from "@/components/Mascot";
 import Page, { P } from "@/components/Page";
 import SeriesCard from "@/components/prices/SeriesCard";
@@ -92,7 +93,7 @@ export default function AfterAnimeIndex() {
           />
         </View>
         {suggested.map((s) => (
-          <Pressable
+          <Tap
             key={s.slug}
             onPress={() => go(s.name)}
             className="flex-row items-center gap-3 border-b border-dotted border-line-soft py-2 active:opacity-70"
@@ -109,7 +110,7 @@ export default function AfterAnimeIndex() {
             >
               {novelParts(s.name).title}
             </Text>
-          </Pressable>
+          </Tap>
         ))}
         {q.length >= 2 && found.q === q && found.guessed && suggested.length ? (
           <Text className="pt-1 font-body text-[13px] text-muted">
@@ -156,14 +157,14 @@ export default function AfterAnimeIndex() {
             ))}
           </View>
           {shownCount < shows.length ? (
-            <Pressable
+            <Tap
               onPress={() => setShownCount(shownCount + CARDS_A_PAGE)}
               className="self-center rounded-[14px] border border-line-soft bg-card px-4 py-2.5 active:opacity-80"
             >
               <Text className="font-body-semibold text-[15px] text-ink">
                 Show {Math.min(CARDS_A_PAGE, shows.length - shownCount)} more
               </Text>
-            </Pressable>
+            </Tap>
           ) : null}
         </View>
       ) : null}

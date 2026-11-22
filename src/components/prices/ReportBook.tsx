@@ -1,7 +1,8 @@
 // "Missing a book?" under an edition's tiles (the web's ReportBook): the
 // book's number and the volumes it holds, sent for others to confirm
+import Tap from "@/components/Tap";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { ChevronDownIcon } from "@/core/components/icons/Icons";
 import { shownBooks, type LookupLine } from "@/core/lib/editionLookup";
 import { reportBook } from "@/core/lib/editionsIndex";
@@ -52,7 +53,7 @@ export default function ReportBook({
   if (!lines.length) return null;
   return (
     <View className="gap-3">
-      <Pressable
+      <Tap
         onPress={() => setOpen(!open)}
         className="flex-row items-center gap-2 self-start"
         accessibilityState={{ expanded: open }}
@@ -63,7 +64,7 @@ export default function ReportBook({
         <View style={{ transform: [{ rotate: open ? "180deg" : "0deg" }] }}>
           <ChevronDownIcon color={c.muted} width={14} height={14} />
         </View>
-      </Pressable>
+      </Tap>
       {!open ? null : state === "sent" ? (
         <Text className="font-body text-[14px] text-ink-soft">
           Thanks. It shows here once three readers say the same, or once it's
@@ -73,7 +74,7 @@ export default function ReportBook({
         <View className="gap-3">
           {lines.length > 1 ? (
             <Field label="Edition">
-              <Pressable
+              <Tap
                 onPress={() => setPicking(true)}
                 className="min-h-[46px] flex-row items-center justify-between rounded-[2px] border-[1.5px] border-line-soft bg-paper px-3"
               >
@@ -81,7 +82,7 @@ export default function ReportBook({
                   {line?.label}
                 </Text>
                 <ChevronDownIcon color={c.inkSoft} width={18} height={18} />
-              </Pressable>
+              </Tap>
               <PickSheet
                 open={picking}
                 title="Edition"

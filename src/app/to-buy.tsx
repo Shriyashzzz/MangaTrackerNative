@@ -2,6 +2,7 @@
 // buy, what they'd cost new and used all together, each with its prices,
 // On my shelf, Ordered and Remove, sorted their way, and Clear list.
 // Marking one theirs whose series isn't on the shelf offers to add it
+import Tap from "@/components/Tap";
 import { Input } from "@/components/Field";
 import { H2 } from "@/components/Page";
 import Sheet from "@/components/Sheet";
@@ -10,7 +11,7 @@ import Backdrop from "@/components/Backdrop";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { Alert, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 import AddSeriesModal from "@/components/AddSeriesModal";
@@ -260,14 +261,15 @@ export default function ToBuyScreen() {
     <Safe edges={["top"]} className="flex-1 bg-paper">
       <Backdrop />
       <View className="h-[62px] flex-row items-center gap-3 px-2">
-        <Pressable
+        <Tap
+          feel="round"
           onPress={() => router.back()}
           hitSlop={8}
           className="p-2"
           accessibilityLabel="Back"
         >
           <ChevronLeftIcon color={c.ink} width={24} height={24} />
-        </Pressable>
+        </Tap>
         <Text className="flex-1 font-brand pr-[6px] text-[24px] tracking-[1px] text-ink uppercase">
           To buy
           {"\u00A0"}
@@ -336,7 +338,7 @@ export default function ToBuyScreen() {
                 ) : null}
               </View>
               <View className="flex-row items-center justify-between gap-3">
-                <Pressable
+                <Tap
                   onPress={() => setPickingSort(true)}
                   className="flex-row items-center gap-1"
                   accessibilityLabel={`Sorted by ${sortLabel}. Change`}
@@ -348,12 +350,12 @@ export default function ToBuyScreen() {
                     {sortLabel}
                   </Text>
                   <ChevronDownIcon color={c.ink} width={14} height={14} />
-                </Pressable>
-                <Pressable onPress={askToClear} hitSlop={6}>
+                </Tap>
+                <Tap onPress={askToClear} hitSlop={6}>
                   <Text className="font-body text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
                     Clear list
                   </Text>
-                </Pressable>
+                </Tap>
               </View>
               <View className="rounded-[14px] border border-line-soft bg-card">
                 {sorted.map((item, i) => (
@@ -362,7 +364,7 @@ export default function ToBuyScreen() {
                     className={`gap-3 px-3 py-3 ${i ? "border-t-[1.5px] border-dashed border-line-soft" : ""}`}
                   >
                     <View className="flex-row gap-3">
-                      <Pressable
+                      <Tap
                         onPress={() => router.push(`/prices/${item.isbn13}`)}
                       >
                         <Image
@@ -388,15 +390,15 @@ export default function ToBuyScreen() {
                             </Text>
                           </View>
                         ) : null}
-                      </Pressable>
+                      </Tap>
                       <View className="min-w-0 flex-1 gap-1">
-                        <Pressable
+                        <Tap
                           onPress={() => router.push(`/prices/${item.isbn13}`)}
                         >
                           <Text className="font-body-semibold text-[15.5px] text-ink">
                             {nameOf(item)}
                           </Text>
-                        </Pressable>
+                        </Tap>
                         {item.shelf?.state ? (
                           <Text className="font-mono text-[11px] tracking-[0.5px] text-ok uppercase">
                             {item.shelf.state === "owned"
@@ -442,7 +444,7 @@ export default function ToBuyScreen() {
                           onPress={() => void settle(item, "ordered")}
                         />
                       ) : null}
-                      <Pressable
+                      <Tap
                         onPress={() => void takeOff(item)}
                         disabled={busy !== null}
                         hitSlop={6}
@@ -450,13 +452,13 @@ export default function ToBuyScreen() {
                         <Text className="font-body text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
                           Remove
                         </Text>
-                      </Pressable>
+                      </Tap>
                       {/* their own order: up and down, only while it's the
                           order shown */}
                       {sort === "mine" ? (
                         <View className="ml-auto flex-row gap-2">
                           {([-1, 1] as const).map((by) => (
-                            <Pressable
+                            <Tap
                               key={by}
                               onPress={() => move(i, by)}
                               disabled={
@@ -479,13 +481,13 @@ export default function ToBuyScreen() {
                                   height={18}
                                 />
                               </View>
-                            </Pressable>
+                            </Tap>
                           ))}
                         </View>
                       ) : null}
                     </View>
                     {/* their own note on it: the words, or the way to add some */}
-                    <Pressable
+                    <Tap
                       onPress={() =>
                         setNoting({
                           isbn13: item.isbn13,
@@ -506,7 +508,7 @@ export default function ToBuyScreen() {
                           + Add a note
                         </Text>
                       )}
-                    </Pressable>
+                    </Tap>
                   </View>
                 ))}
               </View>

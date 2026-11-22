@@ -1,8 +1,9 @@
 // Friends, as the web's pages/Friends/Friends.tsx: the shared shelves they
 // follow, each a way to that shelf, with Unfollow
+import Tap from "@/components/Tap";
 import { useEffect, useState } from "react";
 import { router } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import Mascot from "@/components/Mascot";
 import Page, { P } from "@/components/Page";
 import { getFriends, setFollowing, type Friend } from "@/core/lib/friends";
@@ -44,7 +45,7 @@ export default function FriendsScreen() {
           key={friend.code}
           className="flex-row items-center gap-3 border-b border-dashed border-line-soft pb-3"
         >
-          <Pressable
+          <Tap
             onPress={() =>
               router.push({
                 pathname: "/u/[code]",
@@ -60,12 +61,12 @@ export default function FriendsScreen() {
               {count(friend.series, "series", "series")} ·{" "}
               {count(friend.volumes, "volume", "volumes")}
             </Text>
-          </Pressable>
-          <Pressable onPress={() => void unfollow(friend)} hitSlop={6}>
+          </Tap>
+          <Tap onPress={() => void unfollow(friend)} hitSlop={6}>
             <Text className="font-body-medium text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
               Unfollow
             </Text>
-          </Pressable>
+          </Tap>
         </View>
       ))}
     </Page>

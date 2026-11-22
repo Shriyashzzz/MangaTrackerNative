@@ -3,9 +3,10 @@
 // volumes they own on the spine picker (an edition's books, for a collector
 // of one). The checks and the request are the web's own (core
 // seriesFormRules)
+import Tap from "@/components/Tap";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
@@ -192,14 +193,15 @@ export default function EditScreen() {
   return (
     <Safe edges={["top"]} className="flex-1 bg-paper">
       <View className="h-[62px] flex-row items-center gap-3 px-2">
-        <Pressable
+        <Tap
+          feel="round"
           onPress={() => router.back()}
           hitSlop={8}
           className="p-2"
           accessibilityLabel="Back"
         >
           <ChevronLeftIcon color={c.ink} width={24} height={24} />
-        </Pressable>
+        </Tap>
         <Text className="flex-1 font-brand pr-[6px] text-[24px] tracking-[1px] text-ink uppercase">
           Edit details
           {"\u00A0"}
@@ -289,7 +291,7 @@ export default function EditScreen() {
             }
           />
           <Field label="Genre" optional>
-            <Pressable
+            <Tap
               onPress={() => setPickingGenre(true)}
               className="min-h-[46px] flex-row items-center justify-between rounded-[2px] border-[1.5px] border-line-soft bg-paper px-3"
             >
@@ -299,7 +301,7 @@ export default function EditScreen() {
                 {genreLabel}
               </Text>
               <ChevronDownIcon color={c.inkSoft} width={18} height={18} />
-            </Pressable>
+            </Tap>
           </Field>
           <Field
             label="Notes"

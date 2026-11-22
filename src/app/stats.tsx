@@ -3,9 +3,10 @@
 // complete it is and where the biggest gaps are, the genres, and the
 // longest runs. Every figure is from lib/collectionStats.ts or the server's
 // own shelf totals; a number the app can't know isn't shown as one
+import Tap from "@/components/Tap";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import Mascot from "@/components/Mascot";
 import Page, { H2, P, Rule } from "@/components/Page";
 import { getJson } from "@/core/lib/api";
@@ -48,7 +49,7 @@ function BarRow({
   onPress?: () => void;
 }) {
   return (
-    <Pressable
+    <Tap
       onPress={onPress}
       disabled={!onPress}
       className="gap-1 py-2 active:opacity-70"
@@ -68,7 +69,7 @@ function BarRow({
           style={{ width: `${Math.max(3, Math.min(100, of * 100))}%` }}
         />
       </View>
-    </Pressable>
+    </Tap>
   );
 }
 

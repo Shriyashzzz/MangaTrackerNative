@@ -3,11 +3,12 @@
 // a row per series. Pull down to load it again. Volumes is its own view
 // (VolumesView). Who's in each tab, the search and the sort are the web's own
 // rules (core filterShelf); it opens on the tab and sort the account chose
+import Tap from "@/components/Tap";
 import Backdrop from "@/components/Backdrop";
 import GuestShelf from "@/components/GuestShelf";
 import { useAuth } from "@/store/auth";
 import { useEffect, useState } from "react";
-import { Alert, Pressable, Text, TextInput, View } from "react-native";
+import { Alert, Text, TextInput, View } from "react-native";
 import Animated, {
   FadeOut,
   LayoutAnimationConfig,
@@ -200,16 +201,17 @@ function SignedInShelf() {
                 returnKeyType="search"
                 className="flex-1 py-2 font-body text-[16px] text-ink"
               />
-              <Pressable
+              <Tap
+                feel="round"
                 onPress={closeSearch}
                 hitSlop={10}
                 accessibilityLabel="Close search"
               >
                 <CloseIcon color={c.inkSoft} width={18} height={18} />
-              </Pressable>
+              </Tap>
             </View>
           ) : (
-            <Pressable
+            <Tap
               onPress={() => setPicking("tab")}
               className="flex-1 flex-row items-baseline gap-2"
               accessibilityLabel={`Showing ${shown.label}, ${counts[tab]}. Change what's shown`}
@@ -222,19 +224,21 @@ function SignedInShelf() {
                 {counts[tab]}
               </Text>
               <ChevronDownIcon color={c.inkSoft} width={18} height={18} />
-            </Pressable>
+            </Tap>
           )}
           {searching ? null : (
-            <Pressable
+            <Tap
+              feel="round"
               onPress={() => setSearching(true)}
               hitSlop={8}
               className="p-2"
               accessibilityLabel="Search your shelf"
             >
               <SearchIcon color={c.ink} width={22} height={22} />
-            </Pressable>
+            </Tap>
           )}
-          <Pressable
+          <Tap
+            feel="round"
             onPress={() => setPicking("sort")}
             hitSlop={8}
             className="p-2"
@@ -245,9 +249,9 @@ function SignedInShelf() {
               width={22}
               height={22}
             />
-          </Pressable>
+          </Tap>
           {tab !== "volumes" && !select.selectOn && !searching ? (
-            <Pressable
+            <Tap
               // on the way down, not on release: it answers at once
               onPressIn={select.start}
               hitSlop={8}
@@ -257,7 +261,7 @@ function SignedInShelf() {
               <Text className="font-body-semibold text-[14.5px] text-ink">
                 Select
               </Text>
-            </Pressable>
+            </Tap>
           ) : null}
         </View>
         <View className="mx-4 h-px bg-line" />
@@ -321,14 +325,14 @@ function SignedInShelf() {
             fabStyle,
           ]}
         >
-          <Pressable
+          <Tap
             onPress={() => setAdding(true)}
             accessibilityLabel="Add manga"
             className="h-14 w-14 items-center justify-center rounded-full bg-accent active:opacity-90"
             style={{ boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.35)" }}
           >
             <PlusIcon color={c.onAccent} width={26} height={26} />
-          </Pressable>
+          </Tap>
         </Animated.View>
       ) : null}
       {adding ? (

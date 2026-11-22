@@ -1,8 +1,9 @@
 // The box a reader writes or changes a volume's review in, without leaving
 // the series' page (the web's pages/Details/ReviewDialog.tsx): a sheet with
 // stars, a few words, the spoiler switch, and the way to delete it
+import Tap from "@/components/Tap";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import {
   deleteShelfReview,
   saveShelfReview,
@@ -62,11 +63,11 @@ export default function ReviewDialog({
       />
       {current ? (
         <View className="mt-4 flex-row flex-wrap items-baseline gap-3">
-          <Pressable onPress={() => void remove()} hitSlop={6}>
+          <Tap onPress={() => void remove()} hitSlop={6}>
             <Text className="font-body-medium text-[14px] text-accent border-b pb-[2px] border-accent self-start">
               Delete this review
             </Text>
-          </Pressable>
+          </Tap>
           {deleteFailed ? (
             <Text className="font-body text-[14px] text-accent">
               That didn't delete. Try again.

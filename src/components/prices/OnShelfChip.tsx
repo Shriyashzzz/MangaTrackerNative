@@ -1,7 +1,8 @@
 // "On your shelf", small, right under a cover on the price pages: the series
 // is theirs already, and a tap opens it. Nothing when it isn't
+import Tap from "@/components/Tap";
 import { router } from "expo-router";
-import { Pressable, Text } from "react-native";
+import { Text } from "react-native";
 import { novelParts } from "@/core/lib/prices";
 import { titleKey as sameName } from "@/core/lib/titleKey";
 import { useShelf } from "@/store/shelf";
@@ -23,7 +24,7 @@ export default function OnShelfChip({
   );
   if (!onShelf) return null;
   return (
-    <Pressable
+    <Tap
       onPress={() =>
         router.push({
           pathname: "/details/[id]",
@@ -37,6 +38,6 @@ export default function OnShelfChip({
       <Text className="font-body-medium text-[11px] text-ok">
         {onShelf.planned ? "On to-read" : "On your shelf"}
       </Text>
-    </Pressable>
+    </Tap>
   );
 }

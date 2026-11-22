@@ -2,9 +2,10 @@
 // (Still reading / Finished it / Want to read, Volumes / Editions, All / New /
 // Used). The picked one's fill slides to it rather than jumping, with the
 // system's selection tick, as the platforms' own segmented controls do
+import Tap from "@/components/Tap";
 import * as Haptics from "expo-haptics";
 import { useEffect, useState } from "react";
-import { Pressable, Text, View, type LayoutChangeEvent } from "react-native";
+import { Text, View, type LayoutChangeEvent } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -84,7 +85,7 @@ export default function Segmented<T extends string>({
       {options.map((o, i) => {
         const on = i === picked;
         return (
-          <Pressable
+          <Tap
             key={o.value}
             onPress={() => {
               if (on) return;
@@ -110,7 +111,7 @@ export default function Segmented<T extends string>({
                 </View>
               ) : null}
             </View>
-          </Pressable>
+          </Tap>
         );
       })}
     </View>

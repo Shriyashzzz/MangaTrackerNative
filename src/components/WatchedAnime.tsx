@@ -1,8 +1,9 @@
 // "Watched the anime? Tap your last season": on the add form, a season fills
 // in where they're up to (the web's pages/AfterAnime/WatchedAnime.tsx; the
 // answer and the arithmetic are the web's, core afterAnime)
+import Tap from "@/components/Tap";
 import { useEffect, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { getAfterAnime, type AfterAnime } from "@/core/lib/afterAnime";
 import { placeAfter, type AnimeStop } from "@/core/lib/afterAnimeText";
 
@@ -48,7 +49,7 @@ export default function WatchedAnime({
           const on =
             picked?.asked === seriesName && picked.label === stop.label;
           return (
-            <Pressable
+            <Tap
               key={stop.label}
               onPress={() => pick(stop)}
               accessibilityState={{ selected: on }}
@@ -59,7 +60,7 @@ export default function WatchedAnime({
               >
                 {stop.label === "The anime" ? "Yes, all of it" : stop.label}
               </Text>
-            </Pressable>
+            </Tap>
           );
         })}
       </View>

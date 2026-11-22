@@ -1,8 +1,9 @@
 // The app's one pick-one list: a sheet with the picked one in bold and an
 // optional count on the right. Anywhere something is picked from a short
 // list uses it (the shelf's tab, its sort), as the web reuses its SortMenu
+import Tap from "@/components/Tap";
 import * as Haptics from "expo-haptics";
-import { Pressable, Text } from "react-native";
+import { Text } from "react-native";
 import { useRipple } from "@/lib/press";
 import Sheet from "./Sheet";
 
@@ -36,7 +37,7 @@ export default function PickSheet<T extends string>({
         </Text>
       ) : null}
       {options.map((o) => (
-        <Pressable
+        <Tap
           key={o.value}
           android_ripple={ripple}
           onPress={() => {
@@ -57,7 +58,7 @@ export default function PickSheet<T extends string>({
               {o.count.toLocaleString()}
             </Text>
           ) : null}
-        </Pressable>
+        </Tap>
       ))}
     </Sheet>
   );

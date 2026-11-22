@@ -1,6 +1,7 @@
 // "Watched the anime?" on a series' price page (the web's AfterAnimeBar):
 // the way to which chapter and volume to start from
-import { Pressable, Text, View } from "react-native";
+import Tap from "@/components/Tap";
+import { Text, View } from "react-native";
 import { afterAnimeCanonicalPath } from "@/core/lib/afterAnime";
 import { openWebPath } from "@/lib/webRoutes";
 
@@ -15,14 +16,14 @@ export default function AfterAnimeBar({ seriesName }: { seriesName: string }) {
           See which chapter and volume of the manga to start from.
         </Text>
       </View>
-      <Pressable
+      <Tap
         onPress={() => openWebPath(afterAnimeCanonicalPath(seriesName))}
         hitSlop={6}
       >
         <Text className="font-body-semibold text-[14px] text-accent border-b pb-[2px] border-accent self-start">
           Find where to start
         </Text>
-      </Pressable>
+      </Tap>
     </View>
   );
 }

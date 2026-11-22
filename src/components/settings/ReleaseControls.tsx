@@ -2,8 +2,9 @@
 // for volumes and for chapters, every series or only the ones they're
 // nearly caught up on, and how nearly. Each choice shows an example of what
 // New would say. Saved a moment after the last change
+import Tap from "@/components/Tap";
 import { useEffect, useRef, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { apiFetch } from "@/core/lib/api";
 import type {
   Prefs,
@@ -199,7 +200,7 @@ export default function ReleaseControls() {
             {range.mode === "within" ? (
               <View className="flex-row items-center gap-3">
                 <View className="flex-row items-center overflow-hidden rounded-[12px] bg-ink/10">
-                  <Pressable
+                  <Tap
                     onPress={() =>
                       change({ within: Math.max(1, range.within - 1) })
                     }
@@ -210,13 +211,13 @@ export default function ReleaseControls() {
                     <Text className="font-body-semibold text-[20px] text-ink">
                       −
                     </Text>
-                  </Pressable>
+                  </Tap>
                   <Text className="w-12 border-x border-line-soft text-center font-brand text-[20px] text-ink">
                     {"\u00A0"}
                     {range.within}
                     {"\u00A0"}
                   </Text>
-                  <Pressable
+                  <Tap
                     onPress={() =>
                       change({ within: Math.min(copy.max, range.within + 1) })
                     }
@@ -227,7 +228,7 @@ export default function ReleaseControls() {
                     <Text className="font-body-semibold text-[20px] text-ink">
                       +
                     </Text>
-                  </Pressable>
+                  </Tap>
                 </View>
                 <Text className="shrink font-body text-[14px] text-ink-soft">
                   {howClose}

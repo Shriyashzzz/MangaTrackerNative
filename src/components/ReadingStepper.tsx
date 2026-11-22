@@ -3,9 +3,10 @@
 // edition they collect. Typed or stepped, it saves a moment after the last
 // change, saves in order, and puts the saved number back when one fails.
 // Leaving the page with a change not yet sent still sends it
+import Tap from "@/components/Tap";
 import * as Haptics from "expo-haptics";
 import { useEffect, useRef, useState } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import { Text, TextInput, View } from "react-native";
 import { apiFetch } from "@/core/lib/api";
 import { saveOrKeep } from "@/core/lib/offlineChanges";
 import { useColors } from "@/lib/colors";
@@ -164,14 +165,14 @@ export default function ReadingStepper({
     glyph: string,
     disabled: boolean,
   ) => (
-    <Pressable
+    <Tap
       onPress={() => step(by)}
       disabled={disabled}
       accessibilityLabel={label}
       className={`h-11 w-11 items-center justify-center active:bg-accent-wash ${disabled ? "opacity-40" : ""}`}
     >
       <Text className="font-body-semibold text-[22px] text-ink">{glyph}</Text>
-    </Pressable>
+    </Tap>
   );
   const said =
     problem ??

@@ -1,9 +1,10 @@
 // What AniList says of a series (the web's SeriesFacts): its rating, how
 // popular, how many volumes in Japan, its genres and blurb, folded past a
 // few lines
+import Tap from "@/components/Tap";
 import { openOutside } from "@/lib/openOutside";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { novelParts } from "@/core/lib/prices";
 import type { SeriesInfo } from "@/core/lib/types";
 import { starsOf } from "@/core/pages/Prices/reviews/reviewText";
@@ -28,7 +29,7 @@ export function SeriesDescription({ info }: { info: SeriesInfo }) {
       {/* folded: Read more sits at the end of the third line itself, on a
           patch of the page's colour over the cut-off words */}
       {long && !expanded ? (
-        <Pressable
+        <Tap
           onPress={() => setExpanded(true)}
           hitSlop={8}
           className="absolute right-0 bottom-0 flex-row bg-paper pl-1"
@@ -39,14 +40,14 @@ export function SeriesDescription({ info }: { info: SeriesInfo }) {
           <Text className="font-body-semibold text-[14px] leading-[21px] text-ink">
             Read more
           </Text>
-        </Pressable>
+        </Tap>
       ) : null}
       {long && expanded ? (
-        <Pressable onPress={() => setExpanded(false)} hitSlop={6}>
+        <Tap onPress={() => setExpanded(false)} hitSlop={6}>
           <Text className="self-start border-b border-ink pb-[2px] font-body-medium text-[13.5px] text-ink">
             Show less
           </Text>
-        </Pressable>
+        </Tap>
       ) : null}
     </View>
   );

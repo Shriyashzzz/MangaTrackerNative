@@ -1,7 +1,8 @@
 // "checked 2 h ago" beside Prices (the web's PriceAges): the newest check,
 // opening to each store's own when they differ
+import Tap from "@/components/Tap";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import Sheet from "../Sheet";
 import { shopName, timeAgo } from "@/core/lib/prices";
 import type { Offer } from "@/core/lib/types";
@@ -38,7 +39,7 @@ export default function PriceAges({
     );
   return (
     <>
-      <Pressable
+      <Tap
         onPress={() => setOpen(true)}
         hitSlop={6}
         accessibilityRole="button"
@@ -47,7 +48,7 @@ export default function PriceAges({
         <Text className="font-body text-[13px] text-muted border-b pb-[2px] border-muted self-start">
           checked {timeAgo(newest)}
         </Text>
-      </Pressable>
+      </Tap>
       <Sheet open={open} onClose={() => setOpen(false)}>
         <Text className="pb-3 font-body-semibold text-[13px] tracking-[1px] text-muted uppercase">
           Each store, last checked

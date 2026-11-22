@@ -1,6 +1,7 @@
 // A series' other editions (the web's OtherEditions.tsx, the app's layout):
 // each line's books as cards, which book holds a volume, the lines to switch
 // between, and what a whole run costs against the singles
+import Tap from "@/components/Tap";
 import { H2 } from "@/components/Page";
 import { nextVolumeFor } from "@/core/lib/editionLookup";
 import {
@@ -12,7 +13,7 @@ import { runTotal, seriesCost, type SeriesCost } from "@/core/lib/finishCost";
 import { formatCents, wholeMoney } from "@/core/lib/prices";
 import { router } from "expo-router";
 import { useState } from "react";
-import { Pressable, Text, useWindowDimensions, View } from "react-native";
+import { Text, useWindowDimensions, View } from "react-native";
 import Segmented from "../Segmented";
 import EditionFinder from "./EditionFinder";
 import VolumeCard from "./VolumeCard";
@@ -120,7 +121,7 @@ export default function OtherEditions({
           );
         })}
       </View>
-      <Pressable
+      <Tap
         onPress={() => router.push("/editions")}
         hitSlop={6}
         className="self-start"
@@ -128,7 +129,7 @@ export default function OtherEditions({
         <Text className="font-body-medium text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
           Every series with other editions →
         </Text>
-      </Pressable>
+      </Tap>
       {books ? (
         <View className="gap-0.5">
           <Text className="font-body text-[14px] text-ink-soft">

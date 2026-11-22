@@ -7,9 +7,10 @@
 // "Up to vol." types a run. Whole shelves of ten they own fold into one box
 // set. For a series collected as an edition the bookcase holds that
 // edition's books instead: tap a book to own every volume in it
+import Tap from "@/components/Tap";
 import * as Haptics from "expo-haptics";
 import { useRef, useState } from "react";
-import { Pressable, Text, View, type LayoutChangeEvent } from "react-native";
+import { Text, View, type LayoutChangeEvent } from "react-native";
 import {
   GestureDetector,
   useExclusiveGestures,
@@ -409,7 +410,7 @@ export default function VolumePicker({
           {slots.map((slot, i) => {
             const state = stateOf(slot, owned);
             return (
-              <Pressable
+              <Tap
                 key={i}
                 onPress={() => tapSlot(i + 1)}
                 accessibilityLabel={slotName(edition.line, slot, owned)}
@@ -429,7 +430,7 @@ export default function VolumePicker({
                     single={!slot.book}
                   />
                 </Slot>
-              </Pressable>
+              </Tap>
             );
           })}
         </View>
@@ -438,7 +439,7 @@ export default function VolumePicker({
             <Text className="font-body text-[13.5px] text-ink-soft">
               {slotName(edition.line, askedSlot, owned)}. Own the whole book?
             </Text>
-            <Pressable
+            <Tap
               onPress={() => {
                 setAsking(null);
                 setOwned(toggleSlot(askedSlot, owned));
@@ -446,10 +447,10 @@ export default function VolumePicker({
               hitSlop={6}
             >
               <Text className={link}>Yes, all of it</Text>
-            </Pressable>
-            <Pressable onPress={() => setAsking(null)} hitSlop={6}>
+            </Tap>
+            <Tap onPress={() => setAsking(null)} hitSlop={6}>
               <Text className={link}>No</Text>
-            </Pressable>
+            </Tap>
           </View>
         ) : null}
         <View className="flex-row flex-wrap items-baseline justify-between gap-x-4">
@@ -457,7 +458,7 @@ export default function VolumePicker({
             {owned.length ? ownedCaption(slots, owned) : "None yet"}
           </Text>
           {owned.length ? (
-            <Pressable
+            <Tap
               onPress={() => {
                 setOwned([]);
                 setAsking(null);
@@ -465,7 +466,7 @@ export default function VolumePicker({
               hitSlop={6}
             >
               <Text className={link}>Clear</Text>
-            </Pressable>
+            </Tap>
           ) : null}
         </View>
         {offEditionShelf.length ? (
@@ -511,7 +512,7 @@ export default function VolumePicker({
         >
           {rows.map((row) =>
             row.kind === "box" ? (
-              <Pressable
+              <Tap
                 key={`box-${row.run[0]}`}
                 onPress={() =>
                   setFolds((all) => all.filter((r) => r !== row.run))
@@ -542,7 +543,7 @@ export default function VolumePicker({
                     all yours · open
                   </Text>
                 </View>
-              </Pressable>
+              </Tap>
             ) : (
               <View
                 key={`row-${row.from}`}
@@ -567,7 +568,7 @@ export default function VolumePicker({
           {said}
         </Text>
         <View className="flex-row gap-4">
-          <Pressable
+          <Tap
             onPress={() => {
               setGrown(true);
               setShown((n) => Math.max(n, spines.length) + MORE);
@@ -579,9 +580,9 @@ export default function VolumePicker({
                 ? `Show vols. ${spines.length + 1}–${spines.length + MORE}`
                 : `Show ${MORE} more`}
             </Text>
-          </Pressable>
+          </Tap>
           {owned.length ? (
-            <Pressable
+            <Tap
               onPress={() => {
                 setOwned([]);
                 setFolds([]);
@@ -591,7 +592,7 @@ export default function VolumePicker({
               hitSlop={6}
             >
               <Text className={link}>Clear</Text>
-            </Pressable>
+            </Tap>
           ) : null}
         </View>
       </View>

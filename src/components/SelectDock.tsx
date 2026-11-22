@@ -2,8 +2,9 @@
 // SelectDock.tsx): how many are picked, Select all, Move to, Delete, Done.
 // Under it, or on its own once selecting is over, the note of the last move
 // with its Undo
+import Tap from "@/components/Tap";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { CloseIcon } from "@/core/components/icons/Icons";
 import type { Manga } from "@/core/lib/types";
@@ -31,11 +32,11 @@ export function MovedNote({ select }: { select: SelectMode }) {
             Moved {select.moved!.name || `${select.moved!.was.length} series`}{" "}
             to {MOVE_LABELS[select.moved!.to]}
           </Text>
-          <Pressable onPress={() => void select.undoMove()} hitSlop={8}>
+          <Tap onPress={() => void select.undoMove()} hitSlop={8}>
             <Text className="font-body-semibold text-[15px] tracking-[0.5px] text-accent uppercase">
               Undo
             </Text>
-          </Pressable>
+          </Tap>
         </>
       )}
     </View>
@@ -68,15 +69,15 @@ export default function SelectDock({
           {count}
           {"\u00A0"}
         </Text>
-        <Pressable
+        <Tap
           onPress={select.toggleAll}
           className="min-h-[44px] justify-center px-1"
         >
           <Text className={word(true)}>
             {select.allPicked ? "Clear" : `Select all ${shown.length}`}
           </Text>
-        </Pressable>
-        <Pressable
+        </Tap>
+        <Tap
           onPress={() => setMovePicking(true)}
           disabled={!count || select.moving}
           className="min-h-[44px] justify-center px-1"
@@ -84,8 +85,8 @@ export default function SelectDock({
           <Text className={word(Boolean(count) && !select.moving)}>
             {select.moving ? "Moving…" : "Move to"}
           </Text>
-        </Pressable>
-        <Pressable
+        </Tap>
+        <Tap
           onPress={() => select.setConfirmingDelete(true)}
           disabled={!count}
           className="min-h-[44px] justify-center px-1"
@@ -95,15 +96,16 @@ export default function SelectDock({
           >
             Delete {count || ""}
           </Text>
-        </Pressable>
-        <Pressable
+        </Tap>
+        <Tap
+          feel="round"
           onPress={select.stop}
           hitSlop={8}
           accessibilityLabel="Done selecting"
           className="min-h-[44px] justify-center pl-2"
         >
           <CloseIcon color={c.ink} width={20} height={20} />
-        </Pressable>
+        </Tap>
       </View>
       <PickSheet
         open={movePicking}

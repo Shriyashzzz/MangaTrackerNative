@@ -4,6 +4,7 @@
 // and the highlights: Popular this season, Latest deals, Prices
 // just checked. A search lists the series found, with Did you mean for a
 // typo. The rules are the web's (core findSeries, nearMatches, askedEdition)
+import Tap from "@/components/Tap";
 import PullPage, { pause, usePullTop } from "@/components/PullRefresh";
 import Backdrop from "@/components/Backdrop";
 import AppHeader from "@/components/AppHeader";
@@ -30,14 +31,7 @@ import { look } from "@/lib/platformLook";
 import { usePrefs } from "@/store/prefs";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import {
-  BackHandler,
-  Pressable,
-  ScrollView,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { BackHandler, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 
@@ -74,11 +68,11 @@ function HighlightsStrip() {
         <View className="gap-2">
           <View className="flex-row items-end justify-between">
             <H2>Popular this season</H2>
-            <Pressable onPress={() => router.push("/series")} hitSlop={6}>
+            <Tap onPress={() => router.push("/series")} hitSlop={6}>
               <Text className="font-body-medium text-[14px] text-ink border-b pb-[2px] border-ink self-start">
                 All series →
               </Text>
-            </Pressable>
+            </Tap>
           </View>
           {row(
             data.trending.map((s) => <SeriesCard key={s.slug} series={s} />),
@@ -89,11 +83,11 @@ function HighlightsStrip() {
         <View className="gap-2">
           <View className="flex-row items-end justify-between">
             <H2>Latest deals</H2>
-            <Pressable onPress={() => router.push("/deals")} hitSlop={6}>
+            <Tap onPress={() => router.push("/deals")} hitSlop={6}>
               <Text className="font-body-medium text-[14px] text-ink border-b pb-[2px] border-ink self-start">
                 All deals →
               </Text>
-            </Pressable>
+            </Tap>
           </View>
           {row(
             data.deals.map((d) => (
@@ -229,14 +223,15 @@ export default function PricesScreen() {
       <Safe edges={["top"]} className="flex-1 bg-paper">
         <Backdrop />
         <View className="flex-row items-center gap-2 px-2 pt-2 pb-2">
-          <Pressable
+          <Tap
+            feel="round"
             onPress={() => setFull(false)}
             hitSlop={8}
             className="p-2"
             accessibilityLabel="Close search"
           >
             <ChevronLeftIcon color={c.ink} width={24} height={24} />
-          </Pressable>
+          </Tap>
           <View className="flex-1 flex-row items-center gap-2 rounded-[14px] border border-line-soft bg-card px-3">
             <SearchIcon color={c.inkSoft} width={18} height={18} />
             <TextInput
@@ -262,19 +257,19 @@ export default function PricesScreen() {
                 Recent
               </Text>
               {recent.map((name) => (
-                <Pressable
+                <Tap
                   key={name}
                   onPress={() => pick({ name })}
                   className="py-2.5"
                 >
                   <Text className="font-body text-[16px] text-ink">{name}</Text>
-                </Pressable>
+                </Tap>
               ))}
             </View>
           ) : null}
           {q.length >= 2 && !isbn
             ? shown.map((s) => (
-                <Pressable
+                <Tap
                   key={s.slug}
                   onPress={() => pick(s)}
                   className="flex-row items-center gap-3 border-b border-dotted border-line-soft py-2 active:opacity-70"
@@ -303,7 +298,7 @@ export default function PricesScreen() {
                         .join(" · ")}
                     </Text>
                   </View>
-                </Pressable>
+                </Tap>
               ))
             : null}
           {q.length >= 2 && fresh && found.guessed && shown.length ? (
@@ -312,11 +307,11 @@ export default function PricesScreen() {
             </Text>
           ) : null}
           {q.length >= 2 ? (
-            <Pressable onPress={seeAll} className="py-3">
+            <Tap onPress={seeAll} className="py-3">
               <Text className="font-body-semibold text-[15px] text-ink border-b pb-[2px] border-ink self-start">
                 {isbn ? `Open ISBN ${isbn}` : `See all results for “${q}”`}
               </Text>
-            </Pressable>
+            </Tap>
           ) : null}
         </ScrollView>
       </Safe>
@@ -358,7 +353,7 @@ export default function PricesScreen() {
             <View className="w-[140px]">
               <CountrySwitch />
             </View>
-            <Pressable
+            <Tap
               onPress={() => setFull(true)}
               className="flex-row items-center gap-2 rounded-[12px] border border-line-soft bg-paper px-3"
               accessibilityLabel="Search a series or an ISBN"
@@ -369,7 +364,7 @@ export default function PricesScreen() {
               >
                 {query || "Title or ISBN"}
               </Text>
-            </Pressable>
+            </Tap>
             {!searching ? (
               <View className="gap-2">
                 <Text className="font-body text-[14px] text-ink-soft">Try</Text>
@@ -446,11 +441,11 @@ export default function PricesScreen() {
                   ? "A digit may be off. Check it against the back of the book."
                   : "Try the name printed on the US cover, or paste the ISBN from the back of a volume."}
               </Text>
-              <Pressable onPress={() => router.push("/series")} hitSlop={6}>
+              <Tap onPress={() => router.push("/series")} hitSlop={6}>
                 <Text className="font-body-semibold text-[14.5px] text-ink border-b pb-[2px] border-ink self-start">
                   Browse every series
                 </Text>
-              </Pressable>
+              </Tap>
             </View>
           ) : null}
           {searching && result && result.items.length ? (
@@ -468,7 +463,7 @@ export default function PricesScreen() {
                   <SeriesCard key={s.slug} series={s} width={104} />
                 ))}
               </View>
-              <Pressable
+              <Tap
                 onPress={() => {
                   setResult(null);
                   setText("");
@@ -479,7 +474,7 @@ export default function PricesScreen() {
                 <Text className="font-body-medium text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
                   Clear the search
                 </Text>
-              </Pressable>
+              </Tap>
             </View>
           ) : null}
 

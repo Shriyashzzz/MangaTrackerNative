@@ -1,9 +1,10 @@
 // One volume on a series' price page, as the Android app's cover grid (web
 // pages/Prices/VolumeCard.tsx): its cover with a "Vol. 5" flag, "Yours" when
 // it's on their shelf, and its price under it, or "check price"
+import Tap from "@/components/Tap";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { coverSrc, formatCents } from "@/core/lib/prices";
 import type { SeriesVolume } from "@/core/lib/types";
 import { useColors } from "@/lib/colors";
@@ -20,7 +21,7 @@ export default function VolumeTile({
   const c = useColors();
   return (
     <Link href={`/prices/${volume.isbn13}`} asChild>
-      <Pressable style={{ width }} className="gap-1 active:opacity-70">
+      <Tap style={{ width }} className="gap-1 active:opacity-70">
         <View>
           <Image
             source={
@@ -64,7 +65,7 @@ export default function VolumeTile({
             ? formatCents(volume.knownPriceCents)
             : "check price"}
         </Text>
-      </Pressable>
+      </Tap>
     </Link>
   );
 }

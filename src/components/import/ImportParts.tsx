@@ -2,8 +2,9 @@
 // BookImportParts.tsx and the page's own bits): a numbered step, the
 // progress bar, the waiting dots, the files in an import, the two-step Stop
 // button and the complete sets question
+import Tap from "@/components/Tap";
 import { useEffect, useState, type ReactNode } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import Button from "@/components/Button";
 import { ChevronDownIcon } from "@/core/components/icons/Icons";
 import { useColors } from "@/lib/colors";
@@ -74,7 +75,7 @@ export function FilesInImport({ names }: { names: string[] }) {
   const [open, setOpen] = useState(false);
   return (
     <View>
-      <Pressable
+      <Tap
         onPress={() => setOpen(!open)}
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
@@ -86,7 +87,7 @@ export function FilesInImport({ names }: { names: string[] }) {
         <View style={{ transform: [{ rotate: open ? "180deg" : "0deg" }] }}>
           <ChevronDownIcon color={c.inkSoft} width={16} height={16} />
         </View>
-      </Pressable>
+      </Tap>
       {open
         ? names.map((name) => (
             <Text

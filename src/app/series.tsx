@@ -1,8 +1,9 @@
 // Every series, as the web's pages/Prices/SeriesIndex.tsx: popular, top
 // rated or A to Z, by genre, each a way to its prices
+import Tap from "@/components/Tap";
 import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import Mascot from "@/components/Mascot";
 import Page, { H2, P, TextLink } from "@/components/Page";
 import PickSheet from "@/components/PickSheet";
@@ -118,7 +119,7 @@ export default function SeriesIndexScreen() {
         }}
       />
       {genres.length ? (
-        <Pressable
+        <Tap
           onPress={() => setPickingGenre(true)}
           className="min-h-[44px] flex-row items-center justify-between rounded-[2px] border-[1.5px] border-line-soft bg-paper px-3"
           accessibilityLabel={`Genre: ${genre || "All genres"}. Change`}
@@ -127,7 +128,7 @@ export default function SeriesIndexScreen() {
             {genre || "All genres"}
           </Text>
           <ChevronDownIcon color={c.inkSoft} width={18} height={18} />
-        </Pressable>
+        </Tap>
       ) : null}
       {all === null ? null : shown.length === 0 ? (
         <View className="items-center gap-3 py-6">
@@ -164,14 +165,14 @@ export default function SeriesIndexScreen() {
         </View>
       )}
       {shownCount < shown.length ? (
-        <Pressable
+        <Tap
           onPress={() => setShownCount(shownCount + PAGE)}
           className="self-center rounded-[3px] border-[1.5px] border-line px-4 py-2"
         >
           <Text className="font-body-semibold text-[14px] text-ink">
             Show {Math.min(PAGE, shown.length - shownCount)} more
           </Text>
-        </Pressable>
+        </Tap>
       ) : null}
       <PickSheet
         open={pickingGenre}

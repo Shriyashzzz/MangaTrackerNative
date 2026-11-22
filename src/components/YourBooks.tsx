@@ -4,8 +4,9 @@
 // Each row takes what they paid and the day they bought it; a hand-ticked
 // volume becomes a book the moment it's given one. Folded away, with what
 // they've spent beside its name. The rows are the web's (core yourBooksRows)
+import Tap from "@/components/Tap";
 import { useEffect, useState } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import { Text, TextInput, View } from "react-native";
 import { centsOf, spentOn, type OwnedBook } from "@/core/lib/books";
 import {
   addBooks,
@@ -318,17 +319,18 @@ export default function YourBooks({
     >
       {selecting ? (
         <View className="mb-2 flex-row items-center gap-3 rounded-[4px] bg-ink px-3 py-2">
-          <Pressable
+          <Tap
+            feel="round"
             onPress={stopSelecting}
             hitSlop={8}
             accessibilityLabel="Done selecting"
           >
             <CloseIcon color={c.paper} width={20} height={20} />
-          </Pressable>
+          </Tap>
           <Text className="flex-1 font-body-medium text-[15px] text-paper">
             {selected.size} selected
           </Text>
-          <Pressable
+          <Tap
             onPress={() => setLending(pickedRows)}
             disabled={!selected.size}
             hitSlop={6}
@@ -338,8 +340,8 @@ export default function YourBooks({
             >
               Lend
             </Text>
-          </Pressable>
-          <Pressable
+          </Tap>
+          <Tap
             onPress={() => setRemoving(pickedRows)}
             disabled={!selected.size}
             hitSlop={6}
@@ -349,10 +351,10 @@ export default function YourBooks({
             >
               Remove
             </Text>
-          </Pressable>
+          </Tap>
         </View>
       ) : canRemove && rows.length > 1 ? (
-        <Pressable
+        <Tap
           onPress={() => setSelecting(true)}
           hitSlop={6}
           className="mb-1 self-end"
@@ -360,7 +362,7 @@ export default function YourBooks({
           <Text className="font-body-medium text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
             Select
           </Text>
-        </Pressable>
+        </Tap>
       ) : null}
       {rows.slice(0, shown).map((row) => (
         <BookRow
@@ -406,17 +408,17 @@ export default function YourBooks({
       ) : null}
       {hidden > 0 ? (
         <View className="flex-row items-baseline gap-4 py-2">
-          <Pressable onPress={() => setShown(shown + STEP)} hitSlop={6}>
+          <Tap onPress={() => setShown(shown + STEP)} hitSlop={6}>
             <Text className="font-body-semibold text-[14px] text-ink border-b pb-[2px] border-ink self-start">
               Show {Math.min(STEP, hidden)} more
             </Text>
-          </Pressable>
+          </Tap>
           {hidden > STEP ? (
-            <Pressable onPress={() => setShown(rows.length)} hitSlop={6}>
+            <Tap onPress={() => setShown(rows.length)} hitSlop={6}>
               <Text className="font-body-semibold text-[14px] text-ink border-b pb-[2px] border-ink self-start">
                 Show all {rows.length}
               </Text>
-            </Pressable>
+            </Tap>
           ) : null}
           <Text className="ml-auto font-mono text-[12.5px] text-muted">
             {shown} of {rows.length}
@@ -456,7 +458,7 @@ export default function YourBooks({
             Add a book you own
           </Text>
           <View className="flex-row items-center gap-2">
-            <Pressable
+            <Tap
               onPress={() => setPickingToAdd(true)}
               className="min-w-0 flex-1 flex-row items-center justify-between gap-2 rounded-[2px] border-[1.5px] border-line-soft bg-paper px-3 py-2.5"
             >
@@ -467,7 +469,7 @@ export default function YourBooks({
                 {picked.label}
               </Text>
               <ChevronDownIcon color={c.inkSoft} width={16} height={16} />
-            </Pressable>
+            </Tap>
             <Button
               label={addingNow ? "Adding…" : "Add"}
               small

@@ -4,10 +4,10 @@
 // spent, the highlights, and the shelf as it stands. The numbers and words
 // are the web's (core lib/year). The web also draws the year as a magazine
 // cover to share; the app shares the words for now
+import Tap from "@/components/Tap";
 import { router } from "expo-router";
 import { useEffect, useState, type ReactNode } from "react";
 import {
-  Pressable,
   ScrollView,
   Share,
   Text,
@@ -384,7 +384,8 @@ export default function YearScreen() {
       {cards.length > 1 ? (
         <View className="flex-row justify-center gap-1.5">
           {cards.map((_, i) => (
-            <Pressable
+            <Tap
+              feel="none"
               key={i}
               className={`h-2 w-2 rounded-full ${i === showing ? "bg-ink" : "bg-line-soft"}`}
             />

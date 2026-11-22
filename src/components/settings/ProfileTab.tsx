@@ -2,6 +2,7 @@
 // people with their link see (with "Surprise me"), the picture from the
 // cast, and Share my list with what it includes and its link, shared
 // through the phone's own share sheet
+import Tap from "@/components/Tap";
 import * as Clipboard from "expo-clipboard";
 import {
   useEffect,
@@ -11,7 +12,6 @@ import {
   type RefObject,
 } from "react";
 import {
-  Pressable,
   ScrollView,
   Share,
   Text,
@@ -164,7 +164,7 @@ export default function ProfileTab({
           {pictures.map((avatar) => {
             const on = chosen === avatar.id;
             return (
-              <Pressable
+              <Tap
                 key={avatar.id}
                 onPress={() => void save("picture", { avatar: avatar.id })}
                 accessibilityRole="radio"
@@ -183,11 +183,11 @@ export default function ProfileTab({
                 >
                   {avatar.label}
                 </Text>
-              </Pressable>
+              </Tap>
             );
           })}
         </View>
-        <Pressable
+        <Tap
           onPress={() => setAllPictures(!allPictures)}
           hitSlop={6}
           className="self-start"
@@ -195,7 +195,7 @@ export default function ProfileTab({
           <Text className="font-body-medium text-[14px] text-ink border-b pb-[2px] border-ink self-start">
             {allPictures ? "Show fewer" : `Show ${morePictures} more`}
           </Text>
-        </Pressable>
+        </Tap>
         {noteFor("picture")}
       </Section>
       <View

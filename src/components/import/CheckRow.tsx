@@ -1,7 +1,8 @@
 // A tick box with its words beside it, as the import pages' lists have (the
 // web's checkboxes there): the box is the shelf's select box
+import Tap from "@/components/Tap";
 import type { ReactNode } from "react";
-import { Pressable, View } from "react-native";
+import { View } from "react-native";
 import { CheckIcon } from "@/core/components/icons/Icons";
 import { useColors } from "@/lib/colors";
 
@@ -36,7 +37,7 @@ export default function CheckRow({
   children: ReactNode;
 }) {
   return (
-    <Pressable
+    <Tap
       onPress={onToggle}
       disabled={disabled}
       accessibilityRole="checkbox"
@@ -48,6 +49,6 @@ export default function CheckRow({
         <TickBox checked={checked} disabled={disabled} />
       </View>
       <View className="min-w-0 flex-1">{children}</View>
-    </Pressable>
+    </Tap>
   );
 }

@@ -4,7 +4,7 @@ import { useAccount } from "@/store/account";
 import WeeklyEmail from "./WeeklyEmail";
 import PhoneAlerts from "./PhoneAlerts";
 import { router } from "expo-router";
-import { Pressable, Text } from "react-native";
+import { Text } from "react-native";
 import { usePrefs } from "@/store/prefs";
 import ReleaseControls from "./ReleaseControls";
 import { Help, Section, Tick } from "./parts";
@@ -42,7 +42,6 @@ export default function NewReleasesTab() {
             releases or next chapter dates. Prices still work.
           </Help>
         )}
-        <Pressable />
       </Section>
       {/* how they're told: on this phone, and by email */}
       <Section title="Alerts">

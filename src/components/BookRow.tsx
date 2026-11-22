@@ -3,9 +3,10 @@
 // it. Lend, Got it back and Remove are in its ⋮ sheet (BookActions). While
 // selecting several, a tick takes the ⋮'s place; a long press on the row
 // starts selecting. The price is saved when they leave the box
+import Tap from "@/components/Tap";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useState } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import { Text, TextInput, View } from "react-native";
 import { CheckIcon } from "@/core/components/icons/Icons";
 import { centsOf, dayOf } from "@/core/lib/books";
 import {
@@ -85,7 +86,7 @@ export default function BookRow({
   };
 
   return (
-    <Pressable
+    <Tap
       onPress={select?.onToggle}
       onLongPress={select ? undefined : onLongPress}
       delayLongPress={400}
@@ -103,7 +104,7 @@ export default function BookRow({
           ) : null}
         </View>
         {lentTo ? (
-          <Pressable
+          <Tap
             onPress={() => onSave(row, { lentTo: null })}
             accessibilityLabel={`Lent to ${lentTo}. Got it back?`}
             className="self-start rounded-full border-[1.5px] border-accent px-2.5 py-1"
@@ -112,7 +113,7 @@ export default function BookRow({
               ● Lent to {lentTo}
               {lentOn ? ` · since ${sinceText(lentOn)}` : ""}
             </Text>
-          </Pressable>
+          </Tap>
         ) : null}
         <View className="flex-row flex-wrap items-center gap-2">
           <View className="flex-row items-center rounded-[2px] border-[1.5px] border-line-soft bg-paper px-2">
@@ -129,7 +130,7 @@ export default function BookRow({
               className="py-1.5 pl-1 font-mono text-[14px] text-ink"
             />
           </View>
-          <Pressable
+          <Tap
             onPress={() => setPickingDay(true)}
             accessibilityLabel={`The day you bought ${name}`}
             className="rounded-[2px] border-[1.5px] border-line-soft bg-paper px-2.5 py-2"
@@ -139,9 +140,9 @@ export default function BookRow({
             >
               {boughtOn ? dayText(boughtOn) : "Bought on"}
             </Text>
-          </Pressable>
+          </Tap>
           {boughtOn ? (
-            <Pressable
+            <Tap
               onPress={() => onSave(row, { boughtOn: null })}
               hitSlop={6}
               accessibilityLabel="Clear the day"
@@ -149,7 +150,7 @@ export default function BookRow({
               <Text className="font-body text-[13px] text-muted border-b pb-[2px] border-muted self-start">
                 clear
               </Text>
-            </Pressable>
+            </Tap>
           ) : null}
         </View>
         {notAnAmount ? (
@@ -189,6 +190,6 @@ export default function BookRow({
           }}
         />
       ) : null}
-    </Pressable>
+    </Tap>
   );
 }

@@ -1,9 +1,10 @@
 // The top bar, as the Android app's masthead (web layouts/header): the logo
 // and name, To buy's bag with how many are on the list, and their picture,
 // which opens the menu (SettingsMenu), over a double rule
+import Tap from "@/components/Tap";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { SvgXml } from "react-native-svg";
 import { LOGO_SVG } from "@/core/assets/logo";
 import { BagIcon } from "@/core/components/icons/Icons";
@@ -46,7 +47,7 @@ export default function AppHeader() {
         {/* the list and the menu are an account's: nothing to open without one */}
         {isSignedIn ? (
           <>
-            <Pressable
+            <Tap
               onPress={() => router.push("/to-buy")}
               hitSlop={8}
               accessibilityLabel={`To buy${toBuyCount ? `, ${toBuyCount} on the list` : ""}`}
@@ -60,14 +61,14 @@ export default function AppHeader() {
                   </Text>
                 </View>
               ) : null}
-            </Pressable>
-            <Pressable
+            </Tap>
+            <Tap
               onPress={() => setMenuOpen(true)}
               hitSlop={8}
               accessibilityLabel="Menu"
             >
               <Avatar id={account?.avatar} size={36} />
-            </Pressable>
+            </Tap>
           </>
         ) : null}
       </View>

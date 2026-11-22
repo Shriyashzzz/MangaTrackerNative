@@ -5,6 +5,7 @@
 // card with its price, Yours and Next, Not on your shelf to see only the
 // gaps with what they cost. The rules are the web's (core seriesPageRules,
 // finishCost, useSeriesData)
+import Tap from "@/components/Tap";
 import PullPage, { pause, usePullTop } from "@/components/PullRefresh";
 import TrackPitch from "@/components/prices/TrackPitch";
 import { useAuth } from "@/store/auth";
@@ -59,13 +60,7 @@ import { useColors } from "@/lib/colors";
 import { usePrefs } from "@/store/prefs";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState, type ComponentRef } from "react";
-import {
-  Pressable,
-  ScrollView,
-  Text,
-  useWindowDimensions,
-  View,
-} from "react-native";
+import { ScrollView, Text, useWindowDimensions, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 
@@ -133,14 +128,15 @@ export default function PriceSeriesScreen() {
     <Safe edges={["top"]} className="flex-1 bg-paper">
       <Backdrop />
       <View className="h-[62px] flex-row items-center gap-3 px-2">
-        <Pressable
+        <Tap
+          feel="round"
           onPress={() => router.back()}
           hitSlop={8}
           className="p-2"
           accessibilityLabel="Back"
         >
           <ChevronLeftIcon color={c.ink} width={24} height={24} />
-        </Pressable>
+        </Tap>
         <Text
           numberOfLines={1}
           className="flex-1 font-brand pr-[6px] text-[24px] tracking-[1px] text-ink uppercase"
@@ -354,7 +350,7 @@ export default function PriceSeriesScreen() {
             {finish || (mine && toGet.length < volumes.length) ? (
               <View className="flex-row flex-wrap items-center gap-3">
                 {mine && toGet.length < volumes.length ? (
-                  <Pressable
+                  <Tap
                     onPress={() => setToGetOnly(!toGetOnly)}
                     accessibilityState={{ selected: toGetOnly }}
                     className={`rounded-[3px] border-[1.5px] px-2.5 py-1.5 ${toGetOnly ? "border-accent bg-accent-wash" : "border-line"}`}
@@ -364,7 +360,7 @@ export default function PriceSeriesScreen() {
                     >
                       Not on your shelf ({toGet.length})
                     </Text>
-                  </Pressable>
+                  </Tap>
                 ) : null}
                 {finish?.enough ? (
                   <Text className="font-body text-[14px] text-ink-soft">

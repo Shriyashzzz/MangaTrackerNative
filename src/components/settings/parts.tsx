@@ -1,7 +1,8 @@
 // The small pieces every settings tab is made of: a section with its
 // heading, a radio list, a tick row, and the note that says a save went
+import Tap from "@/components/Tap";
 import type { ReactNode } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { H2 } from "@/components/Page";
 import Switch from "../Switch";
 
@@ -60,7 +61,7 @@ export function Radios<T extends string>({
       {options.map((o, i) => {
         const on = o.value === value;
         return (
-          <Pressable
+          <Tap
             key={o.value}
             onPress={() => onChange(o.value)}
             accessibilityRole="radio"
@@ -79,7 +80,7 @@ export function Radios<T extends string>({
             >
               {o.label}
             </Text>
-          </Pressable>
+          </Tap>
         );
       })}
     </View>

@@ -5,12 +5,13 @@
 // finished. Edit and Delete are in the ⋮ menu. This file loads the series
 // and saves changes to it; each part of the page is its own component, and
 // every rule is the web's own (core pages/Details, core lib)
+import Tap from "@/components/Tap";
 import { isNetworkError } from "@/core/lib/offline";
 import PullPage, { usePullTop } from "@/components/PullRefresh";
 import Backdrop from "@/components/Backdrop";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { Alert, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 import Button from "@/components/Button";
@@ -467,14 +468,15 @@ export default function DetailsScreen() {
       <Backdrop />
       {/* the app bar: back, the name once scrolled past it, and the menu */}
       <View className="h-[62px] flex-row items-center gap-2 px-2">
-        <Pressable
+        <Tap
+          feel="round"
           onPress={() => router.back()}
           hitSlop={8}
           className="p-2"
           accessibilityLabel="Back"
         >
           <ChevronLeftIcon color={c.ink} width={24} height={24} />
-        </Pressable>
+        </Tap>
         <Text
           numberOfLines={1}
           className="flex-1 font-brand pr-[6px] text-[24px] tracking-[1px] text-ink uppercase"
@@ -482,14 +484,15 @@ export default function DetailsScreen() {
           {titleShown ? m.name : ""}
           {"\u00A0"}
         </Text>
-        <Pressable
+        <Tap
+          feel="round"
           onPress={() => setMenuOpen(true)}
           hitSlop={8}
           className="p-2"
           accessibilityLabel="More"
         >
           <MoreIcon color={c.ink} width={22} height={22} />
-        </Pressable>
+        </Tap>
       </View>
       <DoubleRule />
       <PullPage refresh={refreshPage} scrollTop={pull.top}>
@@ -550,7 +553,7 @@ export default function DetailsScreen() {
                 it is, the value is the tap. The shelf, the counter and Buy
                 next all follow it */}
               {editions.lines.length ? (
-                <Pressable
+                <Tap
                   onPress={() => setPickingEdition(true)}
                   hitSlop={8}
                   accessibilityRole="button"
@@ -567,7 +570,7 @@ export default function DetailsScreen() {
                     {editions.line?.label ?? "Single volumes"}
                   </Text>
                   <ChevronDownIcon color={c.accentInk} width={14} height={14} />
-                </Pressable>
+                </Tap>
               ) : null}
             </View>
           </View>
@@ -680,11 +683,11 @@ export default function DetailsScreen() {
                   {actionNote}
                 </Text>
                 {canUndoStatus ? (
-                  <Pressable onPress={() => changeStatus(true)} hitSlop={8}>
+                  <Tap onPress={() => changeStatus(true)} hitSlop={8}>
                     <Text className="font-body-semibold text-[14px] text-accent border-b pb-[2px] border-accent self-start">
                       Undo
                     </Text>
-                  </Pressable>
+                  </Tap>
                 ) : null}
               </View>
             ) : null}

@@ -1,8 +1,9 @@
 // A series' box sets (the web's BoxSets.tsx): the cheapest as a ticket, the
 // rest a price list, and the stores to look in; or, with none priced, where
 // to look for one (BoxSetSearch). A volume page's "Also in a box set" note
+import Tap from "@/components/Tap";
 import { openOutside } from "@/lib/openOutside";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { formatCents, shopName } from "@/core/lib/prices";
 import type { BoxSet, Offer, StoreLink } from "@/core/lib/types";
 import { setsTitle, shownSets } from "@/core/pages/Prices/boxSetRules";
@@ -44,14 +45,14 @@ export function BoxSetNote({
   const sets = offers.filter((o) => o.format === "set" && o.inStock);
   if (!sets.length) return null;
   return (
-    <Pressable onPress={onOpen} hitSlop={6}>
+    <Tap onPress={onOpen} hitSlop={6}>
       <Text className="font-body text-[14px] text-ink-soft">
         Also in a box set, from{" "}
         <Text className="font-body-semibold text-ink border-b pb-[2px] border-ink self-start">
           {formatCents(Math.min(...sets.map((o) => o.priceCents)))} →
         </Text>
       </Text>
-    </Pressable>
+    </Tap>
   );
 }
 
@@ -79,7 +80,7 @@ export default function BoxSets({
   const lead = said(cheapest!);
   const body = (
     <View className="gap-2">
-      <Pressable
+      <Tap
         onPress={cheapest!.url ? () => openOutside(cheapest!.url!) : undefined}
         className="flex-row items-baseline justify-between gap-3 rounded-[12px] border-[1.5px] border-accent bg-accent-wash px-3 py-2.5 active:opacity-90"
       >
@@ -94,11 +95,11 @@ export default function BoxSets({
         <Text className="font-mono-medium text-[16px] text-accent-ink">
           {lead.price}
         </Text>
-      </Pressable>
+      </Tap>
       {rest.map((s) => {
         const { kind, condition, store, price } = said(s);
         return (
-          <Pressable
+          <Tap
             key={`${s.store}-${s.priceCents}-${s.url}`}
             onPress={s.url ? () => openOutside(s.url!) : undefined}
             className="flex-row items-baseline justify-between gap-3 border-b border-dotted border-line-soft py-1.5"
@@ -113,7 +114,7 @@ export default function BoxSets({
             <Text className="font-mono-medium text-[14px] text-ink">
               {price}
             </Text>
-          </Pressable>
+          </Tap>
         );
       })}
       {links.length ? (

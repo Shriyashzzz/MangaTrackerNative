@@ -5,9 +5,10 @@
 // gap; a tap on the bar moves it there), and what finishing it costs.
 // One series is open at a time, so its shelf (useSeriesShelf) lives here and
 // a slide's Undo sits at the foot of the screen
+import Tap from "@/components/Tap";
 import { Link } from "expo-router";
 import { useState, type Dispatch, type SetStateAction } from "react";
-import { FlatList, Pressable, Text, View } from "react-native";
+import { FlatList, Text, View } from "react-native";
 import type { SharedValue } from "react-native-reanimated";
 import { ChevronDownIcon } from "@/core/components/icons/Icons";
 import { totalText, type FinishRow } from "@/core/lib/collector";
@@ -173,7 +174,7 @@ function SeriesRow({
   const owned = ownedOf(m);
   const total = Math.max(Math.floor(Math.max(0, ...owned)), latest ?? 0);
   return (
-    <Pressable
+    <Tap
       onPress={onToggle}
       accessibilityState={{ expanded: open }}
       accessibilityHint={`vols. ${rangesText(owned)}`}
@@ -221,7 +222,7 @@ function SeriesRow({
       <View style={{ transform: [{ rotate: open ? "180deg" : "0deg" }] }}>
         <ChevronDownIcon color={c.muted} width={16} height={16} />
       </View>
-    </Pressable>
+    </Tap>
   );
 }
 

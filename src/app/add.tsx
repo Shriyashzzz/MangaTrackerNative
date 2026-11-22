@@ -4,6 +4,7 @@
 // it in), stars, and under "More about it" the volumes they own, the type,
 // genre and notes. The checks and the request are the web's own (core
 // seriesFormRules); AniList's matches come through core useCoverSearch
+import Tap from "@/components/Tap";
 import { useIsOffline } from "@/core/lib/offline";
 import { Image } from "expo-image";
 import {
@@ -13,7 +14,7 @@ import {
   usePreventRemove,
 } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { Alert, Pressable, Text, View } from "react-native";
+import { Alert, Text, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
@@ -315,14 +316,15 @@ export default function AddScreen() {
   return (
     <Safe edges={["top"]} className="flex-1 bg-paper">
       <View className="h-[62px] flex-row items-center gap-3 px-2">
-        <Pressable
+        <Tap
+          feel="round"
           onPress={() => router.back()}
           hitSlop={8}
           className="p-2"
           accessibilityLabel="Back to the shelf"
         >
           <ChevronLeftIcon color={c.ink} width={24} height={24} />
-        </Pressable>
+        </Tap>
         <Text className="flex-1 font-brand pr-[6px] text-[24px] tracking-[1px] text-ink uppercase">
           Add a manga
           {"\u00A0"}
@@ -355,7 +357,7 @@ export default function AddScreen() {
                   <Text className="font-body text-[14px] text-ink-soft">
                     That's an ISBN.
                   </Text>
-                  <Pressable
+                  <Tap
                     onPress={() =>
                       router.replace({
                         pathname: "/scan",
@@ -367,7 +369,7 @@ export default function AddScreen() {
                     <Text className="font-body-semibold text-[14px] text-ink border-b pb-[2px] border-ink self-start">
                       Add the book it belongs to
                     </Text>
-                  </Pressable>
+                  </Tap>
                 </View>
               ) : (
                 <Text className="font-body text-[13.5px] text-muted">
@@ -416,13 +418,13 @@ export default function AddScreen() {
                   {picked ? meta.join(" · ") : "As you typed it"}
                 </Text>
                 <View className="mt-1 flex-row flex-wrap gap-x-4 gap-y-1">
-                  <Pressable onPress={change} hitSlop={6}>
+                  <Tap onPress={change} hitSlop={6}>
                     <Text className="font-body-medium text-[14px] text-ink border-b pb-[2px] border-ink self-start">
                       Change
                     </Text>
-                  </Pressable>
+                  </Tap>
                   {!ownCover ? (
-                    <Pressable
+                    <Tap
                       onPress={() => {
                         setOwnCover(true);
                         setImage("");
@@ -434,7 +436,7 @@ export default function AddScreen() {
                       <Text className="font-body-medium text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
                         {picked ? "Use my own cover" : "Add a cover image"}
                       </Text>
-                    </Pressable>
+                    </Tap>
                   ) : null}
                 </View>
               </View>
@@ -448,7 +450,7 @@ export default function AddScreen() {
                   </Text>
                   .
                 </Text>
-                <Pressable
+                <Tap
                   onPress={() =>
                     router.replace({
                       pathname: "/details/[id]",
@@ -460,7 +462,7 @@ export default function AddScreen() {
                   <Text className="font-body-semibold text-[14.5px] text-accent border-b pb-[2px] border-accent self-start">
                     Open it
                   </Text>
-                </Pressable>
+                </Tap>
               </View>
             ) : null}
             {ownCover ? (
@@ -480,11 +482,11 @@ export default function AddScreen() {
                       invalid={Boolean(problems.image)}
                     />
                   </View>
-                  <Pressable onPress={closeOwnCover} hitSlop={6}>
+                  <Tap onPress={closeOwnCover} hitSlop={6}>
                     <Text className="font-body-medium text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
                       {picked ? "Use theirs" : "Remove link"}
                     </Text>
-                  </Pressable>
+                  </Tap>
                 </View>
               </Field>
             ) : null}
@@ -535,7 +537,7 @@ export default function AddScreen() {
                 />
               </Field>
             ) : null}
-            <Pressable
+            <Tap
               onPress={() => {
                 setMoreOpen(!moreOpen);
                 writeLocal(MORE_KEY, moreOpen ? "0" : "1");
@@ -558,7 +560,7 @@ export default function AddScreen() {
               >
                 <ChevronDownIcon color={c.inkSoft} width={18} height={18} />
               </View>
-            </Pressable>
+            </Tap>
             {moreOpen ? (
               <View className="gap-5">
                 <VolumePicker
@@ -587,7 +589,7 @@ export default function AddScreen() {
                     ) : undefined
                   }
                 >
-                  <Pressable
+                  <Tap
                     onPress={() => setPickingGenre(true)}
                     className="min-h-[46px] flex-row items-center justify-between rounded-[2px] border-[1.5px] border-line-soft bg-paper px-3"
                   >
@@ -597,7 +599,7 @@ export default function AddScreen() {
                       {genreLabel}
                     </Text>
                     <ChevronDownIcon color={c.inkSoft} width={18} height={18} />
-                  </Pressable>
+                  </Tap>
                 </Field>
                 <Field
                   label="Notes"

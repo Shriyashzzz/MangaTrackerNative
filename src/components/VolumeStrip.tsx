@@ -8,6 +8,7 @@
 // slide reaches. Up and down is the page scrolling, never a slide.
 // An edition's shelf passes `slots`: then each "volume" is a slot, a book of
 // the edition or a single it has no book for, as on the web
+import Tap from "@/components/Tap";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -16,7 +17,7 @@ import { BOOK } from "@/core/lib/volumeShelf";
 import { useColors } from "@/lib/colors";
 import * as Haptics from "expo-haptics";
 import { useRef, useState } from "react";
-import { Pressable, Text, View, type LayoutChangeEvent } from "react-native";
+import { Text, View, type LayoutChangeEvent } from "react-native";
 import {
   GestureDetector,
   useExclusiveGestures,
@@ -192,7 +193,8 @@ export default function VolumeStrip({
       onLayout={(e: LayoutChangeEvent) => setWidth(e.nativeEvent.layout.width)}
     >
       <View style={{ height }} className="flex-row items-end">
-        <Pressable
+        <Tap
+          feel="round"
           accessibilityLabel="Earlier volumes"
           disabled={from <= 1}
           onPress={() => turn(false)}
@@ -200,7 +202,7 @@ export default function VolumeStrip({
           className={`items-center justify-center ${from <= 1 ? "opacity-0" : ""}`}
         >
           <ChevronLeftIcon color={c.ink} width={22} height={22} />
-        </Pressable>
+        </Tap>
         {/* the books are the gesture's; the arrows keep their own taps */}
         <GestureDetector gesture={gesture}>
           <View className="h-full flex-1 flex-row items-end justify-center pb-[2px]">
@@ -224,7 +226,8 @@ export default function VolumeStrip({
             ))}
           </View>
         </GestureDetector>
-        <Pressable
+        <Tap
+          feel="round"
           accessibilityLabel="Later volumes"
           disabled={to >= total}
           onPress={() => turn(true)}
@@ -232,7 +235,7 @@ export default function VolumeStrip({
           className={`items-center justify-center ${to >= total ? "opacity-0" : ""}`}
         >
           <ChevronRightIcon color={c.ink} width={22} height={22} />
-        </Pressable>
+        </Tap>
       </View>
       {/* the shelf they stand on: the web's 3px double rule */}
       <View className="h-[3px] justify-between">

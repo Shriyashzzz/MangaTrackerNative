@@ -1,8 +1,9 @@
 // The FAQ, as the web's pages/Faq: the questions people ask, grouped, each
 // opening to its answer. The words are the web's own (core content/faq)
+import Tap from "@/components/Tap";
 import { router } from "expo-router";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import Page, { H2, P, TextLink } from "@/components/Page";
 import { ChevronDownIcon } from "@/core/components/icons/Icons";
 import { FAQ } from "@/core/lib/content/faq";
@@ -23,7 +24,7 @@ export default function FaqScreen() {
             const on = open === q;
             return (
               <View key={q} className="border-b border-dashed border-line-soft">
-                <Pressable
+                <Tap
                   onPress={() => setOpen(on ? null : q)}
                   accessibilityState={{ expanded: on }}
                   className="flex-row items-center gap-3 py-3"
@@ -36,7 +37,7 @@ export default function FaqScreen() {
                   >
                     <ChevronDownIcon color={c.muted} width={18} height={18} />
                   </View>
-                </Pressable>
+                </Tap>
                 {on ? (
                   <View className="pb-3">
                     <P muted>{a}</P>

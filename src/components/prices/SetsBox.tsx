@@ -1,8 +1,9 @@
 // Beside a series' title: a whole run in one buy, its box sets, and its
 // editions' bigger books, in one box with a pick between them (the web's
 // SetsBox with EditionsBox). The pick is remembered per series on this device
+import Tap from "@/components/Tap";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { ChevronDownIcon } from "@/core/components/icons/Icons";
 import {
   editionBookLabel,
@@ -51,7 +52,7 @@ function EditionsBox({
         const label = editionBookLabel(line, book);
         const first = at === 0;
         return (
-          <Pressable
+          <Tap
             key={book.number}
             onPress={() =>
               openWebPath(volumePath(book.isbn13!, book.title ?? label))
@@ -78,14 +79,14 @@ function EditionsBox({
                 ? formatCents(book.knownPriceCents)
                 : "check price"}
             </Text>
-          </Pressable>
+          </Tap>
         );
       })}
-      <Pressable onPress={onSeeAll} hitSlop={6}>
+      <Tap onPress={onSeeAll} hitSlop={6}>
         <Text className="font-body-medium text-[14px] text-ink border-b pb-[2px] border-ink self-start">
           See all {line.books.length} books ↓
         </Text>
-      </Pressable>
+      </Tap>
     </View>
   );
 }
@@ -135,7 +136,7 @@ export default function SetsBox({
           {"\u00A0"}
         </Text>
         {!alone ? (
-          <Pressable
+          <Tap
             onPress={() => setPicking(true)}
             className="flex-row items-center gap-1"
             accessibilityLabel="Show"
@@ -145,7 +146,7 @@ export default function SetsBox({
               {options.find((o) => o.value === picked)?.label}
             </Text>
             <ChevronDownIcon color={c.ink} width={14} height={14} />
-          </Pressable>
+          </Tap>
         ) : null}
       </View>
       {line ? (

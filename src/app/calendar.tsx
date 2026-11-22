@@ -1,8 +1,9 @@
 // Upcoming Releases, as the web's pages/Calendar/Calendar.tsx: every English
 // volume coming out for the shelf, month by month, each month at a glance
 // with its dates to save, the first two open and the rest folded
+import Tap from "@/components/Tap";
 import { useEffect, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import Button from "@/components/Button";
 import AddToCalendar from "@/components/calendar/AddToCalendar";
 import MiniMonth from "@/components/calendar/MiniMonth";
@@ -88,7 +89,7 @@ export default function CalendarScreen() {
         return (
           <View key={m.month} className="gap-3">
             {i >= OPEN_MONTHS ? (
-              <Pressable
+              <Tap
                 onPress={() =>
                   setOpen((now) => {
                     const next = new Set(now);
@@ -122,7 +123,7 @@ export default function CalendarScreen() {
                 >
                   <ChevronDownIcon color={c.muted} width={18} height={18} />
                 </View>
-              </Pressable>
+              </Tap>
             ) : null}
             {shown ? <Month month={m} /> : null}
           </View>

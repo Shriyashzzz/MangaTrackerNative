@@ -1,7 +1,8 @@
 // Five stars, as the web's components/starRating: shown, or picked when
 // given `onChange` (a tap on a star rates the series that many)
+import Tap from "@/components/Tap";
 import * as Haptics from "expo-haptics";
-import { Pressable, View } from "react-native";
+import { View } from "react-native";
 import { StarIcon } from "@/core/components/icons/Icons";
 import { useColors } from "@/lib/colors";
 
@@ -44,7 +45,7 @@ export default function StarRating({
       accessibilityLabel="Rating"
     >
       {[1, 2, 3, 4, 5].map((n) => (
-        <Pressable
+        <Tap
           key={n}
           hitSlop={4}
           accessibilityRole="radio"
@@ -56,7 +57,7 @@ export default function StarRating({
           }}
         >
           {star(n)}
-        </Pressable>
+        </Tap>
       ))}
     </View>
   );

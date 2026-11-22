@@ -2,8 +2,9 @@
 // web's pages/Details/YourReviews.tsx): what the reader has said about each
 // volume, latest first, with the way to change it. Only volumes they've
 // rated: the ones still to rate are asked about one at a time (RateVolume)
+import Tap from "@/components/Tap";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import type { WrittenReview } from "@/core/lib/reviews";
 import FoldRow from "./FoldRow";
 import StarRating from "./StarRating";
@@ -36,15 +37,11 @@ export default function YourReviews({
                 Vol. {one.volume}
               </Text>
               <StarRating value={one.review.rating} />
-              <Pressable
-                onPress={() => onEdit(one)}
-                hitSlop={6}
-                className="ml-auto"
-              >
+              <Tap onPress={() => onEdit(one)} hitSlop={6} className="ml-auto">
                 <Text className="font-body-medium text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
                   {one.review.text ? "Edit" : "Add words"}
                 </Text>
-              </Pressable>
+              </Tap>
             </View>
             <Text
               className={`font-body text-[14.5px] ${one.review.text ? "text-ink" : "text-muted italic"}`}
@@ -59,7 +56,7 @@ export default function YourReviews({
           </View>
         ))}
         {left > 0 ? (
-          <Pressable
+          <Tap
             onPress={() => setShown(shown + STEP)}
             className="flex-row items-baseline gap-2 py-1"
           >
@@ -69,7 +66,7 @@ export default function YourReviews({
             <Text className="font-mono text-[12.5px] text-muted">
               {left} left
             </Text>
-          </Pressable>
+          </Tap>
         ) : null}
         <Text className="font-body text-[13px] text-muted">
           Shown on each volume's price page, under your display name.

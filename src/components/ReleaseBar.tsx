@@ -2,7 +2,8 @@
 // when), as the web's pages/Details/ReleaseBar.tsx: a red bar with the news,
 // a Psst! stamp on its top edge (clear of the button under it), the white button to buy or preorder the book,
 // and an × that silences this one release
-import { Pressable, Text, View } from "react-native";
+import Tap from "@/components/Tap";
+import { Text, View } from "react-native";
 import { InkCrossIcon } from "@/core/components/icons/Icons";
 import { openWebPath } from "@/lib/webRoutes";
 
@@ -23,23 +24,24 @@ export default function ReleaseBar({
           {"\u00A0"}
         </Text>
         {link ? (
-          <Pressable
+          <Tap
             onPress={() => openWebPath(link.to)}
             className="rounded-[3px] border-[1.5px] border-line bg-white px-2.5 py-1.5 active:opacity-90"
           >
             <Text className="font-body-semibold text-[13.5px] text-[#963d31]">
               {link.label} →
             </Text>
-          </Pressable>
+          </Tap>
         ) : null}
-        <Pressable
+        <Tap
+          feel="round"
           onPress={onClose}
           hitSlop={12}
           accessibilityLabel="Hide this news"
           className="absolute top-2 right-2.5"
         >
           <InkCrossIcon color="#fffaf2" width={14} height={14} />
-        </Pressable>
+        </Tap>
       </View>
       <View className="absolute -top-[22px] right-9 rotate-6 rounded-[4px] border-2 border-accent bg-paper px-1.5">
         <Text className="font-brand pr-[4px] text-[14px] tracking-[1.5px] text-accent">

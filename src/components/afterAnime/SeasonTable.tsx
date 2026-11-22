@@ -1,7 +1,8 @@
 // Every season at a glance (the web's SeasonTable.tsx), for a long show: what
 // they watched, the chapter to start at, and the volume to buy, a row each
+import Tap from "@/components/Tap";
 import { router } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { buyVolume, tableRow, type AnimeStop } from "@/core/lib/afterAnimeText";
 import type { SeriesVolume } from "@/core/lib/types";
 import { bookFor } from "@/core/pages/AfterAnime/bookFor";
@@ -75,7 +76,8 @@ export default function SeasonTable({
       {stops.map((stop, i) => {
         const row = tableRow(stop);
         return (
-          <Pressable
+          <Tap
+            feel="none"
             key={stop.label}
             className={`flex-row items-center gap-2 px-3 py-2.5 ${i ? "border-t border-dotted border-line-soft" : ""}`}
           >
@@ -92,7 +94,7 @@ export default function SeasonTable({
                 volumes={volumes}
               />
             </View>
-          </Pressable>
+          </Tap>
         );
       })}
     </View>

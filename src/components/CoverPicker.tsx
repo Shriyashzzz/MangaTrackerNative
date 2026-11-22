@@ -2,9 +2,10 @@
 // CoverPicker.tsx): the chosen cover, a strip to pick from (their own books'
 // covers first, tagged "yours", then AniList's matches for the title), and a
 // box for a pasted link
+import Tap from "@/components/Tap";
 import { Image } from "expo-image";
 import { useRef, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import type { CoverHit } from "@/core/lib/anilist";
 import { useCoverSearch } from "@/core/components/coverPicker/useCoverSearch";
 import { isVolumeCover } from "@/core/lib/coverSizes";
@@ -30,7 +31,7 @@ function Thumb({
 }) {
   const c = useColors();
   return (
-    <Pressable
+    <Tap
       onPress={onPress}
       accessibilityLabel={label}
       accessibilityState={{ selected }}
@@ -54,7 +55,7 @@ function Thumb({
           </Text>
         </View>
       ) : null}
-    </Pressable>
+    </Tap>
   );
 }
 
@@ -152,11 +153,11 @@ export default function CoverPicker({
               {note}
             </Text>
             {value ? (
-              <Pressable onPress={() => pick("")} hitSlop={6}>
+              <Tap onPress={() => pick("")} hitSlop={6}>
                 <Text className="font-body text-[13px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
                   No cover
                 </Text>
-              </Pressable>
+              </Tap>
             ) : null}
           </View>
           {hasOwn || search.hits.length ? (

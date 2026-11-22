@@ -1,10 +1,11 @@
 // "Sales right now", across the top of the price pages (the web's
 // components/deals/DealsStrip.tsx): the stores' sales, each a link, a code
 // copied with a tap, hidden with its cross until the sales change
+import Tap from "@/components/Tap";
 import { openOutside } from "@/lib/openOutside";
 import * as Clipboard from "expo-clipboard";
 import { useEffect, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { CloseIcon } from "@/core/components/icons/Icons";
 import { getDeals, type Deal } from "@/core/lib/collector";
 import { inCanada } from "@/core/lib/country";
@@ -46,7 +47,8 @@ export default function DealsStrip() {
           Sales right now
           {"\u00A0"}
         </Text>
-        <Pressable
+        <Tap
+          feel="round"
           onPress={() => {
             const id = setId(deals);
             writeLocal(HIDDEN_KEY, id);
@@ -56,20 +58,17 @@ export default function DealsStrip() {
           accessibilityLabel="Hide these sales"
         >
           <CloseIcon color={c.inkSoft} width={16} height={16} />
-        </Pressable>
+        </Tap>
       </View>
       {deals.map((d) => (
         <View key={idOf(d)} className="flex-row flex-wrap items-center gap-2">
-          <Pressable
-            onPress={() => openOutside(d.url)}
-            className="min-w-0 shrink"
-          >
+          <Tap onPress={() => openOutside(d.url)} className="min-w-0 shrink">
             <Text className="font-body text-[14px] text-ink border-b pb-[2px] border-ink self-start">
               <Text className="font-body-semibold">{d.store}</Text>: {d.text}
             </Text>
-          </Pressable>
+          </Tap>
           {d.code ? (
-            <Pressable
+            <Tap
               onPress={() => void copy(d.code!)}
               accessibilityLabel={`Copy code ${d.code}`}
               className="rounded-[2px] border border-dashed border-line px-1.5 py-0.5"
@@ -77,7 +76,7 @@ export default function DealsStrip() {
               <Text className="font-mono-medium text-[12px] text-ink">
                 {copied === d.code ? "Copied" : d.code}
               </Text>
-            </Pressable>
+            </Tap>
           ) : null}
         </View>
       ))}

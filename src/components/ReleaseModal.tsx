@@ -5,8 +5,9 @@
 // the foot: what they have at the bottom, the next volume just above it,
 // later ones further up, so the sheet opens at its foot and the top is a
 // drag away; at the top, one more drag down closes it (Sheet)
+import Tap from "@/components/Tap";
 import { router } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { bookName } from "@/core/lib/bookName";
 import { chaptersText } from "@/core/lib/chapterWords";
 import { volumesToGet } from "@/core/lib/releaseMath";
@@ -106,7 +107,7 @@ export default function ReleaseModal({
         <Text className="pb-2 font-body text-[14px] text-ink-soft">{tail}</Text>
       ) : null}
       {[...rows].reverse().map((row) => (
-        <Pressable
+        <Tap
           key={row.key}
           onPress={row.isbn13 ? () => open(row.isbn13!) : undefined}
           disabled={!row.isbn13}
@@ -122,7 +123,7 @@ export default function ReleaseModal({
               · {row.note}
             </Text>
           ) : null}
-        </Pressable>
+        </Tap>
       ))}
       {/* the foot: what they have */}
       {yours ? (

@@ -5,8 +5,9 @@
 //   no place saved    a choice between tracking chapters and volumes
 //   otherwise         the chapter counter, the volume counter, or both
 // Which counters show is core lib/reading tracksOf
+import Tap from "@/components/Tap";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import {
   insideOf,
   readPastTheBooks,
@@ -171,7 +172,7 @@ export default function ReadingPlace({
       ) : null}
       <View className="flex-row flex-wrap gap-x-5 gap-y-2">
         {both ? (
-          <Pressable
+          <Tap
             onPress={() =>
               setShown(shown === "chapters" ? "volumes" : "chapters")
             }
@@ -180,11 +181,11 @@ export default function ReadingPlace({
             <Text className="font-body-semibold text-[14.5px] text-accent">
               {shown === "chapters" ? "Show volume" : "Show chapter"}
             </Text>
-          </Pressable>
+          </Tap>
         ) : null}
         {/* each series its own way: the other one is a tap away */}
         {trackBy === "series" ? (
-          <Pressable
+          <Tap
             onPress={() => onChange({ byVolume: !manga.byVolume })}
             hitSlop={6}
           >
@@ -193,17 +194,17 @@ export default function ReadingPlace({
                 ? "Track chapters instead"
                 : "Track volumes instead"}
             </Text>
-          </Pressable>
+          </Tap>
         ) : null}
         {ownsPastWhatTheyveRead ? (
-          <Pressable
+          <Tap
             onPress={() => onChange({ readVolume: highestOwned })}
             hitSlop={6}
           >
             <Text className="font-body-semibold text-[14.5px] text-ink-soft">
               Read everything I own
             </Text>
-          </Pressable>
+          </Tap>
         ) : null}
       </View>
     </View>

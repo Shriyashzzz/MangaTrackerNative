@@ -1,6 +1,7 @@
 // A password box with Show / Hide (the web's components/passwordInput)
+import Tap from "@/components/Tap";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { Input } from "./Field";
 
 export default function PasswordInput(
@@ -16,7 +17,7 @@ export default function PasswordInput(
         autoCorrect={false}
         className={`pr-16 ${props.className ?? ""}`}
       />
-      <Pressable
+      <Tap
         onPress={() => setShown(!shown)}
         hitSlop={8}
         className="absolute top-0 right-3 h-[46px] justify-center"
@@ -25,7 +26,7 @@ export default function PasswordInput(
         <Text className="font-body-medium text-[13.5px] text-ink-soft">
           {shown ? "Hide" : "Show"}
         </Text>
-      </Pressable>
+      </Tap>
     </View>
   );
 }

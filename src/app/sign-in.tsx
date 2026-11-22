@@ -1,11 +1,12 @@
 // Signing in, as the web's pages/SignIn: username and password, the
 // server's own words when it says no
+import Tap from "@/components/Tap";
 import AuthArt from "@/components/AuthArt";
 import GoogleButton from "@/components/GoogleButton";
 import { useAuth } from "@/store/auth";
 import { router } from "expo-router";
 import { useState } from "react";
-import { Platform, Pressable, Text, TextInput, View } from "react-native";
+import { Platform, Text, TextInput, View } from "react-native";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
@@ -95,7 +96,7 @@ export default function SignIn() {
             {error}
           </Text>
         ) : null}
-        <Pressable
+        <Tap
           onPress={submit}
           disabled={loading}
           className="items-center rounded-[4px] border-2 border-line bg-accent py-3.5 active:opacity-80 disabled:opacity-60"
@@ -104,7 +105,7 @@ export default function SignIn() {
             {loading ? "Signing in…" : "Sign in"}
             {"\u00A0"}
           </Text>
-        </Pressable>
+        </Tap>
         <Text className="text-center font-body text-[14.5px] text-ink-soft">
           Don't have an account?{" "}
           <Text

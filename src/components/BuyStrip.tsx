@@ -5,6 +5,7 @@
 // newest out, what's ordered and on its way, and the series' price page.
 // Every rule is the web's: the one to buy next (core useBuyOptions), an
 // edition's plan (core useEditions), what's on sale (core onSale)
+import Tap from "@/components/Tap";
 import { H2 } from "@/components/Page";
 import { ChevronDownIcon, InkCrossIcon } from "@/core/components/icons/Icons";
 import { chaptersText, type ChapterRange } from "@/core/lib/chapterWords";
@@ -31,7 +32,7 @@ import Animated, {
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import GotIt from "./GotIt";
 import PickSheet from "./PickSheet";
 
@@ -133,7 +134,7 @@ function NextTicket({
   pills?: React.ReactNode;
 }) {
   return (
-    <Pressable
+    <Tap
       onPress={to ? () => openWebPath(to) : undefined}
       disabled={!to}
       className="gap-1 rounded-[12px] border-[1.5px] border-accent bg-accent-wash px-3 pt-2 pb-2.5 active:opacity-90"
@@ -164,7 +165,7 @@ function NextTicket({
       {pills ? (
         <View className="mt-1 flex-row justify-end">{pills}</View>
       ) : null}
-    </Pressable>
+    </Tap>
   );
 }
 
@@ -179,7 +180,7 @@ const Gap = ({
   italic?: boolean;
   said?: string;
 }) => (
-  <Pressable
+  <Tap
     onPress={() => openWebPath(to)}
     hitSlop={6}
     accessibilityLabel={said}
@@ -190,7 +191,7 @@ const Gap = ({
     >
       {label}
     </Text>
-  </Pressable>
+  </Tap>
 );
 
 const Dashed = ({ children }: { children: React.ReactNode }) => (
@@ -309,7 +310,7 @@ export default function BuyStrip({
               ? `Vol. ${run[0]}`
               : `Vols. ${run[0]}–${run.at(-1)}`;
           return (
-            <Pressable
+            <Tap
               key={run[0]}
               onPress={() => order(run, false)}
               disabled={ordering}
@@ -320,7 +321,7 @@ export default function BuyStrip({
                 {said}
               </Text>
               <InkCrossIcon color={c.inkSoft} width={11} height={11} />
-            </Pressable>
+            </Tap>
           );
         })}
       </View>
@@ -333,7 +334,7 @@ export default function BuyStrip({
     ? `${seriesPath(seriesName)}&${new URLSearchParams({ edition: line.key })}`
     : seriesPath(seriesName);
   const seriesLink = (
-    <Pressable
+    <Tap
       onPress={() => openWebPath(seriesTo)}
       hitSlop={6}
       className="ml-auto py-1"
@@ -344,7 +345,7 @@ export default function BuyStrip({
           : singlesText}{" "}
         →
       </Text>
-    </Pressable>
+    </Tap>
   );
   const moreGaps = (count: number) => (
     <Gap
@@ -361,7 +362,7 @@ export default function BuyStrip({
 
   return (
     <View className="border-y-[1.5px] border-dashed border-line-soft py-1">
-      <Pressable
+      <Tap
         onPress={() => setOpen(!open)}
         accessibilityState={{ expanded: open }}
         className="min-h-[44px] flex-row items-center gap-5"
@@ -380,13 +381,13 @@ export default function BuyStrip({
         <View style={{ transform: [{ rotate: open ? "180deg" : "0deg" }] }}>
           <ChevronDownIcon color={c.inkSoft} width={20} height={20} />
         </View>
-      </Pressable>
+      </Tap>
       {open ? (
         <View className="gap-2 pt-1 pb-3">
           {/* which edition they buy as, and the series' page */}
           <View className="flex-row flex-wrap items-center gap-2">
             {editions.lines.length > 0 ? (
-              <Pressable
+              <Tap
                 onPress={() => setPickingEdition(true)}
                 accessibilityLabel={`Buy next as ${line?.label ?? "single"}. Change`}
                 className="flex-row items-center gap-1"
@@ -396,7 +397,7 @@ export default function BuyStrip({
                   {line?.label ?? "Single"}
                 </Text>
                 <ChevronDownIcon color={c.ink} width={14} height={14} />
-              </Pressable>
+              </Tap>
             ) : null}
             {seriesLink}
           </View>
@@ -537,7 +538,7 @@ export default function BuyStrip({
                   </Text>
                 </Dashed>
               ) : next?.isbn13 !== latest.isbn13 ? (
-                <Pressable
+                <Tap
                   onPress={() =>
                     openWebPath(volumePath(latest.isbn13, latest.title))
                   }
@@ -552,7 +553,7 @@ export default function BuyStrip({
                   <Text className="font-mono-medium text-[14px] text-accent-ink">
                     {price(latest)}
                   </Text>
-                </Pressable>
+                </Tap>
               ) : null}
               {orderedLine}
             </>

@@ -2,8 +2,9 @@
 // news): its cover, name, what's out in the accent ("Vol. 15 next"), how far
 // behind under it, what they have, and Hide. The words are the web's own
 // (core shelfViews newsFor)
+import Tap from "@/components/Tap";
 import { Link, type Href } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { newsFor, type ReleaseKind } from "@/core/pages/Home/shelfViews";
 import type { Manga, ReleaseStatus } from "@/core/lib/types";
 import { look } from "@/lib/platformLook";
@@ -32,7 +33,7 @@ export default function NewRow({
 }) {
   const news = newsFor(manga, found, kind);
   const body = (
-    <Pressable
+    <Tap
       onPress={onOpenList}
       className="min-w-0 flex-1 flex-row items-center gap-3 active:opacity-70"
     >
@@ -67,7 +68,7 @@ export default function NewRow({
           </Text>
         ) : null}
       </View>
-    </Pressable>
+    </Tap>
   );
   return (
     <View className="flex-row items-center gap-3 py-2">
@@ -78,7 +79,7 @@ export default function NewRow({
           {body}
         </Link>
       )}
-      <Pressable
+      <Tap
         onPress={onHide}
         hitSlop={6}
         className={`bg-ink/10 px-3.5 py-2 active:opacity-70 ${look.buttonRadius}`}
@@ -87,7 +88,7 @@ export default function NewRow({
         <Text className="font-body-medium text-[14px] text-ink">
           {hideWord}
         </Text>
-      </Pressable>
+      </Tap>
     </View>
   );
 }

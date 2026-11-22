@@ -4,9 +4,10 @@
 // never a mystery. Gone when there's nothing to say. With changes waiting, a
 // tap opens the list of them; on a page that can't work offline it says so
 // before a tap fails
+import Tap from "@/components/Tap";
 import { usePathname } from "expo-router";
 import { useEffect, useState } from "react";
-import { AppState, Pressable, Text, View } from "react-native";
+import { AppState, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { checkConnection, useIsOffline } from "@/core/lib/offline";
 import {
@@ -80,7 +81,7 @@ export default function OfflineBar({ signedIn }: { signedIn: boolean }) {
   const canOpen = waiting > 0;
   return (
     <>
-      <Pressable
+      <Tap
         accessibilityRole={canOpen ? "button" : "alert"}
         accessibilityHint={canOpen ? "Shows the changes waiting" : undefined}
         disabled={!canOpen}
@@ -95,17 +96,17 @@ export default function OfflineBar({ signedIn }: { signedIn: boolean }) {
           {said}
         </Text>
         {!offline && waiting && !sending ? (
-          <Pressable onPress={() => void sendChanges()} hitSlop={8}>
+          <Tap onPress={() => void sendChanges()} hitSlop={8}>
             <Text className="font-body-semibold text-[13.5px] text-accent-ink">
               Send now
             </Text>
-          </Pressable>
+          </Tap>
         ) : canOpen ? (
           <Text className="font-body-semibold text-[13.5px] text-accent-ink">
             See
           </Text>
         ) : null}
-      </Pressable>
+      </Tap>
       <Sheet
         open={listed !== null}
         onClose={() => setListed(null)}

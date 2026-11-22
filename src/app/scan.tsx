@@ -5,13 +5,14 @@
 // the ISBN works when the camera can't. The phone's camera does the reading
 // (expo-camera), and a buzz says a scan landed; what a scan does to the
 // shelf is the web's own (core lib/scan)
+import Tap from "@/components/Tap";
 import { StatusBar } from "expo-status-bar";
 import ScanFrame from "@/components/ScanFrame";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as Haptics from "expo-haptics";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Linking, Pressable, ScrollView, Text, View } from "react-native";
+import { Linking, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 import Button from "@/components/Button";
@@ -171,15 +172,17 @@ export default function ScanScreen() {
     >
       <StatusBar style="light" />
       <View className="h-[56px] flex-row items-center justify-between px-2">
-        <Pressable
+        <Tap
+          feel="round"
           onPress={close}
           hitSlop={8}
           className="p-2"
           accessibilityLabel="Close the scanner"
         >
           <CloseIcon color="#fffaf2" width={24} height={24} />
-        </Pressable>
-        <Pressable
+        </Tap>
+        <Tap
+          feel="round"
           onPress={() => setTorch(!torch)}
           disabled={showTyping}
           hitSlop={8}
@@ -192,7 +195,7 @@ export default function ScanScreen() {
             width={24}
             height={24}
           />
-        </Pressable>
+        </Tap>
       </View>
       {!showTyping ? (
         <View className="items-center gap-3 px-4">
@@ -315,11 +318,11 @@ export default function ScanScreen() {
       </ScrollView>
       <View className="flex-row items-center justify-between gap-3 border-t border-line-soft bg-paper px-4 py-3">
         {!blocked ? (
-          <Pressable onPress={() => setTyping((on) => !on)} hitSlop={6}>
+          <Tap onPress={() => setTyping((on) => !on)} hitSlop={6}>
             <Text className="font-body-medium text-[14px] text-ink border-b pb-[2px] border-ink self-start">
               {typing ? "Use the camera" : "Type the ISBN"}
             </Text>
-          </Pressable>
+          </Tap>
         ) : (
           <View />
         )}
@@ -383,11 +386,11 @@ function ScanRow({
 }) {
   const { result } = row;
   const link = (label: string, run: () => void) => (
-    <Pressable key={label} onPress={run} hitSlop={6}>
+    <Tap key={label} onPress={run} hitSlop={6}>
       <Text className="font-body-semibold text-[14px] text-ink border-b pb-[2px] border-ink self-start">
         {label}
       </Text>
-    </Pressable>
+    </Tap>
   );
   if (!result)
     return (

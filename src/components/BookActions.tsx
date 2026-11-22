@@ -1,8 +1,9 @@
 // What a row of "Your books" can do besides its price and date (the web's
 // pages/Details/BookActions.tsx): a ⋮ sheet (Lend…, Got it back, Remove
 // book), the lend question, and the question before removing several
+import Tap from "@/components/Tap";
 import { useState } from "react";
-import { Modal, Pressable, Text, TextInput, View } from "react-native";
+import { Modal, Text, TextInput, View } from "react-native";
 import {
   HandIcon,
   MoreIcon,
@@ -30,14 +31,15 @@ export function BookMenu({
   const [open, setOpen] = useState(false);
   return (
     <>
-      <Pressable
+      <Tap
+        feel="round"
         onPress={() => setOpen(true)}
         hitSlop={8}
         accessibilityLabel={`More for ${name}`}
         className="p-2"
       >
         <MoreIcon color={c.inkSoft} width={20} height={20} />
-      </Pressable>
+      </Tap>
       <MenuSheet
         open={open}
         onClose={() => setOpen(false)}
@@ -81,18 +83,20 @@ function Dialog({
 }) {
   return (
     <Modal visible transparent animationType="fade" onRequestClose={onClose}>
-      <Pressable
+      <Tap
+        feel="none"
         className="flex-1 items-center justify-center bg-black/40 px-6"
         onPress={onClose}
       >
-        <Pressable
+        <Tap
+          feel="none"
           className="w-full max-w-[400px] gap-3 rounded-[16px] border border-line-soft bg-card p-5"
           onPress={() => {}}
         >
           <Text className="font-display text-[20px] text-ink">{title}</Text>
           {children}
-        </Pressable>
-      </Pressable>
+        </Tap>
+      </Tap>
     </Modal>
   );
 }

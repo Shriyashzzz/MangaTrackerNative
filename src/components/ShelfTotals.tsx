@@ -2,8 +2,9 @@
 // fetch used, and what finishing every series comes to, folded under one
 // line that says the worth itself once it's known. As the web's
 // (pages/Home/ShelfTotals.tsx); the numbers come from the server
+import Tap from "@/components/Tap";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { ChevronDownIcon } from "@/core/components/icons/Icons";
 import { totalText, type ShelfTools } from "@/core/lib/collector";
 import { formatPaid } from "@/core/lib/prices";
@@ -101,7 +102,7 @@ export default function ShelfTotals({
 
   return (
     <View className="mb-3 border-y border-dashed border-line-soft">
-      <Pressable
+      <Tap
         onPress={() => setOpen(!open)}
         className="flex-row items-center justify-between gap-3 px-1 py-2.5 active:bg-accent-wash"
         accessibilityState={{ expanded: open }}
@@ -114,7 +115,7 @@ export default function ShelfTotals({
         <View style={{ transform: [{ rotate: open ? "180deg" : "0deg" }] }}>
           <ChevronDownIcon color={c.muted} width={16} height={16} />
         </View>
-      </Pressable>
+      </Tap>
       {open ? (
         <View className="gap-4 border-t border-dashed border-line-soft px-1 py-3">
           {spent ? (

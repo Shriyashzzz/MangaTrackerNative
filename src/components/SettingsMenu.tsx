@@ -3,8 +3,9 @@
 // their settings, then the pages the app has no other way to (Share my
 // list, Your year, Friends, Import your list), light or dark, Canadian
 // prices, What's new, FAQ, About, Privacy, and Sign out
+import Tap from "@/components/Tap";
 import { router } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { useUniwind } from "uniwind";
 import {
   CheckIcon,
@@ -51,7 +52,7 @@ function Item({
   const c = useColors();
   const ripple = useRipple();
   return (
-    <Pressable
+    <Tap
       android_ripple={ripple}
       onPress={() => {
         if (!keepOpen) onClose();
@@ -67,7 +68,7 @@ function Item({
         {label}
       </Text>
       {on ? <CheckIcon color={c.accent} width={16} height={16} /> : null}
-    </Pressable>
+    </Tap>
   );
 }
 
@@ -97,7 +98,7 @@ export default function SettingsMenu({
   return (
     <Sheet open={open} onClose={onClose} contentClassName="px-2 pt-2 pb-8">
       {/* who's signed in, and the way to everything about them */}
-      <Pressable
+      <Tap
         onPress={() => go("/settings")}
         className="flex-row items-center gap-3 rounded-[3px] px-3 py-2 active:bg-accent-wash"
       >
@@ -114,7 +115,7 @@ export default function SettingsMenu({
           </Text>
         </View>
         <ChevronRightIcon color={c.muted} width={18} height={18} />
-      </Pressable>
+      </Tap>
       <Divider />
       <Item
         onClose={onClose}
