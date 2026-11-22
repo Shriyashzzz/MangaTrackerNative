@@ -150,13 +150,13 @@ export default function AddScreen() {
 
   // Leaving with something entered (the back arrow, the phone's back, or
   // Cancel) asks first: a slip no longer throws a half-filled form away.
-  // Saved: it leaves without asking
+  // Once it's saved the guard is off, and only then does the page move on
+  // to the new series (while the guard is up, that move is held back too)
   const navigation = useNavigation();
-  const savedIt = useRef(false);
+  const [savedId, setSavedId] = useState<number | null>(null);
   const entered =
     title.trim() !== (fromPrices ?? "").trim() || picked !== null || rating > 0;
-  usePreventRemove(entered, ({ data }) => {
-    if (savedIt.current) return navigation.dispatch(data.action);
+  usePreventRemove(entered && savedId === null, ({ data }) => {
     Alert.alert("Leave without adding it?", "What you entered won't be kept.", [
       { text: "Keep editing", style: "cancel" },
       {
@@ -166,6 +166,13 @@ export default function AddScreen() {
       },
     ]);
   });
+  useEffect(() => {
+    if (savedId === null) return;
+    router.replace({
+      pathname: "/details/[id]",
+      params: { id: String(savedId) },
+    });
+  }, [savedId]);
   const fromVolume = Number(params.ownedVolume) || null;
   const volumesFromLink = fromVolume ?? (Number(params.volumesOwned) || null);
   const bookVolumes = (params.ownedVolumes ?? "")
@@ -283,11 +290,7 @@ export default function AddScreen() {
             newBook(fromBook.title, bookVolumes, fromBook.isbn13 || undefined),
           ]).catch(() => {});
         void useShelf.getState().load();
-        savedIt.current = true;
-        router.replace({
-          pathname: "/details/[id]",
-          params: { id: String(id) },
-        });
+        setSavedId(id);
       } else setErrors(await errorMessages(res));
     } catch {
       setErrors(["Couldn't reach the server. Are you signed in?"]);
