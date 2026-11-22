@@ -188,9 +188,15 @@ export default function AfterAnimeShowScreen() {
           {hasAnswer ? "Where to start the manga" : "No answer yet"}
         </Text>
         {answer ? (
-          <Text className="font-display text-[21px] leading-[29px] text-ink">
-            <AnswerWords text={keepNumbers(answer.lead)} />
-          </Text>
+          // the question on its own line (which season), the answer under it
+          <View className="gap-1">
+            <Text className="font-body-medium text-[15px] text-ink-soft">
+              {answer.asked}
+            </Text>
+            <Text className="font-display text-[21px] leading-[29px] text-ink">
+              <AnswerWords text={keepNumbers(answer.lead)} />
+            </Text>
+          </View>
         ) : null}
         {show && latest ? (
           <SeasonBuy
@@ -204,6 +210,10 @@ export default function AfterAnimeShowScreen() {
         ) : null}
         {show && latest && answer ? (
           <View className="gap-3">
+            {/* the chapter and volume in full, under the book to buy */}
+            <Text className="font-body text-[15px] leading-[22px] text-ink-soft">
+              {keepNumbers(answer.detail)}
+            </Text>
             <SeasonNotes stop={latest} />
             {!latest.coversAll ? (
               <Text className="font-body text-[14.5px] leading-[21px] text-ink-soft">

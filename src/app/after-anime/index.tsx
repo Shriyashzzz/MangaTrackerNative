@@ -2,12 +2,13 @@
 // an anime or manga, or pick a show from the list, to find the chapter and
 // volume to read next
 import { useEffect, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, TextInput, View } from "react-native";
 import Mascot from "@/components/Mascot";
 import Page, { P } from "@/components/Page";
 import SeriesCard from "@/components/prices/SeriesCard";
 import SeriesCover from "@/components/SeriesCover";
 import { openShow } from "@/components/afterAnime/MoreShows";
+import { SearchIcon } from "@/core/components/icons/Icons";
 import { getAfterAnimeIndex, type AfterAnimeShow } from "@/core/lib/afterAnime";
 import { DID_YOU_MEAN } from "@/core/lib/nearMatches";
 import { findSeries, novelParts } from "@/core/lib/prices";
@@ -63,14 +64,7 @@ export default function AfterAnimeIndex() {
   };
 
   return (
-    <Page
-      title="After the anime"
-      search={{
-        placeholder: "Search an anime or manga",
-        onChangeText: setText,
-        onSubmit: (typed) => typed.trim() && go(typed.trim()),
-      }}
-    >
+    <Page title="After the anime">
       <View className="gap-2">
         <Text className="font-brand pr-1 text-[30px] leading-[36px] tracking-[1px] text-ink uppercase">
           Where does the <Text className="text-accent">anime</Text> leave off?
@@ -80,7 +74,22 @@ export default function AfterAnimeIndex() {
         </P>
       </View>
 
+      {/* the search sits in the page, over the shows to pick from */}
       <View className="gap-1">
+        <View className="flex-row items-center gap-2 rounded-[14px] border border-line-soft bg-card px-3">
+          <SearchIcon color={c.inkSoft} width={18} height={18} />
+          <TextInput
+            value={text}
+            onChangeText={setText}
+            onSubmitEditing={() => q && go(q)}
+            placeholder="Search an anime or manga"
+            placeholderTextColor={c.muted}
+            autoCorrect={false}
+            returnKeyType="search"
+            accessibilityLabel="Search an anime or manga"
+            className="min-h-[48px] flex-1 font-body text-[16px] text-ink"
+          />
+        </View>
         {suggested.map((s) => (
           <Pressable
             key={s.slug}
