@@ -67,33 +67,44 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
     </>
   );
 
-  // Aside: one big button to come back by (Kenji and "Back to the tour"),
-  // big enough to hit without aiming, and the two ways out beside it
+  // Aside: Kenji as a round button to come back by, and a pill beside him
+  // with Next and the two ways out. Both tall enough to hit without aiming
   if (hidden)
     return (
       <View
         pointerEvents="box-none"
-        className="absolute right-3 left-3 flex-row items-center gap-2"
+        className="absolute left-3 flex-row items-center gap-2"
         style={{ bottom: foot }}
         onTouchStart={touchIsKenjis}
       >
         <Tap
           feel="none"
           onPress={tourBack}
-          accessibilityRole="button"
           accessibilityLabel="Back to the tour"
-          className="min-h-[58px] flex-row items-center gap-2.5 rounded-full border-[1.5px] border-accent bg-card py-1.5 pr-5 pl-2"
+          className="h-[60px] w-[60px] items-center justify-center rounded-full border-[1.5px] border-line bg-card"
           style={{ elevation: 6 }}
         >
           <Mascot mood="happy" width={44} />
-          <Text className="font-body-semibold text-[15.5px] text-ink">
-            Back to the tour
-          </Text>
         </Tap>
         <View
-          className="min-h-[58px] flex-row items-center gap-4 rounded-full border-[1.5px] border-line bg-card px-4"
+          className="min-h-[54px] flex-row items-center gap-4 rounded-full border-[1.5px] border-line bg-card px-4"
           style={{ elevation: 6 }}
         >
+          {/* the tour goes on from here too: Next brings him back, on
+              his next step */}
+          {at < steps.length - 1 ? (
+            <Tap
+              onPress={() => {
+                hide(false);
+                tourGo(1);
+              }}
+              hitSlop={14}
+            >
+              <Text className="font-body-semibold text-[14px] text-ink">
+                Next ›
+              </Text>
+            </Tap>
+          ) : null}
           {waysOut}
         </View>
       </View>
