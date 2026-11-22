@@ -66,6 +66,13 @@ import { H2 } from "@/components/Page";
 
 const Safe = withUniwind(SafeAreaView);
 
+// nothing under a kind, in three words
+const NOTHING_NEW = {
+  volumes: "No new volumes.",
+  chapters: "No new chapters.",
+  japan: "Nothing new in Japan.",
+} as const;
+
 // covers in a pile's fan, as the web's on a phone
 const FAN = 5;
 const KINDS = Object.keys(RELEASE_KINDS) as ReleaseKind[];
@@ -247,6 +254,13 @@ export default function NewScreen() {
   const toSettings = () =>
     router.push({ pathname: "/settings", params: { tab: "new-releases" } });
 
+  // when the releases were last looked for
+  const checkedLine =
+    !checking && Number.isFinite(oldestCheck) ? (
+      <Text className="font-mono text-[12px] text-muted">
+        Checked {checkedAgo(oldestCheck)}
+      </Text>
+    ) : null;
   return (
     <Safe edges={["top"]} className="flex-1 bg-paper">
       <AppHeader />
@@ -349,6 +363,7 @@ export default function NewScreen() {
             </Pressable>
           ) : null}
         </View>
+        {list.length === 0 ? checkedLine : null}
 
         {list.length === 0 ? (
           <View className="items-center gap-3 pt-6">
@@ -411,13 +426,8 @@ export default function NewScreen() {
                       ? "We don't know where you're up to yet."
                       : viewingHidden
                         ? "Nothing hidden."
-                        : RELEASE_KINDS[kind].emptyTitle}
+                        : NOTHING_NEW[kind]}
                 </Text>
-                {unknownPlace < looked.length ? (
-                  <Text className="text-center font-body text-[15px] text-ink-soft">
-                    {RELEASE_KINDS[kind].emptyBody}
-                  </Text>
-                ) : null}
                 {unknownPlace > 0 &&
                 (chapterOnly === looked.length ||
                   unknownPlace === looked.length) ? (
@@ -437,11 +447,6 @@ export default function NewScreen() {
                 onPress={() => pickKind(elsewhere.kind)}
                 accent
               >{`See ${elsewhere.count} under ${RELEASE_KINDS[elsewhere.kind].label}`}</Word>
-            ) : null}
-            {looked.length < total ? (
-              <Text className="font-body text-[13px] text-muted">
-                Light novels aren't checked for new releases yet.
-              </Text>
             ) : null}
             {!checking && notFound > 0 ? (
               <Text className="text-center font-body text-[13px] text-muted">
@@ -556,11 +561,7 @@ export default function NewScreen() {
             </Text>
           </Text>
         ) : null}
-        {!checking && Number.isFinite(oldestCheck) ? (
-          <Text className="font-mono text-[12px] text-muted">
-            Checked {checkedAgo(oldestCheck)}
-          </Text>
-        ) : null}
+        {list.length > 0 ? checkedLine : null}
       </ScrollView>
 
       {hideActions.hidden || hideActions.failed ? (

@@ -6,7 +6,14 @@
 // typo. The rules are the web's (core findSeries, nearMatches, askedEdition)
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import {
+  BackHandler,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 import AppHeader from "@/components/AppHeader";
@@ -137,6 +144,19 @@ export default function PricesScreen() {
   } | null>(null);
   const [attempt, setAttempt] = useState(0);
   const q = text.trim();
+  const showingResults = (result?.query ?? "").length >= 2;
+  useEffect(() => {
+    if (!full && !showingResults) return;
+    const back = BackHandler.addEventListener("hardwareBackPress", () => {
+      if (full) setFull(false);
+      else {
+        setResult(null);
+        setText("");
+      }
+      return true;
+    });
+    return () => back.remove();
+  }, [full, showingResults]);
   const isbn = isbnFromTyped(q);
 
   // suggestions while typing (the web's SeriesSearchBox)
@@ -304,8 +324,9 @@ export default function PricesScreen() {
         keyboardShouldPersistTaps="handled"
       >
         {!searching ? <DealsStrip /> : null}
-        <View className="gap-3">
-          <Text className="font-brand pr-1 text-[30px] tracking-[1px] text-ink uppercase">
+        {/* Price check, from its name to the names to try, in one box */}
+        <View className="gap-3 rounded-[16px] border border-line-soft bg-card p-4">
+          <Text className="font-brand pr-2 text-[30px] tracking-[1px] text-ink uppercase">
             Price check
           </Text>
           <Text className="font-body text-[14.5px] text-ink-soft">
@@ -318,7 +339,7 @@ export default function PricesScreen() {
           </View>
           <Pressable
             onPress={() => setFull(true)}
-            className="flex-row items-center gap-2 rounded-[14px] border border-line-soft bg-card px-3"
+            className="flex-row items-center gap-2 rounded-[12px] border border-line-soft bg-paper px-3"
             accessibilityLabel="Search a series or an ISBN"
           >
             <SearchIcon color={c.inkSoft} width={20} height={20} />

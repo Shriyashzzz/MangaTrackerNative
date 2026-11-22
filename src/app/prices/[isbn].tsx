@@ -375,26 +375,27 @@ export default function PriceVolumeScreen() {
 
       {/* one country's prices at a time */}
       <View className="gap-3">
-        <View className="flex-row items-center justify-between gap-3">
+        <View className="flex-row items-end justify-between gap-3">
           <H2>{inCanada ? "Prices in Canada" : "Prices"}</H2>
-          <View className="flex-row items-center gap-3">
-            {inCanada ? (
-              canada?.checkedAt ? (
-                <Text className="font-body text-[13px] text-muted">
-                  checked {timeAgo(canada.checkedAt)}
-                </Text>
-              ) : null
-            ) : page.refreshing ? (
-              <Text className="font-body text-[13px] text-muted">
-                checking stores…
-              </Text>
-            ) : (
-              <PriceAges offers={offers} checkedAt={checkedAt} />
-            )}
-            <View className="w-[160px]">
-              <CountrySwitch />
-            </View>
+          <View className="w-[160px]">
+            <CountrySwitch />
           </View>
+        </View>
+        {/* when they were checked, on its own line under the heading */}
+        <View className="-mt-1 flex-row">
+          {inCanada ? (
+            canada?.checkedAt ? (
+              <Text className="font-body text-[13px] text-muted">
+                checked {timeAgo(canada.checkedAt)}
+              </Text>
+            ) : null
+          ) : page.refreshing ? (
+            <Text className="font-body text-[13px] text-muted">
+              checking stores…
+            </Text>
+          ) : (
+            <PriceAges offers={offers} checkedAt={checkedAt} />
+          )}
         </View>
         {inCanada ? (
           <>

@@ -46,9 +46,11 @@ export default function ToReadButton({
           })
         }
         hitSlop={6}
+        accessibilityRole="link"
+        className="flex-row items-center gap-1.5 self-start rounded-full border border-ok bg-ok/15 px-3 py-1.5 active:opacity-70"
       >
-        <Text className="font-body-semibold text-[14.5px] text-ink underline decoration-accent">
-          {onShelf.planned ? "On your To read list" : "On your shelf"} →
+        <Text className="font-body-semibold text-[14px] text-ok">
+          {onShelf.planned ? "On your to-read list" : "On your shelf"}
         </Text>
       </Pressable>
     );

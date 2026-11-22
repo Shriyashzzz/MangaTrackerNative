@@ -63,9 +63,12 @@ export default function SelectDock({
       style={{ bottom: insets.bottom + 16 }}
     >
       <MovedNote select={select} />
-      <View className="w-full flex-row flex-wrap items-center gap-x-4 gap-y-2 rounded-[6px] border-[2.5px] border-line bg-card px-4 py-3">
+      <View className="w-full flex-row items-center justify-between rounded-[18px] border border-line-soft bg-card px-4 py-1.5">
         <Text className="font-brand pr-1 text-[22px] text-ink">{count}</Text>
-        <Pressable onPress={select.toggleAll} hitSlop={6}>
+        <Pressable
+          onPress={select.toggleAll}
+          className="min-h-[44px] justify-center px-1"
+        >
           <Text className={word(true)}>
             {select.allPicked ? "Clear" : `Select all ${shown.length}`}
           </Text>
@@ -73,7 +76,7 @@ export default function SelectDock({
         <Pressable
           onPress={() => setMovePicking(true)}
           disabled={!count || select.moving}
-          hitSlop={6}
+          className="min-h-[44px] justify-center px-1"
         >
           <Text className={word(Boolean(count) && !select.moving)}>
             {select.moving ? "Moving…" : "Move to"}
@@ -82,7 +85,7 @@ export default function SelectDock({
         <Pressable
           onPress={() => select.setConfirmingDelete(true)}
           disabled={!count}
-          hitSlop={6}
+          className="min-h-[44px] justify-center px-1"
         >
           <Text
             className={`font-body-semibold text-[14.5px] ${count ? "text-accent" : "text-muted"}`}
@@ -94,7 +97,7 @@ export default function SelectDock({
           onPress={select.stop}
           hitSlop={8}
           accessibilityLabel="Done selecting"
-          className="ml-auto"
+          className="min-h-[44px] justify-center pl-2"
         >
           <CloseIcon color={c.ink} width={20} height={20} />
         </Pressable>

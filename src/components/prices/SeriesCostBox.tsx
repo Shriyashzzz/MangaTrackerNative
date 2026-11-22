@@ -4,6 +4,7 @@ import { Text, View } from "react-native";
 import { runTotal, type SeriesCost } from "@/core/lib/finishCost";
 import { formatCents, wholeMoney } from "@/core/lib/prices";
 
+// "$261 used for 37 of 113"
 const UsedLine = ({
   used,
   volumes,
@@ -11,15 +12,43 @@ const UsedLine = ({
   used: { volumes: number; cents: number };
   volumes: number;
 }) => (
-  <Text className="font-body text-[14px] text-ink-soft">
-    {used.volumes >= volumes
-      ? `All ${volumes} are on sale used`
-      : `Used copies found for ${used.volumes} of ${volumes}`}
-    :{" "}
-    <Text className="font-body-semibold text-ink">
-      {formatCents(used.cents)}
+  <Text className="font-body text-[14.5px] text-ink">
+    <Text className="font-brand pr-1 text-[18px]">
+      {wholeMoney(used.cents)}
     </Text>{" "}
-    together.
+    <Text className="font-body-semibold text-award-market">used</Text>
+    {used.volumes >= volumes
+      ? ` for all ${volumes}`
+      : ` for ${used.volumes} of ${volumes}`}
+  </Text>
+);
+
+// "About $1,190 new for all 113 (estimate)"
+const NewLine = ({
+  cents,
+  volumes,
+  exact,
+  comingSoon,
+}: {
+  cents: number;
+  volumes: number;
+  exact: boolean;
+  comingSoon: boolean;
+}) => (
+  <Text className="font-body text-[14.5px] text-ink">
+    {exact ? "" : "About "}
+    <Text className="font-brand pr-1 text-[22px]">
+      {exact ? formatCents(cents) : wholeMoney(cents)}
+    </Text>{" "}
+    <Text className="font-body-semibold text-award-new">new</Text> for all{" "}
+    {volumes}
+    {comingSoon ? " out now" : ""}
+    {exact ? null : (
+      <Text className="font-body text-[13px] text-muted italic">
+        {" "}
+        (estimate)
+      </Text>
+    )}
   </Text>
 );
 
@@ -45,42 +74,21 @@ export default function SeriesCostBox({
       <Text className="font-brand pr-1 text-[18px] tracking-[1px] text-ink uppercase">
         Collect every volume
       </Text>
-      {!run ? (
-        rough ? (
-          <>
-            <Text className="font-body text-[15px] text-ink">
-              About{" "}
-              <Text className="font-brand pr-1 text-[22px]">
-                {wholeMoney(rough)}
-              </Text>{" "}
-              new for all {cost.volumes}
-            </Text>
-            <Text className="font-body text-[13.5px] text-ink-soft">
-              A rough guess from the {cost.priced} priced so far.
-            </Text>
-          </>
-        ) : (
-          <Text className="font-body text-[14px] text-ink-soft">
-            No new prices yet. Open a volume to get its price.
-          </Text>
-        )
-      ) : (
-        <>
-          <Text className="font-body text-[15px] text-ink">
-            {run.exact ? "" : "About "}
-            <Text className="font-brand pr-1 text-[22px]">
-              {run.exact ? formatCents(run.cents) : wholeMoney(run.cents)}
-            </Text>{" "}
-            new for all {cost.volumes}
-            {comingSoon ? " out now" : ""}
-          </Text>
-          <Text className="font-body text-[13.5px] text-ink-soft">
-            {run.exact
-              ? `At the lowest new price we've found for each, about ${formatCents(Math.round(cost.cents / cost.volumes))} a volume.`
-              : "An estimate, from the volumes we have prices for."}
-          </Text>
-        </>
-      )}
+      {run ? (
+        <NewLine
+          cents={run.cents}
+          volumes={cost.volumes}
+          exact={run.exact}
+          comingSoon={comingSoon}
+        />
+      ) : rough ? (
+        <NewLine
+          cents={rough}
+          volumes={cost.volumes}
+          exact={false}
+          comingSoon={false}
+        />
+      ) : null}
       {used ? <UsedLine used={used} volumes={cost.volumes} /> : null}
     </View>
   );
