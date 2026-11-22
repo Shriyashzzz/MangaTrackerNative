@@ -1,5 +1,5 @@
 // The app's frame: the fonts the web uses, the session checked once, then
-// the shelf for someone signed in and the sign-in page for anyone else
+// the tabs for everyone; the pages that need an account only when signed in
 import "../global.css";
 import { Bangers_400Regular } from "@expo-google-fonts/bangers";
 import {
@@ -82,8 +82,23 @@ export default function RootLayout() {
               animationMatchesGesture: true,
             }}
           >
-            <Stack.Protected guard={isSignedIn}>
-              <Stack.Screen name="(tabs)" />
+            {/* open to anyone: the tabs (a guest's shelf, prices, sign in),
+                the price pages, and the pages about the app */}
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="prices/series" />
+            <Stack.Screen name="prices/[isbn]" />
+            <Stack.Screen name="after-anime/index" />
+            <Stack.Screen name="after-anime/[slug]" />
+            <Stack.Screen name="editions" />
+            <Stack.Screen name="deals" />
+            <Stack.Screen name="series" />
+            <Stack.Screen name="updates" />
+            <Stack.Screen name="faq" />
+            <Stack.Screen name="about" />
+            <Stack.Screen name="acknowledgements" />
+            <Stack.Screen name="privacy" />
+            <Stack.Screen name="u/[code]" />
+            <Stack.Protected guard={Boolean(isSignedIn)}>
               <Stack.Screen name="details/[id]" />
               <Stack.Screen name="edit/[id]" />
               <Stack.Screen name="add" />
@@ -93,21 +108,8 @@ export default function RootLayout() {
               <Stack.Screen name="new-releases" />
               <Stack.Screen name="friends" />
               <Stack.Screen name="import" />
-              <Stack.Screen name="after-anime/index" />
-              <Stack.Screen name="after-anime/[slug]" />
-              <Stack.Screen name="updates" />
-              <Stack.Screen name="faq" />
-              <Stack.Screen name="about" />
-              <Stack.Screen name="acknowledgements" />
-              <Stack.Screen name="privacy" />
               <Stack.Screen name="calendar" />
-              <Stack.Screen name="editions" />
-              <Stack.Screen name="deals" />
-              <Stack.Screen name="series" />
               <Stack.Screen name="year" />
-              <Stack.Screen name="u/[code]" />
-              <Stack.Screen name="prices/series" />
-              <Stack.Screen name="prices/[isbn]" />
             </Stack.Protected>
             <Stack.Protected guard={!isSignedIn}>
               <Stack.Screen name="sign-in" />

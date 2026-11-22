@@ -42,28 +42,33 @@ export default function AppHeader() {
             Manga Tracker
           </Text>
         </View>
-        <Pressable
-          onPress={() => router.push("/to-buy")}
-          hitSlop={8}
-          accessibilityLabel={`To buy${toBuyCount ? `, ${toBuyCount} on the list` : ""}`}
-          className="p-1"
-        >
-          <BagIcon color={c.inkSoft} width={24} height={24} />
-          {toBuyCount ? (
-            <View className="absolute -top-1 -right-1 min-w-[18px] items-center rounded-full border border-paper bg-accent px-1">
-              <Text className="font-mono-medium text-[10px] text-on-accent">
-                {toBuyCount}
-              </Text>
-            </View>
-          ) : null}
-        </Pressable>
-        <Pressable
-          onPress={() => setMenuOpen(true)}
-          hitSlop={8}
-          accessibilityLabel="Menu"
-        >
-          <Avatar id={account?.avatar} size={36} />
-        </Pressable>
+        {/* the list and the menu are an account's: nothing to open without one */}
+        {isSignedIn ? (
+          <>
+            <Pressable
+              onPress={() => router.push("/to-buy")}
+              hitSlop={8}
+              accessibilityLabel={`To buy${toBuyCount ? `, ${toBuyCount} on the list` : ""}`}
+              className="p-1"
+            >
+              <BagIcon color={c.inkSoft} width={24} height={24} />
+              {toBuyCount ? (
+                <View className="absolute -top-1 -right-1 min-w-[18px] items-center rounded-full border border-paper bg-accent px-1">
+                  <Text className="font-mono-medium text-[10px] text-on-accent">
+                    {toBuyCount}
+                  </Text>
+                </View>
+              ) : null}
+            </Pressable>
+            <Pressable
+              onPress={() => setMenuOpen(true)}
+              hitSlop={8}
+              accessibilityLabel="Menu"
+            >
+              <Avatar id={account?.avatar} size={36} />
+            </Pressable>
+          </>
+        ) : null}
       </View>
       <DoubleRule />
       <SettingsMenu

@@ -3,6 +3,8 @@
 // a row per series. Pull down to load it again. Volumes is its own view
 // (VolumesView). Who's in each tab, the search and the sort are the web's own
 // rules (core filterShelf); it opens on the tab and sort the account chose
+import GuestShelf from "@/components/GuestShelf";
+import { useAuth } from "@/store/auth";
 import { useEffect, useState } from "react";
 import { Alert, Pressable, Text, TextInput, View } from "react-native";
 import Animated, {
@@ -58,7 +60,7 @@ const TABS = [
 type TabId = (typeof TABS)[number]["value"];
 const isTab = (tab: unknown): tab is TabId => TABS.some((t) => t.value === tab);
 
-export default function ShelfScreen() {
+function SignedInShelf() {
   const c = useColors();
   const insets = useSafeAreaInsets();
   const manga = useShelf((s) => s.manga);
@@ -394,5 +396,18 @@ export default function ShelfScreen() {
         onClose={() => setPicking(null)}
       />
     </Safe>
+  );
+}
+
+// the shelf tab: their shelf, or what a shelf is for when nobody's signed in
+export default function ShelfScreen() {
+  const isSignedIn = useAuth((st) => st.isSignedIn);
+  const insets = useSafeAreaInsets();
+  if (isSignedIn) return <SignedInShelf />;
+  return (
+    <View className="flex-1 bg-paper" style={{ paddingTop: insets.top }}>
+      <AppHeader />
+      <GuestShelf />
+    </View>
   );
 }

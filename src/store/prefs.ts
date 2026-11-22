@@ -3,6 +3,7 @@
 // country is passed on to core's country stand-in
 import { create } from "zustand";
 import { apiFetch } from "@/core/lib/api";
+import { useAuth } from "./auth";
 import { setCountry } from "@/core/lib/country";
 import type { Prefs } from "@/core/lib/types";
 
@@ -30,6 +31,8 @@ export const usePrefs = create<PrefsState>()((set, get) => ({
     const prefs = { ...was, ...patch };
     if (patch.country) setCountry(patch.country === "ca" ? "ca" : "us");
     set({ prefs });
+    // no account: the choice holds for this visit, nothing to save it to
+    if (!useAuth.getState().isSignedIn) return;
     try {
       const res = await apiFetch("/api/prefs", { method: "PUT", body: patch });
       if (!res.ok) throw new Error("That didn't save. Try again.");

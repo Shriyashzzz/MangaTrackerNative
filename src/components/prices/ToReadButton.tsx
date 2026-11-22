@@ -7,7 +7,9 @@ import { pickGenre } from "@/core/lib/anilist";
 import { apiFetch } from "@/core/lib/api";
 import { novelParts } from "@/core/lib/prices";
 import { titleKey as sameName } from "@/core/lib/titleKey";
+import { useAuth } from "@/store/auth";
 import { useShelf } from "@/store/shelf";
+import TrackPitch from "./TrackPitch";
 import Button from "../Button";
 
 export default function ToReadButton({
@@ -25,9 +27,10 @@ export default function ToReadButton({
   const loadShelf = useShelf((s) => s.load);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const isSignedIn = useAuth((s) => s.isSignedIn);
   useEffect(() => {
-    if (!shelf) void loadShelf();
-  }, [shelf, loadShelf]);
+    if (isSignedIn && !shelf) void loadShelf();
+  }, [isSignedIn, shelf, loadShelf]);
   const novel = novelParts(name);
   const names = [name, ...altNames].map((n) => sameName(novelParts(n).title));
   const onShelf = shelf?.find(
@@ -35,6 +38,7 @@ export default function ToReadButton({
       Boolean(m.lightNovel) === novel.lightNovel &&
       names.includes(sameName(m.name)),
   );
+  if (!isSignedIn) return <TrackPitch />;
   // theirs already: the chip under the cover says so
   if (onShelf) return null;
   const add = async () => {

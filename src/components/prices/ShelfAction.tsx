@@ -18,7 +18,9 @@ import {
 import { novelParts } from "@/core/lib/prices";
 import { findOnShelf, setVolumesOwned, type Owned } from "@/core/lib/shelf";
 import type { ShelfMatch } from "@/core/lib/types";
+import { useAuth } from "@/store/auth";
 import { useShelf } from "@/store/shelf";
+import TrackPitch from "./TrackPitch";
 import { loadToBuyOnce, useToBuy } from "@/store/toBuy";
 import Button from "../Button";
 import ToReadButton from "./ToReadButton";
@@ -95,7 +97,9 @@ export default function ShelfAction({
   const [failed, setFailed] = useState(false);
   const undoTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const shelfSize = useShelf((s) => s.manga?.length ?? 0);
+  const isSignedIn = useAuth((s) => s.isSignedIn);
   useEffect(() => {
+    if (!isSignedIn) return;
     const controller = new AbortController();
     findOnShelf(series, controller.signal, alsoCalled)
       .then((manga) => setMatch({ series, manga }))
@@ -104,8 +108,9 @@ export default function ShelfAction({
           setMatch({ series, manga: null });
       });
     return () => controller.abort();
-  }, [series, alsoCalled, shelfSize]);
+  }, [isSignedIn, series, alsoCalled, shelfSize]);
   useEffect(() => () => clearTimeout(undoTimer.current), []);
+  if (!isSignedIn) return <TrackPitch />;
   if (match.series !== series) return <View className="h-[40px]" />;
 
   const manga = match.manga;
