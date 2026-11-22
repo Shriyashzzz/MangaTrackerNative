@@ -32,6 +32,7 @@ import { useBuyOptions } from "@/core/pages/Details/useBuyOptions";
 import { useEditions } from "@/core/pages/Details/useEditions";
 import { useOwnedVolumes } from "@/core/pages/Details/useOwnedVolumes";
 import { usePrefs } from "@/store/prefs";
+import { DEFAULT_TRACK_BY } from "@/lib/trackBy";
 
 // what a slide did, for its Undo note: "6 volumes marked yours"
 function slideText(before: number[], now: number[]) {
@@ -69,7 +70,7 @@ export function useSeriesShelf(
     volumeStarts = [],
   }: Options = {},
 ) {
-  const trackBy = usePrefs((s) => s.prefs.trackBy ?? "series");
+  const trackBy = usePrefs((s) => s.prefs.trackBy ?? DEFAULT_TRACK_BY);
   const [saveFailed, setSaveFailed] = useState(false);
   const [undoTo, setUndoTo] = useState<number[] | null>(null);
   const dropUndo = useCallback(() => setUndoTo(null), []);

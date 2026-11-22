@@ -80,6 +80,12 @@ export default function Sheet({
   useEffect(() => {
     if (mounted) sheet.current?.present();
   }, [mounted]);
+  useEffect(() => {
+    if (!mounted || !fromTheFoot) return;
+    const toFoot = () => list.current?.scrollToEnd({ animated: false });
+    const timers = [60, 250, 500].map((ms) => setTimeout(toFoot, ms));
+    return () => timers.forEach(clearTimeout);
+  }, [mounted, fromTheFoot]);
   // Android's back closes the sheet, not the page under it
   useEffect(() => {
     if (!mounted) return;

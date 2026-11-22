@@ -6,6 +6,11 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState, type ComponentRef } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 import DoubleRule from "@/components/DoubleRule";
@@ -37,6 +42,30 @@ export default function SettingsScreen() {
   const [tab, setTab] = useState<TabId>(
     TABS.some((t) => t.id === params.tab) ? (params.tab as TabId) : "profile",
   );
+  // where each tab sits in the bar, so the underline can slide to it
+  const [spots, setSpots] = useState<
+    Record<string, { x: number; width: number }>
+  >({});
+  const lineX = useSharedValue(0);
+  const lineWidth = useSharedValue(0);
+  const spot = spots[tab];
+  const placed = useRef(false);
+  useEffect(() => {
+    if (!spot) return;
+    // the first time it appears under its tab; after that it slides
+    if (!placed.current) {
+      placed.current = true;
+      lineX.set(spot.x);
+      lineWidth.set(spot.width);
+      return;
+    }
+    lineX.set(withTiming(spot.x, { duration: 220 }));
+    lineWidth.set(withTiming(spot.width, { duration: 220 }));
+  }, [spot, lineX, lineWidth]);
+  const underline = useAnimatedStyle(() => ({
+    width: lineWidth.value,
+    transform: [{ translateX: lineX.value }],
+  }));
   const account = useAccount((s) => s.account);
   const loadFailed = useAccount((s) => s.loadFailed);
   const load = useAccount((s) => s.load);
@@ -63,30 +92,50 @@ export default function SettingsScreen() {
       </View>
       <DoubleRule />
       {/* the tabs, as Android lays them along the top: the open one underlined */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerClassName="px-2"
-        className="max-h-[56px] border-b border-line-soft"
-      >
-        {TABS.map((t) => (
-          <Pressable
-            key={t.id}
-            onPress={() => {
-              setTab(t.id);
-              page.current?.scrollTo({ y: 0, animated: false });
-            }}
-            accessibilityState={{ selected: t.id === tab }}
-            className={`min-h-[56px] justify-center px-4 ${t.id === tab ? "border-b-[3px] border-accent" : ""}`}
-          >
-            <Text
-              className={`font-body-semibold text-[16px] ${t.id === tab ? "text-ink" : "text-ink-soft"}`}
+      <View className="h-[52px] border-b border-line-soft">
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerClassName="px-2"
+        >
+          {TABS.map((t) => (
+            <Pressable
+              key={t.id}
+              onPress={() => {
+                setTab(t.id);
+                page.current?.scrollTo({ y: 0, animated: false });
+              }}
+              onLayout={(e) => {
+                const { x, width } = e.nativeEvent.layout;
+                setSpots((now) => ({ ...now, [t.id]: { x, width } }));
+              }}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: t.id === tab }}
+              className="h-[52px] justify-center px-4"
             >
-              {t.label}
-            </Text>
-          </Pressable>
-        ))}
-      </ScrollView>
+              {/* the same weight picked or not, so no tab changes width */}
+              <Text
+                className={`font-body-semibold text-[16px] ${t.id === tab ? "text-ink" : "text-ink-soft"}`}
+              >
+                {t.label}
+              </Text>
+            </Pressable>
+          ))}
+          <Animated.View
+            pointerEvents="none"
+            style={[
+              {
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                height: 3,
+                backgroundColor: c.accent,
+              },
+              underline,
+            ]}
+          />
+        </ScrollView>
+      </View>
       <ScrollView
         ref={page}
         contentContainerClassName="gap-7 px-4 pt-5 pb-16"

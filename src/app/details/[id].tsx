@@ -62,6 +62,7 @@ import { useSeriesShelf } from "@/lib/useSeriesShelf";
 import { usePrefs } from "@/store/prefs";
 import { restoredAs, useShelf } from "@/store/shelf";
 import { H2 } from "@/components/Page";
+import { DEFAULT_TRACK_BY } from "@/lib/trackBy";
 
 const Safe = withUniwind(SafeAreaView);
 
@@ -80,7 +81,7 @@ export default function DetailsScreen() {
   const seriesId = Number(id);
   const c = useColors();
   const prefs = usePrefs((s) => s.prefs);
-  const trackBy = prefs.trackBy ?? "series";
+  const trackBy = prefs.trackBy ?? DEFAULT_TRACK_BY;
   const checksOn = prefs.releaseChecks !== "off";
   // the latest the shelf's own check found, until this page's answer comes
   const fromShelfCheck = useShelf((s) => s.releases[seriesId]);

@@ -44,6 +44,7 @@ import { filterShelf, shelfCounts } from "@/core/pages/Home/shelfViews";
 import { useColors } from "@/lib/colors";
 import { usePrefs } from "@/store/prefs";
 import { useShelf } from "@/store/shelf";
+import { DEFAULT_TRACK_BY } from "@/lib/trackBy";
 
 const Safe = withUniwind(SafeAreaView);
 
@@ -69,7 +70,7 @@ export default function ShelfScreen() {
   const checkReleases = useShelf((s) => s.checkReleases);
   const prefs = usePrefs((s) => s.prefs);
   const checksOn = prefs.releaseChecks !== "off";
-  const trackBy = prefs.trackBy ?? "series";
+  const trackBy = prefs.trackBy ?? DEFAULT_TRACK_BY;
   // what the account chose until they pick here
   const [tabPicked, setTab] = useState<TabId | null>(null);
   const [sortPicked, setSort] = useState<ShelfSort | null>(null);

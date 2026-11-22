@@ -190,8 +190,14 @@ export default function ShelfAction({
     });
   return (
     <View className="gap-2">
-      <Pressable onPress={openSeries} hitSlop={6} className="self-start">
-        <Text className="font-body text-[14px] text-ink-soft underline">
+      {/* under the cover: it's theirs already, and the way to it */}
+      <Pressable
+        onPress={openSeries}
+        hitSlop={6}
+        accessibilityRole="link"
+        className="self-start rounded-full border border-ok/50 bg-ok/10 px-3 py-1 active:opacity-70"
+      >
+        <Text className="font-body-medium text-[13px] text-ok">
           On your shelf
         </Text>
       </Pressable>

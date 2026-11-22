@@ -46,6 +46,7 @@ import { useColors } from "@/lib/colors";
 import { readLocal, writeLocal } from "@/lib/deviceStore";
 import { usePrefs } from "@/store/prefs";
 import { useShelf } from "@/store/shelf";
+import { DEFAULT_TRACK_BY } from "@/lib/trackBy";
 
 const Safe = withUniwind(SafeAreaView);
 
@@ -101,7 +102,7 @@ export default function AddScreen() {
     chapter?: string;
     readVolume?: string;
   }>();
-  const trackBy = usePrefs((s) => s.prefs.trackBy ?? "series");
+  const trackBy = usePrefs((s) => s.prefs.trackBy ?? DEFAULT_TRACK_BY);
   const fromPrices = (params.title ?? "").slice(0, 150);
   const novelFromPrices = params.format === "novel";
   const [stage, setStage] = useState<Stage>("reading");

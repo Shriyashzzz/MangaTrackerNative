@@ -61,6 +61,11 @@ export default function ReadingPlace({
 }) {
   // a collector of the books who asked for the chapter counter after all
   const [chaptersShown, setChaptersShown] = useState(false);
+  // with both kept, which counter is showing: the chapter if they have
+  // one saved, else the volume
+  const [shown, setShown] = useState<"chapters" | "volumes">(
+    manga.bookmark ? "chapters" : "volumes",
+  );
   const booksRead = edition
     ? slotsRead(edition.slots, manga.readVolume ?? null)
     : 0;
@@ -103,9 +108,13 @@ export default function ReadingPlace({
   const tracks = tracksOf(manga, trackBy);
   const ownsPastWhatTheyveRead =
     tracks.volumes && highestOwned > (manga.readVolume ?? 0);
+  // both kept: one counter shows at a time, the other a tap away
+  const both = tracks.chapters && tracks.volumes;
+  const showChapters = tracks.chapters && (!both || shown === "chapters");
+  const showVolumes = tracks.volumes && (!both || shown === "volumes");
   return (
     <View className="gap-3">
-      {tracks.chapters ? (
+      {showChapters ? (
         <View className="flex-row flex-wrap items-center gap-x-3 gap-y-2">
           <Line>Read up to ch.</Line>
           <ReadingStepper
@@ -117,7 +126,7 @@ export default function ReadingPlace({
           />
         </View>
       ) : null}
-      {tracks.volumes && !inBooks ? (
+      {showVolumes && !inBooks ? (
         <View className="flex-row flex-wrap items-center gap-x-3 gap-y-2">
           <Line>Read up to vol.</Line>
           <ReadingStepper
@@ -129,7 +138,7 @@ export default function ReadingPlace({
           />
         </View>
       ) : null}
-      {tracks.volumes && inBooks && edition ? (
+      {showVolumes && inBooks && edition ? (
         // the same place counted in the edition's books: "Definitive 4" is
         // saved as the last volume that book holds
         <View className="flex-row flex-wrap items-center gap-x-3 gap-y-2">
@@ -157,6 +166,18 @@ export default function ReadingPlace({
         </View>
       ) : null}
       <View className="flex-row flex-wrap gap-x-5 gap-y-2">
+        {both ? (
+          <Pressable
+            onPress={() =>
+              setShown(shown === "chapters" ? "volumes" : "chapters")
+            }
+            hitSlop={6}
+          >
+            <Text className="font-body-semibold text-[14.5px] text-accent">
+              {shown === "chapters" ? "Show volume" : "Show chapter"}
+            </Text>
+          </Pressable>
+        ) : null}
         {/* each series its own way: the other one is a tap away */}
         {trackBy === "series" ? (
           <Pressable

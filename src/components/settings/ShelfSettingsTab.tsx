@@ -10,6 +10,7 @@ import { useColors } from "@/lib/colors";
 import { usePrefs } from "@/store/prefs";
 import PickSheet from "../PickSheet";
 import { Radios, Section, Tick } from "./parts";
+import { DEFAULT_TRACK_BY } from "@/lib/trackBy";
 
 const TRACKING = [
   { value: "series", label: "Let me choose for each series" },
@@ -51,7 +52,7 @@ export default function ShelfSettingsTab() {
         <Radios
           label="Track by"
           options={TRACKING}
-          value={prefs.trackBy ?? "series"}
+          value={prefs.trackBy ?? DEFAULT_TRACK_BY}
           onChange={(value) => set({ trackBy: value })}
         />
       </Section>

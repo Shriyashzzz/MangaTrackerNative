@@ -41,6 +41,7 @@ import type { Manga } from "@/core/lib/types";
 import { useColors } from "@/lib/colors";
 import { usePrefs } from "@/store/prefs";
 import { useShelf } from "@/store/shelf";
+import { DEFAULT_TRACK_BY } from "@/lib/trackBy";
 
 const Safe = withUniwind(SafeAreaView);
 
@@ -59,7 +60,7 @@ const FORMATS = [
 export default function EditScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const c = useColors();
-  const trackBy = usePrefs((s) => s.prefs.trackBy ?? "series");
+  const trackBy = usePrefs((s) => s.prefs.trackBy ?? DEFAULT_TRACK_BY);
   const [manga, setManga] = useState<Manga | null>(null);
   const [title, setTitle] = useState("");
   const [image, setImage] = useState("");
