@@ -7,9 +7,39 @@ import { novelParts } from "@/core/lib/prices";
 import type { SeriesInfo } from "@/core/lib/types";
 import { starsOf } from "@/core/pages/Prices/reviews/reviewText";
 
-export default function SeriesFacts({ info }: { info: SeriesInfo }) {
+// what the series is about, three lines until they ask for the rest. On its
+// own so a page can run it full width under the cover
+export function SeriesDescription({ info }: { info: SeriesInfo }) {
   const [expanded, setExpanded] = useState(false);
   const long = (info.description?.length ?? 0) > 320;
+  if (!info.description) return null;
+  return (
+    <View>
+      <Text
+        numberOfLines={expanded ? undefined : 3}
+        className="font-body text-[14px] leading-[21px] text-ink"
+      >
+        {info.description}
+      </Text>
+      {long ? (
+        <Pressable onPress={() => setExpanded(!expanded)} hitSlop={6}>
+          <Text className="self-start border-b border-ink pb-[2px] font-body-medium text-[13.5px] text-ink">
+            {expanded ? "Show less" : "Read more"}
+          </Text>
+        </Pressable>
+      ) : null}
+    </View>
+  );
+}
+
+export default function SeriesFacts({
+  info,
+  withDescription = true,
+}: {
+  info: SeriesInfo;
+  // false where the page draws SeriesDescription itself
+  withDescription?: boolean;
+}) {
   const facts = [
     info.score != null ? `Rated ★ ${starsOf(info.score)}` : null,
     info.popularityRank != null
@@ -44,23 +74,7 @@ export default function SeriesFacts({ info }: { info: SeriesInfo }) {
           ))}
         </View>
       ) : null}
-      {info.description ? (
-        <View>
-          <Text
-            numberOfLines={expanded ? undefined : 3}
-            className="font-body text-[14px] leading-[21px] text-ink"
-          >
-            {info.description}
-          </Text>
-          {long ? (
-            <Pressable onPress={() => setExpanded(!expanded)} hitSlop={6}>
-              <Text className="font-body-medium text-[13.5px] text-ink border-b pb-[2px] border-ink self-start">
-                {expanded ? "Show less" : "Read more"}
-              </Text>
-            </Pressable>
-          ) : null}
-        </View>
-      ) : null}
+      {withDescription ? <SeriesDescription info={info} /> : null}
     </View>
   );
 }

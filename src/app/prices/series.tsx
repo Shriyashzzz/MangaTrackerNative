@@ -21,7 +21,9 @@ import OnShelfChip from "@/components/prices/OnShelfChip";
 import OtherEditions from "@/components/prices/OtherEditions";
 import { SeriesScoreBadge } from "@/components/prices/SeriesCard";
 import SeriesCostBox from "@/components/prices/SeriesCostBox";
-import SeriesFacts from "@/components/prices/SeriesFacts";
+import SeriesFacts, {
+  SeriesDescription,
+} from "@/components/prices/SeriesFacts";
 import SetsBox from "@/components/prices/SetsBox";
 import ToReadButton from "@/components/prices/ToReadButton";
 import VolumeCard from "@/components/prices/VolumeCard";
@@ -225,42 +227,47 @@ export default function PriceSeriesScreen() {
       }}
     >
       <DealsStrip />
-      <View className="flex-row gap-4">
-        {volumes[0]?.coverUrl || info?.coverUrl ? (
-          <View>
-            <View className="self-start">
-              <SeriesCover
-                name={named.title}
-                url={volumes[0]?.coverUrl ?? info?.coverUrl}
-                width={94}
-                border={2}
-              />
+      {/* the cover and the facts, then what it's about from under the cover,
+          the page's full width */}
+      <View className="gap-3">
+        <View className="flex-row gap-4">
+          {volumes[0]?.coverUrl || info?.coverUrl ? (
+            <View>
+              <View className="self-start">
+                <SeriesCover
+                  name={named.title}
+                  url={volumes[0]?.coverUrl ?? info?.coverUrl}
+                  width={94}
+                  border={2}
+                />
 
-              <SeriesScoreBadge percent={info?.score} />
+                <SeriesScoreBadge percent={info?.score} />
+              </View>
+              <OnShelfChip
+                name={info?.name ?? data.name}
+                altNames={info?.altNames}
+              />
             </View>
-            <OnShelfChip
+          ) : null}
+          <View className="min-w-0 flex-1 gap-2">
+            <Text className="font-display text-[23px] leading-[27px] text-ink">
+              {named.title}
+            </Text>
+            {named.lightNovel ? (
+              <Text className="self-start rounded-[2px] border-[1.5px] border-line-soft px-1.5 font-body-medium text-[12px] text-ink-soft">
+                Light novel
+              </Text>
+            ) : null}
+            {info ? <SeriesFacts info={info} withDescription={false} /> : null}
+            <ToReadButton
               name={info?.name ?? data.name}
               altNames={info?.altNames}
+              cover={info?.coverUrl ?? null}
+              genres={info?.genres}
             />
           </View>
-        ) : null}
-        <View className="min-w-0 flex-1 gap-2">
-          <Text className="font-display text-[23px] leading-[27px] text-ink">
-            {named.title}
-          </Text>
-          {named.lightNovel ? (
-            <Text className="self-start rounded-[2px] border-[1.5px] border-line-soft px-1.5 font-body-medium text-[12px] text-ink-soft">
-              Light novel
-            </Text>
-          ) : null}
-          {info ? <SeriesFacts info={info} /> : null}
-          <ToReadButton
-            name={info?.name ?? data.name}
-            altNames={info?.altNames}
-            cover={info?.coverUrl ?? null}
-            genres={info?.genres}
-          />
         </View>
+        {info ? <SeriesDescription info={info} /> : null}
       </View>
 
       {/* no account: the ticket runs the page's full width, so nothing is
