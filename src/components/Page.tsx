@@ -25,6 +25,7 @@ export default function Page({
   // the children are a list that scrolls itself (no page scroll around it)
   scroll = true,
   onRefresh,
+  center = false,
 }: {
   title: string;
   children: ReactNode;
@@ -34,6 +35,8 @@ export default function Page({
   // what a pull down asks for again; a page with nothing to ask for still
   // answers the pull
   onRefresh?: () => Promise<unknown>;
+  // nothing to list: what's said sits in the middle of the screen
+  center?: boolean;
 }) {
   const pull = usePullTop();
   const c = useColors();
@@ -82,7 +85,7 @@ export default function Page({
         <PullPage refresh={onRefresh ?? pause} scrollTop={pull.top}>
           <ScrollView
             contentInsetAdjustmentBehavior="automatic"
-            contentContainerClassName="gap-6 px-4 pt-5 pb-16"
+            contentContainerClassName={`gap-6 px-4 pt-5 pb-16 ${center ? "grow justify-center" : ""}`}
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode="on-drag"
             overScrollMode="never"

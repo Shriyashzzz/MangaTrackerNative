@@ -56,7 +56,7 @@ export default function CalendarScreen() {
     void fetchMonths();
   };
   return (
-    <Page title="Upcoming Releases">
+    <Page title="Upcoming Releases" center={months?.length === 0}>
       <P muted>Upcoming English volumes for the series on your shelf.</P>
       {months && months.length > 1 ? (
         <AddToCalendar
@@ -77,10 +77,10 @@ export default function CalendarScreen() {
       {months?.length === 0 ? (
         <View className="items-center gap-3 py-6">
           <Mascot mood="confused" width={100} />
-          <P muted>
+          <Text className="text-center font-body text-[15px] leading-[22px] text-ink-soft">
             Dates show up here once a publisher lists a coming volume for a
             series on your shelf.
-          </P>
+          </Text>
         </View>
       ) : null}
       {months?.map((m, i) => {

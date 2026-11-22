@@ -28,7 +28,7 @@ export default function FriendsScreen() {
     }
   };
   return (
-    <Page title="Friends">
+    <Page title="Friends" center={friends?.length === 0}>
       {note ? <P>{note}</P> : null}
       {friends && friends.length === 0 ? (
         <View className="items-center gap-3 py-6">
