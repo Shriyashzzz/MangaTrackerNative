@@ -3,7 +3,8 @@
 // drawn big, "Yours" or "Next", readers' stars, the Vol. tab, the name, a
 // line under it, and its price (with what it was, on a deal). A book of
 // several volumes fans the covers behind it
-import { coverAt } from "@/lib/coverAt";
+import { useState } from "react";
+import { coverAt, isNotACover } from "@/lib/coverAt";
 import LightNovelBand from "@/components/LightNovelBand";
 import { Image } from "expo-image";
 import { router } from "expo-router";
@@ -28,7 +29,12 @@ export function CoverFallback({
   numbered?: boolean;
 }) {
   const c = useColors();
-  const isItsOwnArt = number == null || number <= 1 || (plain && numbered);
+  // A volume with no cover of its own borrows the series' cover, dimmed so
+  // it isn't taken for the volume's real one. Where the tile already has
+  // its "Vol. 27" stamp (`plain` and `numbered`), the borrowed cover is all
+  // it needs; anywhere else the number is lettered over it. No series
+  // cover either: the number alone
+  const stamped = plain && numbered;
   return (
     <View
       style={{
@@ -40,28 +46,30 @@ export function CoverFallback({
         justifyContent: "center",
       }}
     >
-      {seriesCoverUrl && !isItsOwnArt ? (
+      {seriesCoverUrl ? (
         <Image
           source={{ uri: coverSrc(seriesCoverUrl) }}
           style={{
             position: "absolute",
             width: "100%",
             height: "100%",
-            opacity: 0.35,
+            opacity: stamped ? 0.55 : 0.35,
           }}
           contentFit="cover"
         />
       ) : null}
-      <Text
-        className="font-brand pr-1 text-ink"
-        style={{
-          fontSize: width * 0.42,
-          opacity: seriesCoverUrl && !isItsOwnArt ? 0.9 : 0.5,
-        }}
-      >
-        {number ?? "?"}
-        {"\u00A0"}
-      </Text>
+      {stamped && seriesCoverUrl ? null : (
+        <Text
+          className="font-brand pr-1 text-ink"
+          style={{
+            fontSize: width * 0.42,
+            opacity: seriesCoverUrl ? 0.9 : 0.5,
+          }}
+        >
+          {number ?? "?"}
+          {"\u00A0"}
+        </Text>
+      )}
     </View>
   );
 }
@@ -111,6 +119,7 @@ export default function VolumeCard({
   pile?: "fan" | "neat" | "flat";
 }) {
   const c = useColors();
+  const [notACover, setNotACover] = useState(false);
   const shown = novelParts(title);
   const behind =
     !holds || pile === "flat"
@@ -185,11 +194,17 @@ export default function VolumeCard({
             plain={plainStandIn}
             numbered={volume != null}
           />
-          {coverUrl ? (
+          {coverUrl && !notACover ? (
             <Image
               source={{ uri: coverAt(coverUrl, width) }}
               style={{ width: "100%", height: "100%" }}
               contentFit="cover"
+              // a store's "no image" picture, or one that won't load: the
+              // stand-in behind shows in its place
+              onLoad={(e) => {
+                if (isNotACover(e.source)) setNotACover(true);
+              }}
+              onError={() => setNotACover(true)}
             />
           ) : null}
           {lightNovel || shown.lightNovel ? (

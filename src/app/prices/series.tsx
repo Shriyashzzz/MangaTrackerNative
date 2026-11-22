@@ -424,6 +424,7 @@ export default function PriceSeriesScreen() {
                         priceCents={first.knownPriceCents}
                         subtitle={bookSubtitle(card)}
                         mark={mark}
+                        seriesCoverUrl={info?.coverUrl ?? null}
                         width={tileWidth}
                       />
                     );

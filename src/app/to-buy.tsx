@@ -2,7 +2,7 @@
 // buy, what they'd cost new and used all together, each with its prices,
 // On my shelf, Ordered and Remove, sorted their way, and Clear list.
 // Marking one theirs whose series isn't on the shelf offers to add it
-import { coverAt } from "@/lib/coverAt";
+import { coverAt, isNotACover } from "@/lib/coverAt";
 import Tap from "@/components/Tap";
 import { Input } from "@/components/Field";
 import { H2 } from "@/components/Page";
@@ -303,6 +303,10 @@ function Card({
               style={coverBox}
               contentFit="cover"
               onError={() => setCoverFailed(true)}
+              // a store's "no image" picture is no cover either
+              onLoad={(e) => {
+                if (isNotACover(e.source)) setCoverFailed(true);
+              }}
             />
           ) : (
             <View style={coverBox}>
