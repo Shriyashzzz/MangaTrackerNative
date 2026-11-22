@@ -2,6 +2,7 @@
 // My shelf, Prices, Sign in for someone without an account). The
 // tab bar is the platform's own (Expo Router's native tabs): Material 3 on
 // Android, UIKit's on an iPhone, with the system's icons for each
+import { router, usePathname } from "expo-router";
 import { NativeTabs } from "expo-router/native-tabs";
 import { useEffect } from "react";
 import { Platform } from "react-native";
@@ -12,6 +13,9 @@ import { useAuth } from "@/store/auth";
 import { usePrefs } from "@/store/prefs";
 import { useShelf } from "@/store/shelf";
 
+// whether the app has been opened this run (the effect below runs once)
+let openedOnce = false;
+
 export default function TabsLayout() {
   const c = useColors();
   // the account's settings, once they're signed in
@@ -20,6 +24,18 @@ export default function TabsLayout() {
   useEffect(() => {
     if (isSignedIn) void loadPrefs();
   }, [isSignedIn, loadPrefs]);
+  // Opened with no account: it starts on Prices, the half of the app that
+  // works without one (the shelf is an account's). Once, as the app opens,
+  // and only from the app's own front door: a link to some other page goes
+  // where it says, and signing out later leaves them where they are
+  const path = usePathname();
+  useEffect(() => {
+    if (openedOnce) return;
+    openedOnce = true;
+    if (!isSignedIn && path === "/") router.replace("/prices");
+    // only as the app opens: not again when they sign out or move about
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   // New's badge: the series with news, as the web's bar counts them
   const manga = useShelf((st) => st.manga);
   const releases = useShelf((st) => st.releases);
