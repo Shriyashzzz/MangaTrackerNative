@@ -12,6 +12,8 @@ import { Image } from "expo-image";
 import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { Alert, ScrollView, Text, View } from "react-native";
+import Svg, { Line } from "react-native-svg";
+import DashedLine from "@/components/DashedLine";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 import AddSeriesModal from "@/components/AddSeriesModal";
@@ -22,6 +24,7 @@ import PickSheet from "@/components/PickSheet";
 import Toast from "@/components/Toast";
 import {
   ChevronDownIcon,
+  InkCrossIcon,
   ChevronLeftIcon,
 } from "@/core/components/icons/Icons";
 import { coverSrc, formatCents, novelParts } from "@/core/lib/prices";
@@ -34,7 +37,6 @@ import {
   type Settled,
   type ToBuyItem,
   type ToBuyList,
-  type ToBuyPrice,
   type ToBuySort,
 } from "@/core/lib/toBuy";
 import { runsText } from "@/core/lib/volumeRuns";
@@ -116,36 +118,231 @@ function settledNote(
   };
 }
 
-const Price = ({ label, price }: { label: string; price: ToBuyPrice }) =>
-  price ? (
-    <Text className="font-mono text-[13px] text-ink-soft">
-      {label}{" "}
-      <Text className="font-mono-medium text-ink">
-        {formatCents(price.cents)}
-      </Text>{" "}
-      at {price.store}
-    </Text>
-  ) : null;
+// the band over the list: "$56.97 new · $27.98 used", each said for how
+// many of the books have a price of that kind when it isn't all of them
+function totalsLine(totals: ToBuyList["totals"], of: number) {
+  const part = (label: string, sum: ToBuyList["totals"]["new"]) =>
+    sum.volumes
+      ? `${formatCents(sum.cents)} ${label}${sum.volumes === of ? "" : ` (${sum.volumes} of ${of})`}`
+      : null;
+  const parts = [part("new", totals.new), part("used", totals.used)].filter(
+    Boolean,
+  );
+  return parts.length ? parts.join(" · ") : "No prices found for these yet.";
+}
 
-const Total = ({
-  label,
-  sum,
-  of,
+// the cheaper of a book's two prices, and the other one
+function pricesOf(item: ToBuyItem) {
+  const both = [
+    item.new ? { kind: "new", ...item.new } : null,
+    item.used ? { kind: "used", ...item.used } : null,
+  ].filter((price) => price !== null);
+  both.sort((a, b) => a.cents - b.cents);
+  return { best: both[0] ?? null, other: both[1] ?? null };
+}
+
+const STUB_HEIGHT = 44;
+
+// the dashed tear between two parts of a ticket's stub
+function Tear() {
+  const c = useColors();
+  return (
+    <Svg width={1.5} height={STUB_HEIGHT}>
+      <Line
+        x1={0.75}
+        y1={0}
+        x2={0.75}
+        y2={STUB_HEIGHT}
+        stroke={c.line}
+        strokeWidth={1.5}
+        strokeDasharray="4 3"
+      />
+    </Svg>
+  );
+}
+
+// One book on the list, as a ticket (the Track stub's look on a series'
+// price page): its cover, name, the best price in big figures with the
+// other under it, their note, and a tear-off stub of what can be done with
+// it. The stub's parts share its width, so it never ends ragged
+function Ticket({
+  item,
+  busy,
+  onOwned,
+  onOrdered,
+  onRemove,
+  onNote,
+  move,
 }: {
-  label: string;
-  sum: ToBuyList["totals"]["new"];
-  of: number;
-}) =>
-  sum.volumes ? (
-    <Text className="font-body text-[15px] text-ink">
-      {label}:{" "}
-      <Text className="font-brand pr-[5px] text-[20px]">
-        {formatCents(sum.cents)}
-        {"\u00A0"}
-      </Text>{" "}
-      for {sum.volumes === of ? `all ${of}` : `${sum.volumes} of ${of}`}
-    </Text>
-  ) : null;
+  item: ToBuyItem;
+  // the book being saved just now, if any: nothing else can be tapped
+  busy: string | null;
+  onOwned: () => void;
+  onOrdered: () => void;
+  onRemove: () => void;
+  onNote: () => void;
+  // "My order" is showing: the ways up and down (null at an end)
+  move: { up: (() => void) | null; down: (() => void) | null } | null;
+}) {
+  const c = useColors();
+  const name = nameOf(item);
+  const { best, other } = pricesOf(item);
+  const open = () => router.push(`/prices/${item.isbn13}`);
+  const waiting = busy !== null;
+  const word = "font-brand text-[16px] tracking-[1px] uppercase";
+  const arrow = (up: boolean, go: (() => void) | null) => (
+    <>
+      <Tear />
+      <Tap
+        onPress={go ?? undefined}
+        disabled={!go || waiting}
+        accessibilityLabel={`Move ${name} ${up ? "up" : "down"}`}
+        className={`w-[42px] items-center justify-center ${go ? "" : "opacity-30"}`}
+        style={{ height: STUB_HEIGHT }}
+      >
+        <View style={{ transform: [{ rotate: up ? "180deg" : "0deg" }] }}>
+          <ChevronDownIcon color={c.ink} width={18} height={18} />
+        </View>
+      </Tap>
+    </>
+  );
+  return (
+    <View className="border-[1.5px] border-line bg-card">
+      <View className="flex-row gap-3 p-3">
+        <Tap onPress={open}>
+          <Image
+            source={{
+              uri: coverSrc(item.coverUrl ?? item.seriesCoverUrl ?? ""),
+            }}
+            style={{
+              width: 60,
+              aspectRatio: 2 / 3,
+              borderWidth: 1.5,
+              borderColor: c.line,
+              backgroundColor: c.paper2,
+            }}
+            contentFit="cover"
+          />
+          {item.volume != null && !item.edition ? (
+            <View className="absolute top-0 left-0 bg-ink px-1.5">
+              <Text className="font-brand pr-[4px] text-[13px] text-paper">
+                {item.volume}
+                {"\u00A0"}
+              </Text>
+            </View>
+          ) : null}
+        </Tap>
+        <View className="min-w-0 flex-1 gap-[3px]">
+          <Tap onPress={open}>
+            <Text className="font-body-semibold text-[15.5px] text-ink">
+              {name}
+            </Text>
+          </Tap>
+          {item.shelf?.state ? (
+            <Text className="font-mono text-[11px] tracking-[0.5px] text-ok uppercase">
+              {item.shelf.state === "owned" ? "Already yours" : "Ordered"}
+            </Text>
+          ) : null}
+          {best ? (
+            <View className="flex-row flex-wrap items-baseline gap-x-2">
+              <Text className="font-brand pr-[6px] text-[26px] leading-[30px] text-ink">
+                {formatCents(best.cents)}
+                {"\u00A0"}
+              </Text>
+              <Text className="font-mono-medium text-[11px] tracking-[0.8px] text-ok uppercase">
+                {best.kind} · {best.store}
+              </Text>
+            </View>
+          ) : item.outOn ? (
+            <View className="flex-row flex-wrap items-baseline gap-x-2">
+              <Text className="font-brand pr-[6px] text-[26px] leading-[30px] text-ink uppercase">
+                {releaseDay(item.outOn)}
+                {"\u00A0"}
+              </Text>
+              <Text className="font-mono-medium text-[11px] tracking-[0.8px] text-ink-soft uppercase">
+                Preorder
+              </Text>
+            </View>
+          ) : null}
+          <Text className="font-mono text-[12.5px] text-ink-soft">
+            {other
+              ? `${other.kind} ${formatCents(other.cents)} at ${other.store}`
+              : best
+                ? `no ${best.kind === "new" ? "used" : "new"} price yet`
+                : "No price yet"}
+          </Text>
+          {/* their own note on it: the words, or the way to add some */}
+          <Tap
+            onPress={onNote}
+            hitSlop={6}
+            className="self-start pt-0.5"
+            accessibilityLabel={
+              item.note ? `Note: ${item.note}. Change` : "Add a note"
+            }
+          >
+            {item.note ? (
+              <Text className="font-display-italic text-[14.5px] leading-[20px] text-ink">
+                “{item.note}”
+              </Text>
+            ) : (
+              <Text className="font-body text-[13.5px] text-muted">
+                + Add a note
+              </Text>
+            )}
+          </Tap>
+        </View>
+      </View>
+      <DashedLine soft={false} />
+      <View className="flex-row items-center">
+        {!item.outOn ? (
+          <Tap
+            onPress={onOwned}
+            disabled={waiting}
+            className="flex-1 items-center justify-center"
+            style={{ height: STUB_HEIGHT }}
+          >
+            <Text className={`${word} text-accent`}>
+              {"\u00A0"}
+              {busy === item.isbn13 ? "Saving…" : "On my shelf"}
+              {"\u00A0"}
+            </Text>
+          </Tap>
+        ) : null}
+        {item.outOn || item.volumes || item.edition ? (
+          <>
+            {!item.outOn ? <Tear /> : null}
+            <Tap
+              onPress={onOrdered}
+              disabled={waiting}
+              className="flex-1 items-center justify-center"
+              style={{ height: STUB_HEIGHT }}
+            >
+              <Text className={`${word} text-ink`}>
+                {"\u00A0"}Ordered{"\u00A0"}
+              </Text>
+            </Tap>
+          </>
+        ) : null}
+        {move ? (
+          <>
+            {arrow(true, move.up)}
+            {arrow(false, move.down)}
+          </>
+        ) : null}
+        <Tear />
+        <Tap
+          onPress={onRemove}
+          disabled={waiting}
+          accessibilityLabel={`Remove ${name} from the list`}
+          className="w-[46px] items-center justify-center"
+          style={{ height: STUB_HEIGHT }}
+        >
+          <InkCrossIcon color={c.muted} width={13} height={13} />
+        </Tap>
+      </View>
+    </View>
+  );
+}
 
 // the orders the list can be shown in: the shared ones, and their own
 // (set with the arrows on each row while it's the one shown)
@@ -323,19 +520,14 @@ export default function ToBuyScreen() {
           ) : null}
           {items && items.length > 0 && list ? (
             <>
-              <View className="gap-1 rounded-[14px] border border-line-soft bg-card p-3">
+              <View className="flex-row flex-wrap items-baseline gap-x-2.5 gap-y-1 rounded-[14px] border border-line-soft bg-card px-3 py-2.5">
                 <Text className="font-brand pr-[5px] text-[20px] tracking-[1px] text-ink uppercase">
-                  {items.length === 1 ? "1 volume" : `${items.length} volumes`}{" "}
-                  to buy
+                  {items.length === 1 ? "1 volume" : `${items.length} volumes`}
                   {"\u00A0"}
                 </Text>
-                <Total label="New" sum={list.totals.new} of={items.length} />
-                <Total label="Used" sum={list.totals.used} of={items.length} />
-                {!list.totals.new.volumes && !list.totals.used.volumes ? (
-                  <Text className="font-body text-[14px] text-ink-soft">
-                    No prices found for these yet.
-                  </Text>
-                ) : null}
+                <Text className="font-mono text-[13px] text-ink-soft">
+                  {totalsLine(list.totals, items.length)}
+                </Text>
               </View>
               <View className="flex-row items-center justify-between gap-3">
                 <Tap
@@ -357,161 +549,29 @@ export default function ToBuyScreen() {
                   </Text>
                 </Tap>
               </View>
-              <View className="rounded-[14px] border border-line-soft bg-card">
-                {sorted.map((item, i) => (
-                  <View
-                    key={item.isbn13}
-                    className={`gap-3 px-3 py-3 ${i ? "border-t-[1.5px] border-dashed border-line-soft" : ""}`}
-                  >
-                    <View className="flex-row gap-3">
-                      <Tap
-                        onPress={() => router.push(`/prices/${item.isbn13}`)}
-                      >
-                        <Image
-                          source={{
-                            uri: coverSrc(
-                              item.coverUrl ?? item.seriesCoverUrl ?? "",
-                            ),
-                          }}
-                          style={{
-                            width: 60,
-                            aspectRatio: 2 / 3,
-                            borderWidth: 1.5,
-                            borderColor: c.line,
-                            backgroundColor: c.paper2,
-                          }}
-                          contentFit="cover"
-                        />
-                        {item.volume != null && !item.edition ? (
-                          <View className="absolute top-0 left-0 bg-ink px-1.5">
-                            <Text className="font-brand pr-[4px] text-[13px] text-paper">
-                              {item.volume}
-                              {"\u00A0"}
-                            </Text>
-                          </View>
-                        ) : null}
-                      </Tap>
-                      <View className="min-w-0 flex-1 gap-1">
-                        <Tap
-                          onPress={() => router.push(`/prices/${item.isbn13}`)}
-                        >
-                          <Text className="font-body-semibold text-[15.5px] text-ink">
-                            {nameOf(item)}
-                          </Text>
-                        </Tap>
-                        {item.shelf?.state ? (
-                          <Text className="font-mono text-[11px] tracking-[0.5px] text-ok uppercase">
-                            {item.shelf.state === "owned"
-                              ? "Already yours"
-                              : "Ordered"}
-                          </Text>
-                        ) : null}
-                        <Price label="New" price={item.new} />
-                        <Price label="Used" price={item.used} />
-                        {!item.new && !item.used ? (
-                          <Text className="font-mono text-[13px] text-ink-soft">
-                            {item.outOn ? (
-                              <>
-                                Preorder. Out{" "}
-                                <Text className="font-mono-medium text-ink">
-                                  {releaseDay(item.outOn)}
-                                </Text>
-                              </>
-                            ) : (
-                              "No price yet"
-                            )}
-                          </Text>
-                        ) : null}
-                      </View>
-                    </View>
-                    <View className="flex-row flex-wrap items-center gap-3">
-                      {!item.outOn ? (
-                        <Button
-                          label={
-                            busy === item.isbn13 ? "Saving…" : "On my shelf"
-                          }
-                          kind="primary"
-                          small
-                          disabled={busy !== null}
-                          onPress={() => void settle(item, "owned")}
-                        />
-                      ) : null}
-                      {item.outOn || item.volumes || item.edition ? (
-                        <Button
-                          label="Ordered"
-                          small
-                          disabled={busy !== null}
-                          onPress={() => void settle(item, "ordered")}
-                        />
-                      ) : null}
-                      <Tap
-                        onPress={() => void takeOff(item)}
-                        disabled={busy !== null}
-                        hitSlop={6}
-                      >
-                        <Text className="font-body text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
-                          Remove
-                        </Text>
-                      </Tap>
-                      {/* their own order: up and down, only while it's the
-                          order shown */}
-                      {sort === "mine" ? (
-                        <View className="ml-auto flex-row gap-2">
-                          {([-1, 1] as const).map((by) => (
-                            <Tap
-                              key={by}
-                              onPress={() => move(i, by)}
-                              disabled={
-                                by < 0 ? i === 0 : i === sorted.length - 1
-                              }
-                              hitSlop={6}
-                              accessibilityLabel={`Move ${nameOf(item)} ${by < 0 ? "up" : "down"}`}
-                              className="h-9 w-9 items-center justify-center rounded-full bg-ink/10 disabled:opacity-30"
-                            >
-                              <View
-                                style={{
-                                  transform: [
-                                    { rotate: by < 0 ? "180deg" : "0deg" },
-                                  ],
-                                }}
-                              >
-                                <ChevronDownIcon
-                                  color={c.ink}
-                                  width={18}
-                                  height={18}
-                                />
-                              </View>
-                            </Tap>
-                          ))}
-                        </View>
-                      ) : null}
-                    </View>
-                    {/* their own note on it: the words, or the way to add some */}
-                    <Tap
-                      onPress={() =>
-                        setNoting({
-                          isbn13: item.isbn13,
-                          text: item.note ?? "",
-                        })
-                      }
-                      hitSlop={6}
-                      accessibilityLabel={
-                        item.note ? `Note: ${item.note}. Change` : "Add a note"
-                      }
-                    >
-                      {item.note ? (
-                        <Text className="font-display-italic text-[14.5px] leading-[20px] text-ink">
-                          “{item.note}”
-                        </Text>
-                      ) : (
-                        <Text className="font-body text-[13.5px] text-muted">
-                          + Add a note
-                        </Text>
-                      )}
-                    </Tap>
-                  </View>
-                ))}
-              </View>
+              {sorted.map((item, i) => (
+                <Ticket
+                  key={item.isbn13}
+                  item={item}
+                  busy={busy}
+                  onOwned={() => void settle(item, "owned")}
+                  onOrdered={() => void settle(item, "ordered")}
+                  onRemove={() => void takeOff(item)}
+                  onNote={() =>
+                    setNoting({ isbn13: item.isbn13, text: item.note ?? "" })
+                  }
+                  // their own order: up and down, only while it's the order
+                  // shown
+                  move={
+                    sort === "mine"
+                      ? {
+                          up: i > 0 ? () => move(i, -1) : null,
+                          down: i < sorted.length - 1 ? () => move(i, 1) : null,
+                        }
+                      : null
+                  }
+                />
+              ))}
             </>
           ) : null}
         </ScrollView>
