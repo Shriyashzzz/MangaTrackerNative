@@ -5,6 +5,8 @@
 // card with its price, Yours and Next, Not on your shelf to see only the
 // gaps with what they cost. The rules are the web's (core seriesPageRules,
 // finishCost, useSeriesData)
+import TrackPitch from "@/components/prices/TrackPitch";
+import { useAuth } from "@/store/auth";
 import Backdrop from "@/components/Backdrop";
 import Button from "@/components/Button";
 import DoubleRule from "@/components/DoubleRule";
@@ -118,6 +120,7 @@ export default function PriceSeriesScreen() {
     return () => controller.abort();
   }, [name]);
   const editionsKnown = editions.name === name;
+  const isSignedIn = useAuth((st) => st.isSignedIn);
   const [askedEdition, setAskedEdition] = useState<string | null>(
     params.edition ?? null,
   );
@@ -259,6 +262,10 @@ export default function PriceSeriesScreen() {
           />
         </View>
       </View>
+
+      {/* no account: the ticket runs the page's full width, so nothing is
+          left empty under the cover */}
+      {!isSignedIn ? <TrackPitch /> : null}
 
       <SetsBox
         key={data.slug}

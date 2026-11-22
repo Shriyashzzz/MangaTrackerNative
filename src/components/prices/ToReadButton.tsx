@@ -9,7 +9,6 @@ import { novelParts } from "@/core/lib/prices";
 import { titleKey as sameName } from "@/core/lib/titleKey";
 import { useAuth } from "@/store/auth";
 import { useShelf } from "@/store/shelf";
-import TrackPitch from "./TrackPitch";
 import Button from "../Button";
 
 export default function ToReadButton({
@@ -38,7 +37,8 @@ export default function ToReadButton({
       Boolean(m.lightNovel) === novel.lightNovel &&
       names.includes(sameName(m.name)),
   );
-  if (!isSignedIn) return <TrackPitch />;
+  // no account: the page shows its ticket under the header instead
+  if (!isSignedIn) return null;
   // theirs already: the chip under the cover says so
   if (onShelf) return null;
   const add = async () => {

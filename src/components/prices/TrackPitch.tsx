@@ -1,46 +1,45 @@
 // Where the shelf buttons go for someone not signed in (the web's
-// ShelfAction pitch), told as a manga panel: Kenji asks, in a speech bubble
-// and comic lettering, and the button under him answers. It promises a
-// phone alert: push must be set up before this ships (the owner's call,
-// 2026-11-21)
+// ShelfAction pitch): a ticket like Buy next's, with a tear-off stub to tap.
+// It promises a phone alert: push must be set up before this ships (the
+// owner's call, 2026-11-21)
 import { router } from "expo-router";
-import { Text, View } from "react-native";
-import { PRINTED } from "@/lib/printed";
-import Button from "../Button";
-import Mascot from "../Mascot";
+import { Pressable, Text, View } from "react-native";
+import { useRipple } from "@/lib/press";
 
 export default function TrackPitch() {
+  const ripple = useRipple();
   return (
-    <View className="gap-2.5">
-      <View className="flex-row items-center gap-3">
-        {/* printed: ink on paper in either theme, as everywhere he appears */}
-        <View
-          className="h-[52px] w-[52px] items-center justify-end overflow-hidden rounded-full border-2 border-line"
-          style={{ backgroundColor: PRINTED.paper }}
-        >
-          <Mascot mood="curious" width={42} />
-        </View>
-        <View className="min-w-0 flex-1">
-          {/* the bubble's tail, a corner turned toward him */}
-          <View
-            className="absolute top-1/2 -left-[6px] h-3 w-3 border-b-[1.5px] border-l-[1.5px] border-line bg-card"
-            style={{ transform: [{ translateY: -6 }, { rotate: "45deg" }] }}
-          />
-          <View className="rounded-[14px] border-[1.5px] border-line bg-card px-3 py-2">
-            <Text className="font-letter text-[14.5px] leading-[19px] text-ink uppercase">
-              Want a nudge when the next volume drops?
-            </Text>
-          </View>
-        </View>
-      </View>
-      <Button
-        kind="primary"
-        wide
-        label="Yes, track it, free"
+    <View className="gap-2">
+      {/* a solid card under the tinted stub, so the page's background
+          drawing never shows through */}
+      <Pressable
         onPress={() => router.push("/sign-up")}
-      />
-      <Text className="font-body text-[13px] leading-[18px] text-ink-soft">
-        A phone alert, your New tab and a weekly email.{"  "}
+        android_ripple={ripple}
+        accessibilityRole="button"
+        accessibilityLabel="Want a nudge when the next volume drops? Track this series, free"
+        className="flex-row overflow-hidden rounded-[12px] border-[1.5px] border-accent bg-card active:opacity-90"
+      >
+        <View className="min-w-0 flex-1 gap-1 px-3 py-2.5">
+          <Text className="font-mono-medium text-[11.5px] tracking-[1.5px] text-accent-ink uppercase">
+            Next volume
+          </Text>
+          <Text className="font-body-semibold text-[15.5px] leading-[21px] text-ink">
+            Want a nudge when the next volume drops?
+          </Text>
+          <Text className="font-body text-[13px] text-ink-soft">
+            Phone alert, New tab, weekly email
+          </Text>
+        </View>
+        <View className="w-[84px] items-center justify-center border-l-[1.5px] border-dashed border-accent bg-accent-wash">
+          <Text className="font-brand pr-1 text-[20px] tracking-[1px] text-accent-ink uppercase">
+            Track
+          </Text>
+          <Text className="font-mono-medium text-[10.5px] tracking-[1px] text-accent-ink uppercase">
+            free
+          </Text>
+        </View>
+      </Pressable>
+      <Text className="font-body text-[13px] text-ink-soft">
         <Text
           onPress={() => router.push("/sign-in")}
           className="font-body-semibold text-ink"
