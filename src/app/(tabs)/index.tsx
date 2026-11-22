@@ -80,7 +80,6 @@ function SignedInShelf() {
   const [query, setQuery] = useState("");
   const [searching, setSearching] = useState(false);
   const [picking, setPicking] = useState<"tab" | "sort" | null>(null);
-  const [refreshing, setRefreshing] = useState(false);
   // a series just deleted (here or on its page): its Undo, at the foot
   const [adding, setAdding] = useState(false);
   const lastDeleted = useShelf((s) => s.lastDeleted);
@@ -143,11 +142,6 @@ function SignedInShelf() {
   const sortLabel =
     SORT_OPTIONS.find((o) => o.value === sortBy)?.label ?? "Last updated";
 
-  const refresh = async () => {
-    setRefreshing(true);
-    await load();
-    setRefreshing(false);
-  };
   // how far the shelf is scrolled: a pull to refresh starts only from 0
   const scrollTop = useSharedValue(0);
   // the + button: 0 in place, 1 slid away under the tab bar
@@ -272,11 +266,7 @@ function SignedInShelf() {
             {failed}
           </Text>
         ) : tab === "volumes" ? (
-          <VolumesView
-            manga={list}
-            refreshing={refreshing}
-            onRefresh={refresh}
-          />
+          <VolumesView manga={list} scrollTop={scrollTop} />
         ) : (
           <LayoutAnimationConfig skipEntering>
             <Animated.FlatList

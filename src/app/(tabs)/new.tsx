@@ -5,16 +5,11 @@
 // one, or any far behind, is sorted into piles, each a fan of covers that
 // opens to all of them. Nothing new says why. Who's in, where, and the
 // words are all the web's own (core shelfViews, piles, farBehind, newTabLinks)
+import PullPage, { usePullTop } from "@/components/PullRefresh";
 import Backdrop from "@/components/Backdrop";
 import { Link, router } from "expo-router";
 import { useEffect, useState } from "react";
-import {
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  Text,
-  View,
-} from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 import AppHeader from "@/components/AppHeader";
@@ -116,7 +111,7 @@ export default function NewScreen() {
   const [wantHidden, setWantHidden] = useState(false);
   const [openList, setOpenList] = useState<number | null>(null);
   const [askingHideAll, setAskingHideAll] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+  const pull = usePullTop();
   useEffect(() => {
     if (manga && checksOn) void checkReleases();
   }, [manga, checksOn, checkReleases]);
@@ -221,11 +216,6 @@ export default function NewScreen() {
     looked.every((m) => outcomes[m.id] === "failed");
   const notFound = looked.filter((m) => outcomes[m.id] === "notFound").length;
 
-  const refresh = async () => {
-    setRefreshing(true);
-    await load();
-    setRefreshing(false);
-  };
   const pickKind = (k: ReleaseKind) => {
     setKind(k);
     setOpenPile(null);
@@ -266,306 +256,308 @@ export default function NewScreen() {
     <Safe edges={["top"]} className="flex-1 bg-paper">
       <Backdrop />
       <AppHeader />
-      <ScrollView
-        contentContainerClassName="gap-4 px-4 pt-5 pb-10"
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={refresh} />
-        }
-      >
-        <View className="flex-row items-baseline gap-2">
-          <Text className="font-brand pr-[7px] text-[30px] tracking-[1px] text-ink uppercase">
-            {viewingHidden ? "Hidden" : "New"}
-            {"\u00A0"}
-          </Text>
-          <Text className="font-mono text-[14px] text-muted">
-            {list.length}
-          </Text>
-        </View>
-
-        {/* the check, while answers are missing */}
-        {checking && total > 0 ? (
-          <View className="gap-1">
-            <View className="h-1 overflow-hidden rounded-full bg-line-soft">
-              <View
-                className="h-full bg-accent"
-                style={{ width: `${(checked / total) * 100}%` }}
-              />
-            </View>
-            <Text className="font-mono text-[12px] text-muted">
-              Checking {checked} of {total}
-              {bigShelfNote ? ` · ${bigShelfNote}` : ""}
+      <PullPage refresh={load} scrollTop={pull.top}>
+        <ScrollView
+          contentContainerClassName="gap-4 px-4 pt-5 pb-10"
+          overScrollMode="never"
+          scrollEventThrottle={16}
+          onScroll={pull.track}
+        >
+          <View className="flex-row items-baseline gap-2">
+            <Text className="font-brand pr-[7px] text-[30px] tracking-[1px] text-ink uppercase">
+              {viewingHidden ? "Hidden" : "New"}
+              {"\u00A0"}
+            </Text>
+            <Text className="font-mono text-[14px] text-muted">
+              {list.length}
             </Text>
           </View>
-        ) : null}
 
-        {!viewingHidden && !openPile ? <UpcomingReleases /> : null}
-
-        {/* Volumes, Chapters, In Japan: one segmented switch */}
-        <Segmented
-          label="What's new"
-          options={KINDS.map((k) => ({
-            value: k,
-            label: RELEASE_KINDS[k].label,
-            count: allFailed ? undefined : kindCounts[k],
-          }))}
-          value={kind}
-          onChange={pickKind}
-        />
-        {viewingHidden ? (
-          <Text className="font-body text-[14px] text-ink-soft">
-            What you've hidden under {RELEASE_KINDS[kind].label}. Show one to
-            put it back.
-          </Text>
-        ) : RELEASE_KINDS[kind].note ? (
-          <Text className="font-body text-[14px] text-ink-soft">
-            {RELEASE_KINDS[kind].note}
-          </Text>
-        ) : null}
-
-        {/* How New works, Hidden, Hide all */}
-        <View className="flex-row flex-wrap items-center gap-x-4 gap-y-2">
-          <Pressable
-            onPress={() => router.push("/new-releases")}
-            hitSlop={6}
-            className="flex-row items-center gap-1.5"
-          >
-            <View className="h-5 w-5 items-center justify-center rounded-full bg-accent">
-              <Text className="font-brand pr-[4px] text-[12px] text-on-accent">
-                ?{"\u00A0"}
+          {/* the check, while answers are missing */}
+          {checking && total > 0 ? (
+            <View className="gap-1">
+              <View className="h-1 overflow-hidden rounded-full bg-line-soft">
+                <View
+                  className="h-full bg-accent"
+                  style={{ width: `${(checked / total) * 100}%` }}
+                />
+              </View>
+              <Text className="font-mono text-[12px] text-muted">
+                Checking {checked} of {total}
+                {bigShelfNote ? ` · ${bigShelfNote}` : ""}
               </Text>
             </View>
-            <Text className="font-body-medium text-[14px] text-ink">
-              How New works
-            </Text>
-          </Pressable>
-          {hiddenCount > 0 && !viewingHidden ? (
-            <Word
-              onPress={() => setWantHidden(true)}
-            >{`Hidden (${hiddenCount})`}</Word>
           ) : null}
+
+          {!viewingHidden && !openPile ? <UpcomingReleases /> : null}
+
+          {/* Volumes, Chapters, In Japan: one segmented switch */}
+          <Segmented
+            label="What's new"
+            options={KINDS.map((k) => ({
+              value: k,
+              label: RELEASE_KINDS[k].label,
+              count: allFailed ? undefined : kindCounts[k],
+            }))}
+            value={kind}
+            onChange={pickKind}
+          />
           {viewingHidden ? (
-            <>
-              <Word onPress={() => void hideActions.unhideAll()}>
-                Unhide all
-              </Word>
-              <Word onPress={() => setWantHidden(false)}>Back to New</Word>
-            </>
+            <Text className="font-body text-[14px] text-ink-soft">
+              What you've hidden under {RELEASE_KINDS[kind].label}. Show one to
+              put it back.
+            </Text>
+          ) : RELEASE_KINDS[kind].note ? (
+            <Text className="font-body text-[14px] text-ink-soft">
+              {RELEASE_KINDS[kind].note}
+            </Text>
           ) : null}
-          {list.length > 0 && !viewingHidden ? (
+
+          {/* How New works, Hidden, Hide all */}
+          <View className="flex-row flex-wrap items-center gap-x-4 gap-y-2">
             <Pressable
-              onPress={hideAll}
+              onPress={() => router.push("/new-releases")}
               hitSlop={6}
-              className={`ml-auto bg-ink/10 px-3.5 py-2 ${look.buttonRadius}`}
+              className="flex-row items-center gap-1.5"
             >
-              <Text className="font-body-medium text-[13.5px] text-ink">
-                {askingHideAll
-                  ? `Hide all ${list.length}? Press again`
-                  : `Hide all ${list.length}`}
+              <View className="h-5 w-5 items-center justify-center rounded-full bg-accent">
+                <Text className="font-brand pr-[4px] text-[12px] text-on-accent">
+                  ?{"\u00A0"}
+                </Text>
+              </View>
+              <Text className="font-body-medium text-[14px] text-ink">
+                How New works
               </Text>
             </Pressable>
-          ) : null}
-        </View>
-        {list.length === 0 ? checkedLine : null}
-
-        {list.length === 0 ? (
-          <View className="items-center gap-3 pt-6">
-            <Mascot mood="happy" width={110} />
-            {farBehind.length > 0 ? (
-              <View className="gap-2">
-                {farBehind.length > 1 ? (
-                  <View className="gap-1">
-                    {farBehind.slice(0, FAR_BEHIND_NAMED).map((one) => (
-                      <Text
-                        key={one.name}
-                        className="font-body text-[14px] text-ink-soft"
-                      >
-                        <Text className="font-body-semibold text-ink">
-                          {one.name}:
-                        </Text>{" "}
-                        {standing(one)}
-                      </Text>
-                    ))}
-                    {farBehind.length > FAR_BEHIND_NAMED ? (
-                      <Text className="font-body text-[14px] text-ink-soft">
-                        +{farBehind.length - FAR_BEHIND_NAMED} more
-                      </Text>
-                    ) : null}
-                  </View>
-                ) : null}
-                <Text className="text-center font-body text-[14.5px] text-ink-soft">
-                  New chapters show here once you're nearly caught up.{" "}
-                  <Text
-                    className="font-body-semibold text-ink underline"
-                    onPress={toSettings}
-                  >
-                    Change what New shows
-                  </Text>
-                </Text>
-              </View>
-            ) : heldBack > 0 ? (
-              <>
-                <Text className="text-center font-display text-[22px] text-ink">
-                  Nothing this close to caught up.
-                </Text>
-                <Text className="text-center font-body text-[14.5px] text-ink-soft">
-                  {heldBack === 1
-                    ? "1 series is further behind than your setting shows. "
-                    : `${heldBack} series are further behind than your setting shows. `}
-                  <Text
-                    className="font-body-semibold text-ink underline"
-                    onPress={toSettings}
-                  >
-                    Change what New shows
-                  </Text>
-                </Text>
-              </>
-            ) : (
-              <>
-                <Text className="text-center font-display text-[22px] text-ink">
-                  {looked.length > 0 && chapterOnly === looked.length
-                    ? "We know your chapter, not your volume."
-                    : looked.length > 0 && unknownPlace === looked.length
-                      ? "We don't know where you're up to yet."
-                      : viewingHidden
-                        ? "Nothing hidden."
-                        : NOTHING_NEW[kind]}
-                </Text>
-                {unknownPlace > 0 &&
-                (chapterOnly === looked.length ||
-                  unknownPlace === looked.length) ? (
-                  <Text className="text-center font-body text-[14.5px] text-ink-soft">
-                    {chapterOnly === looked.length
-                      ? "We can't tell which volume your chapter is in. "
-                      : ""}
-                    {kind === "chapters"
-                      ? "Add the last chapter you read and we'll tell you when the next one's out."
-                      : "Add the volumes you own and we'll tell you when the next one's out."}
-                  </Text>
-                ) : null}
-              </>
-            )}
-            {elsewhere ? (
+            {hiddenCount > 0 && !viewingHidden ? (
               <Word
-                onPress={() => pickKind(elsewhere.kind)}
-                accent
-              >{`See ${elsewhere.count} under ${RELEASE_KINDS[elsewhere.kind].label}`}</Word>
+                onPress={() => setWantHidden(true)}
+              >{`Hidden (${hiddenCount})`}</Word>
             ) : null}
-            {!checking && notFound > 0 ? (
-              <Text className="text-center font-body text-[13px] text-muted">
-                {notFound === looked.length
-                  ? "We couldn't find release news for any of your series."
-                  : notFound === 1
-                    ? "We couldn't find release news for 1 of your series."
-                    : `We couldn't find release news for ${notFound} of your series.`}
-              </Text>
+            {viewingHidden ? (
+              <>
+                <Word onPress={() => void hideActions.unhideAll()}>
+                  Unhide all
+                </Word>
+                <Word onPress={() => setWantHidden(false)}>Back to New</Word>
+              </>
+            ) : null}
+            {list.length > 0 && !viewingHidden ? (
+              <Pressable
+                onPress={hideAll}
+                hitSlop={6}
+                className={`ml-auto bg-ink/10 px-3.5 py-2 ${look.buttonRadius}`}
+              >
+                <Text className="font-body-medium text-[13.5px] text-ink">
+                  {askingHideAll
+                    ? `Hide all ${list.length}? Press again`
+                    : `Hide all ${list.length}`}
+                </Text>
+              </Pressable>
             ) : null}
           </View>
-        ) : piled ? (
-          PILES.filter(
-            (p) => piles[p].length && (!openPile || openPile === p),
-          ).map((p) => (
-            <View key={p} className="gap-2 border-t border-line pt-5 pb-2">
-              <View className="flex-row items-end justify-between">
-                <H2>
-                  {PILE_TEXT[kind][p].name}{" "}
-                  <Text className="font-mono text-[14px] text-muted">
-                    {piles[p].length}
-                  </Text>
-                </H2>
-                <Pressable
-                  onPress={() => setOpenPile(openPile === p ? null : p)}
-                  hitSlop={8}
-                >
-                  <Text className="font-body-semibold text-[14px] text-ink">
-                    {openPile === p ? "Back" : "See all"}
-                  </Text>
-                </Pressable>
-              </View>
-              <Text className="pb-3 font-body text-[13.5px] text-ink-soft">
-                {PILE_TEXT[kind][p].why}
-                {catchUpText(p, piles[p], releases, kind)}
-                {checking && (p === "few" || p === "way") ? " so far" : ""}
-              </Text>
-              {openPile === p ? (
-                piles[p].map((m, i) => (
-                  <View key={m.id}>
-                    {i > 0 && <DashedLine />}
-                    {rowOf(m)}
-                  </View>
-                ))
-              ) : (
-                <View className="flex-row gap-2.5">
-                  {piles[p].slice(0, FAN).map((m) => {
-                    const found = releases[m.id];
-                    const opens = opensAList(found, kind);
-                    const inside = (
-                      <Pressable
-                        onPress={opens ? () => setOpenList(m.id) : undefined}
-                        className="w-[58px] gap-1 active:opacity-70"
-                      >
-                        <View>
-                          <SeriesCover
-                            name={m.name}
-                            lightNovel={m.lightNovel}
-                            url={m.image}
-                            width={58}
-                          />
-                          {stampFor(found, kind) ? (
-                            <View className="absolute -top-2 -left-1 bg-accent px-1">
-                              <Text className="font-brand pr-[4px] text-[12px] tracking-[0.5px] text-on-accent uppercase">
-                                {stampFor(found, kind)}
-                                {"\u00A0"}
-                              </Text>
-                            </View>
-                          ) : null}
-                        </View>
-                        {p !== "one" ? (
-                          <Text
-                            numberOfLines={1}
-                            className="font-body text-[12px] text-ink-soft"
-                          >
-                            {behindOf(found, kind)} {COUNT_WORD[kind]}
-                          </Text>
-                        ) : null}
-                      </Pressable>
-                    );
-                    return opens ? (
-                      <View key={m.id}>{inside}</View>
-                    ) : (
-                      <Link key={m.id} href={`/details/${m.id}`} asChild>
-                        {inside}
-                      </Link>
-                    );
-                  })}
-                </View>
-              )}
-            </View>
-          ))
-        ) : (
-          list.map((m, i) => (
-            <View key={m.id}>
-              {i > 0 && <DashedLine />}
-              {rowOf(m)}
-            </View>
-          ))
-        )}
+          {list.length === 0 ? checkedLine : null}
 
-        {/* a list their setting has shortened says so, under it */}
-        {!viewingHidden && !openPile && heldBack > 0 && list.length > 0 ? (
-          <Text className="text-center font-body text-[13.5px] text-ink-soft">
-            {heldBack === 1
-              ? "1 series is further behind than your setting shows. "
-              : `${heldBack} series are further behind than your setting shows. `}
-            <Text
-              className="font-body-semibold text-ink underline"
-              onPress={toSettings}
-            >
-              Change what New shows
+          {list.length === 0 ? (
+            <View className="items-center gap-3 pt-6">
+              <Mascot mood="happy" width={110} />
+              {farBehind.length > 0 ? (
+                <View className="gap-2">
+                  {farBehind.length > 1 ? (
+                    <View className="gap-1">
+                      {farBehind.slice(0, FAR_BEHIND_NAMED).map((one) => (
+                        <Text
+                          key={one.name}
+                          className="font-body text-[14px] text-ink-soft"
+                        >
+                          <Text className="font-body-semibold text-ink">
+                            {one.name}:
+                          </Text>{" "}
+                          {standing(one)}
+                        </Text>
+                      ))}
+                      {farBehind.length > FAR_BEHIND_NAMED ? (
+                        <Text className="font-body text-[14px] text-ink-soft">
+                          +{farBehind.length - FAR_BEHIND_NAMED} more
+                        </Text>
+                      ) : null}
+                    </View>
+                  ) : null}
+                  <Text className="text-center font-body text-[14.5px] text-ink-soft">
+                    New chapters show here once you're nearly caught up.{" "}
+                    <Text
+                      className="font-body-semibold text-ink underline"
+                      onPress={toSettings}
+                    >
+                      Change what New shows
+                    </Text>
+                  </Text>
+                </View>
+              ) : heldBack > 0 ? (
+                <>
+                  <Text className="text-center font-display text-[22px] text-ink">
+                    Nothing this close to caught up.
+                  </Text>
+                  <Text className="text-center font-body text-[14.5px] text-ink-soft">
+                    {heldBack === 1
+                      ? "1 series is further behind than your setting shows. "
+                      : `${heldBack} series are further behind than your setting shows. `}
+                    <Text
+                      className="font-body-semibold text-ink underline"
+                      onPress={toSettings}
+                    >
+                      Change what New shows
+                    </Text>
+                  </Text>
+                </>
+              ) : (
+                <>
+                  <Text className="text-center font-display text-[22px] text-ink">
+                    {looked.length > 0 && chapterOnly === looked.length
+                      ? "We know your chapter, not your volume."
+                      : looked.length > 0 && unknownPlace === looked.length
+                        ? "We don't know where you're up to yet."
+                        : viewingHidden
+                          ? "Nothing hidden."
+                          : NOTHING_NEW[kind]}
+                  </Text>
+                  {unknownPlace > 0 &&
+                  (chapterOnly === looked.length ||
+                    unknownPlace === looked.length) ? (
+                    <Text className="text-center font-body text-[14.5px] text-ink-soft">
+                      {chapterOnly === looked.length
+                        ? "We can't tell which volume your chapter is in. "
+                        : ""}
+                      {kind === "chapters"
+                        ? "Add the last chapter you read and we'll tell you when the next one's out."
+                        : "Add the volumes you own and we'll tell you when the next one's out."}
+                    </Text>
+                  ) : null}
+                </>
+              )}
+              {elsewhere ? (
+                <Word
+                  onPress={() => pickKind(elsewhere.kind)}
+                  accent
+                >{`See ${elsewhere.count} under ${RELEASE_KINDS[elsewhere.kind].label}`}</Word>
+              ) : null}
+              {!checking && notFound > 0 ? (
+                <Text className="text-center font-body text-[13px] text-muted">
+                  {notFound === looked.length
+                    ? "We couldn't find release news for any of your series."
+                    : notFound === 1
+                      ? "We couldn't find release news for 1 of your series."
+                      : `We couldn't find release news for ${notFound} of your series.`}
+                </Text>
+              ) : null}
+            </View>
+          ) : piled ? (
+            PILES.filter(
+              (p) => piles[p].length && (!openPile || openPile === p),
+            ).map((p) => (
+              <View key={p} className="gap-2 border-t border-line pt-5 pb-2">
+                <View className="flex-row items-end justify-between">
+                  <H2>
+                    {PILE_TEXT[kind][p].name}{" "}
+                    <Text className="font-mono text-[14px] text-muted">
+                      {piles[p].length}
+                    </Text>
+                  </H2>
+                  <Pressable
+                    onPress={() => setOpenPile(openPile === p ? null : p)}
+                    hitSlop={8}
+                  >
+                    <Text className="font-body-semibold text-[14px] text-ink">
+                      {openPile === p ? "Back" : "See all"}
+                    </Text>
+                  </Pressable>
+                </View>
+                <Text className="pb-3 font-body text-[13.5px] text-ink-soft">
+                  {PILE_TEXT[kind][p].why}
+                  {catchUpText(p, piles[p], releases, kind)}
+                  {checking && (p === "few" || p === "way") ? " so far" : ""}
+                </Text>
+                {openPile === p ? (
+                  piles[p].map((m, i) => (
+                    <View key={m.id}>
+                      {i > 0 && <DashedLine />}
+                      {rowOf(m)}
+                    </View>
+                  ))
+                ) : (
+                  <View className="flex-row gap-2.5">
+                    {piles[p].slice(0, FAN).map((m) => {
+                      const found = releases[m.id];
+                      const opens = opensAList(found, kind);
+                      const inside = (
+                        <Pressable
+                          onPress={opens ? () => setOpenList(m.id) : undefined}
+                          className="w-[58px] gap-1 active:opacity-70"
+                        >
+                          <View>
+                            <SeriesCover
+                              name={m.name}
+                              lightNovel={m.lightNovel}
+                              url={m.image}
+                              width={58}
+                            />
+                            {stampFor(found, kind) ? (
+                              <View className="absolute -top-2 -left-1 bg-accent px-1">
+                                <Text className="font-brand pr-[4px] text-[12px] tracking-[0.5px] text-on-accent uppercase">
+                                  {stampFor(found, kind)}
+                                  {"\u00A0"}
+                                </Text>
+                              </View>
+                            ) : null}
+                          </View>
+                          {p !== "one" ? (
+                            <Text
+                              numberOfLines={1}
+                              className="font-body text-[12px] text-ink-soft"
+                            >
+                              {behindOf(found, kind)} {COUNT_WORD[kind]}
+                            </Text>
+                          ) : null}
+                        </Pressable>
+                      );
+                      return opens ? (
+                        <View key={m.id}>{inside}</View>
+                      ) : (
+                        <Link key={m.id} href={`/details/${m.id}`} asChild>
+                          {inside}
+                        </Link>
+                      );
+                    })}
+                  </View>
+                )}
+              </View>
+            ))
+          ) : (
+            list.map((m, i) => (
+              <View key={m.id}>
+                {i > 0 && <DashedLine />}
+                {rowOf(m)}
+              </View>
+            ))
+          )}
+
+          {/* a list their setting has shortened says so, under it */}
+          {!viewingHidden && !openPile && heldBack > 0 && list.length > 0 ? (
+            <Text className="text-center font-body text-[13.5px] text-ink-soft">
+              {heldBack === 1
+                ? "1 series is further behind than your setting shows. "
+                : `${heldBack} series are further behind than your setting shows. `}
+              <Text
+                className="font-body-semibold text-ink underline"
+                onPress={toSettings}
+              >
+                Change what New shows
+              </Text>
             </Text>
-          </Text>
-        ) : null}
-        {list.length > 0 ? checkedLine : null}
-      </ScrollView>
+          ) : null}
+          {list.length > 0 ? checkedLine : null}
+        </ScrollView>
+      </PullPage>
 
       {hideActions.hidden || hideActions.failed ? (
         <Toast

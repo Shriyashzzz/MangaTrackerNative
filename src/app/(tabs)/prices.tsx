@@ -4,6 +4,7 @@
 // and the highlights: Popular this season, Latest deals, Prices
 // just checked. A search lists the series found, with Did you mean for a
 // typo. The rules are the web's (core findSeries, nearMatches, askedEdition)
+import PullPage, { pause, usePullTop } from "@/components/PullRefresh";
 import Backdrop from "@/components/Backdrop";
 import AppHeader from "@/components/AppHeader";
 import Button from "@/components/Button";
@@ -128,6 +129,9 @@ function HighlightsStrip() {
 
 export default function PricesScreen() {
   const c = useColors();
+  const pull = usePullTop();
+  // bumped by a pull to refresh: the page's strips load again
+  const [asked, setAsked] = useState(0);
   const country = usePrefs((s) => (s.prefs.country === "ca" ? "ca" : "us"));
   const [text, setText] = useState("");
   const [full, setFull] = useState(false);
@@ -322,152 +326,166 @@ export default function PricesScreen() {
     <Safe edges={["top"]} className="flex-1 bg-paper">
       <Backdrop />
       <AppHeader />
-      <ScrollView
-        contentContainerClassName="gap-5 px-4 pt-5 pb-10"
-        keyboardShouldPersistTaps="handled"
+      <PullPage
+        refresh={async () => {
+          // the strips under the search (deals, popular, just checked) are
+          // asked for again
+          setAsked((n) => n + 1);
+          await pause();
+        }}
+        scrollTop={pull.top}
       >
-        {!searching ? <DealsStrip /> : null}
-        {/* Price check, from its name to the names to try, in one box */}
-        <View className="gap-3 rounded-[16px] border border-line-soft bg-card p-4">
-          <Text className="font-brand pr-[7px] text-[30px] tracking-[1px] text-ink uppercase">
-            Price check
-            {"\u00A0"}
-          </Text>
-          <Text className="font-body text-[14.5px] text-ink-soft">
-            Find a series, then see what{" "}
-            {country === "ca" ? "stores in Canada" : "US stores"} charge for
-            each volume.
-          </Text>
-          <View className="w-[140px]">
-            <CountrySwitch />
-          </View>
-          <Pressable
-            onPress={() => setFull(true)}
-            className="flex-row items-center gap-2 rounded-[12px] border border-line-soft bg-paper px-3"
-            accessibilityLabel="Search a series or an ISBN"
-          >
-            <SearchIcon color={c.inkSoft} width={20} height={20} />
-            <Text
-              className={`min-h-[46px] flex-1 py-3 font-body text-[16px] ${query ? "text-ink" : "text-muted"}`}
-            >
-              {query || "Title or ISBN"}
+        <ScrollView
+          key={asked}
+          contentContainerClassName="gap-5 px-4 pt-5 pb-10"
+          keyboardShouldPersistTaps="handled"
+          overScrollMode="never"
+          scrollEventThrottle={16}
+          onScroll={pull.track}
+        >
+          {!searching ? <DealsStrip /> : null}
+          {/* Price check, from its name to the names to try, in one box */}
+          <View className="gap-3 rounded-[16px] border border-line-soft bg-card p-4">
+            <Text className="font-brand pr-[7px] text-[30px] tracking-[1px] text-ink uppercase">
+              Price check
+              {"\u00A0"}
             </Text>
-          </Pressable>
-          {!searching ? (
-            <View className="gap-2">
-              <Text className="font-body text-[14px] text-ink-soft">Try</Text>
-              <View className="flex-row flex-wrap gap-2">
-                {TRY.map((name) => (
-                  <PressScale
-                    key={name}
-                    onPress={() =>
-                      router.push({
-                        pathname: "/prices/series",
-                        params: { name },
-                      })
-                    }
-                    style={{ flexBasis: "30%", flexGrow: 1 }}
-                    className={`min-h-[40px] items-center justify-center overflow-hidden border border-line-soft ${look.buttonRadius}`}
-                  >
-                    <Text className="font-body-medium text-[14px] text-ink">
-                      {name}
-                    </Text>
-                  </PressScale>
-                ))}
-              </View>
-            </View>
-          ) : null}
-        </View>
-
-        {!searching ? (
-          <PressScale
-            onPress={() => router.push("/after-anime")}
-            accessibilityRole="link"
-            className="gap-2 rounded-[14px] border border-line-soft bg-card px-4 pt-3.5 pb-3.5"
-          >
-            {/* the door to After the anime: a small stamped title, the
-                words, the way in; a side door, not the main one */}
-            <View
-              className="self-start bg-accent px-1.5 pt-0.5"
-              style={{ transform: [{ rotate: "-2deg" }] }}
-            >
-              <Text className="font-brand pr-[4px] text-[14px] tracking-[1px] text-on-accent uppercase">
-                Finished the anime?
-                {"\u00A0"}
-              </Text>
-            </View>
-            <Text className="font-body text-[14.5px] leading-[20px] text-ink-soft">
-              Find the chapter and volume of the manga to start from.
+            <Text className="font-body text-[14.5px] text-ink-soft">
+              Find a series, then see what{" "}
+              {country === "ca" ? "stores in Canada" : "US stores"} charge for
+              each volume.
             </Text>
-            <Button
-              label="Find where to start →"
-              small
-              onPress={() => router.push("/after-anime")}
-            ></Button>
-          </PressScale>
-        ) : null}
-
-        {searching && result?.error ? (
-          <View className="items-center gap-3 py-6">
-            <Mascot mood="panic" width={100} />
-            <Text className="font-body text-[15px] text-ink-soft">
-              Check your connection and try again in a moment.
-            </Text>
-            <Button
-              center
-              label="Try again"
-              small
-              onPress={() => setAttempt((n) => n + 1)}
-            />
-          </View>
-        ) : null}
-        {searching && result && !result.error && result.items.length === 0 ? (
-          <View className="items-center gap-3 py-6">
-            <Mascot mood="confused" width={100} />
-            <Text className="text-center font-body text-[15px] text-ink-soft">
-              {badIsbn
-                ? "A digit may be off. Check it against the back of the book."
-                : "Try the name printed on the US cover, or paste the ISBN from the back of a volume."}
-            </Text>
-            <Pressable onPress={() => router.push("/series")} hitSlop={6}>
-              <Text className="font-body-semibold text-[14.5px] text-ink border-b pb-[2px] border-ink self-start">
-                Browse every series
-              </Text>
-            </Pressable>
-          </View>
-        ) : null}
-        {searching && result && result.items.length ? (
-          <View className="gap-3">
-            <Text className="font-display text-[19px] text-ink">
-              {result.guessed
-                ? DID_YOU_MEAN
-                : `${result.items.length} series for “${query}”`}
-            </Text>
-            <View
-              className="flex-row flex-wrap justify-between"
-              style={{ rowGap: 18 }}
-            >
-              {result.items.map((s) => (
-                <SeriesCard key={s.slug} series={s} width={104} />
-              ))}
+            <View className="w-[140px]">
+              <CountrySwitch />
             </View>
             <Pressable
-              onPress={() => {
-                setResult(null);
-                setText("");
-              }}
-              hitSlop={6}
-              className="self-start"
+              onPress={() => setFull(true)}
+              className="flex-row items-center gap-2 rounded-[12px] border border-line-soft bg-paper px-3"
+              accessibilityLabel="Search a series or an ISBN"
             >
-              <Text className="font-body-medium text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
-                Clear the search
+              <SearchIcon color={c.inkSoft} width={20} height={20} />
+              <Text
+                className={`min-h-[46px] flex-1 py-3 font-body text-[16px] ${query ? "text-ink" : "text-muted"}`}
+              >
+                {query || "Title or ISBN"}
               </Text>
             </Pressable>
+            {!searching ? (
+              <View className="gap-2">
+                <Text className="font-body text-[14px] text-ink-soft">Try</Text>
+                <View className="flex-row flex-wrap gap-2">
+                  {TRY.map((name) => (
+                    <PressScale
+                      key={name}
+                      onPress={() =>
+                        router.push({
+                          pathname: "/prices/series",
+                          params: { name },
+                        })
+                      }
+                      style={{ flexBasis: "30%", flexGrow: 1 }}
+                      className={`min-h-[40px] items-center justify-center overflow-hidden border border-line-soft ${look.buttonRadius}`}
+                    >
+                      <Text className="font-body-medium text-[14px] text-ink">
+                        {name}
+                      </Text>
+                    </PressScale>
+                  ))}
+                </View>
+              </View>
+            ) : null}
           </View>
-        ) : null}
 
-        {!searching ? <HighlightsStrip /> : null}
-      </ScrollView>
+          {!searching ? (
+            <PressScale
+              onPress={() => router.push("/after-anime")}
+              accessibilityRole="link"
+              className="gap-2 rounded-[14px] border border-line-soft bg-card px-4 pt-3.5 pb-3.5"
+            >
+              {/* the door to After the anime: a small stamped title, the
+                words, the way in; a side door, not the main one */}
+              <View
+                className="self-start bg-accent px-1.5 pt-0.5"
+                style={{ transform: [{ rotate: "-2deg" }] }}
+              >
+                <Text className="font-brand pr-[4px] text-[14px] tracking-[1px] text-on-accent uppercase">
+                  Finished the anime?
+                  {"\u00A0"}
+                </Text>
+              </View>
+              <Text className="font-body text-[14.5px] leading-[20px] text-ink-soft">
+                Find the chapter and volume of the manga to start from.
+              </Text>
+              <Button
+                label="Find where to start →"
+                small
+                onPress={() => router.push("/after-anime")}
+              ></Button>
+            </PressScale>
+          ) : null}
+
+          {searching && result?.error ? (
+            <View className="items-center gap-3 py-6">
+              <Mascot mood="panic" width={100} />
+              <Text className="font-body text-[15px] text-ink-soft">
+                Check your connection and try again in a moment.
+              </Text>
+              <Button
+                center
+                label="Try again"
+                small
+                onPress={() => setAttempt((n) => n + 1)}
+              />
+            </View>
+          ) : null}
+          {searching && result && !result.error && result.items.length === 0 ? (
+            <View className="items-center gap-3 py-6">
+              <Mascot mood="confused" width={100} />
+              <Text className="text-center font-body text-[15px] text-ink-soft">
+                {badIsbn
+                  ? "A digit may be off. Check it against the back of the book."
+                  : "Try the name printed on the US cover, or paste the ISBN from the back of a volume."}
+              </Text>
+              <Pressable onPress={() => router.push("/series")} hitSlop={6}>
+                <Text className="font-body-semibold text-[14.5px] text-ink border-b pb-[2px] border-ink self-start">
+                  Browse every series
+                </Text>
+              </Pressable>
+            </View>
+          ) : null}
+          {searching && result && result.items.length ? (
+            <View className="gap-3">
+              <Text className="font-display text-[19px] text-ink">
+                {result.guessed
+                  ? DID_YOU_MEAN
+                  : `${result.items.length} series for “${query}”`}
+              </Text>
+              <View
+                className="flex-row flex-wrap justify-between"
+                style={{ rowGap: 18 }}
+              >
+                {result.items.map((s) => (
+                  <SeriesCard key={s.slug} series={s} width={104} />
+                ))}
+              </View>
+              <Pressable
+                onPress={() => {
+                  setResult(null);
+                  setText("");
+                }}
+                hitSlop={6}
+                className="self-start"
+              >
+                <Text className="font-body-medium text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
+                  Clear the search
+                </Text>
+              </Pressable>
+            </View>
+          ) : null}
+
+          {!searching ? <HighlightsStrip /> : null}
+        </ScrollView>
+      </PullPage>
     </Safe>
   );
 }

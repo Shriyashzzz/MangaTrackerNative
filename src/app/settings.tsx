@@ -3,6 +3,7 @@
 // (light or dark), New releases, Your shelf, Prices, Account (email, the
 // weekly email, alerts, export, delete). Every setting is saved on the
 // account (store/prefs save, the web's savePrefs; store/account)
+import PullPage, { usePullTop } from "@/components/PullRefresh";
 import Backdrop from "@/components/Backdrop";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState, type ComponentRef } from "react";
@@ -70,6 +71,7 @@ export default function SettingsScreen() {
   const account = useAccount((s) => s.account);
   const loadFailed = useAccount((s) => s.loadFailed);
   const load = useAccount((s) => s.load);
+  const pull = usePullTop();
   const page = useRef<ComponentRef<typeof ScrollView>>(null);
   useEffect(() => {
     void load();
@@ -139,36 +141,41 @@ export default function SettingsScreen() {
           />
         </ScrollView>
       </View>
-      <ScrollView
-        ref={page}
-        contentContainerClassName="gap-7 px-4 pt-5 pb-16"
-        keyboardShouldPersistTaps="handled"
-      >
-        {needsAccount && !account ? (
-          loadFailed ? (
-            <Text className="font-body text-[15px] text-accent">
-              Couldn't load your account. Pull to try again.
-            </Text>
-          ) : null
-        ) : (
-          <>
-            {tab === "profile" && account ? (
-              <ProfileTab
-                account={account}
-                scrollTo={params.at === "share" ? "share" : undefined}
-                page={page}
-              />
-            ) : null}
-            {tab === "appearance" ? <AppearanceTab /> : null}
-            {tab === "new-releases" ? <NewReleasesTab /> : null}
-            {tab === "shelf" ? <ShelfSettingsTab /> : null}
-            {tab === "prices" ? <PricesTab /> : null}
-            {tab === "account" && account ? (
-              <AccountTab account={account} />
-            ) : null}
-          </>
-        )}
-      </ScrollView>
+      <PullPage refresh={load} scrollTop={pull.top}>
+        <ScrollView
+          ref={page}
+          contentContainerClassName="gap-7 px-4 pt-5 pb-16"
+          keyboardShouldPersistTaps="handled"
+          overScrollMode="never"
+          scrollEventThrottle={16}
+          onScroll={pull.track}
+        >
+          {needsAccount && !account ? (
+            loadFailed ? (
+              <Text className="font-body text-[15px] text-accent">
+                Couldn't load your account. Pull to try again.
+              </Text>
+            ) : null
+          ) : (
+            <>
+              {tab === "profile" && account ? (
+                <ProfileTab
+                  account={account}
+                  scrollTo={params.at === "share" ? "share" : undefined}
+                  page={page}
+                />
+              ) : null}
+              {tab === "appearance" ? <AppearanceTab /> : null}
+              {tab === "new-releases" ? <NewReleasesTab /> : null}
+              {tab === "shelf" ? <ShelfSettingsTab /> : null}
+              {tab === "prices" ? <PricesTab /> : null}
+              {tab === "account" && account ? (
+                <AccountTab account={account} />
+              ) : null}
+            </>
+          )}
+        </ScrollView>
+      </PullPage>
     </Safe>
   );
 }

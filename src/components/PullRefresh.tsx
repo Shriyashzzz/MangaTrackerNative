@@ -7,7 +7,12 @@
 // ("グイ…" to "ドン!"), never on a first pull and never twice running.
 // No system spinner: the pull is a gesture of the app's own
 import { useEffect, useState, type ReactNode } from "react";
-import { Text, View } from "react-native";
+import {
+  Text,
+  View,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
+} from "react-native";
 import { Gesture, GestureDetector, State } from "react-native-gesture-handler";
 import Animated, {
   Easing,
@@ -238,6 +243,21 @@ function Zone({
     </Animated.View>
   );
 }
+
+// A screen's scroll, told to the pull: `top` goes to PullPage, `track` is
+// the scroll view's onScroll (with scrollEventThrottle 16). A pull only
+// starts when the screen is at its top
+export function usePullTop() {
+  const top = useSharedValue(0);
+  const track = (e: NativeSyntheticEvent<NativeScrollEvent>) =>
+    top.set(e.nativeEvent.contentOffset.y);
+  return { top, track };
+}
+
+// a refresh that asks for something without waiting on it (a "try again"),
+// or a page with nothing of its own to ask for: Kenji stays a moment
+export const pause = (ms = 600) =>
+  new Promise<void>((done) => setTimeout(done, ms));
 
 export default function PullPage({
   refresh,

@@ -5,6 +5,7 @@
 // card with its price, Yours and Next, Not on your shelf to see only the
 // gaps with what they cost. The rules are the web's (core seriesPageRules,
 // finishCost, useSeriesData)
+import PullPage, { pause, usePullTop } from "@/components/PullRefresh";
 import TrackPitch from "@/components/prices/TrackPitch";
 import { useAuth } from "@/store/auth";
 import Backdrop from "@/components/Backdrop";
@@ -122,6 +123,7 @@ export default function PriceSeriesScreen() {
     return () => controller.abort();
   }, [name]);
   const editionsKnown = editions.name === name;
+  const pull = usePullTop();
   const isSignedIn = useAuth((st) => st.isSignedIn);
   const [askedEdition, setAskedEdition] = useState<string | null>(
     params.edition ?? null,
@@ -215,241 +217,256 @@ export default function PriceSeriesScreen() {
 
   return frame(
     named.title,
-    <ScrollView
-      ref={page}
-      contentContainerClassName="gap-8 px-4 pt-5 pb-20"
-      scrollEventThrottle={100}
-      onScroll={(e) => {
-        const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
-        const left =
-          contentSize.height - contentOffset.y - layoutMeasurement.height;
-        if (left < GROW_WITHIN_PX && grownCount < list.length)
-          setGrownCount(grownCount + PAGE_SIZE);
+    <PullPage
+      refresh={async () => {
+        series.retry();
+        await pause();
       }}
+      scrollTop={pull.top}
     >
-      <DealsStrip />
-      {/* the cover and the facts, then what it's about from under the cover,
+      <ScrollView
+        ref={page}
+        contentContainerClassName="gap-8 px-4 pt-5 pb-20"
+        overScrollMode="never"
+        scrollEventThrottle={16}
+        onScroll={(e) => {
+          pull.track(e);
+          const { contentOffset, contentSize, layoutMeasurement } =
+            e.nativeEvent;
+          const left =
+            contentSize.height - contentOffset.y - layoutMeasurement.height;
+          if (left < GROW_WITHIN_PX && grownCount < list.length)
+            setGrownCount(grownCount + PAGE_SIZE);
+        }}
+      >
+        <DealsStrip />
+        {/* the cover and the facts, then what it's about from under the cover,
           the page's full width */}
-      <View className="gap-3">
-        <View className="flex-row gap-4">
-          {volumes[0]?.coverUrl || info?.coverUrl ? (
-            <View>
-              <View className="self-start">
-                <SeriesCover
-                  name={named.title}
-                  url={volumes[0]?.coverUrl ?? info?.coverUrl}
-                  width={94}
-                  border={2}
-                />
+        <View className="gap-3">
+          <View className="flex-row gap-4">
+            {volumes[0]?.coverUrl || info?.coverUrl ? (
+              <View>
+                <View className="self-start">
+                  <SeriesCover
+                    name={named.title}
+                    url={volumes[0]?.coverUrl ?? info?.coverUrl}
+                    width={94}
+                    border={2}
+                  />
 
-                <SeriesScoreBadge percent={info?.score} />
+                  <SeriesScoreBadge percent={info?.score} />
+                </View>
+                <OnShelfChip
+                  name={info?.name ?? data.name}
+                  altNames={info?.altNames}
+                />
               </View>
-              <OnShelfChip
+            ) : null}
+            <View className="min-w-0 flex-1 gap-2">
+              <Text className="font-display text-[23px] leading-[27px] text-ink">
+                {named.title}
+              </Text>
+              {named.lightNovel ? (
+                <Text className="self-start rounded-[2px] border-[1.5px] border-line-soft px-1.5 font-body-medium text-[12px] text-ink-soft">
+                  Light novel
+                </Text>
+              ) : null}
+              {info ? (
+                <SeriesFacts info={info} withDescription={false} />
+              ) : null}
+              <ToReadButton
                 name={info?.name ?? data.name}
                 altNames={info?.altNames}
+                cover={info?.coverUrl ?? null}
+                genres={info?.genres}
               />
             </View>
-          ) : null}
-          <View className="min-w-0 flex-1 gap-2">
-            <Text className="font-display text-[23px] leading-[27px] text-ink">
-              {named.title}
-            </Text>
-            {named.lightNovel ? (
-              <Text className="self-start rounded-[2px] border-[1.5px] border-line-soft px-1.5 font-body-medium text-[12px] text-ink-soft">
-                Light novel
-              </Text>
-            ) : null}
-            {info ? <SeriesFacts info={info} withDescription={false} /> : null}
-            <ToReadButton
-              name={info?.name ?? data.name}
-              altNames={info?.altNames}
-              cover={info?.coverUrl ?? null}
-              genres={info?.genres}
+          </View>
+          {info ? <SeriesDescription info={info} /> : null}
+        </View>
+
+        {/* no account: the ticket runs the page's full width, so nothing is
+          left empty under the cover */}
+        {!isSignedIn ? <TrackPitch name={named.title} /> : null}
+
+        <SetsBox
+          key={data.slug}
+          series={data.slug}
+          sets={boxSets}
+          links={data.boxSetLinks ?? []}
+          lines={editionLines}
+          headline={headline ?? null}
+          owned={mine ? ownedOf(mine) : []}
+          onSeeAllBooks={(key) => {
+            setAskedEdition(key);
+            setTab("editions");
+          }}
+        />
+        {cost ? (
+          <SeriesCostBox
+            cost={cost}
+            used={used}
+            comingSoon={onSale(volumes).length < volumes.length}
+          />
+        ) : null}
+
+        {tabbed ? (
+          <View>
+            <Segmented
+              label="Show"
+              options={[
+                { value: "volumes", label: "Volumes" },
+                { value: "editions", label: "Editions" },
+              ]}
+              value={onEditions ? "editions" : "volumes"}
+              onChange={(value) => {
+                setTab(value);
+              }}
             />
           </View>
-        </View>
-        {info ? <SeriesDescription info={info} /> : null}
-      </View>
+        ) : null}
 
-      {/* no account: the ticket runs the page's full width, so nothing is
-          left empty under the cover */}
-      {!isSignedIn ? <TrackPitch name={named.title} /> : null}
-
-      <SetsBox
-        key={data.slug}
-        series={data.slug}
-        sets={boxSets}
-        links={data.boxSetLinks ?? []}
-        lines={editionLines}
-        headline={headline ?? null}
-        owned={mine ? ownedOf(mine) : []}
-        onSeeAllBooks={(key) => {
-          setAskedEdition(key);
-          setTab("editions");
-        }}
-      />
-      {cost ? (
-        <SeriesCostBox
-          cost={cost}
-          used={used}
-          comingSoon={onSale(volumes).length < volumes.length}
-        />
-      ) : null}
-
-      {tabbed ? (
-        <View>
-          <Segmented
-            label="Show"
-            options={[
-              { value: "volumes", label: "Volumes" },
-              { value: "editions", label: "Editions" },
-            ]}
-            value={onEditions ? "editions" : "volumes"}
-            onChange={(value) => {
-              setTab(value);
-            }}
-          />
-        </View>
-      ) : null}
-
-      {/* tall enough that the switch above can stay where it is when the
+        {/* tall enough that the switch above can stay where it is when the
           shorter of the two lists is showing */}
-      <View className="gap-8" style={{ minHeight: screenHeight }}>
-        {/* both lists stay drawn and the switch only shows one: nothing is
+        <View className="gap-8" style={{ minHeight: screenHeight }}>
+          {/* both lists stay drawn and the switch only shows one: nothing is
             built again on a tap, so it changes at once */}
-        <View
-          className="gap-3"
-          style={{ display: onEditions ? "none" : "flex" }}
-        >
-          <View className="flex-row items-end justify-between">
-            <H2>Volumes</H2>
-            {volumes.length ? (
-              <Text className="font-mono text-[12.5px] text-muted">
-                {volumes.length} {volumes.length === 1 ? "volume" : "volumes"}{" "}
-                in English
-              </Text>
-            ) : null}
-          </View>
-          {unlisted.length ? (
-            <Text className="font-body text-[13.5px] text-ink-soft">
-              {unlisted.length === 1 ? "Vol." : "Vols."} {rangesText(unlisted)}{" "}
-              {unlisted.length === 1 ? "is" : "are"} missing from our list.
-            </Text>
-          ) : null}
-          {finish || (mine && toGet.length < volumes.length) ? (
-            <View className="flex-row flex-wrap items-center gap-3">
-              {mine && toGet.length < volumes.length ? (
-                <Pressable
-                  onPress={() => setToGetOnly(!toGetOnly)}
-                  accessibilityState={{ selected: toGetOnly }}
-                  className={`rounded-[3px] border-[1.5px] px-2.5 py-1.5 ${toGetOnly ? "border-accent bg-accent-wash" : "border-line"}`}
-                >
-                  <Text
-                    className={`font-body-medium text-[14px] ${toGetOnly ? "text-accent-ink" : "text-ink"}`}
-                  >
-                    Not on your shelf ({toGet.length})
-                  </Text>
-                </Pressable>
-              ) : null}
-              {finish?.enough ? (
-                <Text className="font-body text-[14px] text-ink-soft">
-                  {finishText(finish, formatCents)}
+          <View
+            className="gap-3"
+            style={{ display: onEditions ? "none" : "flex" }}
+          >
+            <View className="flex-row items-end justify-between">
+              <H2>Volumes</H2>
+              {volumes.length ? (
+                <Text className="font-mono text-[12.5px] text-muted">
+                  {volumes.length} {volumes.length === 1 ? "volume" : "volumes"}{" "}
+                  in English
                 </Text>
               ) : null}
             </View>
-          ) : null}
-          {volumes.length ? (
-            <>
-              <View
-                className="flex-row flex-wrap"
-                style={{ rowGap: 20, columnGap: GRID_GAP }}
-              >
-                {cardsOf(shown).map((card) => {
-                  const first = card[0]!;
-                  const mark = markOf(card, mine, next);
-                  if (card.length === 1)
+            {unlisted.length ? (
+              <Text className="font-body text-[13.5px] text-ink-soft">
+                {unlisted.length === 1 ? "Vol." : "Vols."}{" "}
+                {rangesText(unlisted)} {unlisted.length === 1 ? "is" : "are"}{" "}
+                missing from our list.
+              </Text>
+            ) : null}
+            {finish || (mine && toGet.length < volumes.length) ? (
+              <View className="flex-row flex-wrap items-center gap-3">
+                {mine && toGet.length < volumes.length ? (
+                  <Pressable
+                    onPress={() => setToGetOnly(!toGetOnly)}
+                    accessibilityState={{ selected: toGetOnly }}
+                    className={`rounded-[3px] border-[1.5px] px-2.5 py-1.5 ${toGetOnly ? "border-accent bg-accent-wash" : "border-line"}`}
+                  >
+                    <Text
+                      className={`font-body-medium text-[14px] ${toGetOnly ? "text-accent-ink" : "text-ink"}`}
+                    >
+                      Not on your shelf ({toGet.length})
+                    </Text>
+                  </Pressable>
+                ) : null}
+                {finish?.enough ? (
+                  <Text className="font-body text-[14px] text-ink-soft">
+                    {finishText(finish, formatCents)}
+                  </Text>
+                ) : null}
+              </View>
+            ) : null}
+            {volumes.length ? (
+              <>
+                <View
+                  className="flex-row flex-wrap"
+                  style={{ rowGap: 20, columnGap: GRID_GAP }}
+                >
+                  {cardsOf(shown).map((card) => {
+                    const first = card[0]!;
+                    const mark = markOf(card, mine, next);
+                    if (card.length === 1)
+                      return (
+                        <VolumeCard
+                          key={first.volume}
+                          plainStandIn
+                          {...first}
+                          title={`Vol. ${first.volume}`}
+                          priceCents={first.knownPriceCents}
+                          subtitle={oneVolumeSubtitle(first)}
+                          mark={mark}
+                          seriesCoverUrl={info?.coverUrl ?? null}
+                          width={tileWidth}
+                          bare
+                        />
+                      );
+                    const last = card[card.length - 1]!;
                     return (
                       <VolumeCard
                         key={first.volume}
                         plainStandIn
                         {...first}
-                        title={`Vol. ${first.volume}`}
+                        title={`Book ${first.inBook!.book}`}
+                        volume={null}
+                        holds={{ from: first.volume, to: last.volume }}
                         priceCents={first.knownPriceCents}
-                        subtitle={oneVolumeSubtitle(first)}
+                        subtitle={bookSubtitle(card)}
                         mark={mark}
-                        seriesCoverUrl={info?.coverUrl ?? null}
                         width={tileWidth}
-                        bare
                       />
                     );
-                  const last = card[card.length - 1]!;
-                  return (
-                    <VolumeCard
-                      key={first.volume}
-                      plainStandIn
-                      {...first}
-                      title={`Book ${first.inBook!.book}`}
-                      volume={null}
-                      holds={{ from: first.volume, to: last.volume }}
-                      priceCents={first.knownPriceCents}
-                      subtitle={bookSubtitle(card)}
-                      mark={mark}
-                      width={tileWidth}
-                    />
-                  );
-                })}
+                  })}
+                </View>
+              </>
+            ) : incomplete ? (
+              <View className="gap-2">
+                <Text className="font-body text-[14.5px] text-ink-soft">
+                  The book catalog is slow to answer right now, so volumes
+                  didn't load. It usually works on the next try.
+                </Text>
+                <Button label="Try again" small onPress={series.retry} />
               </View>
-            </>
-          ) : incomplete ? (
-            <View className="gap-2">
-              <Text className="font-body text-[14.5px] text-ink-soft">
-                The book catalog is slow to answer right now, so volumes didn't
-                load. It usually works on the next try.
+            ) : (
+              <View className="items-center gap-3 py-6">
+                <Mascot mood="confused" width={100} />
+                <Text className="text-center font-body text-[15px] leading-[22px] text-ink-soft">
+                  No English volumes out yet.{"\n"}If one is, search it by name
+                  or ISBN.
+                </Text>
+                <Button
+                  center
+                  small
+                  label="Search a volume"
+                  onPress={() => router.push("/prices")}
+                />
+              </View>
+            )}
+            {incomplete && volumes.length > 0 && hasHole ? (
+              <Text className="font-body text-[13.5px] text-ink-soft">
+                Some volumes may be missing: the book catalog was slow to
+                answer.{" "}
+                <Text
+                  className="font-body-semibold text-ink underline"
+                  onPress={series.retry}
+                >
+                  Try again
+                </Text>
               </Text>
-              <Button label="Try again" small onPress={series.retry} />
-            </View>
-          ) : (
-            <View className="items-center gap-3 py-6">
-              <Mascot mood="confused" width={100} />
-              <Text className="text-center font-body text-[15px] leading-[22px] text-ink-soft">
-                No English volumes out yet.{"\n"}If one is, search it by name or
-                ISBN.
-              </Text>
-              <Button
-                center
-                small
-                label="Search a volume"
-                onPress={() => router.push("/prices")}
-              />
-            </View>
-          )}
-          {incomplete && volumes.length > 0 && hasHole ? (
-            <Text className="font-body text-[13.5px] text-ink-soft">
-              Some volumes may be missing: the book catalog was slow to answer.{" "}
-              <Text
-                className="font-body-semibold text-ink underline"
-                onPress={series.retry}
-              >
-                Try again
-              </Text>
-            </Text>
-          ) : null}
-        </View>
+            ) : null}
+          </View>
 
-        <View style={{ display: tabbed && !onEditions ? "none" : "flex" }}>
-          <OtherEditions
-            name={name}
-            asked={askedEdition}
-            owned={mine ? ownedOf(mine) : []}
-            lines={editionLines}
-            singles={singles}
-            seriesCoverUrl={info?.coverUrl ?? null}
-          />
+          <View style={{ display: tabbed && !onEditions ? "none" : "flex" }}>
+            <OtherEditions
+              name={name}
+              asked={askedEdition}
+              owned={mine ? ownedOf(mine) : []}
+              lines={editionLines}
+              singles={singles}
+              seriesCoverUrl={info?.coverUrl ?? null}
+            />
+          </View>
         </View>
-      </View>
-      {!hasSets && !onEditions ? (
-        <BoxSetSearch links={data.boxSetLinks ?? []} />
-      ) : null}
-    </ScrollView>,
+        {!hasSets && !onEditions ? (
+          <BoxSetSearch links={data.boxSetLinks ?? []} />
+        ) : null}
+      </ScrollView>
+    </PullPage>,
   );
 }

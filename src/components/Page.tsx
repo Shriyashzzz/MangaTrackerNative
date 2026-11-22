@@ -3,6 +3,7 @@
 // on an iPhone, Material's bar on Android), and its words in a scroll. A
 // page that searches gets the header's own search bar. The pieces the
 // content pages are set in: a heading, a paragraph, a list line
+import PullPage, { pause, usePullTop } from "@/components/PullRefresh";
 import Backdrop from "@/components/Backdrop";
 import { useColors } from "@/lib/colors";
 import { Stack } from "expo-router";
@@ -22,13 +23,18 @@ export default function Page({
   search,
   // the children are a list that scrolls itself (no page scroll around it)
   scroll = true,
+  onRefresh,
 }: {
   title: string;
   children: ReactNode;
   right?: ReactNode;
   search?: PageSearch;
   scroll?: boolean;
+  // what a pull down asks for again; a page with nothing to ask for still
+  // answers the pull
+  onRefresh?: () => Promise<unknown>;
 }) {
+  const pull = usePullTop();
   const c = useColors();
   const ios = Platform.OS === "ios";
   return (
@@ -72,14 +78,19 @@ export default function Page({
         }}
       />
       {scroll ? (
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          contentContainerClassName="gap-6 px-4 pt-5 pb-16"
-          keyboardShouldPersistTaps="handled"
-          keyboardDismissMode="on-drag"
-        >
-          {children}
-        </ScrollView>
+        <PullPage refresh={onRefresh ?? pause} scrollTop={pull.top}>
+          <ScrollView
+            contentInsetAdjustmentBehavior="automatic"
+            contentContainerClassName="gap-6 px-4 pt-5 pb-16"
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
+            overScrollMode="never"
+            scrollEventThrottle={16}
+            onScroll={pull.track}
+          >
+            {children}
+          </ScrollView>
+        </PullPage>
       ) : (
         children
       )}

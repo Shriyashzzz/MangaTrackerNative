@@ -5,6 +5,7 @@
 // finished. Edit and Delete are in the ⋮ menu. This file loads the series
 // and saves changes to it; each part of the page is its own component, and
 // every rule is the web's own (core pages/Details, core lib)
+import PullPage, { usePullTop } from "@/components/PullRefresh";
 import Backdrop from "@/components/Backdrop";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
@@ -102,6 +103,7 @@ export default function DetailsScreen() {
   const [titleShown, setTitleShown] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [pickingEdition, setPickingEdition] = useState(false);
+  const pull = usePullTop();
   // under the buttons: a failed save, or the undo for marking it finished
   const [actionNote, setActionNote] = useState("");
   const [canUndoStatus, setCanUndoStatus] = useState(false);
@@ -396,6 +398,12 @@ export default function DetailsScreen() {
       ],
     );
 
+  // a pull down: the shelf, and this series' releases, asked for again
+  const refreshPage = async () => {
+    setChapterSaves((n) => n + 1);
+    await useShelf.getState().load();
+  };
+
   // ---------- what's shown ----------
   const { release, hideNextTicket } = releaseNews({
     manga: m,
@@ -447,198 +455,205 @@ export default function DetailsScreen() {
         </Pressable>
       </View>
       <DoubleRule />
-      <ScrollView
-        contentContainerClassName="gap-6 px-4 pt-4 pb-16"
-        scrollEventThrottle={64}
-        onScroll={(e) =>
-          setTitleShown(e.nativeEvent.contentOffset.y > TITLE_GONE_AT)
-        }
-        keyboardShouldPersistTaps="handled"
-      >
-        <TwiceNote manga={m} onMerged={() => setLoadTry((n) => n + 1)} />
+      <PullPage refresh={refreshPage} scrollTop={pull.top}>
+        <ScrollView
+          contentContainerClassName="gap-6 px-4 pt-4 pb-16"
+          overScrollMode="never"
+          scrollEventThrottle={16}
+          onScroll={(e) => {
+            pull.track(e);
+            const gone = e.nativeEvent.contentOffset.y > TITLE_GONE_AT;
+            if (gone !== titleShown) setTitleShown(gone);
+          }}
+          keyboardShouldPersistTaps="handled"
+        >
+          <TwiceNote manga={m} onMerged={() => setLoadTry((n) => n + 1)} />
 
-        {/* the cover and name, with how they're getting on */}
-        <View className="flex-row gap-4">
-          <View>
-            <SeriesCover
-              name={m.name}
-              lightNovel={m.lightNovel}
-              url={m.image}
-              width={96}
-              border={2}
-            />
-            {finished ? (
-              <View className="absolute right-[-6px] bottom-2 -rotate-6 border-2 border-accent bg-paper px-1.5">
-                <Text className="font-brand pr-[4px] text-[16px] tracking-[1px] text-accent uppercase">
-                  Done
-                  {"\u00A0"}
-                </Text>
-              </View>
-            ) : null}
-          </View>
-          <View className="min-w-0 flex-1 justify-center gap-2.5">
-            <Text className="font-display text-[26px] leading-[30px] text-ink">
-              {m.name}
-            </Text>
-            <View className="flex-row flex-wrap items-center gap-1.5">
-              <Text
-                className={`rounded-[2px] border-[1.5px] px-2 py-0.5 font-body-medium text-[13px] ${finished ? "border-ok text-ok" : "border-accent text-accent"}`}
-              >
-                {statusWord}
-              </Text>
-              {[m.lightNovel ? "Light novel" : null, genre]
-                .filter(Boolean)
-                .map((chip) => (
-                  <Text
-                    key={chip}
-                    className="rounded-[2px] border-[1.5px] border-line-soft px-2 py-0.5 font-body-medium text-[13px] text-ink-soft"
-                  >
-                    {chip}
+          {/* the cover and name, with how they're getting on */}
+          <View className="flex-row gap-4">
+            <View>
+              <SeriesCover
+                name={m.name}
+                lightNovel={m.lightNovel}
+                url={m.image}
+                width={96}
+                border={2}
+              />
+              {finished ? (
+                <View className="absolute right-[-6px] bottom-2 -rotate-6 border-2 border-accent bg-paper px-1.5">
+                  <Text className="font-brand pr-[4px] text-[16px] tracking-[1px] text-accent uppercase">
+                    Done
+                    {"\u00A0"}
                   </Text>
-                ))}
+                </View>
+              ) : null}
             </View>
-            {/* the edition they collect, under the chips: its label says what
+            <View className="min-w-0 flex-1 justify-center gap-2.5">
+              <Text className="font-display text-[26px] leading-[30px] text-ink">
+                {m.name}
+              </Text>
+              <View className="flex-row flex-wrap items-center gap-1.5">
+                <Text
+                  className={`rounded-[2px] border-[1.5px] px-2 py-0.5 font-body-medium text-[13px] ${finished ? "border-ok text-ok" : "border-accent text-accent"}`}
+                >
+                  {statusWord}
+                </Text>
+                {[m.lightNovel ? "Light novel" : null, genre]
+                  .filter(Boolean)
+                  .map((chip) => (
+                    <Text
+                      key={chip}
+                      className="rounded-[2px] border-[1.5px] border-line-soft px-2 py-0.5 font-body-medium text-[13px] text-ink-soft"
+                    >
+                      {chip}
+                    </Text>
+                  ))}
+              </View>
+              {/* the edition they collect, under the chips: its label says what
                 it is, the value is the tap. The shelf, the counter and Buy
                 next all follow it */}
-            {editions.lines.length ? (
-              <Pressable
-                onPress={() => setPickingEdition(true)}
-                hitSlop={8}
-                accessibilityRole="button"
-                accessibilityLabel={`Edition: ${editions.line?.label ?? "Single volumes"}. Change`}
-                className="flex-row items-center gap-1 self-start active:opacity-70"
-              >
-                <Text className="font-body text-[13.5px] text-ink-soft">
-                  Edition
-                </Text>
-                <Text
-                  numberOfLines={1}
-                  className="shrink font-body-semibold text-[13.5px] text-accent-ink"
+              {editions.lines.length ? (
+                <Pressable
+                  onPress={() => setPickingEdition(true)}
+                  hitSlop={8}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Edition: ${editions.line?.label ?? "Single volumes"}. Change`}
+                  className="flex-row items-center gap-1 self-start active:opacity-70"
                 >
-                  {editions.line?.label ?? "Single volumes"}
-                </Text>
-                <ChevronDownIcon color={c.accentInk} width={14} height={14} />
-              </Pressable>
-            ) : null}
-          </View>
-        </View>
-
-        <BuyStrip
-          options={buyOptions}
-          hideNext={hideNextTicket}
-          barSells={release?.sellsIsbn ?? null}
-          editions={editions}
-          shelfTotal={shelf.total.isKnown ? shelf.total.size : 0}
-          ownsNone={owned.length === 0}
-          nextChapters={
-            buyOptions.next &&
-            buyOptions.next.volume === releaseStatus?.nextVolume
-              ? releaseStatus?.nextVolumeChapters
-              : null
-          }
-          onCollect={(edition) => saveReading({ edition })}
-          onOwnBook={ownBook}
-          onOwnVolume={ownVolume}
-          ordered={ordered}
-          onOrdered={orderVolumes}
-        />
-
-        <View className="gap-2">
-          <View className="flex-row items-end justify-between">
-            <SectionTitle>Your shelf</SectionTitle>
-            <Text className="font-body text-[14px] text-ink-soft">
-              {shelf.count}
-            </Text>
-          </View>
-          <ShelfStrip shelf={shelf} />
-        </View>
-
-        {/* a rule above each section, as the Android app divides them */}
-        <View className="gap-3 border-t border-line-soft pt-6">
-          <ReadingPlace
-            manga={m}
-            finished={finished}
-            planned={planned}
-            trackBy={trackBy}
-            highestOwned={shelf.highest}
-            volumeSets={volumeSets}
-            edition={shelf.editionShelf}
-            newestChapter={releaseStatus?.latestChapter ?? null}
-            onStart={startReading}
-            onChange={saveReading}
-            onPlaceSaved={(saved) => {
-              setManga((now) => (now ? { ...now, ...saved } : now));
-              setChapterSaves((n) => n + 1);
-              void keepTheOtherInStep(saved).finally(
-                () => void useShelf.getState().load(),
-              );
-            }}
-          />
-          {release ? (
-            <ReleaseBar
-              key={release.headline}
-              headline={release.headline}
-              link={release.link}
-              onClose={() => hideRelease(release.seen)}
-            />
-          ) : null}
-        </View>
-
-        <View className="gap-4 border-t border-line-soft pt-6">
-          <RatingField
-            key={`rating-${m.id}`}
-            mangaId={m.id}
-            initial={m.rating ?? 0}
-          />
-          {/* the volume they've read last, asked about quietly beside the
-              series' stars, or out loud in a banner when just finished */}
-          {volumeRating.asked &&
-          !planned &&
-          !volumeRating.inBanner &&
-          volumeRating.showTicket ? (
-            <RateVolume volume={volumeRating} onWrite={setReviewing} />
-          ) : null}
-          {volumeRating.inBanner && !planned ? (
-            <RateVolumeCard volume={volumeRating} onWrite={setReviewing} />
-          ) : null}
-          <NotesField key={m.id} id={m.id} initial={m.description} />
-        </View>
-
-        <View>
-          <YourBooks
-            mangaId={m.id}
-            owned={owned}
-            onRemoved={(left) => setManga((now) => now && withOwned(now, left))}
-            lines={editions.lines}
-            collects={shelf.editionShelf}
-            onAdded={(now) => setManga((was) => was && withOwned(was, now))}
-            booksChanged={booksChanged}
-          />
-          <YourReviews written={reviews.written} onEdit={setReviewing} />
-        </View>
-
-        <View className="gap-2">
-          <Button
-            label={finished ? "Mark as reading" : "Mark as finished"}
-            wide
-            onPress={() => changeStatus()}
-          />
-          {actionNote ? (
-            <View className="flex-row items-baseline justify-center gap-3">
-              <Text className="font-body text-[14px] text-ink-soft">
-                {actionNote}
-              </Text>
-              {canUndoStatus ? (
-                <Pressable onPress={() => changeStatus(true)} hitSlop={8}>
-                  <Text className="font-body-semibold text-[14px] text-accent border-b pb-[2px] border-accent self-start">
-                    Undo
+                  <Text className="font-body text-[13.5px] text-ink-soft">
+                    Edition
                   </Text>
+                  <Text
+                    numberOfLines={1}
+                    className="shrink font-body-semibold text-[13.5px] text-accent-ink"
+                  >
+                    {editions.line?.label ?? "Single volumes"}
+                  </Text>
+                  <ChevronDownIcon color={c.accentInk} width={14} height={14} />
                 </Pressable>
               ) : null}
             </View>
-          ) : null}
-        </View>
-      </ScrollView>
+          </View>
+
+          <BuyStrip
+            options={buyOptions}
+            hideNext={hideNextTicket}
+            barSells={release?.sellsIsbn ?? null}
+            editions={editions}
+            shelfTotal={shelf.total.isKnown ? shelf.total.size : 0}
+            ownsNone={owned.length === 0}
+            nextChapters={
+              buyOptions.next &&
+              buyOptions.next.volume === releaseStatus?.nextVolume
+                ? releaseStatus?.nextVolumeChapters
+                : null
+            }
+            onCollect={(edition) => saveReading({ edition })}
+            onOwnBook={ownBook}
+            onOwnVolume={ownVolume}
+            ordered={ordered}
+            onOrdered={orderVolumes}
+          />
+
+          <View className="gap-2">
+            <View className="flex-row items-end justify-between">
+              <SectionTitle>Your shelf</SectionTitle>
+              <Text className="font-body text-[14px] text-ink-soft">
+                {shelf.count}
+              </Text>
+            </View>
+            <ShelfStrip shelf={shelf} />
+          </View>
+
+          {/* a rule above each section, as the Android app divides them */}
+          <View className="gap-3 border-t border-line-soft pt-6">
+            <ReadingPlace
+              manga={m}
+              finished={finished}
+              planned={planned}
+              trackBy={trackBy}
+              highestOwned={shelf.highest}
+              volumeSets={volumeSets}
+              edition={shelf.editionShelf}
+              newestChapter={releaseStatus?.latestChapter ?? null}
+              onStart={startReading}
+              onChange={saveReading}
+              onPlaceSaved={(saved) => {
+                setManga((now) => (now ? { ...now, ...saved } : now));
+                setChapterSaves((n) => n + 1);
+                void keepTheOtherInStep(saved).finally(
+                  () => void useShelf.getState().load(),
+                );
+              }}
+            />
+            {release ? (
+              <ReleaseBar
+                key={release.headline}
+                headline={release.headline}
+                link={release.link}
+                onClose={() => hideRelease(release.seen)}
+              />
+            ) : null}
+          </View>
+
+          <View className="gap-4 border-t border-line-soft pt-6">
+            <RatingField
+              key={`rating-${m.id}`}
+              mangaId={m.id}
+              initial={m.rating ?? 0}
+            />
+            {/* the volume they've read last, asked about quietly beside the
+              series' stars, or out loud in a banner when just finished */}
+            {volumeRating.asked &&
+            !planned &&
+            !volumeRating.inBanner &&
+            volumeRating.showTicket ? (
+              <RateVolume volume={volumeRating} onWrite={setReviewing} />
+            ) : null}
+            {volumeRating.inBanner && !planned ? (
+              <RateVolumeCard volume={volumeRating} onWrite={setReviewing} />
+            ) : null}
+            <NotesField key={m.id} id={m.id} initial={m.description} />
+          </View>
+
+          <View>
+            <YourBooks
+              mangaId={m.id}
+              owned={owned}
+              onRemoved={(left) =>
+                setManga((now) => now && withOwned(now, left))
+              }
+              lines={editions.lines}
+              collects={shelf.editionShelf}
+              onAdded={(now) => setManga((was) => was && withOwned(was, now))}
+              booksChanged={booksChanged}
+            />
+            <YourReviews written={reviews.written} onEdit={setReviewing} />
+          </View>
+
+          <View className="gap-2">
+            <Button
+              label={finished ? "Mark as reading" : "Mark as finished"}
+              wide
+              onPress={() => changeStatus()}
+            />
+            {actionNote ? (
+              <View className="flex-row items-baseline justify-center gap-3">
+                <Text className="font-body text-[14px] text-ink-soft">
+                  {actionNote}
+                </Text>
+                {canUndoStatus ? (
+                  <Pressable onPress={() => changeStatus(true)} hitSlop={8}>
+                    <Text className="font-body-semibold text-[14px] text-accent border-b pb-[2px] border-accent self-start">
+                      Undo
+                    </Text>
+                  </Pressable>
+                ) : null}
+              </View>
+            ) : null}
+          </View>
+        </ScrollView>
+      </PullPage>
 
       {shelf.undo ? (
         <Toast

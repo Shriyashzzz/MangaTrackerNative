@@ -7,7 +7,8 @@
 // a slide's Undo sits at the foot of the screen
 import { Link } from "expo-router";
 import { useState, type Dispatch, type SetStateAction } from "react";
-import { FlatList, Pressable, RefreshControl, Text, View } from "react-native";
+import { FlatList, Pressable, Text, View } from "react-native";
+import type { SharedValue } from "react-native-reanimated";
 import { ChevronDownIcon } from "@/core/components/icons/Icons";
 import { totalText, type FinishRow } from "@/core/lib/collector";
 import { wholeMoney } from "@/core/lib/country";
@@ -38,15 +39,13 @@ function shortRanges(volumes: number[]) {
 
 export default function VolumesView({
   manga,
-  refreshing,
-  onRefresh,
+  scrollTop,
 }: {
   // the shelf's series that own any volume
   manga: Manga[];
-  refreshing: boolean;
-  onRefresh: () => void;
+  // how far it's scrolled, for the shelf tab's pull to refresh
+  scrollTop: SharedValue<number>;
 }) {
-  const c = useColors();
   const releases = useShelf((s) => s.releases);
   const tools = useShelfTools();
   const [openId, setOpenId] = useState<number | null>(null);
@@ -93,13 +92,11 @@ export default function VolumesView({
         extraData={[open, shelf, jump, tools]}
         ItemSeparatorComponent={DashedLine}
         contentContainerClassName="px-4 pt-3 pb-24"
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            colors={[c.accent]}
-          />
-        }
+        // the shelf tab's pull to refresh is around this list: it's told
+        // how far this one is scrolled
+        overScrollMode="never"
+        scrollEventThrottle={16}
+        onScroll={(e) => scrollTop.set(e.nativeEvent.contentOffset.y)}
         ListHeaderComponent={
           <View>
             <Text className="mb-3 font-mono text-[13px] text-muted">

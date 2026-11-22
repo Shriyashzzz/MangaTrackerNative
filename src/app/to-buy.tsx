@@ -2,18 +2,12 @@
 // buy, what they'd cost new and used all together, each with its prices,
 // On my shelf, Ordered and Remove, sorted their way, and Clear list.
 // Marking one theirs whose series isn't on the shelf offers to add it
+import PullPage, { usePullTop } from "@/components/PullRefresh";
 import Backdrop from "@/components/Backdrop";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import {
-  Alert,
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  Text,
-  View,
-} from "react-native";
+import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 import AddSeriesModal from "@/components/AddSeriesModal";
@@ -166,7 +160,7 @@ export default function ToBuyScreen() {
   >(null);
   const [sort, setSort] = useState<ToBuySort>("added");
   const [pickingSort, setPickingSort] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+  const pull = usePullTop();
   useEffect(() => {
     void load();
   }, [load]);
@@ -242,194 +236,191 @@ export default function ToBuyScreen() {
         </Text>
       </View>
       <DoubleRule />
-      <ScrollView
-        // nothing to list (empty, or it didn't load): Kenji and his line sit
-        // in the middle of the screen, not up under the header
-        contentContainerClassName={`gap-4 px-4 pt-4 pb-24 ${items?.length === 0 || (!items && loadFailed) ? "grow justify-center" : ""}`}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={() => {
-              setRefreshing(true);
-              void load().finally(() => setRefreshing(false));
-            }}
-            colors={[c.accent]}
-          />
-        }
-      >
-        {!items && loadFailed ? (
-          <View className="items-center gap-3 py-8">
-            <Mascot mood="panic" width={100} />
-            <Text className="font-body text-[15px] text-ink-soft">
-              Your list didn't load.
-            </Text>
-            <Button
-              center
-              label="Try again"
-              small
-              onPress={() => void load()}
-            />
-          </View>
-        ) : null}
-        {items?.length === 0 ? (
-          <View className="items-center gap-3 py-8">
-            <Mascot mood="confused" width={100} />
-            <Text className="text-center font-body text-[15px] text-ink-soft">
-              Open a volume's prices and tap “+ To buy” to keep it here.
-            </Text>
-            <Button
-              center
-              label="Browse every series"
-              small
-              onPress={() => router.push("/prices")}
-            />
-          </View>
-        ) : null}
-        {note ? (
-          <Text className="font-body text-[14.5px] text-ink-soft">
-            {note.text}
-            {"link" in note && note.link ? (
-              <> {link(note.link.label, note.link.go)}.</>
-            ) : null}
-          </Text>
-        ) : null}
-        {items && items.length > 0 && list ? (
-          <>
-            <View className="gap-1 rounded-[14px] border border-line-soft bg-card p-3">
-              <Text className="font-brand pr-[5px] text-[20px] tracking-[1px] text-ink uppercase">
-                {items.length === 1 ? "1 volume" : `${items.length} volumes`} to
-                buy
-                {"\u00A0"}
+      <PullPage refresh={load} scrollTop={pull.top}>
+        <ScrollView
+          // nothing to list (empty, or it didn't load): Kenji and his line sit
+          // in the middle of the screen, not up under the header
+          contentContainerClassName={`gap-4 px-4 pt-4 pb-24 ${items?.length === 0 || (!items && loadFailed) ? "grow justify-center" : ""}`}
+          overScrollMode="never"
+          scrollEventThrottle={16}
+          onScroll={pull.track}
+        >
+          {!items && loadFailed ? (
+            <View className="items-center gap-3 py-8">
+              <Mascot mood="panic" width={100} />
+              <Text className="font-body text-[15px] text-ink-soft">
+                Your list didn't load.
               </Text>
-              <Total label="New" sum={list.totals.new} of={items.length} />
-              <Total label="Used" sum={list.totals.used} of={items.length} />
-              {!list.totals.new.volumes && !list.totals.used.volumes ? (
-                <Text className="font-body text-[14px] text-ink-soft">
-                  No prices found for these yet.
-                </Text>
+              <Button
+                center
+                label="Try again"
+                small
+                onPress={() => void load()}
+              />
+            </View>
+          ) : null}
+          {items?.length === 0 ? (
+            <View className="items-center gap-3 py-8">
+              <Mascot mood="confused" width={100} />
+              <Text className="text-center font-body text-[15px] text-ink-soft">
+                Open a volume's prices and tap “+ To buy” to keep it here.
+              </Text>
+              <Button
+                center
+                label="Browse every series"
+                small
+                onPress={() => router.push("/prices")}
+              />
+            </View>
+          ) : null}
+          {note ? (
+            <Text className="font-body text-[14.5px] text-ink-soft">
+              {note.text}
+              {"link" in note && note.link ? (
+                <> {link(note.link.label, note.link.go)}.</>
               ) : null}
-            </View>
-            <View className="flex-row items-center justify-between gap-3">
-              <Pressable
-                onPress={() => setPickingSort(true)}
-                className="flex-row items-center gap-1"
-                accessibilityLabel={`Sorted by ${sortLabel}. Change`}
-              >
-                <Text className="font-body text-[14px] text-ink-soft">
-                  Sorted by
+            </Text>
+          ) : null}
+          {items && items.length > 0 && list ? (
+            <>
+              <View className="gap-1 rounded-[14px] border border-line-soft bg-card p-3">
+                <Text className="font-brand pr-[5px] text-[20px] tracking-[1px] text-ink uppercase">
+                  {items.length === 1 ? "1 volume" : `${items.length} volumes`}{" "}
+                  to buy
+                  {"\u00A0"}
                 </Text>
-                <Text className="font-body-semibold text-[14px] text-ink">
-                  {sortLabel}
-                </Text>
-                <ChevronDownIcon color={c.ink} width={14} height={14} />
-              </Pressable>
-              <Pressable onPress={askToClear} hitSlop={6}>
-                <Text className="font-body text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
-                  Clear list
-                </Text>
-              </Pressable>
-            </View>
-            <View className="rounded-[14px] border border-line-soft bg-card">
-              {sorted.map((item, i) => (
-                <View
-                  key={item.isbn13}
-                  className={`gap-3 px-3 py-3 ${i ? "border-t-[1.5px] border-dashed border-line-soft" : ""}`}
+                <Total label="New" sum={list.totals.new} of={items.length} />
+                <Total label="Used" sum={list.totals.used} of={items.length} />
+                {!list.totals.new.volumes && !list.totals.used.volumes ? (
+                  <Text className="font-body text-[14px] text-ink-soft">
+                    No prices found for these yet.
+                  </Text>
+                ) : null}
+              </View>
+              <View className="flex-row items-center justify-between gap-3">
+                <Pressable
+                  onPress={() => setPickingSort(true)}
+                  className="flex-row items-center gap-1"
+                  accessibilityLabel={`Sorted by ${sortLabel}. Change`}
                 >
-                  <View className="flex-row gap-3">
-                    <Pressable
-                      onPress={() => router.push(`/prices/${item.isbn13}`)}
-                    >
-                      <Image
-                        source={{
-                          uri: coverSrc(
-                            item.coverUrl ?? item.seriesCoverUrl ?? "",
-                          ),
-                        }}
-                        style={{
-                          width: 60,
-                          aspectRatio: 2 / 3,
-                          borderWidth: 1.5,
-                          borderColor: c.line,
-                          backgroundColor: c.paper2,
-                        }}
-                        contentFit="cover"
-                      />
-                      {item.volume != null && !item.edition ? (
-                        <View className="absolute top-0 left-0 bg-ink px-1.5">
-                          <Text className="font-brand pr-[4px] text-[13px] text-paper">
-                            {item.volume}
-                            {"\u00A0"}
-                          </Text>
-                        </View>
-                      ) : null}
-                    </Pressable>
-                    <View className="min-w-0 flex-1 gap-1">
+                  <Text className="font-body text-[14px] text-ink-soft">
+                    Sorted by
+                  </Text>
+                  <Text className="font-body-semibold text-[14px] text-ink">
+                    {sortLabel}
+                  </Text>
+                  <ChevronDownIcon color={c.ink} width={14} height={14} />
+                </Pressable>
+                <Pressable onPress={askToClear} hitSlop={6}>
+                  <Text className="font-body text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
+                    Clear list
+                  </Text>
+                </Pressable>
+              </View>
+              <View className="rounded-[14px] border border-line-soft bg-card">
+                {sorted.map((item, i) => (
+                  <View
+                    key={item.isbn13}
+                    className={`gap-3 px-3 py-3 ${i ? "border-t-[1.5px] border-dashed border-line-soft" : ""}`}
+                  >
+                    <View className="flex-row gap-3">
                       <Pressable
                         onPress={() => router.push(`/prices/${item.isbn13}`)}
                       >
-                        <Text className="font-body-semibold text-[15.5px] text-ink">
-                          {nameOf(item)}
+                        <Image
+                          source={{
+                            uri: coverSrc(
+                              item.coverUrl ?? item.seriesCoverUrl ?? "",
+                            ),
+                          }}
+                          style={{
+                            width: 60,
+                            aspectRatio: 2 / 3,
+                            borderWidth: 1.5,
+                            borderColor: c.line,
+                            backgroundColor: c.paper2,
+                          }}
+                          contentFit="cover"
+                        />
+                        {item.volume != null && !item.edition ? (
+                          <View className="absolute top-0 left-0 bg-ink px-1.5">
+                            <Text className="font-brand pr-[4px] text-[13px] text-paper">
+                              {item.volume}
+                              {"\u00A0"}
+                            </Text>
+                          </View>
+                        ) : null}
+                      </Pressable>
+                      <View className="min-w-0 flex-1 gap-1">
+                        <Pressable
+                          onPress={() => router.push(`/prices/${item.isbn13}`)}
+                        >
+                          <Text className="font-body-semibold text-[15.5px] text-ink">
+                            {nameOf(item)}
+                          </Text>
+                        </Pressable>
+                        {item.shelf?.state ? (
+                          <Text className="font-mono text-[11px] tracking-[0.5px] text-ok uppercase">
+                            {item.shelf.state === "owned"
+                              ? "Already yours"
+                              : "Ordered"}
+                          </Text>
+                        ) : null}
+                        <Price label="New" price={item.new} />
+                        <Price label="Used" price={item.used} />
+                        {!item.new && !item.used ? (
+                          <Text className="font-mono text-[13px] text-ink-soft">
+                            {item.outOn ? (
+                              <>
+                                Preorder. Out{" "}
+                                <Text className="font-mono-medium text-ink">
+                                  {releaseDay(item.outOn)}
+                                </Text>
+                              </>
+                            ) : (
+                              "No price yet"
+                            )}
+                          </Text>
+                        ) : null}
+                      </View>
+                    </View>
+                    <View className="flex-row flex-wrap items-center gap-3">
+                      {!item.outOn ? (
+                        <Button
+                          label={
+                            busy === item.isbn13 ? "Saving…" : "On my shelf"
+                          }
+                          kind="primary"
+                          small
+                          disabled={busy !== null}
+                          onPress={() => void settle(item, "owned")}
+                        />
+                      ) : null}
+                      {item.outOn || item.volumes || item.edition ? (
+                        <Button
+                          label="Ordered"
+                          small
+                          disabled={busy !== null}
+                          onPress={() => void settle(item, "ordered")}
+                        />
+                      ) : null}
+                      <Pressable
+                        onPress={() => void takeOff(item)}
+                        disabled={busy !== null}
+                        hitSlop={6}
+                      >
+                        <Text className="font-body text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
+                          Remove
                         </Text>
                       </Pressable>
-                      {item.shelf?.state ? (
-                        <Text className="font-mono text-[11px] tracking-[0.5px] text-ok uppercase">
-                          {item.shelf.state === "owned"
-                            ? "Already yours"
-                            : "Ordered"}
-                        </Text>
-                      ) : null}
-                      <Price label="New" price={item.new} />
-                      <Price label="Used" price={item.used} />
-                      {!item.new && !item.used ? (
-                        <Text className="font-mono text-[13px] text-ink-soft">
-                          {item.outOn ? (
-                            <>
-                              Preorder. Out{" "}
-                              <Text className="font-mono-medium text-ink">
-                                {releaseDay(item.outOn)}
-                              </Text>
-                            </>
-                          ) : (
-                            "No price yet"
-                          )}
-                        </Text>
-                      ) : null}
                     </View>
                   </View>
-                  <View className="flex-row flex-wrap items-center gap-3">
-                    {!item.outOn ? (
-                      <Button
-                        label={busy === item.isbn13 ? "Saving…" : "On my shelf"}
-                        kind="primary"
-                        small
-                        disabled={busy !== null}
-                        onPress={() => void settle(item, "owned")}
-                      />
-                    ) : null}
-                    {item.outOn || item.volumes || item.edition ? (
-                      <Button
-                        label="Ordered"
-                        small
-                        disabled={busy !== null}
-                        onPress={() => void settle(item, "ordered")}
-                      />
-                    ) : null}
-                    <Pressable
-                      onPress={() => void takeOff(item)}
-                      disabled={busy !== null}
-                      hitSlop={6}
-                    >
-                      <Text className="font-body text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
-                        Remove
-                      </Text>
-                    </Pressable>
-                  </View>
-                </View>
-              ))}
-            </View>
-          </>
-        ) : null}
-      </ScrollView>
+                ))}
+              </View>
+            </>
+          ) : null}
+        </ScrollView>
+      </PullPage>
       <PickSheet
         open={pickingSort}
         title="Sort by"
