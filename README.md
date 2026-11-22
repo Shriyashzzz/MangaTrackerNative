@@ -157,7 +157,6 @@ with `APP_ENV=production` set for a release built on this machine.
   didn't save
 - Live price checks (the website proves a person is there first; the app
   gets stored prices)
-- Before release: allow plain http to localhost only, not everywhere
 
 ## License
 
