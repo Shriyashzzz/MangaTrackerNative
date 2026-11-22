@@ -462,7 +462,7 @@ export default function NewScreen() {
           PILES.filter(
             (p) => piles[p].length && (!openPile || openPile === p),
           ).map((p) => (
-            <View key={p} className="gap-2 border-t border-line pt-3">
+            <View key={p} className="gap-2 border-t border-line pt-5 pb-2">
               <View className="flex-row items-end justify-between">
                 <H2>
                   {PILE_TEXT[kind][p].name}{" "}
@@ -479,7 +479,7 @@ export default function NewScreen() {
                   </Text>
                 </Pressable>
               </View>
-              <Text className="font-body text-[13.5px] text-ink-soft">
+              <Text className="pb-3 font-body text-[13.5px] text-ink-soft">
                 {PILE_TEXT[kind][p].why}
                 {catchUpText(p, piles[p], releases, kind)}
                 {checking && (p === "few" || p === "way") ? " so far" : ""}
