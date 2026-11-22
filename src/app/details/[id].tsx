@@ -5,12 +5,14 @@
 // finished. Edit and Delete are in the ⋮ menu. This file loads the series
 // and saves changes to it; each part of the page is its own component, and
 // every rule is the web's own (core pages/Details, core lib)
+import { useTourScroll } from "@/lib/tourScroll";
+import TourTarget from "@/components/TourTarget";
 import Tap from "@/components/Tap";
 import { isNetworkError } from "@/core/lib/offline";
 import PullPage, { usePullTop } from "@/components/PullRefresh";
 import Backdrop from "@/components/Backdrop";
 import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import { type ComponentRef, useEffect, useRef, useState } from "react";
 import { Alert, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
@@ -110,6 +112,9 @@ export default function DetailsScreen() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [pickingEdition, setPickingEdition] = useState(false);
   const pull = usePullTop();
+  // (the tour scrolls this page to what Kenji points at)
+  const scroller = useRef<ComponentRef<typeof ScrollView>>(null);
+  useTourScroll(scroller, pull.top);
   // under the buttons: a failed save, or the undo for marking it finished
   const [actionNote, setActionNote] = useState("");
   const [canUndoStatus, setCanUndoStatus] = useState(false);
@@ -497,6 +502,7 @@ export default function DetailsScreen() {
       <DoubleRule />
       <PullPage refresh={refreshPage} scrollTop={pull.top}>
         <ScrollView
+          ref={scroller}
           contentContainerClassName="gap-6 px-4 pt-4 pb-16"
           overScrollMode="never"
           scrollEventThrottle={16}
@@ -575,25 +581,27 @@ export default function DetailsScreen() {
             </View>
           </View>
 
-          <BuyStrip
-            options={buyOptions}
-            hideNext={hideNextTicket}
-            barSells={release?.sellsIsbn ?? null}
-            editions={editions}
-            shelfTotal={shelf.total.isKnown ? shelf.total.size : 0}
-            ownsNone={owned.length === 0}
-            nextChapters={
-              buyOptions.next &&
-              buyOptions.next.volume === releaseStatus?.nextVolume
-                ? releaseStatus?.nextVolumeChapters
-                : null
-            }
-            onCollect={(edition) => saveReading({ edition })}
-            onOwnBook={ownBook}
-            onOwnVolume={ownVolume}
-            ordered={ordered}
-            onOrdered={orderVolumes}
-          />
+          <TourTarget name="buy">
+            <BuyStrip
+              options={buyOptions}
+              hideNext={hideNextTicket}
+              barSells={release?.sellsIsbn ?? null}
+              editions={editions}
+              shelfTotal={shelf.total.isKnown ? shelf.total.size : 0}
+              ownsNone={owned.length === 0}
+              nextChapters={
+                buyOptions.next &&
+                buyOptions.next.volume === releaseStatus?.nextVolume
+                  ? releaseStatus?.nextVolumeChapters
+                  : null
+              }
+              onCollect={(edition) => saveReading({ edition })}
+              onOwnBook={ownBook}
+              onOwnVolume={ownVolume}
+              ordered={ordered}
+              onOrdered={orderVolumes}
+            />
+          </TourTarget>
 
           <View className="gap-2">
             <View className="flex-row items-end justify-between">
@@ -602,37 +610,43 @@ export default function DetailsScreen() {
                 {shelf.count}
               </Text>
             </View>
-            <ShelfStrip shelf={shelf} />
+            <TourTarget name="spines">
+              <ShelfStrip shelf={shelf} />
+            </TourTarget>
           </View>
 
           {/* a rule above each section, as the Android app divides them */}
           <View className="gap-3 border-t border-line-soft pt-6">
-            <ReadingPlace
-              manga={withBothPlaces(m)}
-              finished={finished}
-              planned={planned}
-              trackBy={trackBy}
-              highestOwned={shelf.highest}
-              volumeSets={volumeSets}
-              edition={shelf.editionShelf}
-              newestChapter={releaseStatus?.latestChapter ?? null}
-              onStart={startReading}
-              onChange={saveReading}
-              onPlaceSaved={(saved) => {
-                setManga((now) => (now ? { ...now, ...saved } : now));
-                setChapterSaves((n) => n + 1);
-                void keepTheOtherInStep(saved).finally(
-                  () => void useShelf.getState().load(),
-                );
-              }}
-            />
-            {release ? (
-              <ReleaseBar
-                key={release.headline}
-                headline={release.headline}
-                link={release.link}
-                onClose={() => hideRelease(release.seen)}
+            <TourTarget name="chapter-up">
+              <ReadingPlace
+                manga={withBothPlaces(m)}
+                finished={finished}
+                planned={planned}
+                trackBy={trackBy}
+                highestOwned={shelf.highest}
+                volumeSets={volumeSets}
+                edition={shelf.editionShelf}
+                newestChapter={releaseStatus?.latestChapter ?? null}
+                onStart={startReading}
+                onChange={saveReading}
+                onPlaceSaved={(saved) => {
+                  setManga((now) => (now ? { ...now, ...saved } : now));
+                  setChapterSaves((n) => n + 1);
+                  void keepTheOtherInStep(saved).finally(
+                    () => void useShelf.getState().load(),
+                  );
+                }}
               />
+            </TourTarget>
+            {release ? (
+              <TourTarget name="release-toggle">
+                <ReleaseBar
+                  key={release.headline}
+                  headline={release.headline}
+                  link={release.link}
+                  onClose={() => hideRelease(release.seen)}
+                />
+              </TourTarget>
             ) : null}
           </View>
 
@@ -657,17 +671,19 @@ export default function DetailsScreen() {
           </View>
 
           <View>
-            <YourBooks
-              mangaId={m.id}
-              owned={owned}
-              onRemoved={(left) =>
-                setManga((now) => now && withOwned(now, left))
-              }
-              lines={editions.lines}
-              collects={shelf.editionShelf}
-              onAdded={(now) => setManga((was) => was && withOwned(was, now))}
-              booksChanged={booksChanged}
-            />
+            <TourTarget name="your-books">
+              <YourBooks
+                mangaId={m.id}
+                owned={owned}
+                onRemoved={(left) =>
+                  setManga((now) => now && withOwned(now, left))
+                }
+                lines={editions.lines}
+                collects={shelf.editionShelf}
+                onAdded={(now) => setManga((was) => was && withOwned(was, now))}
+                booksChanged={booksChanged}
+              />
+            </TourTarget>
             <YourReviews written={reviews.written} onEdit={setReviewing} />
           </View>
 

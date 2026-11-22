@@ -30,8 +30,7 @@ export type CollectorSeries = {
 
 let loaded: CollectorSeries[] | null = null;
 export async function loadCollector() {
-  loaded ??= (await import("./demoCollector.json"))
-    .default as unknown as CollectorSeries[];
+  loaded ??= (require("./demoCollector.json") as unknown) as unknown as CollectorSeries[];
   return loaded;
 }
 

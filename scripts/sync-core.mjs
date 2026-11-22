@@ -260,16 +260,32 @@ for (const [abs, { text, isStandIn }] of files) {
   // starts and ends that way): the app is told instead, and moves itself.
   // Expo has a location of its own that can't be replaced, so the calls
   // are renamed here
-  const GO = "(globalThis as unknown as { practiceGo: (to: string) => void }).practiceGo";
+  const GO =
+    "(globalThis as unknown as { practiceGo: (to: string) => void }).practiceGo";
   const forTheApp = text
     .replaceAll(
       'import.meta.env.VITE_API_URL ?? ""',
       '(globalThis as { API_URL?: string }).API_URL ?? ""',
     )
+    // (the collector's data is loaded on demand on the website, to keep it
+    // out of the first page; the app has it in its bundle from the start,
+    // where loading it on demand doesn't work)
+    .replaceAll(
+      '(await import("./demoCollector.json"))\n    .default',
+      '(require("./demoCollector.json") as unknown)',
+    )
     .replaceAll("window.location.assign", GO)
     .replaceAll("window.location.reload()", "undefined")
     .replaceAll("window.location.pathname", 'String("/")');
-  writeFileSync(dest, banner + forTheApp);
+  // Kenji's script is worked out once on the website, as its page loads
+  // (starting a tour reloads it). The app never reloads, so it asks afresh
+  // each time a tour starts
+  const forTour =
+    rel === "components/tour/steps.ts"
+      ? forTheApp +
+        '\n// (added by sync-core: the same, asked each time a tour starts)\nexport const tourSteps = (): TourStep[] =>\n  demoKind() === "collector" ? collectorSteps() : stepsOf(READER);\n'
+      : forTheApp;
+  writeFileSync(dest, banner + forTour);
 }
 console.log(`\ncopied into src/core`);
 

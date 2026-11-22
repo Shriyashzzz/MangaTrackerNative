@@ -4,6 +4,7 @@
 // it in), stars, and under "More about it" the volumes they own, the type,
 // genre and notes. The checks and the request are the web's own (core
 // seriesFormRules); AniList's matches come through core useCoverSearch
+import TourTarget from "@/components/TourTarget";
 import Tap from "@/components/Tap";
 import { useIsOffline } from "@/core/lib/offline";
 import { Image } from "expo-image";
@@ -528,15 +529,18 @@ export default function AddScreen() {
               />
             ) : null}
             {stage === "reading" && !lightNovel ? (
-              <WatchedAnime
-                seriesName={title.trim()}
-                onPick={(place) => {
-                  if (place.chapter !== null) setChapter(String(place.chapter));
-                  if (place.volume !== null)
-                    setReadVolume(String(place.volume));
-                  setProblems((e) => ({ ...e, bookmark: undefined }));
-                }}
-              />
+              <TourTarget name="anime">
+                <WatchedAnime
+                  seriesName={title.trim()}
+                  onPick={(place) => {
+                    if (place.chapter !== null)
+                      setChapter(String(place.chapter));
+                    if (place.volume !== null)
+                      setReadVolume(String(place.volume));
+                    setProblems((e) => ({ ...e, bookmark: undefined }));
+                  }}
+                />
+              </TourTarget>
             ) : null}
             {stage !== "planned" ? (
               <Field label="Your rating" optional>

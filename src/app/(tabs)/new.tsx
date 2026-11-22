@@ -5,11 +5,13 @@
 // one, or any far behind, is sorted into piles, each a fan of covers that
 // opens to all of them. Nothing new says why. Who's in, where, and the
 // words are all the web's own (core shelfViews, piles, farBehind, newTabLinks)
+import { useTourScroll } from "@/lib/tourScroll";
+import TourTarget from "@/components/TourTarget";
 import Tap from "@/components/Tap";
 import PullPage, { usePullTop } from "@/components/PullRefresh";
 import Backdrop from "@/components/Backdrop";
 import { Link, router } from "expo-router";
-import { useEffect, useState } from "react";
+import { type ComponentRef, useEffect, useRef, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
@@ -117,6 +119,9 @@ export default function NewScreen() {
   const [japanOf, setJapanOf] = useState<number | null>(null);
   const [askingHideAll, setAskingHideAll] = useState(false);
   const pull = usePullTop();
+  // (the tour scrolls this page to what Kenji points at)
+  const scroller = useRef<ComponentRef<typeof ScrollView>>(null);
+  useTourScroll(scroller, pull.top);
   useEffect(() => {
     if (manga && checksOn) void checkReleases();
   }, [manga, checksOn, checkReleases]);
@@ -276,6 +281,7 @@ export default function NewScreen() {
       <AppHeader />
       <PullPage refresh={load} scrollTop={pull.top}>
         <ScrollView
+          ref={scroller}
           contentContainerClassName="gap-4 px-4 pt-5 pb-10"
           overScrollMode="never"
           scrollEventThrottle={16}
@@ -309,7 +315,11 @@ export default function NewScreen() {
             </View>
           ) : null}
 
-          {!viewingHidden && !openPile ? <UpcomingReleases /> : null}
+          {!viewingHidden && !openPile ? (
+            <TourTarget name="upcoming">
+              <UpcomingReleases />
+            </TourTarget>
+          ) : null}
 
           {/* Volumes, Chapters, In Japan: one segmented switch */}
           <Segmented

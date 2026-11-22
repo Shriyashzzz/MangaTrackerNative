@@ -9,6 +9,7 @@ import { router } from "expo-router";
 import { API_URL } from "@/core/lib/api";
 import { endDemo, isDemo, startDemo, type DemoKind } from "@/core/lib/demo";
 import { useAuth } from "@/store/auth";
+import { useTour } from "@/store/tour";
 import { forgetAccountData } from "./forgetAccount";
 import { whenPracticeGoes } from "./practiceBrowser";
 
@@ -25,9 +26,12 @@ whenPracticeGoes((to) => {
     // anything left of a guest's visit goes first
     forgetAccountData();
     useAuth.setState({ isSignedIn: true });
+    // Kenji's tour starts with it
+    useTour.getState().start();
     router.replace("/");
     return;
   }
+  useTour.getState().end();
   forgetAccountData();
   useAuth.setState({ isSignedIn: false });
   router.replace(to === "/sign-up" ? "/sign-up" : "/");

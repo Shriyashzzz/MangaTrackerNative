@@ -405,3 +405,7 @@ function collectorSteps(): TourStep[] {
 // the tour this page load is on: starting either reloads the page
 export const TOUR_STEPS: TourStep[] =
   demoKind() === "collector" ? collectorSteps() : stepsOf(READER);
+
+// (added by sync-core: the same, asked each time a tour starts)
+export const tourSteps = (): TourStep[] =>
+  demoKind() === "collector" ? collectorSteps() : stepsOf(READER);

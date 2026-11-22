@@ -1,5 +1,6 @@
 // The app's frame: the fonts the web uses, the session checked once, then
 // the tabs for everyone; the pages that need an account only when signed in
+import { View } from "react-native";
 import "../global.css";
 import { Bangers_400Regular } from "@expo-google-fonts/bangers";
 import { ComicNeue_700Bold } from "@expo-google-fonts/comic-neue";
@@ -29,7 +30,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { loadDeviceStore } from "@/lib/deviceStore";
 import OfflineBar from "@/components/OfflineBar";
-import PracticeBar from "@/components/PracticeBar";
+import Tour from "@/components/Tour";
 import { forgetAccountData } from "@/lib/forgetAccount";
 import { openTappedAlerts, refreshPhoneAlerts } from "@/lib/phoneAlerts";
 import { useAuth } from "@/store/auth";
@@ -90,58 +91,62 @@ export default function RootLayout() {
       <KeyboardProvider>
         <BottomSheetModalProvider>
           <StatusBar style="auto" />
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              // pages slide in from the right and swipe back from anywhere,
-              // as an iPhone's do
-              animation: "ios_from_right",
-              animationDuration: 320,
-              gestureEnabled: true,
-              fullScreenGestureEnabled: true,
-              animationMatchesGesture: true,
-            }}
-          >
-            {/* open to anyone: the tabs (a guest's shelf, prices, sign in),
+          {/* the pages, with Kenji's tour floating over them (never
+              pushing them about) */}
+          <View style={{ flex: 1 }}>
+            <Stack
+              screenOptions={{
+                headerShown: false,
+                // pages slide in from the right and swipe back from anywhere,
+                // as an iPhone's do
+                animation: "ios_from_right",
+                animationDuration: 320,
+                gestureEnabled: true,
+                fullScreenGestureEnabled: true,
+                animationMatchesGesture: true,
+              }}
+            >
+              {/* open to anyone: the tabs (a guest's shelf, prices, sign in),
                 the price pages, and the pages about the app */}
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="prices/series" />
-            <Stack.Screen name="prices/[isbn]" />
-            <Stack.Screen name="after-anime/index" />
-            <Stack.Screen name="after-anime/[slug]" />
-            <Stack.Screen name="editions" />
-            <Stack.Screen name="deals" />
-            <Stack.Screen name="series" />
-            <Stack.Screen name="updates" />
-            <Stack.Screen name="faq" />
-            <Stack.Screen name="about" />
-            <Stack.Screen name="acknowledgements" />
-            <Stack.Screen name="privacy" />
-            <Stack.Screen name="u/[code]" />
-            <Stack.Protected guard={Boolean(isSignedIn)}>
-              <Stack.Screen name="details/[id]" />
-              <Stack.Screen name="edit/[id]" />
-              <Stack.Screen name="add" />
-              <Stack.Screen name="scan" />
-              <Stack.Screen name="settings" />
-              <Stack.Screen name="to-buy" />
-              <Stack.Screen name="new-releases" />
-              <Stack.Screen name="friends" />
-              <Stack.Screen name="import" />
-              <Stack.Screen name="calendar" />
-              <Stack.Screen name="year" />
-              <Stack.Screen name="stats" />
-            </Stack.Protected>
-            <Stack.Protected guard={!isSignedIn}>
-              <Stack.Screen name="sign-in" />
-              <Stack.Screen name="sign-up" />
-              <Stack.Screen name="forgot-password" />
-            </Stack.Protected>
-            {/* from a reset link, signed in or not */}
-            <Stack.Screen name="reset-password/[token]" />
-          </Stack>
+              <Stack.Screen name="(tabs)" />
+              <Stack.Screen name="prices/series" />
+              <Stack.Screen name="prices/[isbn]" />
+              <Stack.Screen name="after-anime/index" />
+              <Stack.Screen name="after-anime/[slug]" />
+              <Stack.Screen name="editions" />
+              <Stack.Screen name="deals" />
+              <Stack.Screen name="series" />
+              <Stack.Screen name="updates" />
+              <Stack.Screen name="faq" />
+              <Stack.Screen name="about" />
+              <Stack.Screen name="acknowledgements" />
+              <Stack.Screen name="privacy" />
+              <Stack.Screen name="u/[code]" />
+              <Stack.Protected guard={Boolean(isSignedIn)}>
+                <Stack.Screen name="details/[id]" />
+                <Stack.Screen name="edit/[id]" />
+                <Stack.Screen name="add" />
+                <Stack.Screen name="scan" />
+                <Stack.Screen name="settings" />
+                <Stack.Screen name="to-buy" />
+                <Stack.Screen name="new-releases" />
+                <Stack.Screen name="friends" />
+                <Stack.Screen name="import" />
+                <Stack.Screen name="calendar" />
+                <Stack.Screen name="year" />
+                <Stack.Screen name="stats" />
+              </Stack.Protected>
+              <Stack.Protected guard={!isSignedIn}>
+                <Stack.Screen name="sign-in" />
+                <Stack.Screen name="sign-up" />
+                <Stack.Screen name="forgot-password" />
+              </Stack.Protected>
+              {/* from a reset link, signed in or not */}
+              <Stack.Screen name="reset-password/[token]" />
+            </Stack>
+            <Tour signedIn={Boolean(isSignedIn)} />
+          </View>
           {/* no connection, or kept changes just sent: said along the foot */}
-          <PracticeBar signedIn={Boolean(isSignedIn)} />
           <OfflineBar signedIn={Boolean(isSignedIn)} />
         </BottomSheetModalProvider>
       </KeyboardProvider>
