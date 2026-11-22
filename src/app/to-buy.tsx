@@ -286,10 +286,12 @@ function Card({
             }}
             contentFit="cover"
           />
-          {item.volume != null && !item.edition ? (
+          {/* which book it is: a volume's number, or its edition in a few
+              letters with the book's number ("DLX 10", "DEF 9") */}
+          {item.volume != null || item.editionShort ? (
             <View className="absolute top-0 left-0 bg-ink px-1.5">
               <Text className="font-brand pr-[4px] text-[13px] text-paper">
-                {item.volume}
+                {[item.editionShort, item.volume].filter(Boolean).join(" ")}
                 {"\u00A0"}
               </Text>
             </View>
@@ -369,6 +371,13 @@ function Card({
               </Text>
             </Tap>
           </View>
+          {/* a preorder with a price: when it's out, under their chips (one
+              with no price says so on its button) */}
+          {best && item.outOn ? (
+            <Text className="font-mono text-[12.5px] text-ink-soft">
+              Out {releaseDay(item.outOn)}
+            </Text>
+          ) : null}
           {/* the other copy, beside the cover: the same button, quieter, so
               the cheaper one under it stays the obvious pick */}
           {other ? (
@@ -432,11 +441,6 @@ function Card({
           </Text>
         </Tap>
       )}
-      {best && item.outOn ? (
-        <Text className="font-body text-[13px] text-ink-soft">
-          Out {releaseDay(item.outOn)}
-        </Text>
-      ) : null}
       <MenuSheet
         open={menuOpen}
         title={name}
