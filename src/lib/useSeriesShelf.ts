@@ -159,6 +159,13 @@ export function useSeriesShelf(
           total: slots.length,
           owned: slotsIn(slots, owned, "all"),
           here: inEdition?.slot ?? null,
+          // a book whose missing volumes are all ordered: on its way
+          ordered: slots.flatMap((slot, i) => {
+            const missing = slot.volumes.filter((v) => !owned.includes(v));
+            return missing.length && missing.every((v) => ordered.includes(v))
+              ? [i + 1]
+              : [];
+          }),
           opensAt: opensAt ?? null,
           slots: stripSlots,
           onToggle: (n: number) =>
@@ -173,6 +180,8 @@ export function useSeriesShelf(
           total: total.size,
           owned,
           here: place?.volume ?? null,
+          // ordered and on their way: dashed red spines
+          ordered,
           opensAt: opensAt ?? gaps[0] ?? null,
           onToggle: (v: number) => ownedVolumes.toggle(v),
           onPaint: (next: number[]) => ownedVolumes.paint(next),
