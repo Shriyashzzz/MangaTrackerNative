@@ -257,7 +257,12 @@ export default function ToBuyScreen() {
             <Text className="font-body text-[15px] text-ink-soft">
               Your list didn't load.
             </Text>
-            <Button label="Try again" small onPress={() => void load()} />
+            <Button
+              center
+              label="Try again"
+              small
+              onPress={() => void load()}
+            />
           </View>
         ) : null}
         {items?.length === 0 ? (
@@ -267,6 +272,7 @@ export default function ToBuyScreen() {
               Open a volume's prices and tap “+ To buy” to keep it here.
             </Text>
             <Button
+              center
               label="Browse every series"
               small
               onPress={() => router.push("/prices")}

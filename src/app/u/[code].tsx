@@ -826,6 +826,7 @@ export default function SharedShelfScreen() {
         ) : null}
         <View className="flex-row gap-3">
           <Button
+            center
             label="Share"
             small
             onPress={() =>
@@ -833,6 +834,7 @@ export default function SharedShelfScreen() {
             }
           />
           <Button
+            center
             label="Open on the web"
             small
             onPress={() => void Linking.openURL(link)}

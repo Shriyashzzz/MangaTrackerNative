@@ -286,6 +286,9 @@ export default function PriceVolumeScreen() {
                 Vol. {volume}
               </Text>
             ) : null}
+            <Text className="rounded-[2px] border border-line-soft px-1.5 font-mono text-[11px] text-ink-soft">
+              ISBN-13 {book.isbn13.trim()}
+            </Text>
             {inBook ? (
               <Text className="rounded-[2px] border-[1.5px] border-line-soft px-1.5 font-body-medium text-[12px] text-ink-soft">
                 Vols. {inBook.from}–{inBook.to} in one book

@@ -363,10 +363,19 @@ export default function PriceSeriesScreen() {
               <Button label="Try again" small onPress={series.retry} />
             </View>
           ) : (
-            <Text className="font-body text-[14.5px] text-ink-soft">
-              This manga has no English physical volumes released yet. If one is
-              out, try searching it by name or ISBN.
-            </Text>
+            <View className="items-center gap-3 py-6">
+              <Mascot mood="confused" width={100} />
+              <Text className="text-center font-body text-[15px] leading-[22px] text-ink-soft">
+                No English volumes out yet.{"\n"}If one is, search it by name or
+                ISBN.
+              </Text>
+              <Button
+                center
+                small
+                label="Search a volume"
+                onPress={() => router.push("/prices")}
+              />
+            </View>
           )}
           {incomplete && volumes.length > 0 && hasHole ? (
             <Text className="font-body text-[13.5px] text-ink-soft">

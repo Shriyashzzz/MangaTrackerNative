@@ -386,6 +386,7 @@ export default function PricesScreen() {
               Check your connection and try again in a moment.
             </Text>
             <Button
+              center
               label="Try again"
               small
               onPress={() => setAttempt((n) => n + 1)}

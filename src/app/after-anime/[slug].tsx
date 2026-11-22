@@ -245,6 +245,7 @@ export default function AfterAnimeShowScreen() {
               : "Try again in a moment."}
           </P>
           <Button
+            center
             label="Search shows"
             onPress={() => router.replace("/after-anime")}
           />
