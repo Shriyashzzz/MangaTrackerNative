@@ -21,6 +21,7 @@ export default function BuyRow({
   used,
   seriesCoverUrl,
   lead = false,
+  chapters = null,
 }: {
   volume: number;
   why: string;
@@ -30,6 +31,8 @@ export default function BuyRow({
   seriesCoverUrl: string | null;
   // the page's main answer: bigger words
   lead?: boolean;
+  // "Chapters 53–61 are in this volume.", along the box's foot
+  chapters?: string | null;
 }) {
   const words = bookWords(book, volume);
   const heading = words[0]!.toUpperCase() + words.slice(1);
@@ -42,81 +45,88 @@ export default function BuyRow({
       ? ` (from ${formatCents(book.knownPriceCents)})`
       : "";
   return (
-    <View className="flex-row gap-3 rounded-[4px] border-[1.5px] border-line bg-card p-3">
-      <Pressable
-        onPress={openPrices}
-        accessibilityLabel={`${heading} prices`}
-        style={{ width: COVER_WIDTH, aspectRatio: 2 / 3 }}
-      >
-        <CoverFallback
-          number={volume}
-          seriesCoverUrl={seriesCoverUrl}
-          width={COVER_WIDTH}
-          numbered
-        />
-        {book.coverUrl ? (
-          <Image
-            source={{ uri: coverSrc(book.coverUrl) }}
-            style={{ width: COVER_WIDTH, aspectRatio: 2 / 3 }}
-            contentFit="cover"
-          />
-        ) : null}
-      </Pressable>
-      <View className="min-w-0 flex-1 gap-1.5">
-        <Text
-          className={`font-display text-ink ${lead ? "text-[20px]" : "text-[17px]"}`}
+    <View className="rounded-[4px] border-[1.5px] border-line bg-card p-3">
+      <View className="flex-row gap-3">
+        <Pressable
+          onPress={openPrices}
+          accessibilityLabel={`${heading} prices`}
+          style={{ width: COVER_WIDTH, aspectRatio: 2 / 3 }}
         >
-          {heading}
-        </Text>
-        <Text className="font-body text-[13.5px] leading-[19px] text-ink-soft">
-          {why}
-        </Text>
-        {main ? (
-          <Text className="font-body text-[14px] text-ink">
-            <Text className="font-mono-medium text-[16px]">
-              {formatCents(main.cents)}
-            </Text>{" "}
-            {offer ? "new" : "used"} at {main.store}
+          <CoverFallback
+            number={volume}
+            seriesCoverUrl={seriesCoverUrl}
+            width={COVER_WIDTH}
+            numbered
+          />
+          {book.coverUrl ? (
+            <Image
+              source={{ uri: coverSrc(book.coverUrl) }}
+              style={{ width: COVER_WIDTH, aspectRatio: 2 / 3 }}
+              contentFit="cover"
+            />
+          ) : null}
+        </Pressable>
+        <View className="min-w-0 flex-1 gap-1.5">
+          <Text
+            className={`font-display text-ink ${lead ? "text-[20px]" : "text-[17px]"}`}
+          >
+            {heading}
           </Text>
-        ) : null}
-        <View className="flex-row flex-wrap items-center gap-2 pt-1">
+          <Text className="font-body text-[13.5px] leading-[19px] text-ink-soft">
+            {why}
+          </Text>
           {main ? (
-            <Button
-              kind="primary"
-              small
-              label={`Buy${offer ? "" : " used"} at ${main.store}`}
-              onPress={() => void Linking.openURL(main.url)}
-            />
-          ) : (
-            <Button
-              small
-              label={`Check ${short} prices`}
-              onPress={openPrices}
-            />
-          )}
-        </View>
-        {main ? (
-          <View className="gap-0.5">
-            {cheaperUsed ? (
+            <Text className="font-body text-[14px] text-ink">
+              <Text className="font-mono-medium text-[16px]">
+                {formatCents(main.cents)}
+              </Text>{" "}
+              {offer ? "new" : "used"} at {main.store}
+            </Text>
+          ) : null}
+          <View className="flex-row flex-wrap items-center gap-2 pt-1">
+            {main ? (
+              <Button
+                kind="primary"
+                small
+                label={`Buy${offer ? "" : " used"} at ${main.store}`}
+                onPress={() => void Linking.openURL(main.url)}
+              />
+            ) : (
+              <Button
+                small
+                label={`Check ${short} prices`}
+                onPress={openPrices}
+              />
+            )}
+          </View>
+          {main ? (
+            <View className="gap-0.5">
+              {cheaperUsed ? (
+                <Text
+                  onPress={() => void Linking.openURL(cheaperUsed.url)}
+                  className="font-body-medium text-[13.5px] text-ink underline"
+                >
+                  Used, {formatCents(cheaperUsed.cents)} at {cheaperUsed.store}
+                </Text>
+              ) : null}
               <Text
-                onPress={() => void Linking.openURL(cheaperUsed.url)}
+                onPress={openPrices}
                 className="font-body-medium text-[13.5px] text-ink underline"
               >
-                Used, {formatCents(cheaperUsed.cents)} at {cheaperUsed.store}
+                Compare all stores{cheaperElsewhere}
               </Text>
-            ) : null}
-            <Text
-              onPress={openPrices}
-              className="font-body-medium text-[13.5px] text-ink underline"
-            >
-              Compare all stores{cheaperElsewhere}
-            </Text>
-            <Text className="font-mono text-[12px] text-muted">
-              Price checked {timeAgo(main.checkedAt)}
-            </Text>
-          </View>
-        ) : null}
+              <Text className="font-mono text-[12px] text-muted">
+                Price checked {timeAgo(main.checkedAt)}
+              </Text>
+            </View>
+          ) : null}
+        </View>
       </View>
+      {chapters ? (
+        <Text className="mt-3 border-t border-line-soft pt-2.5 font-mono text-[12.5px] text-ink-soft">
+          {chapters}
+        </Text>
+      ) : null}
     </View>
   );
 }

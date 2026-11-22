@@ -6,6 +6,7 @@ import { Text, View } from "react-native";
 import type { VolumeOffers } from "@/core/lib/afterAnime";
 import {
   buyVolume,
+  chaptersInVolume,
   keepNumbers,
   volumeAfter,
   whyThisVolume,
@@ -79,6 +80,7 @@ export default function SeasonBuy({
           used={offers[book.isbn13.trim()]?.used ?? null}
           seriesCoverUrl={seriesCoverUrl}
           lead={lead}
+          chapters={chaptersInVolume(stop)}
         />
       ) : null}
       {/* for someone who already has the pick */}
