@@ -7,7 +7,6 @@ import Button from "@/components/Button";
 import Mascot from "@/components/Mascot";
 import type { ImportTotals } from "@/core/lib/imports/malImport";
 import { doneTitle, series } from "@/core/pages/Import/bookImportText";
-import { Note } from "./ImportParts";
 
 export function alreadyThereLine(totals: ImportTotals) {
   if (totals.alreadyThere <= 0) return "";
@@ -31,11 +30,11 @@ export default function ImportDone({
       <Text className="text-center font-brand pr-1 text-[30px] tracking-[1px] text-ink uppercase">
         {doneTitle(totals)}
       </Text>
-      <Note>
+      <Text className="text-center font-body text-[14.5px] leading-[21px] text-ink-soft">
         {alreadyThereLine(totals)}
         {totals.noCover > 0 &&
-          `${series(totals.noCover)} came in without a cover. You can add one with Edit details.`}
-      </Note>
+          `${series(totals.noCover)} came in without a cover.\nYou can add one with Edit details.`}
+      </Text>
       {children}
       <Button
         center

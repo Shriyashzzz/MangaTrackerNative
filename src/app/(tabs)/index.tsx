@@ -262,7 +262,8 @@ export default function ShelfScreen() {
               </Animated.View>
             )}
             ItemSeparatorComponent={DashedLine}
-            contentContainerClassName="px-4 pb-6"
+            // room under the last row for the floating +
+            contentContainerClassName="px-4 pb-28"
             refreshControl={
               <RefreshControl
                 refreshing={refreshing}
