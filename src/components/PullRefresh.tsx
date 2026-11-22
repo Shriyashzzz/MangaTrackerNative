@@ -124,6 +124,9 @@ export function useKenjiRefresh(refresh: () => Promise<unknown>, top = 0) {
       <RefreshControl
         refreshing={busy}
         onRefresh={() => void onRefresh()}
+        // the system's circle is parked above the screen: Kenji is the
+        // indicator
+        progressViewOffset={-400}
         colors={["transparent"]}
         progressBackgroundColor="transparent"
         tintColor="transparent"
