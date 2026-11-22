@@ -2,9 +2,38 @@
 // what a shelf is for, and the two ways in. Prices stay open to them along
 // the bottom
 import { router } from "expo-router";
+import type { ReactNode } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import AuthArt from "./AuthArt";
 import Button from "./Button";
+
+// one panel: the drawing over a caption, its shout inked across a corner
+function Panel({
+  shout,
+  caption,
+  children,
+}: {
+  shout: string;
+  caption: string;
+  children: ReactNode;
+}) {
+  return (
+    <View className="min-w-[46%] flex-1 overflow-hidden rounded-[4px] border-[1.5px] border-line bg-card">
+      <View className="h-[66px] justify-end bg-paper-2 px-2.5 pb-2">
+        {children}
+      </View>
+      <Text
+        className="absolute top-1 right-1 bg-accent px-1.5 font-brand pr-2 text-[12px] tracking-[0.5px] text-on-accent uppercase"
+        style={{ transform: [{ rotate: "4deg" }] }}
+      >
+        {shout}
+      </Text>
+      <Text className="border-t-[1.5px] border-line px-2 py-1.5 font-body-medium text-[13px] text-ink">
+        {caption}
+      </Text>
+    </View>
+  );
+}
 
 export default function GuestShelf() {
   return (
@@ -17,10 +46,44 @@ export default function GuestShelf() {
         chapter="1"
         line="Your shelf lives here once you sign up."
       />
-      <Text className="text-center font-body text-[15.5px] leading-[23px] text-ink-soft">
-        Keep your place in every series, track the volumes you own, and see when
-        the next one's out and what it costs.
-      </Text>
+      {/* what a shelf does, as four panels of a manga page (the web's
+          GuestHero): a drawing, a shout, and a caption each */}
+      <View
+        className="flex-row flex-wrap gap-2"
+        accessibilityLabel="Keep your place in every series, track the volumes you own, and see when the next one is out and what it costs."
+      >
+        <Panel shout="Bookmarked!" caption="Keep your place">
+          <View className="flex-row items-baseline gap-1">
+            <Text className="font-brand pr-1 text-[15px] text-ink">ch.</Text>
+            <Text className="font-brand pr-1 text-[28px] leading-[34px] text-ink">
+              374
+            </Text>
+          </View>
+        </Panel>
+        <Panel shout="Mine!" caption="Track what you own">
+          <View className="flex-row items-end gap-[3px]">
+            {[true, true, true, false, true, false].map((owned, i) => (
+              <View
+                key={i}
+                className={`w-[11px] ${owned ? "h-[30px] bg-ink" : "h-[24px] border-[1.5px] border-dashed border-muted"}`}
+              />
+            ))}
+          </View>
+        </Panel>
+        <Panel shout="It's out!" caption="See what's out">
+          <Text className="font-brand pr-1 text-[24px] leading-[30px] text-ink">
+            Vol. 114
+          </Text>
+        </Panel>
+        <Panel shout="Deal!" caption="And what it costs">
+          <Text className="font-mono-medium text-[20px] text-ink">
+            $9.58{" "}
+            <Text className="font-mono text-[12.5px] text-muted line-through">
+              $10.79
+            </Text>
+          </Text>
+        </Panel>
+      </View>
       <View className="gap-3">
         <Button
           kind="primary"
