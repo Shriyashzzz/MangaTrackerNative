@@ -2,6 +2,7 @@
 // label, "(optional)" when it is, the control, and what's wrong under it
 import type { ReactNode } from "react";
 import { Text, TextInput, View, type TextInputProps } from "react-native";
+import { SheetTextInput, useInSheet } from "./Sheet";
 import { useColors } from "@/lib/colors";
 import { look } from "@/lib/platformLook";
 
@@ -53,11 +54,12 @@ export function Input({
   ...props
 }: TextInputProps & { invalid?: boolean }) {
   const c = useColors();
-  return (
-    <TextInput
-      placeholderTextColor={c.muted}
-      {...props}
-      className={`min-h-[48px] px-3.5 py-2.5 font-body text-[16px] text-ink ${look.input} ${invalid ? "border-accent" : look.inputEdge} ${className}`}
-    />
-  );
+  // in a sheet, the sheet's own kind of box (it lifts over the keyboard)
+  const inSheet = useInSheet();
+  const box = {
+    placeholderTextColor: c.muted,
+    ...props,
+    className: `min-h-[48px] px-3.5 py-2.5 font-body text-[16px] text-ink ${look.input} ${invalid ? "border-accent" : look.inputEdge} ${className}`,
+  };
+  return inSheet ? <SheetTextInput {...box} /> : <TextInput {...box} />;
 }

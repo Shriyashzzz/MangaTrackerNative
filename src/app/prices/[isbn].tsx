@@ -4,6 +4,7 @@
 // Canada's), the box-set note, more places to look, the price history,
 // about the series, readers' reviews, and the volumes beside it. Every rule
 // is the web's (core volumePageRules, offerLabels, useVolumeLoad)
+import ToBuyBag from "@/components/ToBuyBag";
 import Tap from "@/components/Tap";
 import PullPage, { pause, usePullTop } from "@/components/PullRefresh";
 import Backdrop from "@/components/Backdrop";
@@ -113,6 +114,9 @@ export default function PriceVolumeScreen() {
           {title}
           {"\u00A0"}
         </Text>
+        <View className="pr-2">
+          <ToBuyBag />
+        </View>
       </View>
       <DoubleRule />
       {body}

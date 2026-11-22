@@ -5,6 +5,7 @@
 // card with its price, Yours and Next, Not on your shelf to see only the
 // gaps with what they cost. The rules are the web's (core seriesPageRules,
 // finishCost, useSeriesData)
+import ToBuyBag from "@/components/ToBuyBag";
 import Tap from "@/components/Tap";
 import PullPage, { pause, usePullTop } from "@/components/PullRefresh";
 import TrackPitch from "@/components/prices/TrackPitch";
@@ -144,6 +145,9 @@ export default function PriceSeriesScreen() {
           {title}
           {"\u00A0"}
         </Text>
+        <View className="pr-2">
+          <ToBuyBag />
+        </View>
       </View>
       <DoubleRule />
       {body}

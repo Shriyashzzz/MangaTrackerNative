@@ -10,11 +10,19 @@ import {
   BottomSheetBackdrop,
   BottomSheetModal,
   BottomSheetScrollView,
+  BottomSheetTextInput,
   BottomSheetView,
   type BottomSheetBackdropProps,
   type BottomSheetScrollViewMethods,
 } from "@gorhom/bottom-sheet";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { BackHandler, useWindowDimensions } from "react-native";
 import { useColors } from "@/lib/colors";
 
@@ -33,6 +41,14 @@ function paddingOf(classes: string) {
     paddingBottom: points("pb"),
   };
 }
+
+// A text box inside a sheet has to be the sheet's own kind: that's what
+// tells the sheet the keyboard is up, so it lifts itself over it (a plain
+// box leaves the sheet hidden behind the keyboard). Anything that draws a
+// text box asks here whether it's in one (components/Field.tsx Input)
+const InSheet = createContext(false);
+export const useInSheet = () => useContext(InSheet);
+export const SheetTextInput = BottomSheetTextInput;
 
 const Backdrop = (props: BottomSheetBackdropProps) => (
   <BottomSheetBackdrop
@@ -121,28 +137,29 @@ export default function Sheet({
       }}
       keyboardBehavior="interactive"
       keyboardBlurBehavior="restore"
-      android_keyboardInputMode="adjustResize"
     >
-      {scroll ? (
-        <BottomSheetScrollView
-          ref={list}
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={
-            fromTheFoot
-              ? { ...padding, flexGrow: 1, justifyContent: "flex-end" }
-              : padding
-          }
-          onContentSizeChange={() => {
-            if (fromTheFoot) list.current?.scrollToEnd({ animated: false });
-          }}
-        >
-          {children}
-        </BottomSheetScrollView>
-      ) : (
-        <BottomSheetView style={{ ...padding, flex: 1 }}>
-          {children}
-        </BottomSheetView>
-      )}
+      <InSheet.Provider value>
+        {scroll ? (
+          <BottomSheetScrollView
+            ref={list}
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={
+              fromTheFoot
+                ? { ...padding, flexGrow: 1, justifyContent: "flex-end" }
+                : padding
+            }
+            onContentSizeChange={() => {
+              if (fromTheFoot) list.current?.scrollToEnd({ animated: false });
+            }}
+          >
+            {children}
+          </BottomSheetScrollView>
+        ) : (
+          <BottomSheetView style={{ ...padding, flex: 1 }}>
+            {children}
+          </BottomSheetView>
+        )}
+      </InSheet.Provider>
     </BottomSheetModal>
   );
 }
