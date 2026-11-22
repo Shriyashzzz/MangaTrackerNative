@@ -1,7 +1,7 @@
 // One series on the shelf, as the Android app's row (web components/mangaCard
-// MangaCard.tsx, its rows): cover, name, their stars under it, their place
-// when the right side doesn't say it, the genre, and on the right how far
-// through they are. The words come from the web's own rules (core cardText,
+// MangaCard.tsx, its rows): cover, name, their stars under it, the genre,
+// and on the right how far through they are (a bar when the total is known,
+// the place alone when it isn't). The words come from the web's own rules (core cardText,
 // reading), so the two apps always say the same. While selecting, a tick box
 // sits on the cover and a tap picks the row. A long press opens the
 // platform's own menu: Edit, Move to, Select several, Delete
@@ -65,10 +65,9 @@ export default memo(function ShelfRow({
     latestChapter ?? manga.latestChapter,
     latestVolume,
   );
-  // the right side says "ch. 50 of 101" with its bar: the place isn't said twice
-  const progressSaysPlace = !manga.status && reading > 0 && knownTotal != null;
-  const place = placeText(manga, trackBy);
-  const rowLine = progressSaysPlace ? null : manga.planned ? "to read" : place;
+  // where they are, said on the right of every row: with its bar when the
+  // total is known, on its own when it isn't
+  const place = manga.planned ? "to read" : placeText(manga, trackBy);
   const kindLine = rowKindLine(manga);
   const rating = Number(manga.rating) || 0;
 
@@ -110,14 +109,6 @@ export default memo(function ShelfRow({
           {manga.name}
         </Text>
         {rating > 0 && <StarRating value={rating} />}
-        {rowLine ? (
-          <Text
-            numberOfLines={1}
-            className="font-mono-medium text-[13.5px] text-ink-soft"
-          >
-            {rowLine}
-          </Text>
-        ) : null}
         {kindLine ? (
           <Text
             numberOfLines={1}
@@ -134,6 +125,7 @@ export default memo(function ShelfRow({
           unit={unit}
           reading={reading}
           knownTotal={knownTotal}
+          place={place}
         />
       </View>
     </Pressable>
@@ -244,30 +236,41 @@ function askToDelete(manga: Manga) {
   );
 }
 
-// the right of a row: "Finished", how many books, or how far through with a
-// bar under it (web MangaCard RowProgress)
+// the right of a row: "Finished", how many books, how far through with a
+// bar under it, or just the place when the total isn't known (web MangaCard RowProgress)
 function RowProgress({
   finished,
   ownedCount,
   unit,
   reading,
   knownTotal,
+  place,
 }: {
   finished: boolean;
   ownedCount: number;
   unit: "ch." | "vol.";
   reading: number;
   knownTotal: number | null;
+  // "ch. 100" or "to read": said alone when there's no total for a bar
+  place: string | null;
 }) {
   const text = "font-mono text-[12px] text-ink-soft text-right";
   if (finished) return <Text className={text}>Finished</Text>;
   if (!reading && ownedCount)
     return (
-      <Text className={text}>
-        {ownedCount} {ownedCount === 1 ? "vol" : "vols"}
-      </Text>
+      <>
+        {place ? <Text className={text}>{place}</Text> : null}
+        <Text className={text}>
+          {ownedCount} {ownedCount === 1 ? "vol" : "vols"}
+        </Text>
+      </>
     );
-  if (knownTotal == null || reading <= 0) return null;
+  if (knownTotal == null || reading <= 0)
+    return place ? (
+      <Text numberOfLines={1} className={text}>
+        {place}
+      </Text>
+    ) : null;
   const percent = knownTotal ? Math.min((reading / knownTotal) * 100, 100) : 0;
   return (
     <>
