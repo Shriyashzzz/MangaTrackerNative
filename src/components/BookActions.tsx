@@ -86,7 +86,7 @@ function Dialog({
         onPress={onClose}
       >
         <Pressable
-          className="w-full max-w-[400px] gap-3 rounded-[8px] border-2 border-line bg-card p-5"
+          className="w-full max-w-[400px] gap-3 rounded-[16px] border border-line-soft bg-card p-5"
           onPress={() => {}}
         >
           <Text className="font-display text-[20px] text-ink">{title}</Text>

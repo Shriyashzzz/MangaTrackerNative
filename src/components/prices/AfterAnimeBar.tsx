@@ -6,7 +6,7 @@ import { openWebPath } from "@/lib/webRoutes";
 
 export default function AfterAnimeBar({ seriesName }: { seriesName: string }) {
   return (
-    <View className="flex-row items-center gap-3 rounded-[4px] border-[1.5px] border-dashed border-line px-3 py-2.5">
+    <View className="flex-row items-center gap-3 rounded-[14px] border border-dashed border-line-soft px-3 py-2.5">
       <View className="min-w-0 flex-1">
         <Text className="font-body-semibold text-[15px] text-ink">
           Watched the anime?

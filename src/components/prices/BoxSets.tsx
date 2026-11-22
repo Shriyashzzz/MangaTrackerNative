@@ -5,6 +5,7 @@ import { Linking, Pressable, Text, View } from "react-native";
 import { formatCents, shopName } from "@/core/lib/prices";
 import type { BoxSet, Offer, StoreLink } from "@/core/lib/types";
 import { setsTitle, shownSets } from "@/core/pages/Prices/boxSetRules";
+import StoreButtons from "./StoreButtons";
 
 const KIND: Record<string, string> = { set: "Box set", omnibus: "Omnibus" };
 const CONDITION: Record<string, string> = { new: "new", used: "used" };
@@ -12,20 +13,7 @@ const AFFILIATE_NOTE =
   "Some store links are affiliate links, which help keep Manga Tracker running at no cost to you.";
 
 const StoreLinks = ({ links }: { links: StoreLink[] }) => (
-  <View className="flex-row flex-wrap gap-2">
-    {links.map((l) => (
-      <Pressable
-        key={l.store}
-        onPress={() => void Linking.openURL(l.url)}
-        className="rounded-[3px] border-[1.5px] border-line px-2.5 py-1.5 active:bg-accent-wash"
-        accessibilityLabel={`${l.store} box sets`}
-      >
-        <Text className="font-body-medium text-[13.5px] text-ink">
-          {l.store}
-        </Text>
-      </Pressable>
-    ))}
-  </View>
+  <StoreButtons links={links} describe={(store) => `${store} box sets`} />
 );
 
 export function BoxSetSearch({ links }: { links: StoreLink[] }) {
@@ -94,7 +82,7 @@ export default function BoxSets({
         onPress={
           cheapest!.url ? () => void Linking.openURL(cheapest!.url!) : undefined
         }
-        className="flex-row items-baseline justify-between gap-3 rounded-[4px] border-2 border-accent bg-accent-wash px-3 py-2.5 active:opacity-90"
+        className="flex-row items-baseline justify-between gap-3 rounded-[12px] border-[1.5px] border-accent bg-accent-wash px-3 py-2.5 active:opacity-90"
       >
         <View className="min-w-0 flex-1">
           <Text className="font-mono-medium text-[11.5px] tracking-[1px] text-accent-ink uppercase">

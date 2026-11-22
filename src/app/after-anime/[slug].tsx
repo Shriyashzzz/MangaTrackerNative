@@ -268,7 +268,7 @@ export default function AfterAnimeShowScreen() {
       {show && show.stops.length > 0 ? (
         <>
           {left ? (
-            <View className="gap-2 rounded-[4px] border-[1.5px] border-dashed border-line px-3 py-3">
+            <View className="gap-2 rounded-[14px] border border-dashed border-line-soft px-3 py-3">
               <Text className="font-brand pr-1 text-[18px] tracking-[1px] text-ink uppercase">
                 What's left to read
               </Text>

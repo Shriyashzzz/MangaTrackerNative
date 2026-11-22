@@ -103,7 +103,7 @@ function NextTicket({
     <Pressable
       onPress={to ? () => openWebPath(to) : undefined}
       disabled={!to}
-      className="gap-1 rounded-[4px] border-2 border-accent bg-accent-wash px-3 pt-2 pb-2.5 active:opacity-90"
+      className="gap-1 rounded-[12px] border-[1.5px] border-accent bg-accent-wash px-3 pt-2 pb-2.5 active:opacity-90"
     >
       <Kind red>{kind}</Kind>
       <View className="flex-row items-baseline justify-between gap-3">
@@ -161,7 +161,7 @@ const Gap = ({
 );
 
 const Dashed = ({ children }: { children: React.ReactNode }) => (
-  <View className="gap-1 rounded-[4px] border-[1.5px] border-dashed border-line-soft px-3 py-2">
+  <View className="gap-1 rounded-[14px] border border-dashed border-line-soft px-3 py-2">
     {children}
   </View>
 );
@@ -511,7 +511,7 @@ export default function BuyStrip({
                   onPress={() =>
                     openWebPath(volumePath(latest.isbn13, latest.title))
                   }
-                  className="flex-row items-baseline justify-between gap-3 rounded-[4px] border-[1.5px] border-dashed border-line bg-paper px-3 py-2.5 active:bg-accent-wash"
+                  className="flex-row items-baseline justify-between gap-3 rounded-[14px] border border-dashed border-line-soft bg-paper px-3 py-2.5 active:bg-accent-wash"
                 >
                   <View>
                     <Kind>Newest</Kind>

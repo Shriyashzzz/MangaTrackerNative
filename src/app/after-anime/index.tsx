@@ -147,7 +147,7 @@ export default function AfterAnimeIndex() {
           {shownCount < shows.length ? (
             <Pressable
               onPress={() => setShownCount(shownCount + CARDS_A_PAGE)}
-              className="self-center rounded-[4px] border-2 border-line bg-card px-4 py-2.5 active:opacity-80"
+              className="self-center rounded-[14px] border border-line-soft bg-card px-4 py-2.5 active:opacity-80"
             >
               <Text className="font-body-semibold text-[15px] text-ink">
                 Show {Math.min(CARDS_A_PAGE, shows.length - shownCount)} more

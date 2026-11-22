@@ -260,7 +260,7 @@ export default function VolumeReviews({
       ) : null}
       {others.length === 0 && data.average === null ? (
         !writing && !yours ? (
-          <View className="gap-2 rounded-[4px] border-[1.5px] border-dashed border-line-soft p-3">
+          <View className="gap-2 rounded-[14px] border border-dashed border-line-soft p-3">
             <Text className="font-body-semibold text-[15px] text-ink">
               Read this one?
             </Text>

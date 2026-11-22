@@ -214,7 +214,7 @@ export default function PricesScreen() {
           >
             <ChevronLeftIcon color={c.ink} width={24} height={24} />
           </Pressable>
-          <View className="flex-1 flex-row items-center gap-2 rounded-[4px] border-2 border-line bg-card px-3">
+          <View className="flex-1 flex-row items-center gap-2 rounded-[14px] border border-line-soft bg-card px-3">
             <SearchIcon color={c.inkSoft} width={18} height={18} />
             <TextInput
               autoFocus
@@ -321,7 +321,7 @@ export default function PricesScreen() {
           </View>
           <Pressable
             onPress={() => setFull(true)}
-            className="flex-row items-center gap-2 rounded-[4px] border-2 border-line bg-card px-3"
+            className="flex-row items-center gap-2 rounded-[14px] border border-line-soft bg-card px-3"
             accessibilityLabel="Search a series or an ISBN"
           >
             <SearchIcon color={c.inkSoft} width={20} height={20} />
@@ -360,7 +360,7 @@ export default function PricesScreen() {
         {!searching ? (
           <Pressable
             onPress={() => router.push("/after-anime")}
-            className="gap-0.5 rounded-[4px] border-2 border-line bg-card px-3 py-2.5 active:bg-accent-wash"
+            className="gap-0.5 rounded-[14px] border border-line-soft bg-card px-3 py-2.5 active:bg-accent-wash"
           >
             <Text className="font-brand pr-1 text-[18px] tracking-[1px] text-ink uppercase">
               Watched the anime?

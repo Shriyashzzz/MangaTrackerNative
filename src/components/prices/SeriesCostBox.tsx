@@ -35,7 +35,7 @@ export default function SeriesCostBox({
   const run = runTotal(cost);
   if (!run && !used) return null;
   return (
-    <View className="gap-1.5 rounded-[4px] border-2 border-line bg-card p-3">
+    <View className="gap-1.5 rounded-[14px] border border-line-soft bg-card p-3">
       <Text className="font-brand pr-1 text-[18px] tracking-[1px] text-ink uppercase">
         Collect every volume
       </Text>

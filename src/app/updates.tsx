@@ -119,7 +119,7 @@ export default function UpdatesScreen() {
           </View>
         ))}
       </View>
-      <View className="gap-1 rounded-[4px] border-2 border-dashed border-line p-3">
+      <View className="gap-1 rounded-[14px] border border-dashed border-line-soft p-3">
         <Text className="self-start bg-accent px-1.5 font-brand pr-1 text-[14px] tracking-[1px] text-on-accent uppercase">
           Soon!
         </Text>

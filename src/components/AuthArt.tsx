@@ -22,7 +22,7 @@ export default function AuthArt({
   const c = useColors();
   return (
     <View className="gap-3">
-      <View className="overflow-hidden rounded-[4px] border-2 border-line bg-card px-4 py-5">
+      <View className="overflow-hidden rounded-[14px] border border-line-soft bg-card px-4 py-5">
         {/* the speed lines, thinner towards the middle */}
         <View className="absolute inset-0 justify-around py-3 opacity-60">
           {Array.from({ length: LINES }, (_, i) => (
@@ -77,7 +77,7 @@ export function Spread({
   return (
     <View className="gap-5">
       <AuthArt sfx={sfx} line={line} chapter={chapter} />
-      <View className="gap-4 rounded-[4px] border-2 border-line bg-card p-4">
+      <View className="gap-4 rounded-[14px] border border-line-soft bg-card p-4">
         <Text className="font-brand pr-1 text-[24px] tracking-[1px] text-ink uppercase">
           {title}
         </Text>

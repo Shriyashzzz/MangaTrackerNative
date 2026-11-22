@@ -89,7 +89,7 @@ export function RateVolumeCard({ volume, onWrite }: Props) {
   const { asked, rating, problem, rate, closeBanner } = volume;
   if (!asked) return null;
   return (
-    <View className="gap-3 rounded-[6px] border-2 border-line bg-card px-4 py-3 pr-10">
+    <View className="gap-3 rounded-[14px] border border-line-soft bg-card px-4 py-3 pr-10">
       <View className="gap-1">
         <Text className="font-display text-[20px] text-ink">
           {rating

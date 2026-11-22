@@ -17,4 +17,12 @@ export const look = {
     : "rounded-[12px] bg-ink/10 p-[3px]",
   segmentInset: isAndroid ? 0 : 3,
   segmentRadius: isAndroid ? 999 : 9,
+  // a text box: Material's outlined field, iOS's filled rounded field
+  input: isAndroid
+    ? "rounded-[4px] border-[1.5px] bg-transparent"
+    : "rounded-[12px] border-[1.5px] bg-ink/10",
+  // the edge of a text box when nothing is wrong with it
+  inputEdge: isAndroid ? "border-line-soft" : "border-transparent",
+  // a − N + counter's frame
+  stepper: "overflow-hidden rounded-[12px] bg-ink/10",
 };

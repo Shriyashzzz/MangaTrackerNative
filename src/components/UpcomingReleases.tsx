@@ -34,7 +34,7 @@ export default function UpcomingReleases() {
   const next = first.volumes[0]!;
   const count = first.volumes.length;
   return (
-    <View className="overflow-hidden rounded-[6px] border-2 border-line bg-accent">
+    <View className="overflow-hidden rounded-[14px] bg-accent">
       <Pressable
         onPress={() => setOpen(!open)}
         accessibilityState={{ expanded: open }}

@@ -213,7 +213,7 @@ function ShelfFacts({ manga }: { manga: SharedManga[] }) {
   if (!hasNumbers && !genres.length) return null;
   const withGenre = genres.reduce((n, g) => n + g.count, 0);
   return (
-    <View className="gap-2 rounded-[4px] border-[1.5px] border-dashed border-line-soft p-3">
+    <View className="gap-2 rounded-[14px] border border-dashed border-line-soft p-3">
       {hasNumbers ? (
         <View className="gap-0.5">
           {ownsAll > 0 ? (
@@ -296,7 +296,7 @@ function FollowBar({
     }
   };
   return (
-    <View className="flex-row items-center gap-3 rounded-[4px] border-2 border-line bg-card px-3 py-2.5">
+    <View className="flex-row items-center gap-3 rounded-[14px] border border-line-soft bg-card px-3 py-2.5">
       <Text className="min-w-0 flex-1 font-body text-[14.5px] text-ink">
         {on ? (
           <>
@@ -792,7 +792,7 @@ export default function SharedShelfScreen() {
         />
       ) : null}
       {shelf.yours ? (
-        <View className="gap-1 rounded-[4px] border-2 border-line bg-accent-wash px-3 py-2">
+        <View className="gap-1 rounded-[14px] bg-accent-wash px-3 py-2">
           <Text className="font-body text-[14px] text-ink">
             Others see this page, as{" "}
             <Text className="font-body-semibold">{shelf.displayName}</Text>.

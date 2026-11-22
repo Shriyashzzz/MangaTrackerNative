@@ -38,7 +38,7 @@ export default function Segmented<T extends string>({
   const cell = width / options.length;
   const at = useSharedValue(0);
   useEffect(() => {
-    if (cell) at.value = withSpring(picked * cell, SLIDE);
+    if (cell) at.set(withSpring(picked * cell, SLIDE));
   }, [at, cell, picked]);
   const fill = useAnimatedStyle(() => ({
     transform: [{ translateX: at.value }],
@@ -47,7 +47,7 @@ export default function Segmented<T extends string>({
   const onLayout = (e: LayoutChangeEvent) => {
     const inner = e.nativeEvent.layout.width - BORDER * 2;
     // the fill starts where it belongs, without sliding in from the left
-    if (!width) at.value = (picked * inner) / options.length;
+    if (!width) at.set((picked * inner) / options.length);
     setWidth(inner);
   };
 

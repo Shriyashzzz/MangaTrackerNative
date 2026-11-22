@@ -17,7 +17,7 @@ export default function ReleaseBar({
 }) {
   return (
     <View className="mt-3">
-      <View className="flex-row flex-wrap items-center gap-x-2.5 gap-y-1.5 rounded-[6px] border-2 border-line bg-accent py-2 pr-10 pl-3">
+      <View className="flex-row flex-wrap items-center gap-x-2.5 gap-y-1.5 rounded-[14px] bg-accent py-2 pr-10 pl-3">
         <Text className="min-w-0 flex-1 font-brand pr-1 text-[21px] leading-[24px] tracking-[1px] text-on-accent">
           {headline}
         </Text>

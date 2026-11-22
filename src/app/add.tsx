@@ -407,7 +407,7 @@ export default function AddScreen() {
               </View>
             </View>
             {already?.title === title ? (
-              <View className="flex-row flex-wrap items-baseline gap-2 rounded-[4px] border-2 border-line bg-accent-wash px-3 py-2">
+              <View className="flex-row flex-wrap items-baseline gap-2 rounded-[14px] bg-accent-wash px-3 py-2">
                 <Text className="font-body text-[14.5px] text-ink">
                   Already on your shelf as{" "}
                   <Text className="font-body-semibold">

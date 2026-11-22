@@ -48,7 +48,7 @@ export default function TwiceNote({
   };
 
   return (
-    <View className="gap-1 rounded-[6px] border-2 border-line bg-accent-wash px-3 py-2">
+    <View className="gap-1 rounded-[14px] bg-accent-wash px-3 py-2">
       <View className="flex-row flex-wrap items-baseline gap-x-3">
         <Text className="font-body text-[14.5px] text-ink">
           This series is on your shelf twice.

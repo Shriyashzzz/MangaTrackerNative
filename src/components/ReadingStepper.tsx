@@ -184,7 +184,7 @@ export default function ReadingStepper({
 
   return (
     <View className="flex-row items-center gap-2.5">
-      <View className="flex-row items-center rounded-[4px] border-2 border-line">
+      <View className="flex-row items-center overflow-hidden rounded-[12px] bg-ink/10">
         {button(-1, `One ${counted} back`, "−", current <= 0)}
         <TextInput
           value={draft}
@@ -208,7 +208,7 @@ export default function ReadingStepper({
             includeFontPadding: false,
             lineHeight: 28,
           }}
-          className="h-11 border-x-2 border-line px-1.5 text-center font-brand text-[24px]"
+          className="h-11 border-x border-line-soft px-1.5 text-center font-brand text-[24px]"
         />
         {button(1, `One ${counted} on`, "+", current >= max)}
       </View>

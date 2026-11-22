@@ -198,7 +198,7 @@ export default function ReleaseControls() {
             {/* how nearly: a − N + counter, where the website has a slider */}
             {range.mode === "within" ? (
               <View className="flex-row items-center gap-3">
-                <View className="flex-row items-center rounded-[4px] border-2 border-line">
+                <View className="flex-row items-center overflow-hidden rounded-[12px] bg-ink/10">
                   <Pressable
                     onPress={() =>
                       change({ within: Math.max(1, range.within - 1) })
@@ -211,7 +211,7 @@ export default function ReleaseControls() {
                       −
                     </Text>
                   </Pressable>
-                  <Text className="w-12 border-x-2 border-line text-center font-brand text-[20px] text-ink">
+                  <Text className="w-12 border-x border-line-soft text-center font-brand text-[20px] text-ink">
                     {range.within}
                   </Text>
                   <Pressable
@@ -232,7 +232,7 @@ export default function ReleaseControls() {
                 </Text>
               </View>
             ) : null}
-            <View className="gap-1 rounded-[4px] border-[1.5px] border-dashed border-line-soft px-3 py-2">
+            <View className="gap-1 rounded-[14px] border border-dashed border-line-soft px-3 py-2">
               <Text className="font-body-medium text-[13.5px] text-ink">
                 {example.newest}
               </Text>

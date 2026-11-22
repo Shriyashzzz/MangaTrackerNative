@@ -44,12 +44,11 @@ export default function PressScale({
         android_ripple={ripple}
         className={className}
         onPressIn={(e) => {
-          if (scaleTo !== 1)
-            scale.value = withTiming(scaleTo, { duration: 90 });
+          if (scaleTo !== 1) scale.set(withTiming(scaleTo, { duration: 90 }));
           pressable.onPressIn?.(e);
         }}
         onPressOut={(e) => {
-          scale.value = withSpring(1, RELEASE);
+          scale.set(withSpring(1, RELEASE));
           pressable.onPressOut?.(e);
         }}
       >

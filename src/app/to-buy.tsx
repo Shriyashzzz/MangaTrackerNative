@@ -283,7 +283,7 @@ export default function ToBuyScreen() {
         ) : null}
         {items && items.length > 0 && list ? (
           <>
-            <View className="gap-1 rounded-[4px] border-2 border-line bg-card p-3">
+            <View className="gap-1 rounded-[14px] border border-line-soft bg-card p-3">
               <Text className="font-brand pr-1 text-[20px] tracking-[1px] text-ink uppercase">
                 {items.length === 1 ? "1 volume" : `${items.length} volumes`} to
                 buy
@@ -316,7 +316,7 @@ export default function ToBuyScreen() {
                 </Text>
               </Pressable>
             </View>
-            <View className="rounded-[4px] border-2 border-line bg-card">
+            <View className="rounded-[14px] border border-line-soft bg-card">
               {sorted.map((item, i) => (
                 <View
                   key={item.isbn13}

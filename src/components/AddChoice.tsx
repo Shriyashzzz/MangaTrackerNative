@@ -26,7 +26,7 @@ export default function AddChoice({
         onClose();
         run();
       }}
-      className="flex-row items-center gap-3 rounded-[4px] border-2 border-line bg-paper p-3 active:bg-accent-wash"
+      className="flex-row items-center gap-3 rounded-[14px] border border-line-soft bg-card p-3 active:bg-accent-wash"
     >
       <Icon color={c.ink} width={28} height={28} />
       <View className="min-w-0 flex-1">

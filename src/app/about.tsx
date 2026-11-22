@@ -43,7 +43,7 @@ export default function AboutScreen() {
   }, []);
   return (
     <Page title="About">
-      <View className="items-center gap-3 rounded-[6px] border-2 border-line bg-card p-5">
+      <View className="items-center gap-3 rounded-[14px] border border-line-soft bg-card p-5">
         <Mascot mood="happy" width={120} />
         <Text className="text-center font-brand pr-1 text-[30px] leading-[34px] tracking-[1px] text-ink uppercase">
           <Text className="bg-accent text-on-accent"> Never lose </Text> your

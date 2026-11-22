@@ -126,7 +126,7 @@ export default function OfferList({
           onChange={setCopies}
         />
       ) : null}
-      <View className="overflow-hidden rounded-[4px] border-2 border-line">
+      <View className="overflow-hidden rounded-[14px] border border-line-soft bg-card">
         {shown.map((o, i) => (
           <Pressable
             key={`${o.store}-${o.priceCents}-${i}`}

@@ -150,7 +150,7 @@ export default function ShelfScreen() {
           and sort on the right */}
       <View className="h-[64px] flex-row items-center gap-2 px-4 pt-3">
         {searching ? (
-          <View className="flex-1 flex-row items-center gap-2 rounded-[4px] border-2 border-line bg-card px-3">
+          <View className="flex-1 flex-row items-center gap-2 rounded-[14px] border border-line-soft bg-card px-3">
             <SearchIcon color={c.inkSoft} width={18} height={18} />
             <TextInput
               autoFocus

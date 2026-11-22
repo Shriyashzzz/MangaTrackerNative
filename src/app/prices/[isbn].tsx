@@ -7,13 +7,14 @@
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { Linking, Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 import Button from "@/components/Button";
 import DoubleRule from "@/components/DoubleRule";
 import Mascot from "@/components/Mascot";
 import OfferList from "@/components/OfferList";
+import StoreButtons from "@/components/prices/StoreButtons";
 import CountrySwitch from "@/components/prices/CountrySwitch";
 import DealsStrip from "@/components/prices/DealsStrip";
 import PriceAges from "@/components/prices/PriceAges";
@@ -77,31 +78,6 @@ const H2 = ({ children }: { children: string }) => (
     {children}
   </Text>
 );
-const StoreButtons = ({
-  links,
-  lead,
-}: {
-  links: { store: string; url: string }[];
-  lead?: boolean;
-}) => (
-  <View className="flex-row flex-wrap gap-2">
-    {links.map((s, i) => (
-      <Pressable
-        key={s.store}
-        onPress={() => void Linking.openURL(s.url)}
-        className={`min-w-[46%] flex-1 items-center rounded-[4px] border-2 py-2.5 active:opacity-90 ${lead && i === 0 ? "border-accent bg-accent" : "border-line bg-card"}`}
-        accessibilityLabel={`${s.store}. Opens the store`}
-      >
-        <Text
-          className={`font-body-semibold text-[14px] ${lead && i === 0 ? "text-on-accent" : "text-ink"}`}
-        >
-          {lead && i === 0 ? `Preorder on ${s.store}` : s.store}
-        </Text>
-      </Pressable>
-    ))}
-  </View>
-);
-
 export default function PriceVolumeScreen() {
   const { isbn } = useLocalSearchParams<{ isbn: string }>();
   const c = useColors();

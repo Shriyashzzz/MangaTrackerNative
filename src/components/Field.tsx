@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { Text, TextInput, View, type TextInputProps } from "react-native";
 import { useColors } from "@/lib/colors";
+import { look } from "@/lib/platformLook";
 
 export function Field({
   label,
@@ -56,7 +57,7 @@ export function Input({
     <TextInput
       placeholderTextColor={c.muted}
       {...props}
-      className={`min-h-[46px] rounded-[2px] border-[1.5px] bg-paper px-3 py-2.5 font-body text-[16px] text-ink ${invalid ? "border-accent" : "border-line-soft"} ${className}`}
+      className={`min-h-[48px] px-3.5 py-2.5 font-body text-[16px] text-ink ${look.input} ${invalid ? "border-accent" : look.inputEdge} ${className}`}
     />
   );
 }

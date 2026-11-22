@@ -56,7 +56,7 @@ function EditionsBox({
             onPress={() =>
               openWebPath(volumePath(book.isbn13!, book.title ?? label))
             }
-            className={`flex-row items-baseline justify-between gap-3 rounded-[4px] border-2 px-3 py-2.5 active:opacity-90 ${first ? "border-accent bg-accent-wash" : "border-dashed border-line-soft"}`}
+            className={`flex-row items-baseline justify-between gap-3 rounded-[12px] border-[1.5px] px-3 py-2.5 active:opacity-90 ${first ? "border-accent bg-accent-wash" : "border-dashed border-line-soft"}`}
           >
             <View className="min-w-0 flex-1">
               <Text
@@ -128,7 +128,7 @@ export default function SetsBox({
   if (alone) title = line ? editionTitle(line) : setsTitle(sets);
   else if (sets.length) title = "Box sets & editions";
   return (
-    <View className="gap-2 rounded-[4px] border-2 border-line bg-card p-3">
+    <View className="gap-2 rounded-[14px] border border-line-soft bg-card p-3">
       <View className="flex-row items-center justify-between gap-3">
         <Text className="shrink font-brand pr-1 text-[18px] tracking-[1px] text-ink uppercase">
           {title}
