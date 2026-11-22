@@ -1,10 +1,9 @@
 // The account (the web's AccountTab): who's signed in, how they sign in,
-// their email, the weekly email, alerts on this phone, export, and deleting
+// their email, the weekly email, export, and deleting
 // the account with its confirmation
-import * as Notifications from "expo-notifications";
 import { router } from "expo-router";
-import { useEffect, useState } from "react";
-import { Linking, Share, Text, View } from "react-native";
+import { useState } from "react";
+import { Share, Text, View } from "react-native";
 import { deleteAccount, shelfToCsv, type Account } from "@/core/lib/account";
 import { apiFetch, getJson } from "@/core/lib/api";
 import type { OwnedBook } from "@/core/lib/books";
@@ -20,51 +19,6 @@ import { Help, Note, Section, Tick } from "./parts";
 
 const LINK_NOT_SENT = "We couldn't send the link. Try again in a minute.";
 type NoteOf = { text: string; failed?: boolean } | null;
-
-// "Alerts on this device": whether this phone may show notifications. The
-// alerts themselves (a volume the day it's out, price drops) are sent to
-// the website's installed app today; the phone app's own are a server
-// addition still to come, so this says where it stands
-function AlertsSection() {
-  const [granted, setGranted] = useState<boolean | null>(null);
-  const [note, setNote] = useState<NoteOf>(null);
-  useEffect(() => {
-    Notifications.getPermissionsAsync()
-      .then((asked) => setGranted(asked.granted))
-      .catch(() => setGranted(false));
-  }, []);
-  if (granted === null) return null;
-  const flip = async (on: boolean) => {
-    setNote(null);
-    if (!on) {
-      await Linking.openSettings();
-      return;
-    }
-    const asked = await Notifications.requestPermissionsAsync();
-    setGranted(asked.granted);
-    if (!asked.granted && !asked.canAskAgain) {
-      setNote({
-        text: "Notifications are off for Manga Tracker in your phone's settings.",
-        failed: true,
-      });
-      await Linking.openSettings();
-    } else if (asked.granted) setNote({ text: "Allowed on this device." });
-  };
-  return (
-    <Section title="Alerts on this device">
-      <Help>
-        A volume for your shelf the day it's out, and price drops on your To buy
-        list.
-      </Help>
-      <Tick
-        label="Allow notifications"
-        value={granted}
-        onChange={(on) => void flip(on)}
-      />
-      <Note text={note?.text} failed={note?.failed} />
-    </Section>
-  );
-}
 
 function SignInSection({ account }: { account: Account }) {
   const firstPassword = useAccount((s) => s.firstPassword);
@@ -279,7 +233,8 @@ export default function AccountTab({ account }: { account: Account }) {
           <Help>Add an email above to get it.</Help>
         )}
       </Section>
-      <AlertsSection />
+      {/* Alerts on this device: back once the server sends to the app's own
+          push tokens (README, Not done yet) */}
       <Section title="Export my list">
         <Help>
           A spreadsheet file of everything on your shelf, notes included.

@@ -9,12 +9,8 @@ import { SORT_OPTIONS } from "@/core/lib/shelf";
 import { useColors } from "@/lib/colors";
 import { usePrefs } from "@/store/prefs";
 import PickSheet from "../PickSheet";
-import { Help, Radios, Section, Tick } from "./parts";
+import { Radios, Section, Tick } from "./parts";
 
-const VIEWS = [
-  { value: "covers", label: "Big covers" },
-  { value: "rows", label: "Compact rows, so more fit on a screen" },
-] as const;
 const TRACKING = [
   { value: "series", label: "Let me choose for each series" },
   { value: "chapters", label: "Chapters only" },
@@ -51,17 +47,6 @@ export default function ShelfSettingsTab() {
   );
   return (
     <>
-      <Section title="How the shelf lists series">
-        <Help>
-          The website shows big covers or compact rows; the app lists rows.
-        </Help>
-        <Radios
-          label="Shelf view"
-          options={VIEWS}
-          value={prefs.shelfView ?? "covers"}
-          onChange={(value) => set({ shelfView: value })}
-        />
-      </Section>
       <Section title="Keeping your place">
         <Radios
           label="Track by"

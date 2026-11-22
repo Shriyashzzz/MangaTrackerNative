@@ -327,7 +327,6 @@ export default function YearScreen() {
         <Kenji says="Tell them." />
         <View className="gap-2">
           <Line strong>Share your year.</Line>
-          <Line>The numbers, as words.</Line>
           <Button
             label="Share my year"
             kind="primary"
