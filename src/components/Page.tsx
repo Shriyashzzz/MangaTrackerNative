@@ -35,14 +35,21 @@ export default function Page({
       <Stack.Screen
         options={{
           headerShown: true,
-          title,
+          title: ios ? title : title.toUpperCase(),
+          headerTitleAlign: "left",
           headerLargeTitle: ios,
           headerTransparent: ios,
           headerBlurEffect: "systemChromeMaterial",
           headerStyle: { backgroundColor: c.paper },
           headerLargeStyle: { backgroundColor: c.paper },
           headerTintColor: c.ink,
-          headerTitleStyle: { color: c.ink },
+          headerTitleStyle: ios
+            ? { color: c.ink }
+            : {
+                color: c.ink,
+                fontFamily: "Bangers_400Regular",
+                fontSize: 24,
+              },
           headerLargeTitleStyle: { color: c.ink },
           headerShadowVisible: false,
           headerBackButtonDisplayMode: "minimal",

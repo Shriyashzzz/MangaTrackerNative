@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { router } from "expo-router";
 import { Pressable, Text, View } from "react-native";
-import Page, { Bullet, P } from "@/components/Page";
+import Mascot from "@/components/Mascot";
+import Page, { P } from "@/components/Page";
 import { getFriends, setFollowing, type Friend } from "@/core/lib/friends";
 
 const count = (n: number, one: string, more: string) =>
@@ -30,10 +31,12 @@ export default function FriendsScreen() {
     <Page title="Friends">
       {note ? <P>{note}</P> : null}
       {friends && friends.length === 0 ? (
-        <View className="gap-2">
-          <P>No one yet. To follow a friend's shelf:</P>
-          <Bullet>Ask for the link to their shared shelf.</Bullet>
-          <Bullet>Open it and press Follow.</Bullet>
+        <View className="items-center gap-3 py-6">
+          <Mascot mood="confused" width={100} />
+          <Text className="text-center font-body text-[15px] leading-[22px] text-ink-soft">
+            No one yet.{"\n"}Ask a friend for their shelf link, open it and
+            press Follow.
+          </Text>
         </View>
       ) : null}
       {friends?.map((friend) => (

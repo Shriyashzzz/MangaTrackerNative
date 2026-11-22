@@ -67,17 +67,20 @@ export default function SettingsScreen() {
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerClassName="px-2"
-        className="max-h-[48px] border-b border-line-soft"
+        className="max-h-[56px] border-b border-line-soft"
       >
         {TABS.map((t) => (
           <Pressable
             key={t.id}
-            onPress={() => setTab(t.id)}
+            onPress={() => {
+              setTab(t.id);
+              page.current?.scrollTo({ y: 0, animated: false });
+            }}
             accessibilityState={{ selected: t.id === tab }}
-            className={`justify-center px-3.5 ${t.id === tab ? "border-b-2 border-accent" : ""}`}
+            className={`min-h-[56px] justify-center px-4 ${t.id === tab ? "border-b-[3px] border-accent" : ""}`}
           >
             <Text
-              className={`font-body-semibold text-[14.5px] ${t.id === tab ? "text-ink" : "text-ink-soft"}`}
+              className={`font-body-semibold text-[16px] ${t.id === tab ? "text-ink" : "text-ink-soft"}`}
             >
               {t.label}
             </Text>
