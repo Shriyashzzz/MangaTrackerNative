@@ -23,10 +23,42 @@ import type { BuyOptions } from "@/core/pages/Details/useBuyOptions";
 import type { Editions } from "@/core/pages/Details/useEditions";
 import { useColors } from "@/lib/colors";
 import { openWebPath } from "@/lib/webRoutes";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from "react-native-reanimated";
 import { Pressable, Text, View } from "react-native";
 import GotIt from "./GotIt";
 import PickSheet from "./PickSheet";
+
+function LoadingBand() {
+  const breath = useSharedValue(0.35);
+  useEffect(() => {
+    breath.set(
+      withRepeat(
+        withTiming(0.9, { duration: 800, easing: Easing.inOut(Easing.quad) }),
+        -1,
+        true,
+      ),
+    );
+  }, [breath]);
+  const fade = useAnimatedStyle(() => ({ opacity: breath.value }));
+  return (
+    <View
+      accessibilityLabel="Loading what to buy next"
+      className="h-[60px] justify-center border-y-[1.5px] border-dashed border-line-soft"
+    >
+      <Animated.View style={fade} className="flex-row items-center gap-5">
+        <View className="h-[18px] w-[104px] rounded-[3px] bg-ink/15" />
+        <View className="h-[14px] w-[64px] rounded-[3px] bg-ink/10" />
+      </Animated.View>
+    </View>
+  );
+}
 
 type Props = {
   options: BuyOptions;
@@ -226,10 +258,9 @@ export default function BuyStrip({
   const coming = volumes.length - out.length;
 
   // its room is kept while it loads, so nothing under it jumps
-  if (loading)
-    return (
-      <View className="h-[60px] border-y-[1.5px] border-dashed border-line-soft" />
-    );
+  // and it says it's loading: two soft bars where the title and the book
+  // will be, breathing, not an empty band that looks broken
+  if (loading) return <LoadingBand />;
   if (!latest) return null;
 
   // the folded line's ticket, as the open box lists them: the book they
