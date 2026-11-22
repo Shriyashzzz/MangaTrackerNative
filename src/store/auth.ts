@@ -3,6 +3,7 @@
 import { create } from "zustand";
 import { apiFetch, errorMessages } from "@/core/lib/api";
 import { forgetGoogle } from "@/lib/googleSignIn";
+import { turnOffPhoneAlerts } from "@/lib/phoneAlerts";
 
 type AuthState = {
   isSignedIn: boolean | null;
@@ -67,6 +68,9 @@ export const useAuth = create<AuthState>()((set) => ({
   },
 
   logOut: async () => {
+    // while still signed in: the server forgets this phone, so the next
+    // person on it gets none of this account's alerts
+    await turnOffPhoneAlerts();
     const res = await apiFetch("/api/auth/logout", { method: "POST" });
     if (res.ok) {
       set({ isSignedIn: false });

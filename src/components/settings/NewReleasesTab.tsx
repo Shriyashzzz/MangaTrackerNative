@@ -1,5 +1,6 @@
 // New releases (the web's NewReleasesTab): checks on or off, and what New
 // lists when they're on
+import PhoneAlerts from "./PhoneAlerts";
 import { router } from "expo-router";
 import { Pressable, Text } from "react-native";
 import { usePrefs } from "@/store/prefs";
@@ -29,6 +30,7 @@ export default function NewReleasesTab() {
               How this works
             </Text>
           </Help>
+          <PhoneAlerts />
           <ReleaseControls />
         </>
       ) : (

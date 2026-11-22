@@ -20,7 +20,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": true,
-      "package": "xyz.mangatracker.app.rn"
+      "package": "xyz.mangatracker.app.rn",
+      "googleServicesFile": "./firebase/google-services.json"
     },
     "web": {
       "output": "server",
