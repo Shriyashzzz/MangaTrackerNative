@@ -38,6 +38,7 @@ export default function ImportDone({
       </Note>
       {children}
       <Button
+        center
         kind="primary"
         label="Go to my shelf"
         onPress={() => router.replace("/(tabs)")}

@@ -20,6 +20,7 @@ import type { BookSource } from "@/core/lib/imports/bookImport";
 import { MAL_LISTS } from "@/core/lib/imports/malImport";
 import { useListImport } from "@/core/pages/Import/useListImport";
 import { pickMalFile } from "@/lib/pickFiles";
+import { look } from "@/lib/platformLook";
 import { bookImportBusy, savedSource, useBookImport } from "@/store/bookImport";
 
 const EXPORT_PAGE = "https://myanimelist.net/panel.php?go=export";
@@ -99,13 +100,13 @@ export default function ImportScreen() {
                     disabled={off}
                     accessibilityRole="radio"
                     accessibilityState={{ checked: on, disabled: off }}
-                    className={`grow basis-[30%] items-center rounded-[4px] border-2 px-2 py-2.5 ${on ? "border-line bg-ink" : "border-line bg-card"} ${off ? "opacity-40" : ""}`}
+                    className={`min-h-[40px] grow basis-[30%] items-center justify-center overflow-hidden border px-2 ${look.buttonRadius} ${on ? "border-accent bg-accent" : "border-line-soft"} ${off ? "opacity-40" : ""}`}
                   >
                     <Text
                       numberOfLines={1}
                       adjustsFontSizeToFit
                       minimumFontScale={0.85}
-                      className={`text-center font-body-semibold text-[13.5px] ${on ? "text-paper" : "text-ink"}`}
+                      className={`text-center font-body-semibold text-[13.5px] ${on ? "text-on-accent" : "text-ink"}`}
                     >
                       {s.label}
                     </Text>

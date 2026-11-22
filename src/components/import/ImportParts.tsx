@@ -14,8 +14,17 @@ import { useShelf } from "@/store/shelf";
 export function Step({ n, children }: { n: number; children: ReactNode }) {
   return (
     <View className="flex-row gap-3">
-      <View className="h-7 w-7 items-center justify-center rounded-full border-2 border-line bg-card">
-        <Text className="font-brand pr-[1px] text-[15px] text-ink">{n}</Text>
+      <View className="h-7 w-7 items-center justify-center rounded-full bg-accent">
+        <Text
+          className="font-body-semibold text-[14px] text-on-accent"
+          style={{
+            lineHeight: 18,
+            textAlign: "center",
+            includeFontPadding: false,
+          }}
+        >
+          {n}
+        </Text>
       </View>
       <View className="min-w-0 flex-1 gap-2 pt-[3px]">{children}</View>
     </View>
