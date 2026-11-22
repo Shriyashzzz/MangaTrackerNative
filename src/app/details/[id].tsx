@@ -64,6 +64,7 @@ import { restoredAs, useShelf } from "@/store/shelf";
 import { H2 } from "@/components/Page";
 import { DEFAULT_TRACK_BY } from "@/lib/trackBy";
 import LoadingQuote from "@/components/LoadingQuote";
+import { useRipple } from "@/lib/press";
 import { lastChapterOf, volumesReadAt } from "@/lib/placeEquivalent";
 
 const Safe = withUniwind(SafeAreaView);
@@ -101,6 +102,7 @@ export default function DetailsScreen() {
   const [titleShown, setTitleShown] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [pickingEdition, setPickingEdition] = useState(false);
+  const ripple = useRipple();
   // under the buttons: a failed save, or the undo for marking it finished
   const [actionNote, setActionNote] = useState("");
   const [canUndoStatus, setCanUndoStatus] = useState(false);
@@ -493,21 +495,6 @@ export default function DetailsScreen() {
                   </Text>
                 ))}
             </View>
-            {/* the edition they collect, or single volumes, on a line of its
-                own under the chips: the shelf, the counter and Buy next all
-                follow it */}
-            {editions.lines.length ? (
-              <Pressable
-                onPress={() => setPickingEdition(true)}
-                accessibilityLabel={`Collected as ${editions.line?.label ?? "single volumes"}. Change`}
-                className="flex-row items-center gap-1 self-start rounded-[2px] border-[1.5px] border-line-soft px-2 py-0.5 active:bg-accent-wash"
-              >
-                <Text className="font-body-medium text-[13px] text-ink">
-                  {editions.line?.label ?? "Single volumes"}
-                </Text>
-                <ChevronDownIcon color={c.ink} width={14} height={14} />
-              </Pressable>
-            ) : null}
           </View>
         </View>
 
@@ -538,6 +525,34 @@ export default function DetailsScreen() {
               {shelf.count}
             </Text>
           </View>
+          {/* which books the shelf is counted in: a full row with its own
+              label, right over the spines it changes (Buy next and the
+              counter follow it too) */}
+          {editions.lines.length ? (
+            <Pressable
+              onPress={() => setPickingEdition(true)}
+              android_ripple={ripple}
+              accessibilityRole="button"
+              accessibilityLabel={`Edition: ${editions.line?.label ?? "Single volumes"}. Change`}
+              className="min-h-[52px] flex-row items-center gap-3 overflow-hidden rounded-[14px] border border-line-soft bg-card px-4 py-2 active:opacity-80"
+            >
+              <View className="min-w-0 flex-1">
+                <Text className="font-body text-[12.5px] text-ink-soft">
+                  Edition
+                </Text>
+                <Text
+                  numberOfLines={1}
+                  className="font-body-semibold text-[15.5px] text-ink"
+                >
+                  {editions.line?.label ?? "Single volumes"}
+                </Text>
+              </View>
+              <Text className="font-body-medium text-[14px] text-accent-ink">
+                Change
+              </Text>
+              <ChevronDownIcon color={c.accentInk} width={16} height={16} />
+            </Pressable>
+          ) : null}
           <ShelfStrip shelf={shelf} />
         </View>
 
