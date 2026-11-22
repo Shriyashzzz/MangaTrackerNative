@@ -322,7 +322,7 @@ export default function NewScreen() {
             >
               <View className="h-5 w-5 items-center justify-center rounded-full bg-accent">
                 <Text className="font-brand pr-[4px] text-[12px] text-on-accent">
-                  ?{"\u00A0"}
+                  {"\u00A0"}?{"\u00A0"}
                 </Text>
               </View>
               <Text className="font-body-medium text-[14px] text-ink">

@@ -76,6 +76,7 @@ export default function AboutScreen() {
         <Mascot mood="happy" width={120} />
 
         <Text className="text-center font-brand pr-[7px] text-[30px] leading-[34px] tracking-[1px] text-ink uppercase">
+          {"\u00A0"}
           <Text className="bg-accent text-on-accent"> Never lose </Text> your
           place again.
           {"\u00A0"}

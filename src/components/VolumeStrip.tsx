@@ -315,6 +315,7 @@ function Book({
           />
         ) : null}
         <Text className={`font-brand pr-[4px] text-[13px] ${ink}`}>
+          {"\u00A0"}
           {spine}
           {"\u00A0"}
         </Text>

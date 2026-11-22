@@ -212,6 +212,7 @@ export default function ReleaseControls() {
                     </Text>
                   </Pressable>
                   <Text className="w-12 border-x border-line-soft text-center font-brand text-[20px] text-ink">
+                    {"\u00A0"}
                     {range.within}
                     {"\u00A0"}
                   </Text>

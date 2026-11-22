@@ -55,6 +55,7 @@ export default function SeriesCover({
           numberOfLines={4}
           className="text-center font-brand pr-[4px] text-[11px] text-ink-soft uppercase"
         >
+          {"\u00A0"}
           {name}
           {"\u00A0"}
         </Text>
