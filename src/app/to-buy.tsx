@@ -18,6 +18,7 @@ import { withUniwind } from "uniwind";
 import AddSeriesModal from "@/components/AddSeriesModal";
 import Button from "@/components/Button";
 import DoubleRule from "@/components/DoubleRule";
+import DrawnCover from "@/components/DrawnCover";
 import Mascot from "@/components/Mascot";
 import MenuSheet, { type MenuItem } from "@/components/MenuSheet";
 import PickSheet from "@/components/PickSheet";
@@ -149,6 +150,8 @@ function SumCell({
       >
         <Text
           numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.75}
           className="font-mono-medium text-[10.5px] tracking-[1px] text-ink-soft uppercase"
         >
           {label}
@@ -169,7 +172,10 @@ function SumCell({
 // "25", "25.5" or "$25.00" as cents; null for what isn't a price we can
 // watch for (the server takes a cent up to a thousand dollars)
 function centsOf(typed: string) {
-  const amount = Number(typed.replace(/[^0-9.]/g, ""));
+  // "9,99" is nine ninety-nine on keyboards that offer a comma for the
+  // point; "1,250" with a point elsewhere is a thousands comma
+  const point = typed.includes(".") ? typed : typed.replace(",", ".");
+  const amount = Number(point.replace(/[^0-9.]/g, ""));
   const cents = Math.round(amount * 100);
   return Number.isFinite(cents) && cents >= 1 && cents <= 100_000
     ? cents
@@ -206,6 +212,8 @@ function Tear({ height = STUB_HEIGHT }: { height?: number }) {
   );
 }
 
+const COVER_WIDTH = 66;
+
 // One book on the list, as a card with one clear way to buy it: the
 // cheapest copy and its store on a single button, the other copy as a line
 // of text, their note and price alert as two chips, and everything else
@@ -236,6 +244,16 @@ function Card({
 }) {
   const c = useColors();
   const [menuOpen, setMenuOpen] = useState(false);
+  const coverUrl = item.coverUrl ?? item.seriesCoverUrl;
+  const [coverFailed, setCoverFailed] = useState(false);
+  const coverBox = {
+    width: COVER_WIDTH,
+    aspectRatio: 2 / 3,
+    borderWidth: 1.5,
+    borderColor: c.line,
+    backgroundColor: c.paper2,
+    overflow: "hidden" as const,
+  };
   const name = nameOf(item);
   const { best, other } = pricesOf(item);
   const open = () => router.push(`/prices/${item.isbn13}`);
@@ -273,25 +291,37 @@ function Card({
     <View className="gap-2.5 rounded-[16px] border border-line-soft bg-card p-3">
       <View className="flex-row gap-3">
         <Tap onPress={open}>
-          <Image
-            source={{
-              uri: coverSrc(item.coverUrl ?? item.seriesCoverUrl ?? ""),
-            }}
-            style={{
-              width: 66,
-              aspectRatio: 2 / 3,
-              borderWidth: 1.5,
-              borderColor: c.line,
-              backgroundColor: c.paper2,
-            }}
-            contentFit="cover"
-          />
+          {/* no picture for it (or it won't load, as with no connection):
+              the series' name on a printed cover, as on the shelf */}
+          {coverUrl && !coverFailed ? (
+            <Image
+              source={{ uri: coverSrc(coverUrl) }}
+              style={coverBox}
+              contentFit="cover"
+              onError={() => setCoverFailed(true)}
+            />
+          ) : (
+            <View style={coverBox}>
+              <DrawnCover title={item.series || name} width={COVER_WIDTH - 3} />
+            </View>
+          )}
           {/* which book it is: a volume's number, or its edition in a few
-              letters with the book's number ("DLX 10", "DEF 9") */}
+              letters with the book's number ("DLX 10", "DEF 9"). Never
+              wider than the cover: a long one ("3-IN-1 12") is set smaller */}
           {item.volume != null || item.editionShort ? (
-            <View className="absolute top-0 left-0 bg-ink px-1.5">
-              <Text className="font-brand pr-[4px] text-[13px] text-paper">
-                {[item.editionShort, item.volume].filter(Boolean).join(" ")}
+            <View
+              className="absolute top-0 left-0 bg-ink px-1.5"
+              style={{ maxWidth: COVER_WIDTH }}
+            >
+              <Text
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.6}
+                className="font-brand pr-[4px] text-[13px] text-paper"
+              >
+                {[item.editionShort, item.volume]
+                  .filter((part) => part != null && part !== "")
+                  .join(" ")}
                 {"\u00A0"}
               </Text>
             </View>
@@ -300,7 +330,10 @@ function Card({
         <View className="min-w-0 flex-1 gap-1.5">
           <View className="flex-row items-start gap-2">
             <Tap onPress={open} className="min-w-0 flex-1">
-              <Text className="font-body-semibold text-[15.5px] leading-[20px] text-ink">
+              <Text
+                numberOfLines={3}
+                className="font-body-semibold text-[15.5px] leading-[20px] text-ink"
+              >
                 {name}
               </Text>
             </Tap>
@@ -434,8 +467,8 @@ function Card({
             </Text>
           ) : null}
           <Text
-            numberOfLines={1}
-            className="ml-auto min-w-0 shrink text-right font-body-semibold text-[13.5px] text-ink"
+            numberOfLines={2}
+            className="ml-auto min-w-0 shrink text-right font-body-semibold text-[13.5px] leading-[17px] text-ink"
           >
             {item.outOn ? "See the preorder page →" : "Check prices →"}
           </Text>
