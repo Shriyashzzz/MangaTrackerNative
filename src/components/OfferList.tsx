@@ -4,8 +4,9 @@
 // first, then box sets, then ebooks, five shown until "Show all". A row opens
 // the store. Which copy gets which stamp is the web's own rule (core
 // offerLabels awardsOf)
+import { openOutside } from "@/lib/openOutside";
 import { useState } from "react";
-import { Linking, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { ChevronRightIcon } from "@/core/components/icons/Icons";
 import { shopName } from "@/core/lib/prices";
 import { isCollection, type Offer } from "@/core/lib/types";
@@ -131,7 +132,7 @@ export default function OfferList({
           <Pressable
             key={`${o.store}-${o.priceCents}-${i}`}
             disabled={!o.url}
-            onPress={() => o.url && Linking.openURL(o.url)}
+            onPress={() => o.url && openOutside(o.url)}
             className={`flex-row items-center gap-3 px-3 py-3 active:bg-accent-wash ${i ? "border-t border-line-soft" : ""} ${o === highlighted ? "bg-accent-wash" : ""}`}
           >
             <View className="min-w-0 flex-1 gap-1">

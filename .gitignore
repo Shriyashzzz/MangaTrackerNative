@@ -46,3 +46,9 @@ example
 # generated from app.json by expo prebuild (continuous native generation)
 /android
 /ios
+
+
+eas.json
+# design brief for local tooling, not for the repo
+PRODUCT.md
+DESIGN.md

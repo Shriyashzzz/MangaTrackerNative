@@ -27,6 +27,7 @@ import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { loadDeviceStore } from "@/lib/deviceStore";
+import { forgetAccountData } from "@/lib/forgetAccount";
 import { openTappedAlerts, refreshPhoneAlerts } from "@/lib/phoneAlerts";
 import { useAuth } from "@/store/auth";
 import { usePrefs } from "@/store/prefs";
@@ -61,6 +62,10 @@ export default function RootLayout() {
     void loadDeviceStore().then(() => setStoreLoaded(true));
   }, [check]);
 
+  // signed out, however it happened: the account's data leaves memory
+  useEffect(() => {
+    if (isSignedIn === false) forgetAccountData();
+  }, [isSignedIn]);
   // phone alerts: the token given again once signed in, and a tapped alert
   // opened once the screens are up
   useEffect(() => {

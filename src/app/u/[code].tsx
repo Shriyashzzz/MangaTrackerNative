@@ -5,10 +5,10 @@
 // To read and To get as tabs over a searched, sorted list of rows or
 // covers. A series opens as a sheet with its facts, synopsis, notes, spines
 // and the way to its prices. The rules are the web's (core SharedShelf)
+import { openOutside } from "@/lib/openOutside";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import {
-  Linking,
   Pressable,
   ScrollView,
   Share,
@@ -840,7 +840,7 @@ export default function SharedShelfScreen() {
             center
             label="Open on the web"
             small
-            onPress={() => void Linking.openURL(link)}
+            onPress={() => openOutside(link)}
           />
         </View>
       </View>

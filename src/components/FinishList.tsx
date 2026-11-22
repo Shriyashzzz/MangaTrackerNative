@@ -3,8 +3,9 @@
 // page for the rest. In Buy next's order (core toGetLines, their Next in line
 // setting). As the web's (pages/Home/FinishList.tsx). A price opens the
 // store; one not checked yet says "check price" and opens the volume's page
+import { openOutside } from "@/lib/openOutside";
 import { router } from "expo-router";
-import { Linking, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import {
   money,
   totalText,
@@ -67,7 +68,7 @@ function Where({ volume }: { volume: MissingVolume }) {
   if (!cheapest) return <Link onPress={openVolume}>check price</Link>;
   const url = cheapest.url;
   return (
-    <Link onPress={url ? () => Linking.openURL(url) : openVolume}>
+    <Link onPress={url ? () => openOutside(url) : openVolume}>
       <Price cents={cheapest.cents} /> at {shopName(cheapest.store)}
     </Link>
   );

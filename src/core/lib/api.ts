@@ -16,6 +16,18 @@ export const API_URL: string =
 
 type FetchOptions = Omit<RequestInit, "body"> & { body?: unknown };
 
+// a request that hasn't answered in this long is given up on, so a screen
+// never waits for ever on a bad connection (the slowest answers, a live
+// price check or a big import, take well under it)
+const GIVE_UP_AFTER_MS = 60_000;
+
+// told when the server says the session is gone (a 401 on anything but the
+// sign-in routes themselves): the auth store sends them to sign in again
+let signedOut: (() => void) | null = null;
+export const whenSignedOut = (run: () => void) => {
+  signedOut = run;
+};
+
 // fetch that always sends the session cookie and serialises JSON bodies
 export function apiFetch(
   path: string,
@@ -23,9 +35,16 @@ export function apiFetch(
 ) {
   const method = (options.method ?? "GET").toUpperCase();
   if (method !== "GET" && isOffline()) return Promise.resolve(offlineAnswer());
+  // the caller's own cancel still works: it stops this one too
+  const limit = new AbortController();
+  const timer = setTimeout(() => limit.abort(), GIVE_UP_AFTER_MS);
+  const theirs = options.signal;
+  if (theirs?.aborted) limit.abort();
+  else theirs?.addEventListener("abort", () => limit.abort(), { once: true });
   return fetch(`${API_URL}${path}`, {
     credentials: "include",
     ...options,
+    signal: limit.signal,
     headers:
       body !== undefined
         ? { "Content-Type": "application/json", ...headers }
@@ -33,10 +52,19 @@ export function apiFetch(
     body: body !== undefined ? JSON.stringify(body) : undefined,
   }).then(
     (res) => {
+      clearTimeout(timer);
       noteAnswer(res);
+      if (res.status === 401 && !path.startsWith("/api/auth/")) signedOut?.();
       return res;
     },
     (e: unknown) => {
+      clearTimeout(timer);
+      // gave up waiting (not the caller's own cancel): said as no answer
+      if (limit.signal.aborted && !theirs?.aborted)
+        throw new TypeError(
+          orOffline("The server took too long. Try again."),
+          { cause: e },
+        );
       if (e instanceof TypeError)
         throw new TypeError(
           orOffline("Couldn't reach the server. Try again."),

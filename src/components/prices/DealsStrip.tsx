@@ -1,9 +1,10 @@
 // "Sales right now", across the top of the price pages (the web's
 // components/deals/DealsStrip.tsx): the stores' sales, each a link, a code
 // copied with a tap, hidden with its cross until the sales change
+import { openOutside } from "@/lib/openOutside";
 import * as Clipboard from "expo-clipboard";
 import { useEffect, useState } from "react";
-import { Linking, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { CloseIcon } from "@/core/components/icons/Icons";
 import { getDeals, type Deal } from "@/core/lib/collector";
 import { inCanada } from "@/core/lib/country";
@@ -60,7 +61,7 @@ export default function DealsStrip() {
       {deals.map((d) => (
         <View key={idOf(d)} className="flex-row flex-wrap items-center gap-2">
           <Pressable
-            onPress={() => void Linking.openURL(d.url)}
+            onPress={() => openOutside(d.url)}
             className="min-w-0 shrink"
           >
             <Text className="font-body text-[14px] text-ink border-b pb-[2px] border-ink self-start">

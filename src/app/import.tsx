@@ -1,8 +1,9 @@
 // Import your list, as the web's pages/Import/Import.tsx: where it comes
 // from (MyAnimeList's export file, an AniList or Kitsu username, or a book
 // app's files), what was found, which lists to add, then adding them
+import { openOutside } from "@/lib/openOutside";
 import { useState } from "react";
-import { Linking, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import Button from "@/components/Button";
 import { Field, Input } from "@/components/Field";
 import Page, { H2 } from "@/components/Page";
@@ -160,7 +161,7 @@ export default function ImportScreen() {
                     </Note>
                     <Button
                       label="Open the export page"
-                      onPress={() => void Linking.openURL(EXPORT_PAGE)}
+                      onPress={() => openOutside(EXPORT_PAGE)}
                     />
                   </Step>
                   <Step n={2}>

@@ -1,9 +1,10 @@
 // A show's page, as the web's pages/AfterAnime/AfterAnimeShow.tsx: where the
 // anime leaves off and the chapter and volume to start the manga at, what to
 // buy and its price, what's left to read, every season, and the questions
+import { openOutside } from "@/lib/openOutside";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { Linking, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import Button from "@/components/Button";
 import FoldRow from "@/components/FoldRow";
 import Mascot from "@/components/Mascot";
@@ -297,7 +298,7 @@ export default function AfterAnimeShowScreen() {
               </Text>{" "}
               at{" "}
               <Text
-                onPress={() => void Linking.openURL(boxSet.url!)}
+                onPress={() => openOutside(boxSet.url!)}
                 className="font-body-semibold text-ink underline"
               >
                 {boxSet.store}
@@ -372,7 +373,7 @@ export default function AfterAnimeShowScreen() {
                 <>
                   Source:{" "}
                   <Text
-                    onPress={() => void Linking.openURL(show.sourceUrl!)}
+                    onPress={() => openOutside(show.sourceUrl!)}
                     className="underline"
                   >
                     MangaUpdates

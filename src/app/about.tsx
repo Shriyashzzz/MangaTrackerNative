@@ -1,3 +1,4 @@
+import { openOutside } from "@/lib/openOutside";
 import Button from "@/components/Button";
 import Mascot from "@/components/Mascot";
 import Page, { H2, H3, P, Rule, TextLink } from "@/components/Page";
@@ -5,7 +6,7 @@ import { CONTACT_EMAIL } from "@/core/lib/contact";
 import { getPricedCount } from "@/core/lib/prices";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Linking, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 const STRIP = [
   {
@@ -202,7 +203,7 @@ export default function AboutScreen() {
         label="Get in touch →"
         kind="primary"
         small
-        onPress={() => void Linking.openURL(`mailto:${CONTACT_EMAIL}`)}
+        onPress={() => openOutside(`mailto:${CONTACT_EMAIL}`)}
       />
 
       {/* Additional links */}

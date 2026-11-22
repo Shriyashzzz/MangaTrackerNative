@@ -1,8 +1,9 @@
 // What AniList says of a series (the web's SeriesFacts): its rating, how
 // popular, how many volumes in Japan, its genres and blurb, folded past a
 // few lines
+import { openOutside } from "@/lib/openOutside";
 import { useState } from "react";
-import { Linking, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { novelParts } from "@/core/lib/prices";
 import type { SeriesInfo } from "@/core/lib/types";
 import { starsOf } from "@/core/pages/Prices/reviews/reviewText";
@@ -72,7 +73,7 @@ export default function SeriesFacts({
         {info.siteUrl ? (
           <Text
             className="font-body-medium text-ink underline"
-            onPress={() => void Linking.openURL(info.siteUrl)}
+            onPress={() => openOutside(info.siteUrl)}
           >
             {facts.length ? " · " : ""}AniList
           </Text>

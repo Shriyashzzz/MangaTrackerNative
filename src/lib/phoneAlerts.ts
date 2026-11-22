@@ -81,6 +81,19 @@ export async function turnOffPhoneAlerts() {
   if (token) await tell("/api/push/device/forget", token).catch(() => {});
 }
 
+// signing out: the server forgets this phone for this account, but the
+// switch stays as they left it, so signing in again brings the alerts back
+// (refreshPhoneAlerts). Never holds the sign-out up: three seconds at most
+export async function forgetThisPhone() {
+  const token = readLocal(TOKEN_KEY);
+  if (!token) return;
+  writeLocal(TOKEN_KEY, "");
+  await Promise.race([
+    tell("/api/push/device/forget", token).catch(() => {}),
+    new Promise((done) => setTimeout(done, 3000)),
+  ]);
+}
+
 // signed in with alerts on from before: the token is given again, in case
 // it changed or the account did. Never asks the phone anything
 export async function refreshPhoneAlerts() {

@@ -1,9 +1,9 @@
 // Who's signed in, as the web's store/auth.ts: the session cookie and
 // /api/auth/me decide. null while asking
 import { create } from "zustand";
-import { apiFetch, errorMessages } from "@/core/lib/api";
+import { apiFetch, errorMessages, whenSignedOut } from "@/core/lib/api";
 import { forgetGoogle } from "@/lib/googleSignIn";
-import { turnOffPhoneAlerts } from "@/lib/phoneAlerts";
+import { forgetThisPhone } from "@/lib/phoneAlerts";
 
 type AuthState = {
   isSignedIn: boolean | null;
@@ -70,7 +70,7 @@ export const useAuth = create<AuthState>()((set) => ({
   logOut: async () => {
     // while still signed in: the server forgets this phone, so the next
     // person on it gets none of this account's alerts
-    await turnOffPhoneAlerts();
+    await forgetThisPhone();
     const res = await apiFetch("/api/auth/logout", { method: "POST" });
     if (res.ok) {
       set({ isSignedIn: false });
@@ -78,3 +78,10 @@ export const useAuth = create<AuthState>()((set) => ({
     }
   },
 }));
+
+// the server says the session is gone (it lapsed, or the account was signed
+// out everywhere): the app goes back to its signed-out screens, where a
+// request that needs an account would only fail again
+whenSignedOut(() => {
+  if (useAuth.getState().isSignedIn) useAuth.setState({ isSignedIn: false });
+});

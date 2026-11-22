@@ -2,7 +2,8 @@
 // takes the whole row, so no row is ragged): a volume's "More places to
 // look" and a series' "More box sets at". `lead` makes the first the main
 // action ("Preorder on Amazon")
-import { Linking, Text, View } from "react-native";
+import { openOutside } from "@/lib/openOutside";
+import { Text, View } from "react-native";
 import { look } from "@/lib/platformLook";
 import PressScale from "../PressScale";
 
@@ -24,7 +25,7 @@ export default function StoreButtons({
         return (
           <PressScale
             key={s.store}
-            onPress={() => void Linking.openURL(s.url)}
+            onPress={() => openOutside(s.url)}
             accessibilityRole="link"
             accessibilityLabel={describe(s.store)}
             style={{ flexBasis: wide ? "100%" : "47%", flexGrow: 1 }}

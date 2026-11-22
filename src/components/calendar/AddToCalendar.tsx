@@ -1,8 +1,9 @@
 // "Save the date" (the web's components/calendar/AddToCalendar.tsx): one
 // release into Google Calendar, or the dates as a calendar file handed to
 // the phone's share sheet for Apple, Outlook and the rest
+import { openOutside } from "@/lib/openOutside";
 import { useState } from "react";
-import { Linking, Pressable, Share, Text } from "react-native";
+import { Pressable, Share, Text } from "react-native";
 import { CalendarPlusIcon } from "@/core/components/icons/Icons";
 import { buildIcs, googleCalendarLink, hasDay } from "@/core/lib/addToCalendar";
 import type { CalendarVolume } from "@/core/lib/collector";
@@ -59,10 +60,13 @@ export default function AddToCalendar({
         items={[
           {
             label: "Google Calendar",
-            onPress: () =>
-              void Linking.openURL(
+            onPress: () => {
+              openOutside(
                 one ? googleCalendarLink(one, pageFor) : GOOGLE_IMPORT_PAGE,
-              ).then(() => (one ? undefined : shareFile())),
+              );
+              // several dates: Google's import page, and the file to give it
+              if (!one) void shareFile();
+            },
           },
           { label: "Apple, Outlook and others", onPress: shareFile },
         ]}

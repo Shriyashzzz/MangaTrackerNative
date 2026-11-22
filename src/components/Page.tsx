@@ -3,12 +3,13 @@
 // on an iPhone, Material's bar on Android), and its words in a scroll. A
 // page that searches gets the header's own search bar. The pieces the
 // content pages are set in: a heading, a paragraph, a list line
+import { openOutside } from "@/lib/openOutside";
 import PullPage, { pause, usePullTop } from "@/components/PullRefresh";
 import Backdrop from "@/components/Backdrop";
 import { useColors } from "@/lib/colors";
 import { Stack } from "expo-router";
 import type { ReactNode } from "react";
-import { Linking, Platform, ScrollView, Text, View } from "react-native";
+import { Platform, ScrollView, Text, View } from "react-native";
 
 export type PageSearch = {
   placeholder: string;
@@ -148,7 +149,7 @@ export const TextLink = ({
 }) => (
   <Text
     className="font-body-semibold text-[15.5px] text-ink underline"
-    onPress={href ? () => void Linking.openURL(href) : onPress}
+    onPress={href ? () => openOutside(href) : onPress}
   >
     {children}
   </Text>

@@ -1,9 +1,10 @@
 // The volume to buy after a season (the web's pages/AfterAnime/BuyRow.tsx):
 // its cover, why this one, the best saved price and the store, or the way
 // to its prices when none is saved
+import { openOutside } from "@/lib/openOutside";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import { Linking, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import Button from "@/components/Button";
 import { CoverFallback } from "@/components/prices/VolumeCard";
 import type { BuyOffer, UsedOffer } from "@/core/lib/afterAnime";
@@ -90,7 +91,7 @@ export default function BuyRow({
                 kind="primary"
                 small
                 label={`Buy${offer ? "" : " used"} at ${main.store}`}
-                onPress={() => void Linking.openURL(main.url)}
+                onPress={() => openOutside(main.url)}
               />
             ) : (
               <Button
@@ -104,7 +105,7 @@ export default function BuyRow({
             <View className="gap-0.5">
               {cheaperUsed ? (
                 <Text
-                  onPress={() => void Linking.openURL(cheaperUsed.url)}
+                  onPress={() => openOutside(cheaperUsed.url)}
                   className="font-body-medium text-[13.5px] text-ink underline"
                 >
                   Used, {formatCents(cheaperUsed.cents)} at {cheaperUsed.store}

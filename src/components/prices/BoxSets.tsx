@@ -1,7 +1,8 @@
 // A series' box sets (the web's BoxSets.tsx): the cheapest as a ticket, the
 // rest a price list, and the stores to look in; or, with none priced, where
 // to look for one (BoxSetSearch). A volume page's "Also in a box set" note
-import { Linking, Pressable, Text, View } from "react-native";
+import { openOutside } from "@/lib/openOutside";
+import { Pressable, Text, View } from "react-native";
 import { formatCents, shopName } from "@/core/lib/prices";
 import type { BoxSet, Offer, StoreLink } from "@/core/lib/types";
 import { setsTitle, shownSets } from "@/core/pages/Prices/boxSetRules";
@@ -79,9 +80,7 @@ export default function BoxSets({
   const body = (
     <View className="gap-2">
       <Pressable
-        onPress={
-          cheapest!.url ? () => void Linking.openURL(cheapest!.url!) : undefined
-        }
+        onPress={cheapest!.url ? () => openOutside(cheapest!.url!) : undefined}
         className="flex-row items-baseline justify-between gap-3 rounded-[12px] border-[1.5px] border-accent bg-accent-wash px-3 py-2.5 active:opacity-90"
       >
         <View className="min-w-0 flex-1">
@@ -101,7 +100,7 @@ export default function BoxSets({
         return (
           <Pressable
             key={`${s.store}-${s.priceCents}-${s.url}`}
-            onPress={s.url ? () => void Linking.openURL(s.url!) : undefined}
+            onPress={s.url ? () => openOutside(s.url!) : undefined}
             className="flex-row items-baseline justify-between gap-3 border-b border-dotted border-line-soft py-1.5"
           >
             <Text className="min-w-0 flex-1 font-body text-[14px] text-ink">
