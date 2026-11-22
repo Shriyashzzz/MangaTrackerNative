@@ -576,7 +576,7 @@ export default function NewScreen() {
           {/* the foot: the one way to change the list, and when it was
               last looked for */}
           {list.length > 0 ? (
-            <View className="flex-row items-center justify-between gap-3 pt-1">
+            <View className="flex-row items-baseline justify-between gap-3 pt-1">
               <Tap onPress={toSettings} hitSlop={8}>
                 <Text className="font-body-semibold text-[14px] text-ink underline">
                   Change what New shows
