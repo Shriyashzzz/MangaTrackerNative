@@ -21,10 +21,26 @@ export function SeriesDescription({ info }: { info: SeriesInfo }) {
       >
         {info.description}
       </Text>
-      {long ? (
-        <Pressable onPress={() => setExpanded(!expanded)} hitSlop={6}>
+      {/* folded: Read more sits at the end of the third line itself, on a
+          patch of the page's colour over the cut-off words */}
+      {long && !expanded ? (
+        <Pressable
+          onPress={() => setExpanded(true)}
+          hitSlop={8}
+          className="absolute right-0 bottom-0 flex-row bg-paper pl-1"
+        >
+          <Text className="font-body text-[14px] leading-[21px] text-ink">
+            …{" "}
+          </Text>
+          <Text className="font-body-semibold text-[14px] leading-[21px] text-ink">
+            Read more
+          </Text>
+        </Pressable>
+      ) : null}
+      {long && expanded ? (
+        <Pressable onPress={() => setExpanded(false)} hitSlop={6}>
           <Text className="self-start border-b border-ink pb-[2px] font-body-medium text-[13.5px] text-ink">
-            {expanded ? "Show less" : "Read more"}
+            Show less
           </Text>
         </Pressable>
       ) : null}
