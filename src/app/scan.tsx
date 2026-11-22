@@ -5,6 +5,7 @@
 // the ISBN works when the camera can't. The phone's camera does the reading
 // (expo-camera), and a buzz says a scan landed; what a scan does to the
 // shelf is the web's own (core lib/scan)
+import { StatusBar } from "expo-status-bar";
 import ScanFrame from "@/components/ScanFrame";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as Haptics from "expo-haptics";
@@ -51,6 +52,10 @@ function flashFor(kind: ScanResult["kind"]): {
     return { tone: "bad", note: "Couldn't find this one" };
   return { tone: "bad", note: "That didn't save" };
 }
+
+// the scanner's dark surround and the words on it, the same in both themes
+const CHROME = "#16140f";
+const ON_CHROME = "#fffaf2";
 
 export default function ScanScreen() {
   const { isbn: firstIsbn } = useLocalSearchParams<{ isbn?: string }>();
@@ -157,7 +162,14 @@ export default function ScanScreen() {
   const editingResult = editingRow?.result;
 
   return (
-    <Safe edges={["top"]} className="flex-1 bg-ink">
+    // the camera's surround is dark in both themes, as a camera's is: its
+    // own colours, not the theme's ink and paper (which swap in dark mode)
+    <Safe
+      edges={["top"]}
+      className="flex-1"
+      style={{ backgroundColor: CHROME }}
+    >
+      <StatusBar style="light" />
       <View className="h-[56px] flex-row items-center justify-between px-2">
         <Pressable
           onPress={close}
@@ -231,18 +243,24 @@ export default function ScanScreen() {
               </View>
             ) : null}
           </View>
-          <Text className="text-center font-body text-[15px] text-paper">
+          <Text
+            className="text-center font-body text-[15px]"
+            style={{ color: ON_CHROME }}
+          >
             {!cameraOn && permission?.granted
               ? "Starting the camera…"
               : notice || "Point at the barcode on the back"}
           </Text>
-          <Text className="text-center font-body text-[13px] text-paper/70">
+          <Text
+            className="text-center font-body text-[13px] opacity-70"
+            style={{ color: ON_CHROME }}
+          >
             Keep going for a whole stack.
           </Text>
         </View>
       ) : (
         <View className="gap-3 px-4">
-          <Text className="font-body text-[15px] text-paper">
+          <Text className="font-body text-[15px]" style={{ color: ON_CHROME }}>
             {!blocked
               ? "Type the 13 digits under the barcode."
               : "The camera's off. Allow it for Manga Tracker in your phone's settings, or type the 13 digits under the barcode."}
