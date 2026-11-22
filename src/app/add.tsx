@@ -7,14 +7,9 @@
 import Tap from "@/components/Tap";
 import { useIsOffline } from "@/core/lib/offline";
 import { Image } from "expo-image";
-import {
-  router,
-  useLocalSearchParams,
-  useNavigation,
-  usePreventRemove,
-} from "expo-router";
+import { router, useLocalSearchParams, usePreventRemove } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { Alert, Text, View } from "react-native";
+import { Alert, BackHandler, Keyboard, Text, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
@@ -93,6 +88,16 @@ function useAlreadyOnShelf(title: string, chosen: boolean) {
   return already;
 }
 
+// "Leave without adding it?": the keyboard goes first, so the question
+// isn't drawn while the page is still moving under it
+function askToLeave(setLeaving: (leaving: boolean) => void) {
+  Keyboard.dismiss();
+  Alert.alert("Leave without adding it?", "What you entered won't be kept.", [
+    { text: "Keep editing", style: "cancel" },
+    { text: "Leave", style: "destructive", onPress: () => setLeaving(true) },
+  ]);
+}
+
 export default function AddScreen() {
   const c = useColors();
   // no connection: the strip at the foot says why the button is off
@@ -154,22 +159,29 @@ export default function AddScreen() {
 
   // Leaving with something entered (the back arrow, the phone's back, or
   // Cancel) asks first: a slip no longer throws a half-filled form away.
-  // Once it's saved the guard is off, and only then does the page move on
-  // to the new series (while the guard is up, that move is held back too)
-  const navigation = useNavigation();
+  // The three ways out ask before any move starts, so the page never
+  // begins to slide away and snap back; usePreventRemove is only the net
+  // under them (a swipe back). The guard comes off once it's saved, or once
+  // they've said Leave, and only then does the page move (while the guard
+  // is up, that move would be held back too)
   const [savedId, setSavedId] = useState<number | null>(null);
+  const [leaving, setLeaving] = useState(false);
   const entered =
     title.trim() !== (fromPrices ?? "").trim() || picked !== null || rating > 0;
-  usePreventRemove(entered && savedId === null, ({ data }) => {
-    Alert.alert("Leave without adding it?", "What you entered won't be kept.", [
-      { text: "Keep editing", style: "cancel" },
-      {
-        text: "Leave",
-        style: "destructive",
-        onPress: () => navigation.dispatch(data.action),
-      },
-    ]);
-  });
+  const guarded = entered && savedId === null && !leaving;
+  const leave = () => (guarded ? askToLeave(setLeaving) : router.back());
+  usePreventRemove(guarded, () => askToLeave(setLeaving));
+  useEffect(() => {
+    if (!guarded) return;
+    const back = BackHandler.addEventListener("hardwareBackPress", () => {
+      askToLeave(setLeaving);
+      return true;
+    });
+    return () => back.remove();
+  }, [guarded]);
+  useEffect(() => {
+    if (leaving) router.back();
+  }, [leaving]);
   useEffect(() => {
     if (savedId === null) return;
     router.replace({
@@ -318,7 +330,7 @@ export default function AddScreen() {
       <View className="h-[62px] flex-row items-center gap-3 px-2">
         <Tap
           feel="round"
-          onPress={() => router.back()}
+          onPress={leave}
           hitSlop={8}
           className="p-2"
           accessibilityLabel="Back to the shelf"
@@ -638,7 +650,7 @@ export default function AddScreen() {
               </View>
             ) : null}
             <View className="flex-row items-center justify-end gap-4 pt-2">
-              <Button label="Cancel" onPress={() => router.back()} />
+              <Button label="Cancel" onPress={leave} />
               <Button
                 label={submitting ? "Adding…" : "Put it on the shelf"}
                 kind="primary"
