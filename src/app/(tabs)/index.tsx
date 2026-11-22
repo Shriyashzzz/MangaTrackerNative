@@ -223,7 +223,8 @@ export default function ShelfScreen() {
         </Pressable>
         {tab !== "volumes" && !select.selectOn && !searching ? (
           <Pressable
-            onPress={select.start}
+            // on the way down, not on release: it answers at once
+            onPressIn={select.start}
             hitSlop={8}
             className="py-2 pl-1"
             accessibilityLabel="Select several"
