@@ -23,6 +23,7 @@ import Mascot from "@/components/Mascot";
 import SeriesCover from "@/components/SeriesCover";
 import { BoxSetSearch } from "@/components/prices/BoxSets";
 import DealsStrip from "@/components/prices/DealsStrip";
+import OnShelfChip from "@/components/prices/OnShelfChip";
 import OtherEditions from "@/components/prices/OtherEditions";
 import { SeriesScoreBadge } from "@/components/prices/SeriesCard";
 import SeriesCostBox from "@/components/prices/SeriesCostBox";
@@ -211,6 +212,10 @@ export default function PriceSeriesScreen() {
               border={2}
             />
             <SeriesScoreBadge percent={info?.score} />
+            <OnShelfChip
+              name={info?.name ?? data.name}
+              altNames={info?.altNames}
+            />
           </View>
         ) : null}
         <View className="min-w-0 flex-1 gap-2">

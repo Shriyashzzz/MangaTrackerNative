@@ -14,6 +14,7 @@ import Button from "@/components/Button";
 import DoubleRule from "@/components/DoubleRule";
 import Mascot from "@/components/Mascot";
 import OfferList from "@/components/OfferList";
+import OnShelfChip from "@/components/prices/OnShelfChip";
 import StoreButtons from "@/components/prices/StoreButtons";
 import CountrySwitch from "@/components/prices/CountrySwitch";
 import DealsStrip from "@/components/prices/DealsStrip";
@@ -229,45 +230,48 @@ export default function PriceVolumeScreen() {
     <ScrollView contentContainerClassName="gap-6 px-4 pt-4 pb-16">
       <DealsStrip />
       <View className="flex-row gap-3.5">
-        <Pressable
-          onPress={openSeries}
-          accessibilityLabel={`${shownSeries}: open the series`}
-          style={{
-            width: 102,
-            aspectRatio: 2 / 3,
-            borderWidth: 2,
-            borderColor: c.line,
-            backgroundColor: c.paper2,
-            overflow: "hidden",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          {!book.coverUrl && series.info?.coverUrl ? (
-            <Image
-              source={{ uri: coverSrc(series.info.coverUrl) }}
-              style={{
-                position: "absolute",
-                width: "100%",
-                height: "100%",
-                opacity: 0.35,
-              }}
-              contentFit="cover"
-            />
-          ) : null}
-          {!book.coverUrl ? (
-            <Text className="font-brand pr-1 text-[40px] text-ink">
-              {volume ?? "?"}
-            </Text>
-          ) : null}
-          {book.coverUrl ? (
-            <Image
-              source={{ uri: coverSrc(book.coverUrl) }}
-              style={{ width: "100%", height: "100%" }}
-              contentFit="cover"
-            />
-          ) : null}
-        </Pressable>
+        <View>
+          <Pressable
+            onPress={openSeries}
+            accessibilityLabel={`${shownSeries}: open the series`}
+            style={{
+              width: 102,
+              aspectRatio: 2 / 3,
+              borderWidth: 2,
+              borderColor: c.line,
+              backgroundColor: c.paper2,
+              overflow: "hidden",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            {!book.coverUrl && series.info?.coverUrl ? (
+              <Image
+                source={{ uri: coverSrc(series.info.coverUrl) }}
+                style={{
+                  position: "absolute",
+                  width: "100%",
+                  height: "100%",
+                  opacity: 0.35,
+                }}
+                contentFit="cover"
+              />
+            ) : null}
+            {!book.coverUrl ? (
+              <Text className="font-brand pr-1 text-[40px] text-ink">
+                {volume ?? "?"}
+              </Text>
+            ) : null}
+            {book.coverUrl ? (
+              <Image
+                source={{ uri: coverSrc(book.coverUrl) }}
+                style={{ width: "100%", height: "100%" }}
+                contentFit="cover"
+              />
+            ) : null}
+          </Pressable>
+          <OnShelfChip name={seriesLabel} altNames={[series.name]} />
+        </View>
         <View className="min-w-0 flex-1 gap-1.5">
           <Text className="font-display text-[21px] leading-[25px] text-ink">
             {shownBook.title}

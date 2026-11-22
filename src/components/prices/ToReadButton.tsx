@@ -1,9 +1,8 @@
 // "+ Add to my to-read" on a series' price page (the web's components/
 // toRead/ToReadButton.tsx): the series onto the shelf's To read list, or
 // the way to it when it's there already
-import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { pickGenre } from "@/core/lib/anilist";
 import { apiFetch } from "@/core/lib/api";
 import { novelParts } from "@/core/lib/prices";
@@ -36,24 +35,8 @@ export default function ToReadButton({
       Boolean(m.lightNovel) === novel.lightNovel &&
       names.includes(sameName(m.name)),
   );
-  if (onShelf)
-    return (
-      <Pressable
-        onPress={() =>
-          router.push({
-            pathname: "/details/[id]",
-            params: { id: String(onShelf.id) },
-          })
-        }
-        hitSlop={6}
-        accessibilityRole="link"
-        className="flex-row items-center gap-1.5 self-start rounded-full border border-ok bg-ok/15 px-3 py-1.5 active:opacity-70"
-      >
-        <Text className="font-body-semibold text-[14px] text-ok">
-          {onShelf.planned ? "On your to-read list" : "On your shelf"}
-        </Text>
-      </Pressable>
-    );
+  // theirs already: the chip under the cover says so
+  if (onShelf) return null;
   const add = async () => {
     setSaving(true);
     setError("");

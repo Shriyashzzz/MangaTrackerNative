@@ -6,7 +6,7 @@ import PressScale from "@/components/PressScale";
 import { look } from "@/lib/platformLook";
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { newBook } from "@/core/lib/books";
 import { saveBooks } from "@/core/lib/booksApi";
 import {
@@ -190,17 +190,6 @@ export default function ShelfAction({
     });
   return (
     <View className="gap-2">
-      {/* under the cover: it's theirs already, and the way to it */}
-      <Pressable
-        onPress={openSeries}
-        hitSlop={6}
-        accessibilityRole="link"
-        className="self-start rounded-full border border-ok/50 bg-ok/10 px-3 py-1 active:opacity-70"
-      >
-        <Text className="font-body-medium text-[13px] text-ok">
-          On your shelf
-        </Text>
-      </Pressable>
       <View className="flex-row gap-2.5">
         {holds?.length && thing && !ownsThis ? (
           <Button
