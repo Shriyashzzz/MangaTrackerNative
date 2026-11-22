@@ -4,18 +4,21 @@
 // (or over it, when there's no room under), with a small tail pointing at
 // it; with nothing to point at, it rests at the foot of the screen, above
 // the tab bar where there is one. Next takes them to the page his next line
-// is about. Hidden, he's a small round button to bring him back. The bubble
+// is about. A touch anywhere else on the page means they want to look
+// around: he steps aside to a small round button at the foot, and comes
+// back on a tap. The bubble
 // (or a pill beside the button) also says it's a practice shelf, with the
 // two ways out. The lines are the website's (core components/tour/
 // steps.ts), the phone's wording where it has one
 import { usePathname } from "expo-router";
 import { useState } from "react";
 import { Text, useWindowDimensions, View } from "react-native";
+import Animated, { LinearTransition } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { InkCrossIcon } from "@/core/components/icons/Icons";
 import { useColors } from "@/lib/colors";
 import { inPractice, leavePractice } from "@/lib/practice";
-import { tourGo } from "@/lib/tourGo";
+import { tourBack, tourGo, touchIsKenjis } from "@/lib/tourGo";
 import { useTour } from "@/store/tour";
 import Button from "./Button";
 import Mascot from "./Mascot";
@@ -70,10 +73,11 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
         pointerEvents="box-none"
         className="absolute left-3 flex-row items-center gap-2"
         style={{ bottom: foot }}
+        onTouchStart={touchIsKenjis}
       >
         <Tap
           feel="none"
-          onPress={() => hide(false)}
+          onPress={tourBack}
           accessibilityLabel="Bring Kenji back"
           className="h-[52px] w-[52px] items-center justify-center rounded-full border-[1.5px] border-line bg-card"
           style={{ elevation: 6 }}
@@ -84,9 +88,21 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
           className="flex-row items-center gap-3 rounded-full border-[1.5px] border-line bg-card px-3.5 py-2"
           style={{ elevation: 6 }}
         >
-          <Text className="font-mono text-[11.5px] text-ink-soft">
-            Practice shelf
-          </Text>
+          {/* the tour goes on from here too: Next brings him back, on
+              his next step */}
+          {at < steps.length - 1 ? (
+            <Tap
+              onPress={() => {
+                hide(false);
+                tourGo(1);
+              }}
+              hitSlop={8}
+            >
+              <Text className="font-body-semibold text-[13px] text-ink">
+                Next ›
+              </Text>
+            </Tap>
+          ) : null}
           {waysOut}
         </View>
       </View>
@@ -118,7 +134,9 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
         ? { top: over, tail: "down" }
         : AT_THE_FOOT.has(step.target ?? "")
           ? { top: insets.top + HEADER + 46, tail: null }
-          : { bottom: foot, tail: null };
+          : // too tall to sit beside: he rests at the foot and still
+            // points up at it
+            { bottom: foot, tail: box && height ? "up" : null };
   // the tail points at the middle of the thing, as far as the bubble's
   // corners (and Kenji, on its top left) allow
   const middle = box ? box.x + box.width / 2 - SIDE : 0;
@@ -131,11 +149,14 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
   );
   const last = at === steps.length - 1;
   return (
-    <View
+    <Animated.View
       pointerEvents="box-none"
       className="absolute right-3 left-3"
       style={{ top: place.top, bottom: place.bottom }}
+      // it glides to its next place: a hop would read as a stutter
+      layout={LinearTransition.duration(180)}
       onLayout={(e) => setHeight(e.nativeEvent.layout.height)}
+      onTouchStart={touchIsKenjis}
     >
       <View
         className="rounded-[18px] border-[1.5px] border-line bg-card px-3.5 pt-3 pb-2.5"
@@ -193,7 +214,7 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
           {waysOut}
         </View>
       </View>
-    </View>
+    </Animated.View>
   );
 }
 

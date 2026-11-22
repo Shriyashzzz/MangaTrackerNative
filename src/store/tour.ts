@@ -40,6 +40,22 @@ function topToBottom(steps: TourStep[]) {
   return told;
 }
 
+// The things that are ringed in the app (each has a TourTarget around it):
+// the bubble waits for these to say where they are
+const RINGED = new Set([
+  "anime",
+  "edition",
+  "buy",
+  "spines",
+  "chapter-up",
+  "release-toggle",
+  "your-books",
+  "prices",
+  "upcoming",
+  "export",
+  "share",
+]);
+
 // where the thing he's pointing at is on the screen
 type Box = { x: number; y: number; width: number; height: number };
 
@@ -84,8 +100,14 @@ export const useTour = create<TourState>()((set, get) => ({
     // passed over when it doesn't
     while (steps[next] && steps[next]!.when && !steps[next]!.when!())
       next += by;
-    // (the new step's thing is found afresh)
-    if (steps[next]) set({ at: next, box: null });
+    // The new step's thing is found afresh. Until it is, the bubble stays
+    // where it was (it would only hop to the foot and back); a step with
+    // nothing to ring has no place to wait for
+    if (steps[next])
+      set({
+        at: next,
+        box: RINGED.has(steps[next]!.target ?? "") ? get().box : null,
+      });
   },
   hide: (hidden) => set({ hidden }),
 }));

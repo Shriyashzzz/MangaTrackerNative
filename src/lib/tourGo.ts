@@ -20,17 +20,56 @@ function pageOf(step: TourStep): Href | null {
   return hrefOf(to);
 }
 
+// the app's page for the step the tour is on, with the pages over a tab
+// closed first (or the tab changes out of sight behind them)
+function openPageOf(step: TourStep) {
+  const page = pageOf(step);
+  if (!page) return;
+  const isTab = page === "/" || page === "/new";
+  if (isTab && router.canDismiss()) router.dismissAll();
+  // (going to the page already in front does nothing)
+  router.navigate(page);
+}
+
+// A touch anywhere on the page but Kenji's bubble (or the thing he's asking
+// them to use): they want to look around, so he steps aside to his small
+// button at the foot. The bubble and the ringed thing say "that was me"
+// first (their touch is heard before the page's)
+let mine = false;
+export const touchIsKenjis = () => {
+  mine = true;
+};
+export function pageTouched() {
+  if (mine) {
+    mine = false;
+    return;
+  }
+  const { steps, hidden, hide } = useTour.getState();
+  if (steps.length && !hidden) hide(true);
+}
+
+// Kenji called back: his bubble, on the page his step is about (they may
+// have wandered off while he was aside)
+export function tourBack() {
+  const { steps, at, hide } = useTour.getState();
+  hide(false);
+  if (steps[at]) openPageOf(steps[at]!);
+}
+
+// how long the bubble waits where it was for a new step's thing to be found
+const FIND_WITHIN_MS = 1400;
+
 export function tourGo(by: 1 | -1) {
   const before = useTour.getState().at;
   useTour.getState().move(by);
   const { steps, at } = useTour.getState();
   if (at === before) return;
-  const page = pageOf(steps[at]!);
-  if (!page) return;
-  // The shelf and New are tabs under whatever pages are open over them:
-  // those pages go first, or the tab changes out of sight behind them
-  const isTab = page === "/" || page === "/new";
-  if (isTab && router.canDismiss()) router.dismissAll();
-  // (going to the page already in front does nothing)
-  router.navigate(page);
+  openPageOf(steps[at]!);
+  // the thing never showed (a page that didn't open, a part of it folded
+  // away): the bubble stops waiting and rests at the foot
+  const waitingFor = useTour.getState().box;
+  setTimeout(() => {
+    const now = useTour.getState();
+    if (now.at === at && now.box === waitingFor && waitingFor) now.point(null);
+  }, FIND_WITHIN_MS);
 }
