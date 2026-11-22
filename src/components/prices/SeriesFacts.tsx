@@ -14,13 +14,16 @@ export function SeriesDescription({ info }: { info: SeriesInfo }) {
   const [expanded, setExpanded] = useState(false);
   const long = (info.description?.length ?? 0) > 320;
   if (!info.description) return null;
+  // folded, it runs on as one paragraph: a blank line in the middle would
+  // leave the third line empty beside Read more
+  const folded = info.description.replace(/\s+/g, " ").trim();
   return (
     <View>
       <Text
         numberOfLines={expanded ? undefined : 3}
         className="font-body text-[14px] leading-[21px] text-ink"
       >
-        {info.description}
+        {expanded ? info.description : folded}
       </Text>
       {/* folded: Read more sits at the end of the third line itself, on a
           patch of the page's colour over the cut-off words */}

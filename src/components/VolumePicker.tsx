@@ -488,7 +488,7 @@ export default function VolumePicker({
           </Text>
           <Input
             keyboardType="number-pad"
-            placeholder="e.g. 12"
+            placeholder="12"
             value={upToText ?? (run ? String(run) : "")}
             onChangeText={typeUpTo}
             onBlur={endTyping}

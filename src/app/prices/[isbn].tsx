@@ -559,7 +559,7 @@ export default function PriceVolumeScreen() {
             >
               <H2>Price history</H2>
               {/* level with the heading's words, not the rule under them */}
-              <Text className="font-mono text-[12.5px] leading-[30px] text-muted">
+              <Text className="pt-[9px] font-mono text-[12.5px] text-muted">
                 lowest {formatCents(lowestInHistory)}
               </Text>
               <View
