@@ -1,6 +1,6 @@
 // One series on the shelf, as the Android app's row (web components/mangaCard
-// MangaCard.tsx, its rows): cover, name, their stars under it, the genre
-// with how many books they own, and on the right how far through they are (a bar when the total is known,
+// MangaCard.tsx, its rows): cover, name, their stars under it, the genre,
+// and on the right how far through they are (a bar when the total is known,
 // the place alone when it isn't). The words come from the web's own rules (core cardText,
 // reading), so the two apps always say the same. While selecting, a tick box
 // sits on the cover and a tap picks the row. A long press opens the
@@ -21,7 +21,6 @@ import MenuSheet from "./MenuSheet";
 import { CheckIcon } from "@/core/components/icons/Icons";
 import { useColors } from "@/lib/colors";
 import { progressOf, rowKindLine } from "@/core/components/mangaCard/cardText";
-import { ownedOf } from "@/core/lib/ownedVolumes";
 import { placeText, tracksOf, type TrackBy } from "@/core/lib/reading";
 import type { Manga } from "@/core/lib/types";
 import StarRating from "./StarRating";
@@ -68,14 +67,7 @@ export default memo(function ShelfRow({
   // where they are, said on the right of every row: with its bar when the
   // total is known, on its own when it isn't
   const place = manga.planned ? "to read" : placeText(manga, trackBy);
-  // what it is, then how many books of it they own: "Action · 12 vols"
-  const ownedCount = ownedOf(manga).length;
-  const kindLine = [
-    rowKindLine(manga),
-    ownedCount ? `${ownedCount} ${ownedCount === 1 ? "vol" : "vols"}` : "",
-  ]
-    .filter(Boolean)
-    .join(" · ");
+  const kindLine = rowKindLine(manga);
   const rating = Number(manga.rating) || 0;
 
   const row = (
