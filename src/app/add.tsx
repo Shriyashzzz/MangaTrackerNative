@@ -5,9 +5,14 @@
 // genre and notes. The checks and the request are the web's own (core
 // seriesFormRules); AniList's matches come through core useCoverSearch
 import { Image } from "expo-image";
-import { router, useLocalSearchParams } from "expo-router";
+import {
+  router,
+  useLocalSearchParams,
+  useNavigation,
+  usePreventRemove,
+} from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Alert, Pressable, Text, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
@@ -142,6 +147,25 @@ export default function AddScreen() {
   const [description, setDescription] = useState("");
   const [errors, setErrors] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
+
+  // Leaving with something entered (the back arrow, the phone's back, or
+  // Cancel) asks first: a slip no longer throws a half-filled form away.
+  // Saved: it leaves without asking
+  const navigation = useNavigation();
+  const savedIt = useRef(false);
+  const entered =
+    title.trim() !== (fromPrices ?? "").trim() || picked !== null || rating > 0;
+  usePreventRemove(entered, ({ data }) => {
+    if (savedIt.current) return navigation.dispatch(data.action);
+    Alert.alert("Leave without adding it?", "What you entered won't be kept.", [
+      { text: "Keep editing", style: "cancel" },
+      {
+        text: "Leave",
+        style: "destructive",
+        onPress: () => navigation.dispatch(data.action),
+      },
+    ]);
+  });
   const fromVolume = Number(params.ownedVolume) || null;
   const volumesFromLink = fromVolume ?? (Number(params.volumesOwned) || null);
   const bookVolumes = (params.ownedVolumes ?? "")
@@ -259,6 +283,7 @@ export default function AddScreen() {
             newBook(fromBook.title, bookVolumes, fromBook.isbn13 || undefined),
           ]).catch(() => {});
         void useShelf.getState().load();
+        savedIt.current = true;
         router.replace({
           pathname: "/details/[id]",
           params: { id: String(id) },
