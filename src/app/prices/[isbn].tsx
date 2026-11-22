@@ -481,13 +481,17 @@ export default function PriceVolumeScreen() {
             ) : offers.length ? (
               <OfferList offers={offers} formatPrice={formatCents} />
             ) : (
-              <Text className="font-body text-[14px] text-ink-soft">
-                {page.refreshing
-                  ? "Checking stores for prices…"
-                  : liveSources.length
-                    ? "No live prices for this one right now. It's often still in stock, so check the store links below for Amazon, Barnes & Noble and more."
-                    : "Live prices aren't switched on yet. Check the store links below for now."}
-              </Text>
+              // no prices to list: the same box the prices come in, so the
+              // page keeps its shape
+              <View className="rounded-[14px] border border-line-soft bg-card px-4 py-3.5">
+                <Text className="font-body text-[14.5px] leading-[21px] text-ink-soft">
+                  {page.refreshing
+                    ? "Checking stores for prices…"
+                    : liveSources.length
+                      ? "No live prices for this one right now. It's often still in stock, so check the store links below for Amazon, Barnes & Noble and more."
+                      : "Live prices aren't switched on yet. Check the store links below for now."}
+                </Text>
+              </View>
             )}
             <BoxSetNote offers={allOffers} onOpen={openSeries} />
             {hiddenEbooks > 0 ? (

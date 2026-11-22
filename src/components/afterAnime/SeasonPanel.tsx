@@ -5,6 +5,7 @@ import type { VolumeOffers } from "@/core/lib/afterAnime";
 import {
   afterLabel,
   keepNumbers,
+  buyVolume,
   startText,
   type AnimeStop,
 } from "@/core/lib/afterAnimeText";
@@ -13,6 +14,15 @@ import AnswerWords from "./AnswerWords";
 import FixForm from "./FixForm";
 import SeasonBuy from "./SeasonBuy";
 import SeasonNotes from "./SeasonNotes";
+
+// the chapter and then the volume in the heading itself: the book's box
+// under it can take a moment to bring its price
+function startWords(stop: AnimeStop) {
+  const volume = buyVolume(stop);
+  return stop.nextChapter !== null && volume !== null
+    ? `${startText(stop)}, volume ${volume}`
+    : startText(stop);
+}
 
 export default function SeasonPanel({
   stop,
@@ -35,7 +45,7 @@ export default function SeasonPanel({
           {keepNumbers(afterLabel(stop))}
         </Text>
         <Text className="font-display text-[19px] leading-[26px] text-ink">
-          <AnswerWords text={keepNumbers(startText(stop))} />
+          <AnswerWords text={keepNumbers(startWords(stop))} />
         </Text>
         <SeasonNotes stop={stop} />
       </View>
