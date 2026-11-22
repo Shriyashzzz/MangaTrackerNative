@@ -107,6 +107,8 @@ export default function SettingsScreen() {
         >
           {TABS.map((t) => (
             <Tap
+              // the underline sliding to the tab is the answer to the tap
+              feel="none"
               key={t.id}
               onPress={() => {
                 setTab(t.id);

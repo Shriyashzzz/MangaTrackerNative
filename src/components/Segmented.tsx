@@ -86,6 +86,9 @@ export default function Segmented<T extends string>({
         const on = i === picked;
         return (
           <Tap
+            // the pill sliding across is the answer to the tap: a ripple as
+            // well would be two for one press
+            feel="none"
             key={o.value}
             onPress={() => {
               if (on) return;
