@@ -45,7 +45,12 @@ function isDark(hex: string) {
   );
 }
 
-export default function Backdrop() {
+export default function Backdrop({
+  soft = false,
+}: {
+  // behind a list read line by line (the shelf): fainter, so it stays back
+  soft?: boolean;
+}) {
   const c = useColors();
   const { width, height } = useWindowDimensions();
   const picked = usePrefs((s) => s.prefs.background ?? DEFAULT_BACKGROUND);
@@ -212,7 +217,14 @@ export default function Backdrop() {
       pointerEvents="none"
       accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants"
-      style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0 }}
+      style={{
+        position: "absolute",
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+        opacity: soft ? 0.45 : 1,
+      }}
     >
       {drawing}
     </View>

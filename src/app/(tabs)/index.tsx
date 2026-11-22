@@ -186,7 +186,7 @@ function SignedInShelf() {
 
   return (
     <Safe edges={["top"]} className="flex-1 bg-paper">
-      <Backdrop />
+      <Backdrop soft />
       <AppHeader />
       {/* everything under the header pulls down to refresh */}
       <PullPage refresh={load} scrollTop={scrollTop}>
@@ -408,7 +408,7 @@ export default function ShelfScreen() {
   if (isSignedIn) return <SignedInShelf />;
   return (
     <View className="flex-1 bg-paper" style={{ paddingTop: insets.top }}>
-      <Backdrop />
+      <Backdrop soft />
       <AppHeader />
       <GuestShelf />
     </View>

@@ -92,7 +92,6 @@ export default function PriceSeriesScreen() {
   // how many rows are shown, for the list they were grown for: a new series
   // or filter starts at the first page again
   // where the Volumes / Editions switch sits in the page, to scroll to
-  const [tabsY, setTabsY] = useState(0);
   const page = useRef<ComponentRef<typeof ScrollView>>(null);
   const listKey = `${name}|${toGetOnly}`;
   const [grown, setGrown] = useState({ key: listKey, count: PAGE_SIZE });
@@ -283,7 +282,7 @@ export default function PriceSeriesScreen() {
       ) : null}
 
       {tabbed ? (
-        <View onLayout={(e) => setTabsY(e.nativeEvent.layout.y)}>
+        <View>
           <Segmented
             label="Show"
             options={[
@@ -301,135 +300,128 @@ export default function PriceSeriesScreen() {
       {/* tall enough that the switch above can stay where it is when the
           shorter of the two lists is showing */}
       <View className="gap-8" style={{ minHeight: screenHeight }}>
-        {!onEditions ? (
-          <View className="gap-3">
-            <View className="flex-row items-end justify-between">
-              <H2>Volumes</H2>
-              {volumes.length ? (
-                <Text className="font-mono text-[12.5px] text-muted">
-                  {volumes.length} {volumes.length === 1 ? "volume" : "volumes"}{" "}
-                  in English
+        {/* both lists stay drawn and the switch only shows one: nothing is
+            built again on a tap, so it changes at once */}
+        <View
+          className="gap-3"
+          style={{ display: onEditions ? "none" : "flex" }}
+        >
+          <View className="flex-row items-end justify-between">
+            <H2>Volumes</H2>
+            {volumes.length ? (
+              <Text className="font-mono text-[12.5px] text-muted">
+                {volumes.length} {volumes.length === 1 ? "volume" : "volumes"}{" "}
+                in English
+              </Text>
+            ) : null}
+          </View>
+          {unlisted.length ? (
+            <Text className="font-body text-[13.5px] text-ink-soft">
+              {unlisted.length === 1 ? "Vol." : "Vols."} {rangesText(unlisted)}{" "}
+              {unlisted.length === 1 ? "is" : "are"} missing from our list.
+            </Text>
+          ) : null}
+          {finish || (mine && toGet.length < volumes.length) ? (
+            <View className="flex-row flex-wrap items-center gap-3">
+              {mine && toGet.length < volumes.length ? (
+                <Pressable
+                  onPress={() => setToGetOnly(!toGetOnly)}
+                  accessibilityState={{ selected: toGetOnly }}
+                  className={`rounded-[3px] border-[1.5px] px-2.5 py-1.5 ${toGetOnly ? "border-accent bg-accent-wash" : "border-line"}`}
+                >
+                  <Text
+                    className={`font-body-medium text-[14px] ${toGetOnly ? "text-accent-ink" : "text-ink"}`}
+                  >
+                    Not on your shelf ({toGet.length})
+                  </Text>
+                </Pressable>
+              ) : null}
+              {finish?.enough ? (
+                <Text className="font-body text-[14px] text-ink-soft">
+                  {finishText(finish, formatCents)}
                 </Text>
               ) : null}
             </View>
-            {unlisted.length ? (
-              <Text className="font-body text-[13.5px] text-ink-soft">
-                {unlisted.length === 1 ? "Vol." : "Vols."}{" "}
-                {rangesText(unlisted)} {unlisted.length === 1 ? "is" : "are"}{" "}
-                missing from our list.
-              </Text>
-            ) : null}
-            {finish || (mine && toGet.length < volumes.length) ? (
-              <View className="flex-row flex-wrap items-center gap-3">
-                {mine && toGet.length < volumes.length ? (
-                  <Pressable
-                    onPress={() => setToGetOnly(!toGetOnly)}
-                    accessibilityState={{ selected: toGetOnly }}
-                    className={`rounded-[3px] border-[1.5px] px-2.5 py-1.5 ${toGetOnly ? "border-accent bg-accent-wash" : "border-line"}`}
-                  >
-                    <Text
-                      className={`font-body-medium text-[14px] ${toGetOnly ? "text-accent-ink" : "text-ink"}`}
-                    >
-                      Not on your shelf ({toGet.length})
-                    </Text>
-                  </Pressable>
-                ) : null}
-                {finish?.enough ? (
-                  <Text className="font-body text-[14px] text-ink-soft">
-                    {finishText(finish, formatCents)}
-                  </Text>
-                ) : null}
-              </View>
-            ) : null}
-            {volumes.length ? (
-              <>
-                <View
-                  className="flex-row flex-wrap"
-                  style={{ rowGap: 20, columnGap: GRID_GAP }}
-                >
-                  {cardsOf(shown).map((card) => {
-                    const first = card[0]!;
-                    const mark = markOf(card, mine, next);
-                    if (card.length === 1)
-                      return (
-                        <VolumeCard
-                          key={first.volume}
-                          plainStandIn
-                          {...first}
-                          title={`Vol. ${first.volume}`}
-                          priceCents={first.knownPriceCents}
-                          subtitle={oneVolumeSubtitle(first)}
-                          mark={mark}
-                          seriesCoverUrl={info?.coverUrl ?? null}
-                          width={tileWidth}
-                          bare
-                        />
-                      );
-                    const last = card[card.length - 1]!;
+          ) : null}
+          {volumes.length ? (
+            <>
+              <View
+                className="flex-row flex-wrap"
+                style={{ rowGap: 20, columnGap: GRID_GAP }}
+              >
+                {cardsOf(shown).map((card) => {
+                  const first = card[0]!;
+                  const mark = markOf(card, mine, next);
+                  if (card.length === 1)
                     return (
                       <VolumeCard
                         key={first.volume}
                         plainStandIn
                         {...first}
-                        title={`Book ${first.inBook!.book}`}
-                        volume={null}
-                        holds={{ from: first.volume, to: last.volume }}
+                        title={`Vol. ${first.volume}`}
                         priceCents={first.knownPriceCents}
-                        subtitle={bookSubtitle(card)}
+                        subtitle={oneVolumeSubtitle(first)}
                         mark={mark}
+                        seriesCoverUrl={info?.coverUrl ?? null}
                         width={tileWidth}
+                        bare
                       />
                     );
-                  })}
-                </View>
-              </>
-            ) : incomplete ? (
-              <View className="gap-2">
-                <Text className="font-body text-[14.5px] text-ink-soft">
-                  The book catalog is slow to answer right now, so volumes
-                  didn't load. It usually works on the next try.
-                </Text>
-                <Button label="Try again" small onPress={series.retry} />
+                  const last = card[card.length - 1]!;
+                  return (
+                    <VolumeCard
+                      key={first.volume}
+                      plainStandIn
+                      {...first}
+                      title={`Book ${first.inBook!.book}`}
+                      volume={null}
+                      holds={{ from: first.volume, to: last.volume }}
+                      priceCents={first.knownPriceCents}
+                      subtitle={bookSubtitle(card)}
+                      mark={mark}
+                      width={tileWidth}
+                    />
+                  );
+                })}
               </View>
-            ) : (
-              <View className="items-center gap-3 py-6">
-                <Mascot mood="confused" width={100} />
-                <Text className="text-center font-body text-[15px] leading-[22px] text-ink-soft">
-                  No English volumes out yet.{"\n"}If one is, search it by name
-                  or ISBN.
-                </Text>
-                <Button
-                  center
-                  small
-                  label="Search a volume"
-                  onPress={() => router.push("/prices")}
-                />
-              </View>
-            )}
-            {incomplete && volumes.length > 0 && hasHole ? (
-              <Text className="font-body text-[13.5px] text-ink-soft">
-                Some volumes may be missing: the book catalog was slow to
-                answer.{" "}
-                <Text
-                  className="font-body-semibold text-ink underline"
-                  onPress={series.retry}
-                >
-                  Try again
-                </Text>
+            </>
+          ) : incomplete ? (
+            <View className="gap-2">
+              <Text className="font-body text-[14.5px] text-ink-soft">
+                The book catalog is slow to answer right now, so volumes didn't
+                load. It usually works on the next try.
               </Text>
-            ) : null}
-          </View>
-        ) : null}
+              <Button label="Try again" small onPress={series.retry} />
+            </View>
+          ) : (
+            <View className="items-center gap-3 py-6">
+              <Mascot mood="confused" width={100} />
+              <Text className="text-center font-body text-[15px] leading-[22px] text-ink-soft">
+                No English volumes out yet.{"\n"}If one is, search it by name or
+                ISBN.
+              </Text>
+              <Button
+                center
+                small
+                label="Search a volume"
+                onPress={() => router.push("/prices")}
+              />
+            </View>
+          )}
+          {incomplete && volumes.length > 0 && hasHole ? (
+            <Text className="font-body text-[13.5px] text-ink-soft">
+              Some volumes may be missing: the book catalog was slow to answer.{" "}
+              <Text
+                className="font-body-semibold text-ink underline"
+                onPress={series.retry}
+              >
+                Try again
+              </Text>
+            </Text>
+          ) : null}
+        </View>
 
-        {/* on the Volumes tab it's there, unseen: it fetches the lines the tabs
-          and the header box need */}
-        <View
-          style={
-            tabbed && !onEditions
-              ? { height: 0, overflow: "hidden" }
-              : undefined
-          }
-        >
+        <View style={{ display: tabbed && !onEditions ? "none" : "flex" }}>
           <OtherEditions
             name={name}
             asked={askedEdition}

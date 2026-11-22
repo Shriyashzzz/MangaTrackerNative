@@ -2,6 +2,7 @@
 // the tabs for everyone; the pages that need an account only when signed in
 import "../global.css";
 import { Bangers_400Regular } from "@expo-google-fonts/bangers";
+import { ComicNeue_700Bold } from "@expo-google-fonts/comic-neue";
 import {
   Fraunces_400Regular,
   Fraunces_400Regular_Italic,
@@ -34,6 +35,7 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
     Bangers_400Regular,
+    ComicNeue_700Bold,
     Fraunces_400Regular,
     Fraunces_400Regular_Italic,
     Fraunces_600SemiBold,

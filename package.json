@@ -4,6 +4,7 @@
   "main": "index.ts",
   "dependencies": {
     "@expo-google-fonts/bangers": "^0.4.1",
+    "@expo-google-fonts/comic-neue": "^0.4.1",
     "@expo-google-fonts/fraunces": "^0.4.1",
     "@expo-google-fonts/ibm-plex-mono": "^0.4.2",
     "@expo-google-fonts/ibm-plex-sans": "^0.4.1",
