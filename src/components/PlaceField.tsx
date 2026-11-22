@@ -2,6 +2,7 @@
 // components/placeField/PlaceField.tsx): the chapter, the volume they've
 // read up to, or both, as their settings say. With each series choosing its
 // own way, a small switch beside the label says what the box counts
+import { useState } from "react";
 import { View } from "react-native";
 import { tracksOf, type TrackBy } from "@/core/lib/reading";
 import { Field, Input } from "./Field";
@@ -34,6 +35,39 @@ export default function PlaceField({
   optional?: boolean;
 }) {
   const tracks = tracksOf({ byVolume }, mode);
+  // both kept: still one box at a time, the switch saying which. Which one
+  // shows is only this form's; the series goes on keeping both
+  const [shownUnit, setShownUnit] = useState<"chapter" | "volume">(
+    Number(chapter) > 0 || !volume ? "chapter" : "volume",
+  );
+  if (mode === "both") {
+    const onVolumeBox = shownUnit === "volume";
+    return (
+      <Field
+        label="Read up to"
+        optional={optional}
+        error={onVolumeBox ? undefined : chapterError}
+      >
+        <View className="gap-2">
+          <View className="w-[200px]">
+            <Segmented
+              label="Read up to, by"
+              options={UNITS}
+              value={shownUnit}
+              onChange={setShownUnit}
+            />
+          </View>
+          <Input
+            keyboardType="number-pad"
+            value={onVolumeBox ? volume : chapter}
+            placeholder={onVolumeBox ? "e.g. 12" : "e.g. 1073"}
+            invalid={!onVolumeBox && Boolean(chapterError)}
+            onChangeText={onVolumeBox ? onVolume : onChapter}
+          />
+        </View>
+      </Field>
+    );
+  }
   if (mode === "series")
     return (
       <Field
