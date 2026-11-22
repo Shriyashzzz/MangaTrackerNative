@@ -95,6 +95,7 @@ export const H2 = ({ children }: { children: ReactNode }) => (
   <View className="gap-1 self-start w-fit ">
     <Text className="font-brand min-w-fit pr-[5px] text-[22px] tracking-[1px] text-ink uppercase">
       {children}
+      {"\u00A0"}
     </Text>
     <View className="h-[3px] w-10 bg-accent" />
   </View>

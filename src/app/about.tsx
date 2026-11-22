@@ -77,6 +77,7 @@ export default function AboutScreen() {
         <Text className="text-center font-brand pr-[7px] text-[30px] leading-[34px] tracking-[1px] text-ink uppercase">
           <Text className="bg-accent text-on-accent"> Never lose </Text> your
           place again.
+          {"\u00A0"}
         </Text>
       </View>
 
@@ -98,6 +99,7 @@ export default function AboutScreen() {
               </Text>
               <Text className="font-brand pr-[5px] text-[21px] leading-[25px] tracking-[1px] text-ink uppercase">
                 {part.title}
+                {"\u00A0"}
               </Text>
               <Text className="font-body text-[15.5px] leading-[23px] text-ink">
                 {part.words}

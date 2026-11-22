@@ -66,6 +66,7 @@ export default function SelectDock({
       <View className="w-full flex-row items-center justify-between rounded-[18px] border border-line-soft bg-card px-4 py-1.5">
         <Text className="font-brand pr-[5px] text-[22px] text-ink">
           {count}
+          {"\u00A0"}
         </Text>
         <Pressable
           onPress={select.toggleAll}

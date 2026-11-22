@@ -532,6 +532,7 @@ function SeriesSheet({
         <View className="gap-1">
           <Text className="font-brand pr-[4px] text-[16px] tracking-[1px] text-ink uppercase">
             Notes
+            {"\u00A0"}
           </Text>
           <Text className="font-body text-[14.5px] leading-[21px] text-ink">
             {m.notes}
@@ -541,6 +542,7 @@ function SeriesSheet({
       <View className="gap-2">
         <Text className="font-brand pr-[4px] text-[16px] tracking-[1px] text-ink uppercase">
           On {owner}'s shelf
+          {"\u00A0"}
         </Text>
         {owned.length ? (
           <View
@@ -556,6 +558,7 @@ function SeriesSheet({
                   className={`font-brand pr-[4px] text-[11px] ${mine ? "text-paper" : "text-muted"}`}
                 >
                   {v}
+                  {"\u00A0"}
                 </Text>
               </View>
             ))}

@@ -68,6 +68,7 @@ export default function AfterAnimeIndex() {
       <View className="gap-2">
         <Text className="font-brand pr-[7px] text-[30px] leading-[36px] tracking-[1px] text-ink uppercase">
           Where does the <Text className="text-accent">anime</Text> leave off?
+          {"\u00A0"}
         </Text>
         <P muted>
           Finished a season? Find the chapter and volume to read next.
@@ -138,6 +139,7 @@ export default function AfterAnimeIndex() {
         <View className="gap-3">
           <Text className="font-brand pr-[5px] text-[20px] tracking-[1px] text-ink uppercase">
             Pick a show
+            {"\u00A0"}
           </Text>
           <View className="flex-row flex-wrap gap-3">
             {shows.slice(0, shownCount).map((show) => (

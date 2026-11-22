@@ -144,6 +144,7 @@ export default function PriceSeriesScreen() {
           className="flex-1 font-brand pr-[6px] text-[24px] tracking-[1px] text-ink uppercase"
         >
           {title}
+          {"\u00A0"}
         </Text>
       </View>
       <DoubleRule />

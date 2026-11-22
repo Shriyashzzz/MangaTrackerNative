@@ -40,6 +40,7 @@ export default function AppHeader() {
             className="font-brand pr-[6px] text-[26px] tracking-[1px] text-ink uppercase"
           >
             Manga Tracker
+            {"\u00A0"}
           </Text>
         </View>
         {/* the list and the menu are an account's: nothing to open without one */}

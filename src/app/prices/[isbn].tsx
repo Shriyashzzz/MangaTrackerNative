@@ -107,6 +107,7 @@ export default function PriceVolumeScreen() {
           className="flex-1 font-brand pr-[6px] text-[24px] tracking-[1px] text-ink uppercase"
         >
           {title}
+          {"\u00A0"}
         </Text>
       </View>
       <DoubleRule />
@@ -261,6 +262,7 @@ export default function PriceVolumeScreen() {
             {!book.coverUrl ? (
               <Text className="font-brand pr-[10px] text-[40px] text-ink">
                 {volume ?? "?"}
+                {"\u00A0"}
               </Text>
             ) : null}
             {book.coverUrl ? (
@@ -285,11 +287,13 @@ export default function PriceVolumeScreen() {
             {preorder ? (
               <Text className="rounded-[2px] bg-accent px-1.5 font-brand pr-[4px] text-[12px] tracking-[1px] text-on-accent uppercase">
                 Preorder · out {releaseDay(preorder)}
+                {"\u00A0"}
               </Text>
             ) : null}
             {volume != null ? (
               <Text className="rounded-[2px] border-[1.5px] border-line px-1.5 font-brand pr-[4px] text-[12px] tracking-[1px] text-ink uppercase">
                 Vol. {volume}
+                {"\u00A0"}
               </Text>
             ) : null}
             <Text className="rounded-[2px] border border-line-soft px-1.5 font-mono text-[11px] text-ink-soft">
@@ -465,6 +469,7 @@ export default function PriceVolumeScreen() {
                 <View className="gap-1 rounded-[14px] bg-accent-wash px-4 py-3.5">
                   <Text className="self-start bg-accent px-1.5 pt-0.5 font-brand pr-[4px] text-[13px] tracking-[1px] text-on-accent uppercase">
                     Preorder
+                    {"\u00A0"}
                   </Text>
                   <Text className="font-display text-[20px] text-ink">
                     Out {releaseDay(preorder)}
@@ -563,6 +568,7 @@ export default function PriceVolumeScreen() {
                     className={`self-start px-1.5 pt-0.5 font-brand pr-[4px] text-[13px] tracking-[1px] uppercase ${k.kind === "new" ? "bg-award-new text-on-award-new" : "bg-award-market text-stamp-ink"}`}
                   >
                     {KIND_LABEL[k.kind] ?? k.kind}
+                    {"\u00A0"}
                   </Text>
                   <View className="flex-row gap-3">
                     {(

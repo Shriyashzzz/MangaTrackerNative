@@ -186,6 +186,7 @@ export default function AfterAnimeShowScreen() {
       <View className="gap-3">
         <Text className="font-brand pr-[7px] text-[28px] leading-[34px] tracking-[1px] text-ink uppercase">
           {hasAnswer ? "Where to start the manga" : "No answer yet"}
+          {"\u00A0"}
         </Text>
         {answer ? (
           // the question on its own line (which season), the answer under it
@@ -282,6 +283,7 @@ export default function AfterAnimeShowScreen() {
             <View className="gap-2 rounded-[14px] border border-dashed border-line-soft px-3 py-3">
               <Text className="font-brand pr-[4px] text-[18px] tracking-[1px] text-ink uppercase">
                 What's left to read
+                {"\u00A0"}
               </Text>
               <P>{keepNumbers(left)}</P>
               <AllVolumesLink seriesName={show.name} />
@@ -314,6 +316,7 @@ export default function AfterAnimeShowScreen() {
             <View className="gap-2">
               <Text className="font-brand pr-[5px] text-[20px] tracking-[1px] text-ink uppercase">
                 Earlier seasons
+                {"\u00A0"}
               </Text>
               {earlier.map((stop) => (
                 <SeasonPanel
@@ -341,6 +344,7 @@ export default function AfterAnimeShowScreen() {
             <View>
               <Text className="pb-1 font-brand pr-[5px] text-[20px] tracking-[1px] text-ink uppercase">
                 Questions
+                {"\u00A0"}
               </Text>
               {questions.map(({ q, shown, a, list }) => (
                 <FoldRow key={q} title={shown ?? q}>

@@ -51,6 +51,7 @@ function Total({
       </Text>
       <Text className="font-brand pr-[6px] text-[26px] leading-[30px] text-ink">
         {value}
+        {"\u00A0"}
       </Text>
       {notes.map((line) => (
         <Text key={line} className="font-mono text-[12px] text-muted">

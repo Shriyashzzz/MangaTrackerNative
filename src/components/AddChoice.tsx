@@ -39,6 +39,7 @@ export default function AddChoice({
     <Sheet open onClose={onClose} contentClassName="gap-3 px-4 pb-8">
       <Text className="font-brand pr-[6px] text-[24px] tracking-[1px] text-ink uppercase">
         Add manga
+        {"\u00A0"}
       </Text>
       {choice(
         TypeIcon,

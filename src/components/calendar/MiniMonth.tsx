@@ -34,6 +34,7 @@ export default function MiniMonth({
       <View className="flex-row items-baseline justify-between">
         <Text className="font-brand pr-[5px] text-[19px] tracking-[1px] text-ink uppercase">
           {monthName(month)}
+          {"\u00A0"}
         </Text>
         <Text className="font-body text-[13px] text-ink-soft">
           {volumes.length} {volumes.length === 1 ? "release" : "releases"}

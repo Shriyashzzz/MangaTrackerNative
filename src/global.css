@@ -62,6 +62,9 @@
 /* Android needs one family name per weight: font-body-semibold, not
    font-body with font-semibold */
 @theme {
+  /* Bangers leans forward and Android cuts a line at its measured width, so
+     the last letter loses its tip: every font-brand Text ends in a
+     non-breaking space ({"\u00A0"}) to give it the room */
   --font-brand: "Bangers_400Regular";
   --font-display: "Fraunces_600SemiBold";
   --font-display-regular: "Fraunces_400Regular";

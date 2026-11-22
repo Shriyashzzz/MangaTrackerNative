@@ -58,6 +58,7 @@ export function CoverFallback({
         }}
       >
         {number ?? "?"}
+        {"\u00A0"}
       </Text>
     </View>
   );
@@ -189,9 +190,11 @@ export default function VolumeCard({
             <View className="absolute top-0 left-0 flex-row items-baseline gap-0.5 bg-ink px-1.5 pb-0.5">
               <Text className="font-brand pr-[4px] text-[10px] tracking-[0.5px] text-paper uppercase">
                 {holds ? "Vols." : "Vol."}
+                {"\u00A0"}
               </Text>
               <Text className="font-brand pr-[4px] text-[15px] text-paper">
                 {holds ? `${holds.from}–${holds.to}` : volume}
+                {"\u00A0"}
               </Text>
             </View>
           ) : null}
@@ -203,6 +206,7 @@ export default function VolumeCard({
                 className={`font-brand pr-[4px] text-[11px] tracking-[1px] uppercase ${mark === "next" ? "text-on-accent" : "text-ink"}`}
               >
                 {mark === "next" ? "Next" : "Yours"}
+                {"\u00A0"}
               </Text>
             </View>
           ) : null}

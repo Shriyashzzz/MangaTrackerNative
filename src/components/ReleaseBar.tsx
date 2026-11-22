@@ -20,6 +20,7 @@ export default function ReleaseBar({
       <View className="flex-row flex-wrap items-center gap-x-2.5 gap-y-1.5 rounded-[14px] bg-accent py-2 pr-10 pl-3">
         <Text className="min-w-0 flex-1 font-brand pr-[5px] text-[21px] leading-[24px] tracking-[1px] text-on-accent">
           {headline}
+          {"\u00A0"}
         </Text>
         {link ? (
           <Pressable
@@ -43,6 +44,7 @@ export default function ReleaseBar({
       <View className="absolute -top-3 right-9 rotate-6 rounded-[4px] border-2 border-accent bg-paper px-1.5">
         <Text className="font-brand pr-[4px] text-[14px] tracking-[1.5px] text-accent">
           Psst!
+          {"\u00A0"}
         </Text>
       </View>
     </View>

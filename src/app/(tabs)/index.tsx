@@ -222,6 +222,7 @@ function SignedInShelf() {
             >
               <Text className="font-brand pr-[7px] text-[30px] tracking-[1px] text-ink uppercase">
                 {shown.label}
+                {"\u00A0"}
               </Text>
               <Text className="font-mono text-[14px] text-muted">
                 {counts[tab]}

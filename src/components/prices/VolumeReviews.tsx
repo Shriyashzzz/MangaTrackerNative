@@ -41,6 +41,7 @@ function ReviewScore({
         <Text className="font-brand pr-[8px] text-[34px] leading-[36px] text-ink">
           {scoreText(average)}
           <Text className="text-[16px] text-muted"> / 5</Text>
+          {"\u00A0"}
         </Text>
         <StarRating value={Math.round(average)} />
         <Text className="font-mono text-[11.5px] text-muted">

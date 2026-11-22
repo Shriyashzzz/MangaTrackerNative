@@ -331,6 +331,7 @@ export default function PricesScreen() {
         <View className="gap-3 rounded-[16px] border border-line-soft bg-card p-4">
           <Text className="font-brand pr-[7px] text-[30px] tracking-[1px] text-ink uppercase">
             Price check
+            {"\u00A0"}
           </Text>
           <Text className="font-body text-[14.5px] text-ink-soft">
             Find a series, then see what{" "}
@@ -392,6 +393,7 @@ export default function PricesScreen() {
             >
               <Text className="font-brand pr-[4px] text-[14px] tracking-[1px] text-on-accent uppercase">
                 Finished the anime?
+                {"\u00A0"}
               </Text>
             </View>
             <Text className="font-body text-[14.5px] leading-[20px] text-ink-soft">

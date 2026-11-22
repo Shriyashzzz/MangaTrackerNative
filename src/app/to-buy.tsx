@@ -142,6 +142,7 @@ const Total = ({
       {label}:{" "}
       <Text className="font-brand pr-[5px] text-[20px]">
         {formatCents(sum.cents)}
+        {"\u00A0"}
       </Text>{" "}
       for {sum.volumes === of ? `all ${of}` : `${sum.volumes} of ${of}`}
     </Text>
@@ -237,6 +238,7 @@ export default function ToBuyScreen() {
         </Pressable>
         <Text className="flex-1 font-brand pr-[6px] text-[24px] tracking-[1px] text-ink uppercase">
           To buy
+          {"\u00A0"}
         </Text>
       </View>
       <DoubleRule />
@@ -297,6 +299,7 @@ export default function ToBuyScreen() {
               <Text className="font-brand pr-[5px] text-[20px] tracking-[1px] text-ink uppercase">
                 {items.length === 1 ? "1 volume" : `${items.length} volumes`} to
                 buy
+                {"\u00A0"}
               </Text>
               <Total label="New" sum={list.totals.new} of={items.length} />
               <Total label="Used" sum={list.totals.used} of={items.length} />
@@ -355,6 +358,7 @@ export default function ToBuyScreen() {
                         <View className="absolute top-0 left-0 bg-ink px-1.5">
                           <Text className="font-brand pr-[4px] text-[13px] text-paper">
                             {item.volume}
+                            {"\u00A0"}
                           </Text>
                         </View>
                       ) : null}

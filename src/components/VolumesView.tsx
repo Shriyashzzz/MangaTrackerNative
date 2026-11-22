@@ -211,6 +211,7 @@ function SeriesRow({
           ) : null}
           <Text className="font-brand pr-[5px] text-[21px] leading-[24px] text-ink">
             {owned.length}
+            {"\u00A0"}
           </Text>
         </View>
         <OwnedBar

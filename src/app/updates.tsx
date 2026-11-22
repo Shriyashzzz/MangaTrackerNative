@@ -122,6 +122,7 @@ export default function UpdatesScreen() {
       <View className="gap-1 rounded-[14px] border border-dashed border-line-soft p-3">
         <Text className="self-start bg-accent px-1.5 font-brand pr-[4px] text-[14px] tracking-[1px] text-on-accent uppercase">
           Soon!
+          {"\u00A0"}
         </Text>
         <H3>A release calendar for everyone</H3>
         <P muted>

@@ -49,6 +49,7 @@ export default function RateVolume({ volume, onWrite }: Props) {
         </Text>
         <Text className="font-brand pr-[6px] text-[24px] leading-[26px] text-paper">
           {asked.volume}
+          {"\u00A0"}
         </Text>
       </View>
       <View className="min-w-0 flex-1 gap-1.5 py-2 pr-9 pl-3">

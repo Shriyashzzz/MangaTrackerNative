@@ -43,6 +43,7 @@ export default function DealsStrip() {
       <View className="flex-row items-center justify-between">
         <Text className="font-brand pr-[4px] text-[16px] tracking-[1px] text-ink uppercase">
           Sales right now
+          {"\u00A0"}
         </Text>
         <Pressable
           onPress={() => {

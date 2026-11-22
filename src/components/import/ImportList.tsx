@@ -199,6 +199,7 @@ export default function ImportList({
                 >
                   <Text className="font-brand pr-[4px] text-[17px] tracking-[0.5px] text-ink uppercase">
                     {g.title}
+                    {"\u00A0"}
                   </Text>
                   <Text className="font-mono text-[13px] text-muted">
                     {g.rows.length}

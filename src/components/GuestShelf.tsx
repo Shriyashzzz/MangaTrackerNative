@@ -27,6 +27,7 @@ function Panel({
         style={{ transform: [{ rotate: "4deg" }] }}
       >
         {shout}
+        {"\u00A0"}
       </Text>
       <Text className="border-t-[1.5px] border-line px-2 py-1.5 text-center font-body-medium text-[13px] text-ink">
         {caption}
@@ -56,9 +57,11 @@ export default function GuestShelf() {
           <View className="flex-row items-baseline gap-1">
             <Text className="font-brand pr-[4px] text-[15px] text-ink">
               ch.
+              {"\u00A0"}
             </Text>
             <Text className="font-brand pr-[7px] text-[28px] leading-[34px] text-ink">
               374
+              {"\u00A0"}
             </Text>
           </View>
         </Panel>
@@ -75,6 +78,7 @@ export default function GuestShelf() {
         <Panel shout="It's out!" caption="See what's out">
           <Text className="font-brand pr-[6px] text-[24px] leading-[30px] text-ink">
             Vol. 114
+            {"\u00A0"}
           </Text>
         </Panel>
         <Panel shout="Deal!" caption="And what it costs">

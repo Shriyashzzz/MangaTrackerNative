@@ -36,6 +36,7 @@ export default function MoreShows({ notThis }: { notThis: string }) {
     <View className="gap-3">
       <Text className="font-brand pr-[5px] text-[20px] tracking-[1px] text-ink uppercase">
         More shows
+        {"\u00A0"}
       </Text>
       <ScrollView
         horizontal

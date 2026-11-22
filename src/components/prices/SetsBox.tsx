@@ -132,6 +132,7 @@ export default function SetsBox({
       <View className="flex-row items-center justify-between gap-3">
         <Text className="shrink font-brand pr-[4px] text-[18px] tracking-[1px] text-ink uppercase">
           {title}
+          {"\u00A0"}
         </Text>
         {!alone ? (
           <Pressable

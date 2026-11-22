@@ -56,6 +56,7 @@ export default function SeriesCover({
           className="text-center font-brand pr-[4px] text-[11px] text-ink-soft uppercase"
         >
           {name}
+          {"\u00A0"}
         </Text>
       </View>
     );

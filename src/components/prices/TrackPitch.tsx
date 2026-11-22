@@ -40,6 +40,7 @@ export default function TrackPitch({ name }: { name: string }) {
         <View className="w-[84px] items-center justify-center border-l-[1.5px] border-dashed border-accent bg-accent-wash">
           <Text className="font-brand pr-[5px] text-[20px] tracking-[1px] text-accent-ink uppercase">
             Track
+            {"\u00A0"}
           </Text>
           <Text className="font-mono-medium text-[10.5px] tracking-[1px] text-accent-ink uppercase">
             free

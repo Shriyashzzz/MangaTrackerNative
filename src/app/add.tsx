@@ -294,6 +294,7 @@ export default function AddScreen() {
         </Pressable>
         <Text className="flex-1 font-brand pr-[6px] text-[24px] tracking-[1px] text-ink uppercase">
           Add a manga
+          {"\u00A0"}
         </Text>
       </View>
       <DoubleRule />

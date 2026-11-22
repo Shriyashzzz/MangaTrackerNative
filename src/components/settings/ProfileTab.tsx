@@ -117,6 +117,7 @@ export default function ProfileTab({
           className="min-w-0 flex-1 font-brand pr-[6px] text-[26px] leading-[30px] tracking-[1px] text-ink uppercase"
         >
           {account.displayName || account.defaultName}
+          {"\u00A0"}
         </Text>
       </View>
       <Section first title="Your name">

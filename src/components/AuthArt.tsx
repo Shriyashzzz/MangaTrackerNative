@@ -50,6 +50,7 @@ export default function AuthArt({
           style={{ transform: [{ rotate: "-2deg" }] }}
         >
           {sfx}
+          {"\u00A0"}
         </Text>
       </View>
       {/* the speech bubble */}
@@ -80,6 +81,7 @@ export function Spread({
       <View className="gap-4 rounded-[14px] border border-line-soft bg-card p-4">
         <Text className="font-brand pr-[6px] text-[24px] tracking-[1px] text-ink uppercase">
           {title}
+          {"\u00A0"}
         </Text>
         {children}
       </View>

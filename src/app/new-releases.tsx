@@ -29,15 +29,18 @@ function CardSketch({
         <View className="h-[54px] w-[36px] items-center justify-center border-[1.5px] border-line bg-paper-2">
           <Text className="font-brand pr-[4px] text-[16px] text-ink">
             {cover}
+            {"\u00A0"}
           </Text>
         </View>
         <View className="min-w-0 flex-1 justify-center">
           <Text className="font-brand pr-[4px] text-[15px] tracking-[1px] text-accent uppercase">
             {news}
+            {"\u00A0"}
           </Text>
           {behind ? (
             <Text className="font-brand pr-[4px] text-[13px] tracking-[1px] text-ink-soft uppercase">
               {behind}
+              {"\u00A0"}
             </Text>
           ) : null}
           <Text className="font-body text-[13px] text-ink-soft">{yours}</Text>
@@ -184,6 +187,7 @@ export default function NewReleasesScreen() {
                 className={`font-brand pr-[4px] text-[14px] ${i === 2 ? "text-on-accent" : "text-ink"}`}
               >
                 {mark}
+                {"\u00A0"}
               </Text>
             </View>
             <Text className="text-center font-body text-[12.5px] text-ink">

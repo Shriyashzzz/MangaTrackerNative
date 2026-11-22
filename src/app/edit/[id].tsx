@@ -202,6 +202,7 @@ export default function EditScreen() {
         </Pressable>
         <Text className="flex-1 font-brand pr-[6px] text-[24px] tracking-[1px] text-ink uppercase">
           Edit details
+          {"\u00A0"}
         </Text>
       </View>
       <DoubleRule />

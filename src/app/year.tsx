@@ -75,6 +75,7 @@ const Big = ({ children }: { children: ReactNode }) => (
     className="font-brand pr-[11px] text-[44px] leading-[46px]"
   >
     {children}
+    {"\u00A0"}
   </Text>
 );
 const Line = ({

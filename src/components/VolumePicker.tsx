@@ -155,6 +155,7 @@ function Spine({
         }}
       >
         {n}
+        {"\u00A0"}
       </Text>
     </View>
   );
@@ -535,6 +536,7 @@ export default function VolumePicker({
                 >
                   <Text className="font-brand pr-[5px] text-[20px] tracking-[1px] text-paper uppercase">
                     Vols. {row.run[0] * MORE + 1}–{(row.run[1] + 1) * MORE}
+                    {"\u00A0"}
                   </Text>
                   <Text className="font-body text-[13px] text-paper/75">
                     all yours · open

@@ -46,10 +46,12 @@ export default function NewRow({
           className={`font-brand pr-[4px] text-[17px] tracking-[1px] uppercase ${news.behind ? "text-ink-soft" : "text-accent"}`}
         >
           {news.text}
+          {"\u00A0"}
         </Text>
         {news.behind ? (
           <Text className="font-brand pr-[4px] text-[14px] tracking-[1px] text-ink-soft uppercase">
             {news.behind}
+            {"\u00A0"}
           </Text>
         ) : null}
         {news.yours ? (

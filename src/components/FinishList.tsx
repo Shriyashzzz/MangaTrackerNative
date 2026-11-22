@@ -108,6 +108,7 @@ export default function FinishList({
         {total ? (
           <Text className="font-brand pr-[5px] text-[20px] text-ink">
             {total}
+            {"\u00A0"}
           </Text>
         ) : null}
       </View>

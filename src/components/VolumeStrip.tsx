@@ -300,6 +300,7 @@ function Book({
           className="absolute -top-4 left-0 font-brand pr-[4px] text-[11px] tracking-[1px] text-ink-soft uppercase"
         >
           {runName}
+          {"\u00A0"}
         </Text>
       ) : null}
       <View
@@ -315,6 +316,7 @@ function Book({
         ) : null}
         <Text className={`font-brand pr-[4px] text-[13px] ${ink}`}>
           {spine}
+          {"\u00A0"}
         </Text>
       </View>
     </View>

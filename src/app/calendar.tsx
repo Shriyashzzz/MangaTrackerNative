@@ -102,6 +102,7 @@ export default function CalendarScreen() {
                 <View className="min-w-0 flex-1">
                   <Text className="font-brand pr-[5px] text-[20px] tracking-[1px] text-ink uppercase">
                     {monthName(m.month)}
+                    {"\u00A0"}
                   </Text>
                   <Text className="font-mono text-[12px] text-muted">
                     {m.volumes.length} coming

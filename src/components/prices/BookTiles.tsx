@@ -42,6 +42,7 @@ export default function BookTiles({
                 className={`font-brand pr-[4px] text-[18px] ${ownsAll ? "text-paper" : "text-ink"}`}
               >
                 {book.number}
+                {"\u00A0"}
               </Text>
               <Text
                 className={`font-mono text-[10.5px] ${ownsAll ? "text-paper" : "text-muted"}`}

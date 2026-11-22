@@ -137,6 +137,7 @@ export default function BoxSets({
     <View className="gap-2">
       <Text className="font-brand pr-[4px] text-[18px] tracking-[1px] text-ink uppercase">
         {setsTitle(sets)}
+        {"\u00A0"}
       </Text>
       {body}
     </View>

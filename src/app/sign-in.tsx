@@ -102,6 +102,7 @@ export default function SignIn() {
         >
           <Text className="font-brand pr-[5px] text-[22px] tracking-[1px] text-on-accent uppercase">
             {loading ? "Signing in…" : "Sign in"}
+            {"\u00A0"}
           </Text>
         </Pressable>
         <Text className="text-center font-body text-[14.5px] text-ink-soft">
