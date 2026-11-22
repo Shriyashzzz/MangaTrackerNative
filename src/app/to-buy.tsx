@@ -42,6 +42,7 @@ import {
 import { runsText } from "@/core/lib/volumeRuns";
 import { releaseDay } from "@/core/pages/Prices/volumePageRules";
 import { useColors } from "@/lib/colors";
+import { openOutside } from "@/lib/openOutside";
 import { phoneAlertsOn } from "@/lib/phoneAlerts";
 import { usePrefs } from "@/store/prefs";
 import { useShelf } from "@/store/shelf";
@@ -291,16 +292,26 @@ function Ticket({
               {item.shelf.state === "owned" ? "Already yours" : "Ordered"}
             </Text>
           ) : null}
+          {/* the cheaper copy in big figures, the other under it: each is
+              the way to that copy at its store, where there's a link */}
           {best ? (
-            <View className="flex-row flex-wrap items-baseline gap-x-2">
+            <Tap
+              onPress={() => openOutside(best.url)}
+              disabled={!best.url}
+              feel={best.url ? "ripple" : "none"}
+              accessibilityRole={best.url ? "link" : undefined}
+              accessibilityLabel={`${formatCents(best.cents)} ${best.kind} at ${best.store}${best.url ? ". Open the store" : ""}`}
+              className="flex-row flex-wrap items-baseline gap-x-2 self-start"
+            >
               <Text className="font-brand pr-[6px] text-[26px] leading-[30px] text-ink">
                 {formatCents(best.cents)}
                 {"\u00A0"}
               </Text>
               <Text className="font-mono-medium text-[11px] tracking-[0.8px] text-ok uppercase">
                 {best.kind} · {best.store}
+                {best.url ? " →" : ""}
               </Text>
-            </View>
+            </Tap>
           ) : item.outOn ? (
             <View className="flex-row flex-wrap items-baseline gap-x-2">
               <Text className="font-brand pr-[6px] text-[26px] leading-[30px] text-ink uppercase">
@@ -312,13 +323,27 @@ function Ticket({
               </Text>
             </View>
           ) : null}
-          <Text className="font-mono text-[12.5px] text-ink-soft">
-            {other
-              ? `${other.kind} ${formatCents(other.cents)} at ${other.store}`
-              : best
-                ? `no ${best.kind === "new" ? "used" : "new"} price yet`
-                : "No price yet"}
-          </Text>
+          {other?.url ? (
+            <Tap
+              onPress={() => openOutside(other.url)}
+              hitSlop={4}
+              accessibilityRole="link"
+              className="self-start"
+            >
+              <Text className="font-mono text-[12.5px] text-ink-soft">
+                {other.kind} {formatCents(other.cents)} at{" "}
+                <Text className="text-ink underline">{other.store}</Text> →
+              </Text>
+            </Tap>
+          ) : (
+            <Text className="font-mono text-[12.5px] text-ink-soft">
+              {other
+                ? `${other.kind} ${formatCents(other.cents)} at ${other.store}`
+                : best
+                  ? `no ${best.kind === "new" ? "used" : "new"} price yet`
+                  : "No price yet"}
+            </Text>
+          )}
           {/* theirs: the note on it and the price to be told at, or the
               ways to add them, side by side while both are short */}
           <View className="flex-row flex-wrap items-baseline gap-x-4 gap-y-1 pt-0.5">
@@ -349,8 +374,12 @@ function Ticket({
               }
             >
               {item.alertCents ? (
+                // met already: said so, or "Alert under $30" beside an $8
+                // book reads as a mistake
                 <Text className="font-mono-medium text-[12.5px] text-accent-ink">
-                  Alert under {formatCents(item.alertCents)}
+                  {best && best.cents <= item.alertCents
+                    ? `Under your ${formatCents(item.alertCents)} now`
+                    : `Alert under ${formatCents(item.alertCents)}`}
                 </Text>
               ) : (
                 <Text className="font-body text-[13.5px] text-muted">
