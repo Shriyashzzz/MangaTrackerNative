@@ -28,6 +28,7 @@ import { recentSearches, rememberSearch } from "@/core/lib/recentSearches";
 import type { Highlights, SeriesHit } from "@/core/lib/types";
 import { starsOf } from "@/core/pages/Prices/reviews/reviewText";
 import { useColors } from "@/lib/colors";
+import { look } from "@/lib/platformLook";
 import { usePrefs } from "@/store/prefs";
 import { H2 } from "@/components/Page";
 
@@ -332,7 +333,7 @@ export default function PricesScreen() {
               <Text className="font-body text-[14px] text-ink-soft">Try</Text>
               <View className="flex-row flex-wrap gap-2">
                 {TRY.map((name) => (
-                  <Pressable
+                  <PressScale
                     key={name}
                     onPress={() =>
                       router.push({
@@ -340,13 +341,13 @@ export default function PricesScreen() {
                         params: { name },
                       })
                     }
-                    style={{ flexBasis: "30%" }}
-                    className="flex-1 items-center rounded-[3px] border-[1.5px] border-line py-2 active:bg-accent-wash"
+                    style={{ flexBasis: "30%", flexGrow: 1 }}
+                    className={`min-h-[40px] items-center justify-center overflow-hidden bg-ink/10 ${look.buttonRadius}`}
                   >
                     <Text className="font-body-medium text-[14px] text-ink">
                       {name}
                     </Text>
-                  </Pressable>
+                  </PressScale>
                 ))}
               </View>
             </View>
