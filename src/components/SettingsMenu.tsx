@@ -145,6 +145,12 @@ export default function SettingsMenu({
       />
       <Item
         onClose={onClose}
+        icon={StarIcon}
+        label="Stats"
+        onPress={() => router.push("/stats")}
+      />
+      <Item
+        onClose={onClose}
         icon={ImportIcon}
         label="Import your list"
         onPress={() => router.push("/import")}

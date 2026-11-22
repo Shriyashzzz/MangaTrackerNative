@@ -126,6 +126,7 @@ export default function RootLayout() {
               <Stack.Screen name="import" />
               <Stack.Screen name="calendar" />
               <Stack.Screen name="year" />
+              <Stack.Screen name="stats" />
             </Stack.Protected>
             <Stack.Protected guard={!isSignedIn}>
               <Stack.Screen name="sign-in" />
