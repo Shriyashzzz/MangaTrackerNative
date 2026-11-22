@@ -4,22 +4,11 @@
 // and the highlights: Popular this season, Latest deals, Prices
 // just checked. A search lists the series found, with Did you mean for a
 // typo. The rules are the web's (core findSeries, nearMatches, askedEdition)
-import { router } from "expo-router";
-import { useEffect, useState } from "react";
-import {
-  BackHandler,
-  Pressable,
-  ScrollView,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { withUniwind } from "uniwind";
 import AppHeader from "@/components/AppHeader";
 import Button from "@/components/Button";
-import PressScale from "@/components/PressScale";
 import Mascot from "@/components/Mascot";
+import { H2 } from "@/components/Page";
+import PressScale from "@/components/PressScale";
 import SeriesCover from "@/components/SeriesCover";
 import CountrySwitch from "@/components/prices/CountrySwitch";
 import DealsStrip from "@/components/prices/DealsStrip";
@@ -37,7 +26,18 @@ import { starsOf } from "@/core/pages/Prices/reviews/reviewText";
 import { useColors } from "@/lib/colors";
 import { look } from "@/lib/platformLook";
 import { usePrefs } from "@/store/prefs";
-import { H2 } from "@/components/Page";
+import { router } from "expo-router";
+import { useEffect, useState } from "react";
+import {
+  BackHandler,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { withUniwind } from "uniwind";
 
 const Safe = withUniwind(SafeAreaView);
 
@@ -73,7 +73,7 @@ function HighlightsStrip() {
           <View className="flex-row items-end justify-between">
             <H2>Popular this season</H2>
             <Pressable onPress={() => router.push("/series")} hitSlop={6}>
-              <Text className="font-body-medium text-[14px] text-ink underline">
+              <Text className="font-body-medium text-[14px] text-ink border-b pb-[2px] border-ink self-start">
                 All series →
               </Text>
             </Pressable>
@@ -88,7 +88,7 @@ function HighlightsStrip() {
           <View className="flex-row items-end justify-between">
             <H2>Latest deals</H2>
             <Pressable onPress={() => router.push("/deals")} hitSlop={6}>
-              <Text className="font-body-medium text-[14px] text-ink underline">
+              <Text className="font-body-medium text-[14px] text-ink border-b pb-[2px] border-ink self-start">
                 All deals →
               </Text>
             </Pressable>
@@ -307,7 +307,7 @@ export default function PricesScreen() {
           ) : null}
           {q.length >= 2 ? (
             <Pressable onPress={seeAll} className="py-3">
-              <Text className="font-body-semibold text-[15px] text-ink underline">
+              <Text className="font-body-semibold text-[15px] text-ink border-b pb-[2px] border-ink self-start">
                 {isbn ? `Open ISBN ${isbn}` : `See all results for “${q}”`}
               </Text>
             </Pressable>
@@ -394,9 +394,11 @@ export default function PricesScreen() {
             <Text className="font-body text-[14.5px] leading-[20px] text-ink-soft">
               Find the chapter and volume of the manga to start from.
             </Text>
-            <Text className="font-body-semibold text-[14.5px] text-ink underline">
-              Find where to start →
-            </Text>
+            <Button
+              label="Find where to start →"
+              small
+              onPress={() => router.push("/after-anime")}
+            ></Button>
           </PressScale>
         ) : null}
 
@@ -423,7 +425,7 @@ export default function PricesScreen() {
                 : "Try the name printed on the US cover, or paste the ISBN from the back of a volume."}
             </Text>
             <Pressable onPress={() => router.push("/series")} hitSlop={6}>
-              <Text className="font-body-semibold text-[14.5px] text-ink underline">
+              <Text className="font-body-semibold text-[14.5px] text-ink border-b pb-[2px] border-ink self-start">
                 Browse every series
               </Text>
             </Pressable>
@@ -452,7 +454,7 @@ export default function PricesScreen() {
               hitSlop={6}
               className="self-start"
             >
-              <Text className="font-body-medium text-[14px] text-ink-soft underline">
+              <Text className="font-body-medium text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
                 Clear the search
               </Text>
             </Pressable>

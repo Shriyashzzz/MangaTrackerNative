@@ -53,7 +53,7 @@ export default function FriendsScreen() {
             }
             className="min-w-0 flex-1"
           >
-            <Text className="font-body-semibold text-[16px] text-ink underline">
+            <Text className="font-body-semibold text-[16px] text-ink border-b pb-[2px] border-ink self-start">
               {friend.name}
             </Text>
             <Text className="font-mono text-[12.5px] text-muted">
@@ -62,7 +62,7 @@ export default function FriendsScreen() {
             </Text>
           </Pressable>
           <Pressable onPress={() => void unfollow(friend)} hitSlop={6}>
-            <Text className="font-body-medium text-[14px] text-ink-soft underline">
+            <Text className="font-body-medium text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
               Unfollow
             </Text>
           </Pressable>

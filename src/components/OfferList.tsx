@@ -170,7 +170,7 @@ export default function OfferList({
       </View>
       {listed.length > VISIBLE_OFFERS ? (
         <Pressable onPress={() => setOpen(!open)} className="self-start py-1">
-          <Text className="font-body-semibold text-[14px] text-ink underline">
+          <Text className="font-body-semibold text-[14px] text-ink border-b pb-[2px] border-ink self-start">
             {open ? "Show fewer" : `Show all ${listed.length}`}
           </Text>
         </Pressable>

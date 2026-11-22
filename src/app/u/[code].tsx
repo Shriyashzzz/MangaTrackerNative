@@ -360,7 +360,7 @@ function Synopsis({ m }: { m: SharedManga }) {
       </Text>
       {found.text.length > 220 ? (
         <Pressable onPress={() => setExpanded(!expanded)} hitSlop={6}>
-          <Text className="font-body-medium text-[13.5px] text-ink underline">
+          <Text className="font-body-medium text-[13.5px] text-ink border-b pb-[2px] border-ink self-start">
             {expanded ? "Show less" : "Read more"}
           </Text>
         </Pressable>
@@ -390,7 +390,7 @@ function AddToShelf({ m }: { m: SharedManga }) {
         }
         hitSlop={6}
       >
-        <Text className="font-body-semibold text-[14.5px] text-ink underline decoration-accent">
+        <Text className="font-body-semibold text-[14.5px] text-ink border-b pb-[2px] border-ink self-start decoration-accent">
           {onShelf.planned ? "On your To read list" : "On your shelf too"} →
         </Text>
       </Pressable>
@@ -584,7 +584,7 @@ function SeriesSheet({
           className="flex-row items-center gap-1.5"
         >
           <LinkIcon color={c.inkSoft} width={16} height={16} />
-          <Text className="font-body-medium text-[14px] text-ink-soft underline">
+          <Text className="font-body-medium text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
             Share link
           </Text>
         </Pressable>
@@ -804,7 +804,7 @@ export default function SharedShelfScreen() {
             }
             hitSlop={6}
           >
-            <Text className="font-body-medium text-[14px] text-ink underline">
+            <Text className="font-body-medium text-[14px] text-ink border-b pb-[2px] border-ink self-start">
               Change name or what's shared
             </Text>
           </Pressable>
@@ -993,7 +993,7 @@ export default function SharedShelfScreen() {
                         : ""}
                   </Text>
                 </View>
-                <Text className="font-body-semibold text-[13.5px] text-accent underline">
+                <Text className="font-body-semibold text-[13.5px] text-accent border-b pb-[2px] border-accent self-start">
                   {next.comingOut ? "Preorder" : "See prices"}
                 </Text>
               </Pressable>
@@ -1010,7 +1010,7 @@ export default function SharedShelfScreen() {
             onPress={() => setMore({ key: listKey, count: showing + PAGE })}
             hitSlop={6}
           >
-            <Text className="font-body-semibold text-[14px] text-ink underline">
+            <Text className="font-body-semibold text-[14px] text-ink border-b pb-[2px] border-ink self-start">
               Show {Math.min(PAGE, listed - showing)} more
             </Text>
           </Pressable>

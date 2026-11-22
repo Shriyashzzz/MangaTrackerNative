@@ -240,12 +240,12 @@ export default function VolumeReviews({
           ) : null}
           <View className="flex-row items-center gap-4">
             <Pressable onPress={() => setWriting(true)} hitSlop={6}>
-              <Text className="font-body-medium text-[14px] text-ink underline">
+              <Text className="font-body-medium text-[14px] text-ink border-b pb-[2px] border-ink self-start">
                 Edit
               </Text>
             </Pressable>
             <Pressable onPress={() => void remove()} hitSlop={6}>
-              <Text className="font-body-medium text-[14px] text-ink-soft underline">
+              <Text className="font-body-medium text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
                 Delete
               </Text>
             </Pressable>
@@ -300,7 +300,7 @@ export default function VolumeReviews({
           )}
           {left > 0 ? (
             <Pressable onPress={() => setMost(most + STEP)} className="py-1">
-              <Text className="font-body-semibold text-[14px] text-ink underline">
+              <Text className="font-body-semibold text-[14px] text-ink border-b pb-[2px] border-ink self-start">
                 Show {Math.min(STEP, left)} more
               </Text>
             </Pressable>

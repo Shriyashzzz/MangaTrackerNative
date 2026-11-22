@@ -44,7 +44,7 @@ export default function PriceAges({
         accessibilityRole="button"
         accessibilityLabel={`Checked ${timeAgo(newest)}. Each store's last check`}
       >
-        <Text className="font-body text-[13px] text-muted underline">
+        <Text className="font-body text-[13px] text-muted border-b pb-[2px] border-muted self-start">
           checked {timeAgo(newest)}
         </Text>
       </Pressable>

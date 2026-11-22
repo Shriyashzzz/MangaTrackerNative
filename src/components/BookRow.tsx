@@ -146,7 +146,7 @@ export default function BookRow({
               hitSlop={6}
               accessibilityLabel="Clear the day"
             >
-              <Text className="font-body text-[13px] text-muted underline">
+              <Text className="font-body text-[13px] text-muted border-b pb-[2px] border-muted self-start">
                 clear
               </Text>
             </Pressable>

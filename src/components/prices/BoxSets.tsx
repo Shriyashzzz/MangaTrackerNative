@@ -46,7 +46,7 @@ export function BoxSetNote({
     <Pressable onPress={onOpen} hitSlop={6}>
       <Text className="font-body text-[14px] text-ink-soft">
         Also in a box set, from{" "}
-        <Text className="font-body-semibold text-ink underline">
+        <Text className="font-body-semibold text-ink border-b pb-[2px] border-ink self-start">
           {formatCents(Math.min(...sets.map((o) => o.priceCents)))} →
         </Text>
       </Text>

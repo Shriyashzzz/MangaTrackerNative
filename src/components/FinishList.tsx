@@ -167,7 +167,7 @@ export default function FinishList({
           }
         >
           <Pressable onPress={() => openSeries(series)} hitSlop={6}>
-            <Text className="font-body-medium text-[14px] text-ink underline decoration-accent">
+            <Text className="font-body-medium text-[14px] text-ink border-b pb-[2px] border-ink self-start decoration-accent">
               Check the series page
             </Text>
           </Pressable>

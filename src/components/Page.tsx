@@ -3,10 +3,10 @@
 // on an iPhone, Material's bar on Android), and its words in a scroll. A
 // page that searches gets the header's own search bar. The pieces the
 // content pages are set in: a heading, a paragraph, a list line
+import { useColors } from "@/lib/colors";
 import { Stack } from "expo-router";
 import type { ReactNode } from "react";
 import { Linking, Platform, ScrollView, Text, View } from "react-native";
-import { useColors } from "@/lib/colors";
 
 export type PageSearch = {
   placeholder: string;
@@ -87,11 +87,11 @@ export default function Page({
 
 // a section's title: the lettering with a short accent rule under it
 export const H2 = ({ children }: { children: ReactNode }) => (
-  <View className="gap-1 self-start">
-    <Text className="font-brand pr-1 text-[22px] tracking-[1px] text-ink uppercase">
+  <View className="gap-1 self-start w-fit ">
+    <Text className="font-brand min-w-fit pr-1 text-[22px] tracking-[1px] text-ink uppercase">
       {children}
     </Text>
-    <View className="h-[3px] w-9 bg-accent" />
+    <View className="h-[3px] w-10 bg-accent" />
   </View>
 );
 export const H3 = ({ children }: { children: ReactNode }) => (

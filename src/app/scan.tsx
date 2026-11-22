@@ -298,7 +298,7 @@ export default function ScanScreen() {
       <View className="flex-row items-center justify-between gap-3 border-t border-line-soft bg-paper px-4 py-3">
         {!blocked ? (
           <Pressable onPress={() => setTyping((on) => !on)} hitSlop={6}>
-            <Text className="font-body-medium text-[14px] text-ink underline">
+            <Text className="font-body-medium text-[14px] text-ink border-b pb-[2px] border-ink self-start">
               {typing ? "Use the camera" : "Type the ISBN"}
             </Text>
           </Pressable>
@@ -366,7 +366,7 @@ function ScanRow({
   const { result } = row;
   const link = (label: string, run: () => void) => (
     <Pressable key={label} onPress={run} hitSlop={6}>
-      <Text className="font-body-semibold text-[14px] text-ink underline">
+      <Text className="font-body-semibold text-[14px] text-ink border-b pb-[2px] border-ink self-start">
         {label}
       </Text>
     </Pressable>

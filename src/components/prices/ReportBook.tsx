@@ -57,7 +57,7 @@ export default function ReportBook({
         className="flex-row items-center gap-2 self-start"
         accessibilityState={{ expanded: open }}
       >
-        <Text className="font-body-medium text-[14px] text-ink-soft underline">
+        <Text className="font-body-medium text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
           Missing a book?
         </Text>
         <View style={{ transform: [{ rotate: open ? "180deg" : "0deg" }] }}>

@@ -109,7 +109,7 @@ export default function TitleField({
                 : ""}
             </Text>
             <Pressable onPress={onTyped} hitSlop={6}>
-              <Text className="font-body-semibold text-[14px] text-ink underline">
+              <Text className="font-body-semibold text-[14px] text-ink border-b pb-[2px] border-ink self-start">
                 Add “{typed}” as typed
               </Text>
             </Pressable>

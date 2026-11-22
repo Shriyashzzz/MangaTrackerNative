@@ -332,7 +332,7 @@ export default function AddScreen() {
                     }
                     hitSlop={6}
                   >
-                    <Text className="font-body-semibold text-[14px] text-ink underline">
+                    <Text className="font-body-semibold text-[14px] text-ink border-b pb-[2px] border-ink self-start">
                       Add the book it belongs to
                     </Text>
                   </Pressable>
@@ -385,7 +385,7 @@ export default function AddScreen() {
                 </Text>
                 <View className="mt-1 flex-row flex-wrap gap-x-4 gap-y-1">
                   <Pressable onPress={change} hitSlop={6}>
-                    <Text className="font-body-medium text-[14px] text-ink underline">
+                    <Text className="font-body-medium text-[14px] text-ink border-b pb-[2px] border-ink self-start">
                       Change
                     </Text>
                   </Pressable>
@@ -399,7 +399,7 @@ export default function AddScreen() {
                       className="flex-row items-center gap-1"
                     >
                       <LinkIcon color={c.inkSoft} width={14} height={14} />
-                      <Text className="font-body-medium text-[14px] text-ink-soft underline">
+                      <Text className="font-body-medium text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
                         {picked ? "Use my own cover" : "Add a cover image"}
                       </Text>
                     </Pressable>
@@ -425,7 +425,7 @@ export default function AddScreen() {
                   }
                   hitSlop={6}
                 >
-                  <Text className="font-body-semibold text-[14.5px] text-accent underline">
+                  <Text className="font-body-semibold text-[14.5px] text-accent border-b pb-[2px] border-accent self-start">
                     Open it
                   </Text>
                 </Pressable>
@@ -449,7 +449,7 @@ export default function AddScreen() {
                     />
                   </View>
                   <Pressable onPress={closeOwnCover} hitSlop={6}>
-                    <Text className="font-body-medium text-[14px] text-ink-soft underline">
+                    <Text className="font-body-medium text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
                       {picked ? "Use theirs" : "Remove link"}
                     </Text>
                   </Pressable>

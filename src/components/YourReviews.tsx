@@ -41,7 +41,7 @@ export default function YourReviews({
                 hitSlop={6}
                 className="ml-auto"
               >
-                <Text className="font-body-medium text-[14px] text-ink-soft underline">
+                <Text className="font-body-medium text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
                   {one.review.text ? "Edit" : "Add words"}
                 </Text>
               </Pressable>
@@ -63,7 +63,7 @@ export default function YourReviews({
             onPress={() => setShown(shown + STEP)}
             className="flex-row items-baseline gap-2 py-1"
           >
-            <Text className="font-body-semibold text-[14px] text-ink underline">
+            <Text className="font-body-semibold text-[14px] text-ink border-b pb-[2px] border-ink self-start">
               Show {Math.min(STEP, left)} more
             </Text>
             <Text className="font-mono text-[12.5px] text-muted">

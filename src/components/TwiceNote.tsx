@@ -54,7 +54,7 @@ export default function TwiceNote({
           This series is on your shelf twice.
         </Text>
         <Pressable onPress={() => void merge()} disabled={merging} hitSlop={6}>
-          <Text className="font-body-semibold text-[14.5px] text-accent underline">
+          <Text className="font-body-semibold text-[14.5px] text-accent border-b pb-[2px] border-accent self-start">
             {merging ? "Merging…" : "Merge them"}
           </Text>
         </Pressable>

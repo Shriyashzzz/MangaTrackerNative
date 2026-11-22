@@ -54,7 +54,7 @@ export default function SeriesFacts({ info }: { info: SeriesInfo }) {
           </Text>
           {long ? (
             <Pressable onPress={() => setExpanded(!expanded)} hitSlop={6}>
-              <Text className="font-body-medium text-[13.5px] text-ink underline">
+              <Text className="font-body-medium text-[13.5px] text-ink border-b pb-[2px] border-ink self-start">
                 {expanded ? "Show less" : "Read more"}
               </Text>
             </Pressable>

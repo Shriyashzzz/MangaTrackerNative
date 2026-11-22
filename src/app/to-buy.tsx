@@ -317,7 +317,7 @@ export default function ToBuyScreen() {
                 <ChevronDownIcon color={c.ink} width={14} height={14} />
               </Pressable>
               <Pressable onPress={askToClear} hitSlop={6}>
-                <Text className="font-body text-[14px] text-ink-soft underline">
+                <Text className="font-body text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
                   Clear list
                 </Text>
               </Pressable>
@@ -411,7 +411,7 @@ export default function ToBuyScreen() {
                       disabled={busy !== null}
                       hitSlop={6}
                     >
-                      <Text className="font-body text-[14px] text-ink-soft underline">
+                      <Text className="font-body text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
                         Remove
                       </Text>
                     </Pressable>

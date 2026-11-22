@@ -249,7 +249,7 @@ function SeriesPanel({
           </Text>
         ) : null}
         <Link href={`/details/${manga.id}`} className="ml-auto">
-          <Text className="font-body-medium text-[14px] text-ink-soft underline">
+          <Text className="font-body-medium text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
             Open series
           </Text>
         </Link>

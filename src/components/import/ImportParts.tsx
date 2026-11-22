@@ -80,7 +80,7 @@ export function FilesInImport({ names }: { names: string[] }) {
         accessibilityState={{ expanded: open }}
         className="flex-row items-center gap-1 self-start py-1"
       >
-        <Text className="font-body-medium text-[14px] text-ink-soft underline">
+        <Text className="font-body-medium text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
           {names.length} {names.length === 1 ? "file" : "files"} in this import
         </Text>
         <View style={{ transform: [{ rotate: open ? "180deg" : "0deg" }] }}>

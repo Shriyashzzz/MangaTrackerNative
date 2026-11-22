@@ -153,7 +153,7 @@ export default function CoverPicker({
             </Text>
             {value ? (
               <Pressable onPress={() => pick("")} hitSlop={6}>
-                <Text className="font-body text-[13px] text-ink-soft underline">
+                <Text className="font-body text-[13px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
                   No cover
                 </Text>
               </Pressable>

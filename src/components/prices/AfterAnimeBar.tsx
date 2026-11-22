@@ -19,7 +19,7 @@ export default function AfterAnimeBar({ seriesName }: { seriesName: string }) {
         onPress={() => openWebPath(afterAnimeCanonicalPath(seriesName))}
         hitSlop={6}
       >
-        <Text className="font-body-semibold text-[14px] text-accent underline">
+        <Text className="font-body-semibold text-[14px] text-accent border-b pb-[2px] border-accent self-start">
           Find where to start
         </Text>
       </Pressable>

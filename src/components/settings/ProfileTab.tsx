@@ -191,7 +191,7 @@ export default function ProfileTab({
           hitSlop={6}
           className="self-start"
         >
-          <Text className="font-body-medium text-[14px] text-ink underline">
+          <Text className="font-body-medium text-[14px] text-ink border-b pb-[2px] border-ink self-start">
             {allPictures ? "Show fewer" : `Show ${morePictures} more`}
           </Text>
         </Pressable>

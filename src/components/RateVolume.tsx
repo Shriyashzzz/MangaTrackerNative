@@ -23,7 +23,7 @@ function WaysOn({ volume, onWrite }: Props) {
   if (!asked || rating === 0) return null;
   return (
     <Pressable onPress={() => onWrite(asked)} hitSlop={6}>
-      <Text className="font-body-medium text-[13.5px] text-ink-soft underline">
+      <Text className="font-body-medium text-[13.5px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
         {hasWords ? "Edit your review" : "Add a few words"}
       </Text>
     </Pressable>

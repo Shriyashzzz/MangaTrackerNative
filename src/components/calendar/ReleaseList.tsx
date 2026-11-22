@@ -102,7 +102,7 @@ export default function ReleaseList({
                 onPress={() => router.push(`/prices/${v.isbn13}`)}
                 hitSlop={6}
               >
-                <Text className="font-body-semibold text-[13.5px] text-accent underline">
+                <Text className="font-body-semibold text-[13.5px] text-accent border-b pb-[2px] border-accent self-start">
                   Preorder →
                 </Text>
               </Pressable>
@@ -112,7 +112,7 @@ export default function ReleaseList({
       })}
       {limit && volumes.length > limit ? (
         <Pressable onPress={() => setAll(!all)} className="py-2">
-          <Text className="font-body-semibold text-[14px] text-ink underline">
+          <Text className="font-body-semibold text-[14px] text-ink border-b pb-[2px] border-ink self-start">
             {all ? "Show fewer" : `Show all ${volumes.length}`}
           </Text>
         </Pressable>

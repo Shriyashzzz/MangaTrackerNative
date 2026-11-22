@@ -70,7 +70,7 @@ function Picked({
           Its series page looks for them; once found they show here too.
         </P>
         <Pressable onPress={() => openWebPath(seriesPath(asked))} hitSlop={6}>
-          <Text className="font-body-semibold text-[14.5px] text-ink underline">
+          <Text className="font-body-semibold text-[14.5px] text-ink border-b pb-[2px] border-ink self-start">
             Open {asked}
           </Text>
         </Pressable>
@@ -108,7 +108,7 @@ function Picked({
             hitSlop={6}
             className="self-start"
           >
-            <Text className="font-body-medium text-[14px] text-ink underline">
+            <Text className="font-body-medium text-[14px] text-ink border-b pb-[2px] border-ink self-start">
               {line.label} prices →
             </Text>
           </Pressable>
@@ -170,7 +170,7 @@ function SeriesFold({
           ))}
           <View className="flex-row flex-wrap gap-4">
             <Pressable onPress={onPick} hitSlop={6}>
-              <Text className="font-body-medium text-[14px] text-ink underline">
+              <Text className="font-body-medium text-[14px] text-ink border-b pb-[2px] border-ink self-start">
                 Which book has my volume?
               </Text>
             </Pressable>
@@ -178,7 +178,7 @@ function SeriesFold({
               onPress={() => openWebPath(seriesPath(entry.name))}
               hitSlop={6}
             >
-              <Text className="font-body-medium text-[14px] text-ink underline">
+              <Text className="font-body-medium text-[14px] text-ink border-b pb-[2px] border-ink self-start">
                 Prices
               </Text>
             </Pressable>
@@ -271,7 +271,7 @@ export default function EditionsScreen() {
             hitSlop={6}
             className="self-start"
           >
-            <Text className="font-body-medium text-[14px] text-ink-soft underline">
+            <Text className="font-body-medium text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
               Every series with editions
             </Text>
           </Pressable>

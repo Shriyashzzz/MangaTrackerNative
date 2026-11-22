@@ -5,8 +5,7 @@
 // newest out, what's ordered and on its way, and the series' price page.
 // Every rule is the web's: the one to buy next (core useBuyOptions), an
 // edition's plan (core useEditions), what's on sale (core onSale)
-import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { H2 } from "@/components/Page";
 import { ChevronDownIcon, InkCrossIcon } from "@/core/components/icons/Icons";
 import { chaptersText, type ChapterRange } from "@/core/lib/chapterWords";
 import {
@@ -15,8 +14,8 @@ import {
   type EditionBook,
   type EditionLine,
 } from "@/core/lib/editions";
-import { formatCents } from "@/core/lib/prices";
 import { seriesPath, volumePath } from "@/core/lib/pricePaths";
+import { formatCents } from "@/core/lib/prices";
 import { onSale } from "@/core/lib/releaseDate";
 import type { SeriesVolume } from "@/core/lib/types";
 import { runsOf } from "@/core/lib/volumeRuns";
@@ -24,9 +23,10 @@ import type { BuyOptions } from "@/core/pages/Details/useBuyOptions";
 import type { Editions } from "@/core/pages/Details/useEditions";
 import { useColors } from "@/lib/colors";
 import { openWebPath } from "@/lib/webRoutes";
+import { useState } from "react";
+import { Pressable, Text, View } from "react-native";
 import GotIt from "./GotIt";
 import PickSheet from "./PickSheet";
-import { H2 } from "@/components/Page";
 
 type Props = {
   options: BuyOptions;
@@ -285,7 +285,7 @@ export default function BuyStrip({
               accessibilityLabel={`${said}: not ordered after all`}
               className="min-h-[36px] flex-row items-center gap-1"
             >
-              <Text className="font-body-semibold text-[14px] text-ink underline">
+              <Text className="font-body-semibold text-[14px] text-ink border-b pb-[2px] border-ink self-start">
                 {said}
               </Text>
               <InkCrossIcon color={c.inkSoft} width={11} height={11} />
@@ -307,7 +307,7 @@ export default function BuyStrip({
       hitSlop={6}
       className="ml-auto py-1"
     >
-      <Text className="font-body-medium text-[14px] text-ink-soft underline">
+      <Text className="font-body-medium text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
         {line && plan && plan.outBooks > 1
           ? `All ${plan.outBooks} ${line.label} books`
           : singlesText}{" "}
@@ -333,7 +333,7 @@ export default function BuyStrip({
       <Pressable
         onPress={() => setOpen(!open)}
         accessibilityState={{ expanded: open }}
-        className="min-h-[44px] flex-row items-center gap-3"
+        className="min-h-[44px] flex-row items-center gap-5"
       >
         <H2>{title}</H2>
         {!open ? (

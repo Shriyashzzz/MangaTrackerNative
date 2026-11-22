@@ -4,26 +4,21 @@
 // Canada's), the box-set note, more places to look, the price history,
 // about the series, readers' reviews, and the volumes beside it. Every rule
 // is the web's (core volumePageRules, offerLabels, useVolumeLoad)
-import { Image } from "expo-image";
-import { router, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { withUniwind } from "uniwind";
 import Button from "@/components/Button";
 import DoubleRule from "@/components/DoubleRule";
+import LoadingQuote from "@/components/LoadingQuote";
 import Mascot from "@/components/Mascot";
 import OfferList from "@/components/OfferList";
-import OnShelfChip from "@/components/prices/OnShelfChip";
-import StoreButtons from "@/components/prices/StoreButtons";
+import { H2 } from "@/components/Page";
+import { BoxSetNote } from "@/components/prices/BoxSets";
 import CountrySwitch from "@/components/prices/CountrySwitch";
 import DealsStrip from "@/components/prices/DealsStrip";
 import PriceAges from "@/components/prices/PriceAges";
 import SeriesFacts from "@/components/prices/SeriesFacts";
 import ShelfAction from "@/components/prices/ShelfAction";
+import StoreButtons from "@/components/prices/StoreButtons";
 import VolumeCard from "@/components/prices/VolumeCard";
 import VolumeReviews from "@/components/prices/VolumeReviews";
-import { BoxSetNote } from "@/components/prices/BoxSets";
 import {
   ChevronDownIcon,
   ChevronLeftIcon,
@@ -55,8 +50,12 @@ import {
 } from "@/core/pages/Prices/volumePageRules";
 import { useColors } from "@/lib/colors";
 import { usePrefs } from "@/store/prefs";
-import { H2 } from "@/components/Page";
-import LoadingQuote from "@/components/LoadingQuote";
+import { Image } from "expo-image";
+import { router, useLocalSearchParams } from "expo-router";
+import { useState } from "react";
+import { Pressable, ScrollView, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { withUniwind } from "uniwind";
 
 const Safe = withUniwind(SafeAreaView);
 // a history kind's name: the offer labels' words for new print and ebooks
@@ -270,7 +269,6 @@ export default function PriceVolumeScreen() {
               />
             ) : null}
           </Pressable>
-          <OnShelfChip name={seriesLabel} altNames={[series.name]} />
         </View>
         <View className="min-w-0 flex-1 gap-1.5">
           <Text className="font-display text-[21px] leading-[25px] text-ink">
@@ -309,7 +307,7 @@ export default function PriceVolumeScreen() {
           <Pressable onPress={openSeries} hitSlop={4}>
             <Text className="font-body text-[14px] text-ink-soft">
               Part of{" "}
-              <Text className="font-body-semibold text-ink underline">
+              <Text className="font-body-semibold text-ink border-b pb-[2px] border-ink self-start">
                 {shownSeries}
               </Text>
             </Text>
@@ -616,7 +614,7 @@ export default function PriceVolumeScreen() {
           <View className="flex-row items-end justify-between">
             <H2>From the same series</H2>
             <Pressable onPress={openSeries} hitSlop={6}>
-              <Text className="font-body-medium text-[14px] text-ink underline">
+              <Text className="font-body-medium text-[14px] text-ink border-b pb-[2px] border-ink self-start">
                 See them all
               </Text>
             </Pressable>

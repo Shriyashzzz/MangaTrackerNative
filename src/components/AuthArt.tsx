@@ -1,9 +1,9 @@
 // The manga panel over the account pages (the web's components/authArt/
 // AuthArt.tsx and Spread.tsx): speed lines with a chapter number, a sound
 // effect lettered across them, and the line a speech bubble says
+import { useColors } from "@/lib/colors";
 import type { ReactNode } from "react";
 import { Text, View } from "react-native";
-import { useColors } from "@/lib/colors";
 
 const LINES = 9;
 
@@ -21,7 +21,7 @@ export default function AuthArt({
 }) {
   const c = useColors();
   return (
-    <View className="gap-3">
+    <View className="gap-3 justify-center  ">
       <View className="overflow-hidden rounded-[14px] border border-line-soft bg-card px-4 py-5">
         {/* the speed lines, thinner towards the middle */}
         <View className="absolute inset-0 justify-around py-3 opacity-60">
@@ -53,7 +53,7 @@ export default function AuthArt({
         </Text>
       </View>
       {/* the speech bubble */}
-      <View className="self-start rounded-[16px] border-2 border-line bg-card px-4 py-2.5">
+      <View className="self-start rounded-[16px] border-2 border-line bg-card px-4 py-2.5 min-w-full flex items items-center">
         <Text className="font-display text-[16px] text-ink">{line}</Text>
       </View>
     </View>

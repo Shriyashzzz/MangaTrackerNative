@@ -618,7 +618,7 @@ export default function DetailsScreen() {
               </Text>
               {canUndoStatus ? (
                 <Pressable onPress={() => changeStatus(true)} hitSlop={8}>
-                  <Text className="font-body-semibold text-[14px] text-accent underline">
+                  <Text className="font-body-semibold text-[14px] text-accent border-b pb-[2px] border-accent self-start">
                     Undo
                   </Text>
                 </Pressable>

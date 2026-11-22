@@ -77,7 +77,7 @@ export default function UpcomingReleases() {
               text={`Save ${first.volumes.length > 1 ? `${first.volumes.length} dates` : "the date"}`}
             />
             <Pressable onPress={() => router.push("/calendar")} hitSlop={6}>
-              <Text className="font-body-semibold text-[14px] text-ink underline">
+              <Text className="font-body-semibold text-[14px] text-ink border-b pb-[2px] border-ink self-start">
                 Full calendar
               </Text>
             </Pressable>

@@ -82,7 +82,7 @@ function EditionsBox({
         );
       })}
       <Pressable onPress={onSeeAll} hitSlop={6}>
-        <Text className="font-body-medium text-[14px] text-ink underline">
+        <Text className="font-body-medium text-[14px] text-ink border-b pb-[2px] border-ink self-start">
           See all {line.books.length} books ↓
         </Text>
       </Pressable>

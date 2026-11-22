@@ -63,7 +63,7 @@ export default function ReviewDialog({
       {current ? (
         <View className="mt-4 flex-row flex-wrap items-baseline gap-3">
           <Pressable onPress={() => void remove()} hitSlop={6}>
-            <Text className="font-body-medium text-[14px] text-accent underline">
+            <Text className="font-body-medium text-[14px] text-accent border-b pb-[2px] border-accent self-start">
               Delete this review
             </Text>
           </Pressable>

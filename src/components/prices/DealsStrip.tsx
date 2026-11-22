@@ -62,7 +62,7 @@ export default function DealsStrip() {
             onPress={() => void Linking.openURL(d.url)}
             className="min-w-0 shrink"
           >
-            <Text className="font-body text-[14px] text-ink underline">
+            <Text className="font-body text-[14px] text-ink border-b pb-[2px] border-ink self-start">
               <Text className="font-body-semibold">{d.store}</Text>: {d.text}
             </Text>
           </Pressable>

@@ -357,7 +357,7 @@ export default function YourBooks({
           hitSlop={6}
           className="mb-1 self-end"
         >
-          <Text className="font-body-medium text-[14px] text-ink-soft underline">
+          <Text className="font-body-medium text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
             Select
           </Text>
         </Pressable>
@@ -407,13 +407,13 @@ export default function YourBooks({
       {hidden > 0 ? (
         <View className="flex-row items-baseline gap-4 py-2">
           <Pressable onPress={() => setShown(shown + STEP)} hitSlop={6}>
-            <Text className="font-body-semibold text-[14px] text-ink underline">
+            <Text className="font-body-semibold text-[14px] text-ink border-b pb-[2px] border-ink self-start">
               Show {Math.min(STEP, hidden)} more
             </Text>
           </Pressable>
           {hidden > STEP ? (
             <Pressable onPress={() => setShown(rows.length)} hitSlop={6}>
-              <Text className="font-body-semibold text-[14px] text-ink underline">
+              <Text className="font-body-semibold text-[14px] text-ink border-b pb-[2px] border-ink self-start">
                 Show all {rows.length}
               </Text>
             </Pressable>
