@@ -17,6 +17,9 @@ type ToBuyState = {
   load: () => Promise<void>;
   add: (isbn13: string) => Promise<void>;
   remove: (isbn13: string) => Promise<void>;
+  // one item off the list on screen at once, before the server has
+  // answered. Hands back the way to put it back, for when the server refuses
+  drop: (isbn13: string) => () => void;
   clear: () => Promise<void>;
   // their own note on one item, and their own order for the list: shown at
   // once, put back if the server doesn't take it (the error is thrown on)
@@ -26,6 +29,19 @@ type ToBuyState = {
   setOrder: (isbns: string[]) => Promise<void>;
   reset: () => void;
 };
+
+// the list's totals, added up here as the server adds them (its toBuy.ts
+// toBuyTotals): each kind over the volumes that have a price of that kind
+function totalsOf(items: ToBuyList["items"]): ToBuyList["totals"] {
+  const sum = (kind: "new" | "used") => {
+    const priced = items.flatMap((item) => (item[kind] ? [item[kind]] : []));
+    return {
+      cents: priced.reduce((total, price) => total + price.cents, 0),
+      volumes: priced.length,
+    };
+  };
+  return { volumes: items.length, new: sum("new"), used: sum("used") };
+}
 
 export const useToBuy = create<ToBuyState>()((set, get) => ({
   list: null,
@@ -41,9 +57,26 @@ export const useToBuy = create<ToBuyState>()((set, get) => ({
     await addToBuy(isbn13);
     await get().load();
   },
+  drop: (isbn13) => {
+    const was = get().list;
+    if (!was) return () => {};
+    const items = was.items.filter((item) => item.isbn13 !== isbn13);
+    set({ list: { items, totals: totalsOf(items) } });
+    // only if nothing else has changed the list since
+    return () => {
+      if (get().list?.items === items) set({ list: was });
+      else void get().load();
+    };
+  },
+  // gone from the screen at once; back if the server doesn't take it
   remove: async (isbn13) => {
-    await removeToBuy(isbn13);
-    await get().load();
+    const putBack = get().drop(isbn13);
+    try {
+      await removeToBuy(isbn13);
+    } catch (e) {
+      putBack();
+      throw e;
+    }
   },
   clear: async () => {
     await clearToBuy();

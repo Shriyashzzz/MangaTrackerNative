@@ -223,7 +223,6 @@ const COVER_WIDTH = 66;
 // its own price page, where the preorder links are
 function Card({
   item,
-  busy,
   onOwned,
   onOrdered,
   onRemove,
@@ -232,8 +231,6 @@ function Card({
   move,
 }: {
   item: ToBuyItem;
-  // the book being saved just now, if any: nothing else can be tapped
-  busy: string | null;
   onOwned: () => void;
   onOrdered: () => void;
   onRemove: () => void;
@@ -260,8 +257,6 @@ function Card({
   const name = nameOf(item);
   const { best, other } = pricesOf(item);
   const open = () => router.push(`/prices/${item.isbn13}`);
-  const waiting = busy !== null;
-  const saving = busy === item.isbn13;
   // the store's own page for a copy, or this book's price page when the
   // copy has no link
   const toStore = (url: string | null | undefined) =>
@@ -346,13 +341,12 @@ function Card({
             <Tap
               feel="round"
               onPress={() => setMenuOpen(true)}
-              disabled={waiting}
               hitSlop={10}
               accessibilityLabel={`More for ${name}`}
               className="-mt-1 px-1"
             >
               <Text className="font-body-semibold text-[22px] leading-[24px] text-ink-soft">
-                {saving ? "…" : "⋯"}
+                ⋯
               </Text>
             </Tap>
           </View>
@@ -497,9 +491,8 @@ type ListSort = ToBuySort | "mine";
 
 export default function ToBuyScreen() {
   const c = useColors();
-  const { list, loadFailed, load, remove, clear } = useToBuy();
+  const { list, loadFailed, load, remove, drop, clear } = useToBuy();
   const offerAdd = usePrefs((s) => s.prefs.offerAdd !== "off");
-  const [busy, setBusy] = useState<string | null>(null);
   const [note, setNote] = useState<
     ReturnType<typeof settledNote> | { text: string } | null
   >(null);
@@ -530,30 +523,29 @@ export default function ToBuyScreen() {
     void load();
   }, [load]);
 
+  // On my shelf, Ordered and Remove take the book off the screen at once
+  // and tell the server after: waiting on the answer (and on the whole
+  // list read again) made each tap feel stuck. If the server refuses, the
+  // book comes back and the page says so
   const settle = async (item: ToBuyItem, how: "owned" | "ordered") => {
-    setBusy(item.isbn13);
     setNote(null);
+    const putBack = drop(item.isbn13);
     try {
       const settled = await settleToBuy(item.isbn13, how);
-      await load();
       if (!settled.shelf && offerAdd) setAddAsking({ item, settled, how });
       else setNote(settledNote(item, settled));
     } catch (e) {
+      putBack();
       setNote({ text: (e as Error).message });
-    } finally {
-      setBusy(null);
     }
   };
   const takeOff = async (item: ToBuyItem) => {
-    setBusy(item.isbn13);
     setNote(null);
     try {
       await remove(item.isbn13);
       setNote({ text: `${nameOf(item)} is off the list.` });
     } catch {
       setNote({ text: "That didn't save. Try again." });
-    } finally {
-      setBusy(null);
     }
   };
   const askToClear = () => {
@@ -735,7 +727,6 @@ export default function ToBuyScreen() {
                 <Card
                   key={item.isbn13}
                   item={item}
-                  busy={busy}
                   onOwned={() => void settle(item, "owned")}
                   onOrdered={() => void settle(item, "ordered")}
                   onRemove={() => void takeOff(item)}
