@@ -1,6 +1,7 @@
 // The shelf: every series they have (/api/manga), and what each one's
 // release check found, as the web's store/shelf.ts keeps them. null while
 // the shelf loads
+import { checkOrder, laneOf } from "@/core/lib/releaseOrder";
 import { create } from "zustand";
 import { apiFetch, getJson } from "@/core/lib/api";
 import { restorable, restorePieces } from "@/core/lib/restorePieces";
@@ -86,11 +87,15 @@ const SEEN = {
 } as const;
 
 // one series, given up on after a while so one stuck title can't stop the rest
-async function askAbout(id: number) {
+// It says which lane it waits in on the server (core lib/releaseOrder.ts):
+// "now" for a series someone is waiting on news for, "later" for the rest,
+// so a series page opened meanwhile (always "now") is never stuck behind a
+// whole shelf's checks
+async function askAbout(m: Manga) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), RELEASE_CHECK_TIMEOUT_MS);
   try {
-    return await getReleases(id, controller.signal);
+    return await getReleases(m.id, controller.signal, laneOf(m));
   } catch {
     return null;
   } finally {
@@ -338,9 +343,10 @@ export const useShelf = create<ShelfState>()((set, get) => ({
         }
         set({ releases, outcomes, checkedAt });
       }
-      for (const m of get().manga ?? []) {
+      // the ones most likely to have news first (checkOrder)
+      for (const m of checkOrder(get().manga ?? [])) {
         if (m.id in get().releases) continue;
-        const found = await askAbout(m.id);
+        const found = await askAbout(m);
         const outcome: ReleaseOutcome = !found
           ? "failed"
           : found.releaseStatus

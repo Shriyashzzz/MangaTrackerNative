@@ -500,7 +500,7 @@ export default function VolumePicker({
       {/* what the spines are, said once */}
       <Text className="font-body text-[13.5px] text-ink-soft">
         Each spine is a volume. Tap the ones you own, or hold and slide to mark
-        several.
+        a run. Own a lot? Type the highest in Up to vol. and they're all marked.
       </Text>
       <GestureDetector gesture={gesture}>
         <View

@@ -31,6 +31,7 @@ const BROWSER_OK = new Set([
 
 // what the native screens use; everything they import comes along
 const ENTRIES = [
+  "lib/releaseOrder.ts",
   "lib/types.ts",
   "lib/ownedVolumes.ts",
   "lib/reading.ts",
