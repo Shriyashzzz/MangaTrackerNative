@@ -141,6 +141,27 @@ export default function DetailsScreen() {
   });
   const { buyOptions, editions } = shelf;
 
+  // both counters kept, but only one has a value (a series added by its
+  // chapter has no volume read yet, and the other way round): the empty one
+  // is shown at the same place, when the volume list is sure where that is.
+  // Without this the first tap on the empty counter started from 0 and
+  // dragged the real place back with it. Shown only; saved with their next
+  // change, like any other
+  const withBothPlaces = (series: Manga): Manga => {
+    const tracks = tracksOf(series, trackBy);
+    const starts = releaseData?.volumeStarts ?? [];
+    if (!tracks.chapters || !tracks.volumes || !starts.length) return series;
+    if (!series.readVolume && series.bookmark) {
+      const volume = volumesReadAt(series.bookmark, starts);
+      return volume && volume > 0 ? { ...series, readVolume: volume } : series;
+    }
+    if (!series.bookmark && series.readVolume) {
+      const chapter = lastChapterOf(series.readVolume, starts);
+      return chapter ? { ...series, bookmark: chapter } : series;
+    }
+    return series;
+  };
+
   // both counters kept: saving one moves the other to the same place, when
   // the volume list is sure where that is (lib/placeEquivalent.ts)
   const keepTheOtherInStep = async (saved: {
@@ -568,7 +589,7 @@ export default function DetailsScreen() {
           {/* a rule above each section, as the Android app divides them */}
           <View className="gap-3 border-t border-line-soft pt-6">
             <ReadingPlace
-              manga={m}
+              manga={withBothPlaces(m)}
               finished={finished}
               planned={planned}
               trackBy={trackBy}
