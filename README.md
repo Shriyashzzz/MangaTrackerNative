@@ -137,6 +137,24 @@ To buy. The server decides what to send and sends each once
 - The token needs the Expo project ID (`app.json` `extra.eas.projectId`). It
   is baked in when the app is built, so rebuild after changing it.
 
+## Offline
+
+With no connection the app shows the last shelf the server sent (kept on the
+phone) and still takes changes to a series: volumes owned, the chapter or
+volume read, finished or To read, the rating and the notes. Each is kept on
+the phone and sent when the connection is back, by the website's own rules
+(`core/lib/offlineChangeRules.ts`) and route.
+
+- `src/native/lib/offline.ts`: whether there's a connection. A phone has no
+  browser to say so, so a request that never reaches the server means
+  offline, and any answer means it's back.
+- `src/native/lib/offlineChanges.ts`: the kept changes and the sender.
+- `src/components/OfflineBar.tsx`: the strip along the foot that says so.
+- A start with no connection keeps them signed in if they were last time
+  (`store/auth.ts`); signing out forgets the kept shelf and changes.
+
+Everything else (adding a series, To buy, prices) needs a connection.
+
 ## Release builds
 
 `app.config.js` turns plain http off and keeps the session out of Android
@@ -153,8 +171,6 @@ with `APP_ENV=production` set for a release built on this machine.
 - Owner tools (reported reviews, fixes to review, reported books), the
   tour and practice account
 - Linking Google to an account from the app
-- Changes made offline: the website keeps and sends them; the app says they
-  didn't save
 - Live price checks (the website proves a person is there first; the app
   gets stored prices)
 
