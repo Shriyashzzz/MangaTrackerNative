@@ -2,6 +2,9 @@
 // buy, what they'd cost new and used all together, each with its prices,
 // On my shelf, Ordered and Remove, sorted their way, and Clear list.
 // Marking one theirs whose series isn't on the shelf offers to add it
+import { Input } from "@/components/Field";
+import { H2 } from "@/components/Page";
+import Sheet from "@/components/Sheet";
 import PullPage, { usePullTop } from "@/components/PullRefresh";
 import Backdrop from "@/components/Backdrop";
 import { Image } from "expo-image";
@@ -23,6 +26,7 @@ import {
 import { coverSrc, formatCents, novelParts } from "@/core/lib/prices";
 import {
   settleToBuy,
+  inOwnOrder,
   sortToBuy,
   TO_BUY_SORTS,
   type AddedFromToBuy,
@@ -142,6 +146,11 @@ const Total = ({
     </Text>
   ) : null;
 
+// the orders the list can be shown in: the shared ones, and their own
+// (set with the arrows on each row while it's the one shown)
+const SORTS = [...TO_BUY_SORTS, { value: "mine", label: "My order" }] as const;
+type ListSort = ToBuySort | "mine";
+
 export default function ToBuyScreen() {
   const c = useColors();
   const { list, loadFailed, load, remove, clear } = useToBuy();
@@ -158,7 +167,13 @@ export default function ToBuyScreen() {
   const [added, setAdded] = useState<
     (AddedFromToBuy & { ticked: number[] }) | null
   >(null);
-  const [sort, setSort] = useState<ToBuySort>("added");
+  const [sort, setSort] = useState<ListSort>("added");
+  const setNoteOf = useToBuy((st) => st.setNote);
+  const setOrder = useToBuy((st) => st.setOrder);
+  // the item whose note is being written, and the words so far
+  const [noting, setNoting] = useState<{ isbn13: string; text: string } | null>(
+    null,
+  );
   const [pickingSort, setPickingSort] = useState(false);
   const pull = usePullTop();
   useEffect(() => {
@@ -210,8 +225,31 @@ export default function ToBuyScreen() {
     );
   };
   const items = list?.items;
-  const sorted = useMemo(() => sortToBuy(items ?? [], sort), [items, sort]);
-  const sortLabel = TO_BUY_SORTS.find((s) => s.value === sort)?.label ?? "";
+  const sorted = useMemo(
+    () =>
+      sort === "mine" ? inOwnOrder(items ?? []) : sortToBuy(items ?? [], sort),
+    [items, sort],
+  );
+  const sortLabel = SORTS.find((s) => s.value === sort)?.label ?? "";
+  // one item a place up or down in their own order: the whole list is saved
+  // in its new order, so every item has a place from then on
+  const move = (at: number, by: -1 | 1) => {
+    const to = at + by;
+    if (to < 0 || to >= sorted.length) return;
+    const isbns = sorted.map((item) => item.isbn13);
+    [isbns[at], isbns[to]] = [isbns[to]!, isbns[at]!];
+    void setOrder(isbns).catch(() =>
+      Alert.alert("That didn't save. Try again."),
+    );
+  };
+  const saveNote = () => {
+    if (!noting) return;
+    const { isbn13, text } = noting;
+    setNoting(null);
+    void setNoteOf(isbn13, text).catch(() =>
+      Alert.alert("That didn't save. Try again."),
+    );
+  };
   const link = (label: string, go: () => void) => (
     <Text className="font-body-semibold text-ink underline" onPress={go}>
       {label}
@@ -413,7 +451,62 @@ export default function ToBuyScreen() {
                           Remove
                         </Text>
                       </Pressable>
+                      {/* their own order: up and down, only while it's the
+                          order shown */}
+                      {sort === "mine" ? (
+                        <View className="ml-auto flex-row gap-2">
+                          {([-1, 1] as const).map((by) => (
+                            <Pressable
+                              key={by}
+                              onPress={() => move(i, by)}
+                              disabled={
+                                by < 0 ? i === 0 : i === sorted.length - 1
+                              }
+                              hitSlop={6}
+                              accessibilityLabel={`Move ${nameOf(item)} ${by < 0 ? "up" : "down"}`}
+                              className="h-9 w-9 items-center justify-center rounded-full bg-ink/10 disabled:opacity-30"
+                            >
+                              <View
+                                style={{
+                                  transform: [
+                                    { rotate: by < 0 ? "180deg" : "0deg" },
+                                  ],
+                                }}
+                              >
+                                <ChevronDownIcon
+                                  color={c.ink}
+                                  width={18}
+                                  height={18}
+                                />
+                              </View>
+                            </Pressable>
+                          ))}
+                        </View>
+                      ) : null}
                     </View>
+                    {/* their own note on it: the words, or the way to add some */}
+                    <Pressable
+                      onPress={() =>
+                        setNoting({
+                          isbn13: item.isbn13,
+                          text: item.note ?? "",
+                        })
+                      }
+                      hitSlop={6}
+                      accessibilityLabel={
+                        item.note ? `Note: ${item.note}. Change` : "Add a note"
+                      }
+                    >
+                      {item.note ? (
+                        <Text className="font-display-italic text-[14.5px] leading-[20px] text-ink">
+                          “{item.note}”
+                        </Text>
+                      ) : (
+                        <Text className="font-body text-[13.5px] text-muted">
+                          + Add a note
+                        </Text>
+                      )}
+                    </Pressable>
                   </View>
                 ))}
               </View>
@@ -421,10 +514,30 @@ export default function ToBuyScreen() {
           ) : null}
         </ScrollView>
       </PullPage>
+      <Sheet open={noting !== null} onClose={() => setNoting(null)}>
+        <View className="gap-3 pb-4">
+          <H2>Your note</H2>
+          <Input
+            value={noting?.text ?? ""}
+            onChangeText={(text) =>
+              setNoting((now) => (now ? { ...now, text } : now))
+            }
+            placeholder="Wait for a sale, a gift for…"
+            maxLength={140}
+            autoFocus
+            returnKeyType="done"
+            onSubmitEditing={saveNote}
+          />
+          <View className="flex-row justify-end gap-3">
+            <Button small label="Cancel" onPress={() => setNoting(null)} />
+            <Button small kind="primary" label="Save" onPress={saveNote} />
+          </View>
+        </View>
+      </Sheet>
       <PickSheet
         open={pickingSort}
         title="Sort by"
-        options={TO_BUY_SORTS}
+        options={SORTS}
         picked={sort}
         onPick={setSort}
         onClose={() => setPickingSort(false)}
