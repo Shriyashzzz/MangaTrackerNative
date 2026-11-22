@@ -13,7 +13,7 @@ export default function AppearanceTab() {
   const theme = usePrefs((s) => s.prefs.theme ?? "system");
   const save = usePrefs((s) => s.save);
   return (
-    <Section title="Theme">
+    <Section first title="Theme">
       <Radios
         label="Theme"
         options={THEMES}

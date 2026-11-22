@@ -47,7 +47,7 @@ export default function ShelfSettingsTab() {
   );
   return (
     <>
-      <Section title="Keeping your place">
+      <Section first title="Keeping your place">
         <Radios
           label="Track by"
           options={TRACKING}

@@ -10,7 +10,7 @@ export default function NewReleasesTab() {
   const checksOn = usePrefs((s) => s.prefs.releaseChecks !== "off");
   const save = usePrefs((s) => s.save);
   return (
-    <Section title="New releases">
+    <Section first title="New releases">
       <Tick
         label="Check for new volumes and chapters"
         value={checksOn}

@@ -3,6 +3,7 @@
 import * as Haptics from "expo-haptics";
 import { Pressable, Switch as NativeSwitch, Text } from "react-native";
 import { useColors } from "@/lib/colors";
+import { PRINTED } from "@/lib/printed";
 
 export default function Switch({
   label,
@@ -29,8 +30,11 @@ export default function Switch({
       <NativeSwitch
         value={value}
         onValueChange={flip}
-        trackColor={{ false: c.line, true: c.accent }}
-        thumbColor={c.paper}
+        // the knob is always light, so it reads on the dark track in dark
+        // mode as well as on the accent when on
+        trackColor={{ false: c.lineSoft, true: c.accent }}
+        thumbColor={PRINTED.paper}
+        ios_backgroundColor={c.lineSoft}
       />
     </Pressable>
   );

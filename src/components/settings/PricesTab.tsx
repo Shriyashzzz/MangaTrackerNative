@@ -13,7 +13,7 @@ export default function PricesTab() {
   const save = usePrefs((s) => s.save);
   return (
     <>
-      <Section title="Ebooks">
+      <Section first title="Ebooks">
         <Tick
           label="Hide ebooks on volume pages"
           value={prefs.hideEbooks === "yes"}

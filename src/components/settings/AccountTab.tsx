@@ -39,7 +39,7 @@ function SignInSection({ account }: { account: Account }) {
     }
   };
   return (
-    <Section title="Signing in">
+    <Section first title="Signing in">
       {account.google ? (
         <Help>You can sign in with Google.</Help>
       ) : (

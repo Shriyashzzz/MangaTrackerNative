@@ -2,21 +2,21 @@
 // heading, a radio list, a tick row, and the note that says a save went
 import type { ReactNode } from "react";
 import { Pressable, Text, View } from "react-native";
-import { CheckIcon } from "@/core/components/icons/Icons";
-import { useColors } from "@/lib/colors";
+import { H2 } from "@/components/Page";
 import Switch from "../Switch";
 
 export const Section = ({
   title,
   children,
+  // the first section sits under the tabs with no rule above it
+  first = false,
 }: {
   title: string;
   children: ReactNode;
+  first?: boolean;
 }) => (
-  <View className="gap-3">
-    <Text className="font-brand pr-1 text-[20px] tracking-[1px] text-ink uppercase">
-      {title}
-    </Text>
+  <View className={`gap-3 ${first ? "" : "border-t-[1.5px] border-line pt-6"}`}>
+    <H2>{title}</H2>
     {children}
   </View>
 );
@@ -51,12 +51,11 @@ export function Radios<T extends string>({
   onChange: (v: T) => void;
   label: string;
 }) {
-  const c = useColors();
   return (
     <View
       accessibilityRole="radiogroup"
       accessibilityLabel={label}
-      className="rounded-[4px] border-[1.5px] border-line-soft"
+      className="overflow-hidden rounded-[14px] border border-line-soft bg-card"
     >
       {options.map((o, i) => {
         const on = o.value === value;
@@ -80,7 +79,6 @@ export function Radios<T extends string>({
             >
               {o.label}
             </Text>
-            {on ? <CheckIcon color={c.accent} width={16} height={16} /> : null}
           </Pressable>
         );
       })}

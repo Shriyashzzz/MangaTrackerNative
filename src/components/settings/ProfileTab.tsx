@@ -110,10 +110,16 @@ export default function ProfileTab({
 
   return (
     <View className="gap-7">
-      <Text className="font-display text-[26px] text-ink">
-        {account.displayName || account.defaultName}
-      </Text>
-      <Section title="Your name">
+      <View className="flex-row items-center gap-3">
+        <Avatar id={account.avatar} size={52} />
+        <Text
+          numberOfLines={2}
+          className="min-w-0 flex-1 font-brand pr-2 text-[26px] leading-[30px] tracking-[1px] text-ink uppercase"
+        >
+          {account.displayName || account.defaultName}
+        </Text>
+      </View>
+      <Section first title="Your name">
         <Input
           value={name}
           maxLength={40}
@@ -163,9 +169,13 @@ export default function ProfileTab({
                 accessibilityRole="radio"
                 accessibilityState={{ checked: on }}
                 accessibilityLabel={avatar.label}
-                className="w-[30%] items-center gap-1"
+                className="w-[30%] items-center gap-1.5"
               >
-                <Avatar id={avatar.id} size={72} border={on ? 3 : 2} />
+                <View
+                  className={`rounded-full border-2 p-[3px] ${on ? "border-accent" : "border-transparent"}`}
+                >
+                  <Avatar id={avatar.id} size={68} />
+                </View>
                 <Text
                   numberOfLines={1}
                   className={`text-center text-[12.5px] ${on ? "font-body-semibold text-ink" : "font-body text-ink-soft"}`}
