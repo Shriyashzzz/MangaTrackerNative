@@ -37,7 +37,7 @@ const SIDE = 12;
 const AT_THE_FOOT = new Set(["scan", "gaps", "gaps-open"]);
 
 export default function Tour({ signedIn }: { signedIn: boolean }) {
-  const { steps, at, hidden, box, hide } = useTour();
+  const { steps, at, hidden, box: found, hide } = useTour();
   const here = usePathname();
   const insets = useSafeAreaInsets();
   const { height: screen, width } = useWindowDimensions();
@@ -92,6 +92,19 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
       </View>
     );
 
+  // A step about the New tab points at the tab itself, in the bar along
+  // the foot: the middle one of the three
+  const aboutNewTab =
+    step.tab === "new" &&
+    (step.target === "tab-new" || step.target === "shelf");
+  const box = aboutNewTab
+    ? {
+        x: width / 3,
+        width: width / 3,
+        y: screen - insets.bottom - 62,
+        height: 62,
+      }
+    : found;
   // Where the bubble goes: under the thing he points at, with its tail up;
   // over it, tail down, when there's no room under; at the foot, with no
   // tail, when there's nothing to point at (or it's too tall for either)
@@ -184,13 +197,17 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
   );
 }
 
-// Kenji's line, with the two places where the website's words don't fit
-// the app: there's no "Hide Kenji" button here (it's the ✕ on his bubble),
+// Kenji's line, with the few places where the website's words don't fit
+// the app or read badly on a phone: there's no "Hide Kenji" button here (it's the ✕ on his bubble),
 // Berserk's page is told top to bottom, so "Let's open one" isn't how its
 // last step starts, and the app doesn't say what it costs
 const wordsFor = (said: string) =>
   said
     .replace("Tap Hide Kenji to", "Tap the ✕ on this bubble to")
+    .replace(
+      "Import your list, under your avatar at the top right, brings yours over in one go.",
+      "To bring your own list in, tap your picture at the top right and pick Import your list.",
+    )
     .replace(
       "Let's open one: Berserk, collected in Deluxe.",
       "This is Berserk.",

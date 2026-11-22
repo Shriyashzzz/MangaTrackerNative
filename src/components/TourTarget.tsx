@@ -54,10 +54,18 @@ export default function TourTarget({
           const roomUnder = y + height + BUBBLE <= screen - FOOT;
           const roomOver = y - BUBBLE >= HEADER;
           // already where it can be seen with Kenji beside it: left alone
-          if (inSight && (roomUnder || roomOver)) return found();
+          if (inSight && (roomUnder || roomOver)) {
+            found();
+            // (and once more: a page still laying itself out moves things)
+            settle = setTimeout(found, SETTLE_MS * 2);
+            return;
+          }
           const tall = height > screen * 0.35;
           scrollTourBy(y - screen * (tall ? TALL_SITS_AT : SIT_AT));
-          settle = setTimeout(found, SETTLE_MS);
+          settle = setTimeout(() => {
+            found();
+            settle = setTimeout(found, SETTLE_MS * 2);
+          }, SETTLE_MS);
         },
       );
     }, SETTLE_MS);

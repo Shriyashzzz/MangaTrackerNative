@@ -43,9 +43,15 @@ type TabId = (typeof TABS)[number]["id"];
 export default function SettingsScreen() {
   const c = useColors();
   const params = useLocalSearchParams<{ tab?: string; at?: string }>();
-  const [tab, setTab] = useState<TabId>(
-    TABS.some((t) => t.id === params.tab) ? (params.tab as TabId) : "profile",
-  );
+  // the tab a link asked for, until they pick one here. A new link to this
+  // page while it's open (Kenji's tour moving from one tab's step to
+  // another's) is followed too
+  const fromLink: TabId = TABS.some((t) => t.id === params.tab)
+    ? (params.tab as TabId)
+    : "profile";
+  const [picked, setPicked] = useState({ tab: fromLink, link: params.tab });
+  const tab = picked.link === params.tab ? picked.tab : fromLink;
+  const setTab = (to: TabId) => setPicked({ tab: to, link: params.tab });
   // where each tab sits in the bar, so the underline can slide to it
   const [spots, setSpots] = useState<
     Record<string, { x: number; width: number }>
