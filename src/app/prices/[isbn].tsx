@@ -4,6 +4,7 @@
 // Canada's), the box-set note, more places to look, the price history,
 // about the series, readers' reviews, and the volumes beside it. Every rule
 // is the web's (core volumePageRules, offerLabels, useVolumeLoad)
+import { useShelf } from "@/store/shelf";
 import { useTourScroll } from "@/lib/tourScroll";
 import TourTarget from "@/components/TourTarget";
 import { coverAt, isNotACover } from "@/lib/coverAt";
@@ -95,6 +96,10 @@ export default function PriceVolumeScreen() {
   const scroller = useRef<ComponentRef<typeof ScrollView>>(null);
   useTourScroll(scroller, pull.top);
   const [coverGone, setCoverGone] = useState(false);
+  const seriesName = page.data?.series.name;
+  const shelfCover = useShelf(
+    (state) => state.manga?.find((m) => m.name === seriesName)?.image,
+  );
   const loadedBook = page.data?.book ?? null;
   const canada = useCanadaPrices(
     country === "ca" ? (loadedBook?.isbn13 ?? null) : null,
@@ -185,6 +190,9 @@ export default function PriceVolumeScreen() {
   } = page.data;
   const seriesLabel = series.info?.name ?? series.name;
   const noCover = !book.coverUrl || coverGone;
+  // what stands in then: the series' cover, or the one on their own shelf
+  // (a series the price pages know nothing more about still has that)
+  const standIn = series.info?.coverUrl ?? shelfCover ?? null;
   const shownSeries = novelParts(seriesLabel).title;
   const shownBook = novelParts(page.data.heading ?? book.title);
   const inCanada = country === "ca";
@@ -277,9 +285,9 @@ export default function PriceVolumeScreen() {
                 justifyContent: "center",
               }}
             >
-              {noCover && series.info?.coverUrl ? (
+              {noCover && standIn ? (
                 <Image
-                  source={{ uri: coverSrc(series.info.coverUrl) }}
+                  source={{ uri: coverSrc(standIn) }}
                   style={{
                     position: "absolute",
                     width: "100%",
