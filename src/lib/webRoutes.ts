@@ -17,6 +17,9 @@ export function hrefOf(webPath: string): Href | null {
   if (volume) return `/prices/${volume[1]}`;
   const series = path!.match(/^\/details\/(\d+)$/);
   if (series) return `/details/${series[1]}`;
+  // the New tab and To buy (an alert for several things at once opens New)
+  if (path === "/new-releases") return "/new";
+  if (path === "/to-buy") return "/to-buy";
   if (path === "/after-the-anime") return "/after-anime";
   const show = path!.match(/^\/after-the-anime\/([^/]+)$/);
   if (show)

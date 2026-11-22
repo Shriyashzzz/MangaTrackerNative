@@ -42,6 +42,7 @@ import {
 import { runsText } from "@/core/lib/volumeRuns";
 import { releaseDay } from "@/core/pages/Prices/volumePageRules";
 import { useColors } from "@/lib/colors";
+import { phoneAlertsOn } from "@/lib/phoneAlerts";
 import { usePrefs } from "@/store/prefs";
 import { useShelf } from "@/store/shelf";
 import { useToBuy } from "@/store/toBuy";
@@ -165,6 +166,16 @@ function SumCell({
   );
 }
 
+// "25", "25.5" or "$25.00" as cents; null for what isn't a price we can
+// watch for (the server takes a cent up to a thousand dollars)
+function centsOf(typed: string) {
+  const amount = Number(typed.replace(/[^0-9.]/g, ""));
+  const cents = Math.round(amount * 100);
+  return Number.isFinite(cents) && cents >= 1 && cents <= 100_000
+    ? cents
+    : null;
+}
+
 // the cheaper of a book's two prices, and the other one
 function pricesOf(item: ToBuyItem) {
   const both = [
@@ -206,6 +217,7 @@ function Ticket({
   onOrdered,
   onRemove,
   onNote,
+  onAlert,
   move,
 }: {
   item: ToBuyItem;
@@ -215,6 +227,8 @@ function Ticket({
   onOrdered: () => void;
   onRemove: () => void;
   onNote: () => void;
+  // the price to be told at: set, changed or taken off
+  onAlert: () => void;
   // "My order" is showing: the ways up and down (null at an end)
   move: { up: (() => void) | null; down: (() => void) | null } | null;
 }) {
@@ -305,25 +319,46 @@ function Ticket({
                 ? `no ${best.kind === "new" ? "used" : "new"} price yet`
                 : "No price yet"}
           </Text>
-          {/* their own note on it: the words, or the way to add some */}
-          <Tap
-            onPress={onNote}
-            hitSlop={6}
-            className="self-start pt-0.5"
-            accessibilityLabel={
-              item.note ? `Note: ${item.note}. Change` : "Add a note"
-            }
-          >
-            {item.note ? (
-              <Text className="font-display-italic text-[14.5px] leading-[20px] text-ink">
-                “{item.note}”
-              </Text>
-            ) : (
-              <Text className="font-body text-[13.5px] text-muted">
-                + Add a note
-              </Text>
-            )}
-          </Tap>
+          {/* theirs: the note on it and the price to be told at, or the
+              ways to add them, side by side while both are short */}
+          <View className="flex-row flex-wrap items-baseline gap-x-4 gap-y-1 pt-0.5">
+            <Tap
+              onPress={onNote}
+              hitSlop={6}
+              accessibilityLabel={
+                item.note ? `Note: ${item.note}. Change` : "Add a note"
+              }
+            >
+              {item.note ? (
+                <Text className="font-display-italic text-[14.5px] leading-[20px] text-ink">
+                  “{item.note}”
+                </Text>
+              ) : (
+                <Text className="font-body text-[13.5px] text-muted">
+                  + Add a note
+                </Text>
+              )}
+            </Tap>
+            <Tap
+              onPress={onAlert}
+              hitSlop={6}
+              accessibilityLabel={
+                item.alertCents
+                  ? `Alert under ${formatCents(item.alertCents)}. Change`
+                  : "Set a price alert"
+              }
+            >
+              {item.alertCents ? (
+                <Text className="font-mono-medium text-[12.5px] text-accent-ink">
+                  Alert under {formatCents(item.alertCents)}
+                </Text>
+              ) : (
+                <Text className="font-body text-[13.5px] text-muted">
+                  + Price alert
+                </Text>
+              )}
+            </Tap>
+          </View>
         </View>
       </View>
       <DashedLine soft={false} />
@@ -401,6 +436,12 @@ export default function ToBuyScreen() {
   >(null);
   const [sort, setSort] = useState<ListSort>("added");
   const setNoteOf = useToBuy((st) => st.setNote);
+  const setAlertOf = useToBuy((st) => st.setAlert);
+  // the price alert being set, if any: the book and what's typed
+  const [alerting, setAlerting] = useState<{
+    isbn13: string;
+    text: string;
+  } | null>(null);
   const setOrder = useToBuy((st) => st.setOrder);
   // the item whose note is being written, and the words so far
   const [noting, setNoting] = useState<{ isbn13: string; text: string } | null>(
@@ -471,6 +512,16 @@ export default function ToBuyScreen() {
     const isbns = sorted.map((item) => item.isbn13);
     [isbns[at], isbns[to]] = [isbns[to]!, isbns[at]!];
     void setOrder(isbns).catch(() =>
+      Alert.alert("That didn't save. Try again."),
+    );
+  };
+  // the price to be told at: what's typed, in the money's own units
+  const alertCents = alerting ? centsOf(alerting.text) : null;
+  const saveAlert = (cents: number | null) => {
+    if (!alerting) return;
+    const { isbn13 } = alerting;
+    setAlerting(null);
+    void setAlertOf(isbn13, cents).catch(() =>
       Alert.alert("That didn't save. Try again."),
     );
   };
@@ -602,6 +653,14 @@ export default function ToBuyScreen() {
                   onNote={() =>
                     setNoting({ isbn13: item.isbn13, text: item.note ?? "" })
                   }
+                  onAlert={() =>
+                    setAlerting({
+                      isbn13: item.isbn13,
+                      text: item.alertCents
+                        ? (item.alertCents / 100).toFixed(2)
+                        : "",
+                    })
+                  }
                   // their own order: up and down, only while it's the order
                   // shown
                   move={
@@ -635,6 +694,71 @@ export default function ToBuyScreen() {
           <View className="flex-row justify-end gap-3">
             <Button small label="Cancel" onPress={() => setNoting(null)} />
             <Button small kind="primary" label="Save" onPress={saveNote} />
+          </View>
+        </View>
+      </Sheet>
+      <Sheet open={alerting !== null} onClose={() => setAlerting(null)}>
+        <View className="gap-3 pb-4">
+          <H2>Price alert</H2>
+          <Text className="font-body text-[14.5px] leading-[20px] text-ink-soft">
+            An alert on this phone when a copy, new or used, is at or under your
+            price.
+          </Text>
+          <Input
+            value={alerting?.text ?? ""}
+            onChangeText={(text) =>
+              setAlerting((now) => (now ? { ...now, text } : now))
+            }
+            placeholder="25.00"
+            keyboardType="decimal-pad"
+            maxLength={8}
+            autoFocus
+            returnKeyType="done"
+            onSubmitEditing={() => {
+              if (alertCents) saveAlert(alertCents);
+            }}
+          />
+          {phoneAlertsOn() ? null : (
+            <Text className="font-body text-[13.5px] leading-[19px] text-ink-soft">
+              Alerts are off on this phone.{" "}
+              <Text
+                className="font-body-semibold text-ink underline"
+                onPress={() => {
+                  setAlerting(null);
+                  router.push({
+                    pathname: "/settings",
+                    params: { tab: "new-releases" },
+                  });
+                }}
+              >
+                Turn them on
+              </Text>{" "}
+              to be told.
+            </Text>
+          )}
+          <View className="flex-row items-center justify-end gap-3">
+            {sorted.find((item) => item.isbn13 === alerting?.isbn13)
+              ?.alertCents ? (
+              <Tap
+                onPress={() => saveAlert(null)}
+                hitSlop={6}
+                className="mr-auto"
+              >
+                <Text className="font-body text-[14px] text-ink-soft underline">
+                  Remove alert
+                </Text>
+              </Tap>
+            ) : null}
+            <Button small label="Cancel" onPress={() => setAlerting(null)} />
+            <Button
+              small
+              kind="primary"
+              label="Save"
+              disabled={!alertCents}
+              onPress={() => {
+                if (alertCents) saveAlert(alertCents);
+              }}
+            />
           </View>
         </View>
       </Sheet>

@@ -81,10 +81,13 @@ export async function turnOffPhoneAlerts() {
   if (token) await tell("/api/push/device/forget", token).catch(() => {});
 }
 
-// signing out: the server forgets this phone for this account, but the
-// switch stays as they left it, so signing in again brings the alerts back
-// (refreshPhoneAlerts). Never holds the sign-out up: three seconds at most
+// signing out: the server forgets this phone for this account, and the
+// switch goes off, so nobody who signs in next gets alerts they didn't ask
+// for. Never holds the sign-out up: three seconds at most
 export async function forgetThisPhone() {
+  // signing out switches alerts off on this phone: whoever signs in next
+  // (them again, or someone else) turns them on for themselves
+  writeLocal(ON_KEY, "no");
   const token = readLocal(TOKEN_KEY);
   if (!token) return;
   writeLocal(TOKEN_KEY, "");
@@ -102,8 +105,13 @@ export async function refreshPhoneAlerts() {
     const { granted } = await Notifications.getPermissionsAsync();
     if (!granted) return;
     const token = await tokenForThisPhone();
+    const before = readLocal(TOKEN_KEY);
     const res = await tell("/api/push/device", token);
-    if (res.ok) writeLocal(TOKEN_KEY, token);
+    if (!res.ok) return;
+    writeLocal(TOKEN_KEY, token);
+    // the phone was given a new token: the old one is no good, and goes
+    if (before && before !== token)
+      await tell("/api/push/device/forget", before).catch(() => {});
   } catch {
     // the next sign-in or app start tries again
   }
@@ -115,6 +123,9 @@ export function openTappedAlerts() {
   const open = (response: Notifications.NotificationResponse | null) => {
     const url = response?.notification.request.content.data?.url;
     if (typeof url !== "string") return;
+    // opened once: left as "the last one tapped", it would open its page
+    // again the next time this runs (signing out and back in)
+    Notifications.clearLastNotificationResponse();
     openWebPath(url.replace(/^https?:\/\/[^/]+/, "") || "/");
   };
   // the tap that started the app, then any after
