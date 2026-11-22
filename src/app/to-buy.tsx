@@ -241,7 +241,9 @@ export default function ToBuyScreen() {
       </View>
       <DoubleRule />
       <ScrollView
-        contentContainerClassName="gap-4 px-4 pt-4 pb-24"
+        // nothing to list (empty, or it didn't load): Kenji and his line sit
+        // in the middle of the screen, not up under the header
+        contentContainerClassName={`gap-4 px-4 pt-4 pb-24 ${items?.length === 0 || (!items && loadFailed) ? "grow justify-center" : ""}`}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
