@@ -3,12 +3,13 @@
 // a row per series. Pull down to load it again. Volumes is its own view
 // (VolumesView). Who's in each tab, the search and the sort are the web's own
 // rules (core filterShelf); it opens on the tab and sort the account chose
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, Pressable, Text, TextInput, View } from "react-native";
 import Animated, {
   FadeOut,
   LayoutAnimationConfig,
   LinearTransition,
+  useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -145,11 +146,29 @@ export default function ShelfScreen() {
     setRefreshing(false);
   };
   // how far the shelf is scrolled: a pull to refresh starts only from 0
-  const scrollTop = useRef(0);
+  const scrollTop = useSharedValue(0);
   // the + button: 0 in place, 1 slid away under the tab bar
   const fabAway = useSharedValue(0);
-  const fabHidden = useRef(false);
-  const lastY = useRef(0);
+  const fabHidden = useSharedValue(false);
+  const lastY = useSharedValue(0);
+  // on the UI thread: the + leaves as they read down the shelf and comes
+  // back the moment they scroll up, as the Android app's does
+  const onShelfScroll = useAnimatedScrollHandler((e) => {
+    const y = e.contentOffset.y;
+    scrollTop.set(y);
+    const moved = y - lastY.get();
+    if (Math.abs(moved) < 6) return;
+    lastY.set(y);
+    const hide = moved > 0 && y > 40;
+    if (hide === fabHidden.get()) return;
+    fabHidden.set(hide);
+    fabAway.set(withTiming(hide ? 1 : 0, { duration: 200 }));
+  });
+  // "Select several" on a row: Select starts with that row picked
+  const selectFrom = (id: number) => {
+    select.start();
+    select.toggle(id);
+  };
   const fabStyle = useAnimatedStyle(() => ({
     opacity: 1 - fabAway.value,
     transform: [
@@ -268,39 +287,24 @@ export default function ShelfScreen() {
                     trackBy={trackBy}
                     latestChapter={releases[item.id]?.latestChapter}
                     latestVolume={releases[item.id]?.latestVolume}
-                    select={
-                      select.selectOn
-                        ? {
-                            checked: select.picked.has(item.id),
-                            onToggle: () => select.toggle(item.id),
-                          }
-                        : undefined
-                    }
-                    onLongPress={() => {
-                      select.start();
-                      select.toggle(item.id);
-                    }}
+                    selecting={select.selectOn}
+                    checked={select.selectOn && select.picked.has(item.id)}
+                    onToggle={select.toggle}
+                    onSelectSeveral={selectFrom}
                   />
                 </Animated.View>
               )}
               ItemSeparatorComponent={DashedLine}
               // room under the last row for the floating +
               contentContainerClassName="px-4 pb-28"
-              scrollEventThrottle={32}
-              onScroll={(e) => {
-                // the + leaves as they read down the shelf, and comes back
-                // the moment they scroll up, as the Android app's does
-                const y = e.nativeEvent.contentOffset.y;
-                scrollTop.current = y;
-                const moved = y - lastY.current;
-                if (Math.abs(moved) < 6) return;
-                lastY.current = y;
-                const hide = moved > 0 && y > 40;
-                if (hide !== fabHidden.current) {
-                  fabHidden.current = hide;
-                  fabAway.set(withTiming(hide ? 1 : 0, { duration: 200 }));
-                }
-              }}
+              // the first screenful at once, the rest in small batches
+              initialNumToRender={9}
+              maxToRenderPerBatch={8}
+              windowSize={9}
+              // the pull to refresh is the app's own: no system stretch
+              overScrollMode="never"
+              scrollEventThrottle={16}
+              onScroll={onShelfScroll}
               ListEmptyComponent={
                 manga ? (
                   <Text className="pt-6 font-body text-[15px] text-ink-soft">

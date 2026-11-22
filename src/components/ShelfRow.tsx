@@ -13,7 +13,7 @@ import {
 } from "@react-native-menu/menu";
 import * as Haptics from "expo-haptics";
 import { Link, router } from "expo-router";
-import { useRef, useState } from "react";
+import { memo, useRef, useState } from "react";
 import { Alert, Platform, Pressable, Text, View } from "react-native";
 import { useRipple } from "@/lib/press";
 import { useShelf } from "@/store/shelf";
@@ -26,22 +26,33 @@ import { placeText, tracksOf, type TrackBy } from "@/core/lib/reading";
 import type { Manga } from "@/core/lib/types";
 import StarRating from "./StarRating";
 
-export default function ShelfRow({
+// memo'd with plain props: picking one row in Select, or a refresh that
+// changes nothing, redraws only the rows it touches
+export default memo(function ShelfRow({
   manga,
   trackBy,
   latestChapter,
   latestVolume,
-  select,
-  onLongPress,
+  selecting = false,
+  checked = false,
+  onToggle,
+  onSelectSeveral,
 }: {
   manga: Manga;
   trackBy: TrackBy;
   latestChapter?: number | null;
   latestVolume?: number | null;
-  select?: { checked: boolean; onToggle: () => void };
+  // Select is on, and whether this row is picked
+  selecting?: boolean;
+  checked?: boolean;
+  onToggle?: (id: number) => void;
   // "Select several" from the menu
-  onLongPress?: () => void;
+  onSelectSeveral?: (id: number) => void;
 }) {
+  const select = selecting
+    ? { checked, onToggle: () => onToggle?.(manga.id) }
+    : undefined;
+  const onLongPress = () => onSelectSeveral?.(manga.id);
   const c = useColors();
   const ripple = useRipple();
   // Android's menu is opened from the row's own long press (the row takes
@@ -129,7 +140,7 @@ export default function ShelfRow({
   );
   const act = (id: string) => {
     if (id === "edit") router.push(`/edit/${manga.id}`);
-    else if (id === "select") onLongPress?.();
+    else if (id === "select") onLongPress();
     else if (id === "delete") askToDelete(manga);
     else if (id.startsWith("move:"))
       void useShelf
@@ -171,7 +182,7 @@ export default function ShelfRow({
       </Link>
     </MenuView>
   );
-}
+});
 
 type ShelfStatus = "reading" | "finished" | "planned";
 

@@ -6,9 +6,9 @@
 // while the shelf comes back. Now and then it's the comic burst instead
 // ("グイ…" to "ドン!"), never on a first pull and never twice running.
 // No system spinner: the pull is a gesture of the app's own
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Text, View } from "react-native";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { Gesture, GestureDetector, State } from "react-native-gesture-handler";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -20,6 +20,7 @@ import Animated, {
   type SharedValue,
 } from "react-native-reanimated";
 import Svg, { Polygon } from "react-native-svg";
+import { scheduleOnRN, scheduleOnUI } from "react-native-worklets";
 import { useColors } from "@/lib/colors";
 import { readLocal, writeLocal } from "@/lib/deviceStore";
 import Mascot from "./Mascot";
@@ -31,6 +32,9 @@ const MARK = 64;
 const HOLD = 92;
 // the page moves at half the finger's speed, as Android's does
 const DRAG = 0.5;
+// how far down a finger goes before the pull takes the touch: under
+// Android's own 8 point scroll slop, or the list would take it first
+const TAKE = 5;
 const BACK = { duration: 260, easing: Easing.bezier(0.2, 0, 0, 1) };
 
 type Look = "kenji" | "burst";
@@ -243,71 +247,88 @@ export default function PullPage({
   // what the pull asks for again
   refresh: () => Promise<unknown>;
   // how far the list inside is scrolled: a pull only starts from its top
-  scrollTop: { current: number };
+  scrollTop: SharedValue<number>;
   children: ReactNode;
 }) {
+  // the pull runs on the UI thread, so the page stays under the finger even
+  // while React is busy; React only hears when the stage changes
   const pull = useSharedValue(0);
+  const startY = useSharedValue(0);
+  const startX = useSharedValue(0);
+  const pulled = useSharedValue(0);
+  const ready = useSharedValue(false);
+  const running = useSharedValue(false);
   const [stage, setStage] = useState<Stage>("pull");
   const [look, setLook] = useState<Look>("kenji");
-  const [pulling, setPulling] = useState(false);
-  const running = useRef(false);
-  const fromTop = useRef(false);
-  const pulled = useRef(0);
+  const [shown, setShown] = useState(false);
 
-  // the refs below are read and set when a finger moves, never while
-  // rendering: the lint rule can't tell a gesture's callbacks from render
-  /* eslint-disable react-hooks/refs */
+  const begin = () => {
+    setLook(pickLook());
+    setStage("pull");
+    setShown(true);
+  };
+  const hide = () => {
+    setShown(false);
+    setStage("pull");
+  };
+  // the page slides back up, and the gap goes once it has
+  const close = () => {
+    "worklet";
+    pull.set(
+      withTiming(0, BACK, (done) => {
+        if (done) scheduleOnRN(hide);
+      }),
+    );
+  };
+  const run = () => {
+    setStage("busy");
+    refresh()
+      .catch(() => {})
+      .finally(() => {
+        running.set(false);
+        scheduleOnUI(close);
+      });
+  };
+
   const pan = Gesture.Pan()
-    .runOnJS(true)
-    // a clear drag down takes it; sideways or up is the list's own
-    .activeOffsetY(10)
-    .failOffsetX([-24, 24])
-    .onBegin(() => {
-      fromTop.current = scrollTop.current <= 0 && !running.current;
-      pulled.current = 0;
+    // it takes the touch only for a pull down from the very top; any other
+    // drag stays the list's own scroll
+    .manualActivation(true)
+    .onTouchesDown((e) => {
+      startY.set(e.allTouches[0]?.absoluteY ?? 0);
+      startX.set(e.allTouches[0]?.absoluteX ?? 0);
+    })
+    .onTouchesMove((e, manager) => {
+      const touch = e.allTouches[0];
+      if (!touch || e.state === State.ACTIVE) return;
+      const down = touch.absoluteY - startY.get();
+      const across = Math.abs(touch.absoluteX - startX.get());
+      if (scrollTop.get() > 0 || running.get() || down < -TAKE || across > 24)
+        manager.fail();
+      else if (down > TAKE) manager.activate();
+    })
+    .onStart(() => {
+      pulled.set(0);
+      ready.set(false);
+      scheduleOnRN(begin);
     })
     .onUpdate((e) => {
-      if (!fromTop.current) return;
-      // scrolled meanwhile: the pull is off
-      if (scrollTop.current > 0) {
-        fromTop.current = false;
-        pull.set(withTiming(0, BACK));
-        setPulling(false);
-        return;
+      const now = Math.max(0, e.translationY) * DRAG;
+      pulled.set(now);
+      const at = Math.min(now, MOST);
+      pull.set(at);
+      const isReady = at >= MARK;
+      if (isReady !== ready.get()) {
+        ready.set(isReady);
+        scheduleOnRN(setStage, isReady ? "ready" : "pull");
       }
-      const was = pulled.current;
-      pulled.current = Math.max(0, e.translationY) * DRAG;
-      if (was <= 0 && pulled.current > 0) {
-        setLook(pickLook());
-        setPulling(true);
-      }
-      const shown = Math.min(pulled.current, MOST);
-      pull.set(shown);
-      setStage(shown >= MARK ? "ready" : "pull");
     })
     .onEnd(() => {
-      if (!fromTop.current) return;
-      fromTop.current = false;
-      if (pulled.current < MARK) {
-        pull.set(withTiming(0, BACK));
-        setPulling(false);
-        setStage("pull");
-        return;
-      }
-      running.current = true;
-      setStage("busy");
+      if (pulled.get() < MARK) return close();
+      running.set(true);
       pull.set(withTiming(HOLD, BACK));
-      refresh()
-        .catch(() => {})
-        .finally(() => {
-          running.current = false;
-          pull.set(withTiming(0, BACK));
-          setPulling(false);
-          setStage("pull");
-        });
+      scheduleOnRN(run);
     });
-
-  /* eslint-enable react-hooks/refs */
 
   // the page moves down after the finger
   const moved = useAnimatedStyle(() => ({
@@ -316,9 +337,7 @@ export default function PullPage({
   return (
     <GestureDetector gesture={pan}>
       <View className="flex-1">
-        {pulling || stage === "busy" ? (
-          <Zone pull={pull} stage={stage} look={look} />
-        ) : null}
+        {shown ? <Zone pull={pull} stage={stage} look={look} /> : null}
         <Animated.View style={[{ flex: 1 }, moved]}>{children}</Animated.View>
       </View>
     </GestureDetector>

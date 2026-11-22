@@ -27,7 +27,7 @@ import {
 // room for each ‹ ›, as the web's NAV
 const NAV = 36;
 // a book's padding either side (web .vshelf-page .vshelf-book)
-const GAP = 6;
+const GAP = 3;
 
 export type StripSlots = {
   // a book at full size: thicker than a single volume
