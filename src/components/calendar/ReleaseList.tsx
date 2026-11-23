@@ -67,8 +67,6 @@ export function VolumeCover({
   );
 }
 
-const ROOMY_UP_TO = 3;
-
 export default function ReleaseList({
   volumes,
   limit,
@@ -78,7 +76,6 @@ export default function ReleaseList({
 }) {
   const [all, setAll] = useState(false);
   const shown = !limit || all ? volumes : volumes.slice(0, limit);
-  const roomy = shown.length <= ROOMY_UP_TO;
   return (
     <View>
       {shown.map((v, i) => {
@@ -94,7 +91,9 @@ export default function ReleaseList({
               className="active:opacity-70"
               accessibilityLabel={`${named}: out ${dayName(v.published)}${v.owned ? ", on your shelf" : ""}`}
             >
-              <VolumeCover volume={v} big={roomy} />
+              {/* always the big cover: a row is tall enough for it, and the
+                  cover is what the reader recognises first */}
+              <VolumeCover volume={v} big />
             </Tap>
             {/* the name and volume, and under them the date to save */}
             <View className="min-w-0 flex-1 justify-between gap-2">
@@ -133,9 +132,11 @@ export default function ReleaseList({
                 <Tap
                   onPress={() => router.push(`/prices/${v.isbn13}`)}
                   accessibilityRole="button"
-                  className="min-h-[34px] justify-center rounded-full border-[1.5px] border-ink bg-accent px-3.5"
+                  // an outline, so the date stays the loudest thing in the row
+                  className="min-h-[34px] justify-center rounded-full border-[1.5px] border-accent-ink px-3.5 active:opacity-70"
                 >
-                  <Text className="font-body-semibold text-[14px] text-on-accent">
+                  {/* accent-ink: the accent made readable as text in every look */}
+                  <Text className="font-body-semibold text-[14px] text-accent-ink">
                     Preorder →
                   </Text>
                 </Tap>
