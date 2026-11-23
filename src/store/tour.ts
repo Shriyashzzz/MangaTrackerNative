@@ -78,10 +78,11 @@ type TourState = {
   hide: (hidden: boolean) => void;
 };
 
-// One step the website's tour doesn't have: the phone's alerts, said after
-// the last step about New (what they're alerts of)
+// One step the website's tour doesn't have: the phone's alerts, said right
+// after the first step about New (what they're alerts of), so the two about
+// New go together and What's coming (Upcoming releases) follows them
 function withAlerts(steps: TourStep[]): TourStep[] {
-  const last = steps.findLastIndex((step) => step.tab === "new");
+  const last = steps.findIndex((step) => step.tab === "new");
   if (last < 0) return steps;
   const alerts: TourStep = {
     path: "/shelf",
