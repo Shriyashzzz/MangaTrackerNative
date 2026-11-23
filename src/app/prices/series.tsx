@@ -266,7 +266,8 @@ export default function PriceSeriesScreen() {
                   <SeriesCover
                     name={named.title}
                     lightNovel={named.lightNovel}
-                    url={volumes[0]?.coverUrl ?? info?.coverUrl}
+                    url={volumes[0]?.coverUrl || info?.coverUrl}
+                    fallbackUrl={info?.coverUrl}
                     width={94}
                     border={2}
                   />

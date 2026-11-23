@@ -17,6 +17,9 @@ type Props = {
   name: string;
   lightNovel?: boolean;
   url: string | null | undefined;
+  // tried when `url` is missing or doesn't load: the series' own cover
+  // behind a volume's (Mieruko-chan's volume 1 has a link that's dead)
+  fallbackUrl?: string | null;
   // how wide it's drawn, in the screen's points
   width: number;
   // the ink border's width: 1.5 on a row, 2 on a series' page
@@ -27,16 +30,27 @@ export default function SeriesCover({
   name,
   lightNovel,
   url,
+  fallbackUrl,
   width,
   border = 1.5,
 }: Props) {
   const c = useColors();
-  const choices = coverChoices(url, { name: priceName({ name, lightNovel }) });
   const wanted = width * PixelRatio.get();
-  const choice =
-    choices.find((x) => x.width >= wanted) ?? choices[choices.length - 1];
-  const src = coverSrc(choice?.url);
-  const [failed, setFailed] = useState<string | null>(null);
+  // the sharpest size that's enough for this width, of one cover
+  const srcOf = (cover: string | null | undefined) => {
+    if (!cover) return undefined;
+    const choices = coverChoices(cover, {
+      name: priceName({ name, lightNovel }),
+    });
+    const choice =
+      choices.find((x) => x.width >= wanted) ?? choices[choices.length - 1];
+    return coverSrc(choice?.url);
+  };
+  const [failed, setFailed] = useState<string[]>([]);
+  // the first of the two that hasn't failed to load
+  const src = [srcOf(url), srcOf(fallbackUrl)].find(
+    (x) => x && !failed.includes(x),
+  );
   const box = {
     width,
     aspectRatio: 2 / 3,
@@ -48,7 +62,7 @@ export default function SeriesCover({
   // a light novel says so on its cover: told by the caller, or by a name
   // that says it ("Spice and Wolf Light Novel")
   const novel = lightNovel || novelParts(name).lightNovel;
-  const drawn = !src || failed === src;
+  const drawn = !src;
   return (
     <View style={box}>
       {drawn ? (
@@ -59,7 +73,7 @@ export default function SeriesCover({
           style={{ width: "100%", height: "100%" }}
           contentFit="cover"
           transition={180}
-          onError={() => setFailed(src)}
+          onError={() => setFailed((was) => [...was, src])}
         />
       )}
       {novel ? <LightNovelBand width={width} /> : null}
