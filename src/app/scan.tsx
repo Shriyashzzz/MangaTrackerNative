@@ -5,6 +5,7 @@
 // the ISBN works when the camera can't. The phone's camera does the reading
 // (expo-camera), and a buzz says a scan landed; what a scan does to the
 // shelf is the web's own (core lib/scan)
+import { columnStyle } from "@/lib/wide";
 import Tap from "@/components/Tap";
 import { StatusBar } from "expo-status-bar";
 import ScanFrame from "@/components/ScanFrame";
@@ -299,6 +300,7 @@ export default function ScanScreen() {
       <ScrollView
         className="mt-3 flex-1 rounded-t-2xl bg-paper"
         contentContainerClassName="px-4 pt-3 pb-6"
+        contentContainerStyle={columnStyle}
       >
         {!rows.length ? (
           <Text className="py-6 text-center font-body text-[14px] text-muted">

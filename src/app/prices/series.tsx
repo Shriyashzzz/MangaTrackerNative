@@ -5,6 +5,7 @@
 // card with its price, Yours and Next, Not on your shelf to see only the
 // gaps with what they cost. The rules are the web's (core seriesPageRules,
 // finishCost, useSeriesData)
+import { columnStyle } from "@/lib/wide";
 import { useTourScroll } from "@/lib/tourScroll";
 import { todayOf } from "@/core/lib/editionNews";
 import ToBuyBag from "@/components/ToBuyBag";
@@ -241,6 +242,7 @@ export default function PriceSeriesScreen() {
       <ScrollView
         ref={page}
         contentContainerClassName="gap-8 px-4 pt-5 pb-20"
+        contentContainerStyle={columnStyle}
         overScrollMode="never"
         scrollEventThrottle={16}
         onScroll={(e) => {

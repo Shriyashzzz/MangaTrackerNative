@@ -3,6 +3,7 @@
 // on an iPhone, Material's bar on Android), and its words in a scroll. A
 // page that searches gets the header's own search bar. The pieces the
 // content pages are set in: a heading, a paragraph, a list line
+import { columnStyle } from "@/lib/wide";
 import { openOutside } from "@/lib/openOutside";
 import PullPage, { pause, usePullTop } from "@/components/PullRefresh";
 import Backdrop from "@/components/Backdrop";
@@ -86,6 +87,8 @@ export default function Page({
           <ScrollView
             contentInsetAdjustmentBehavior="automatic"
             contentContainerClassName={`gap-6 px-4 pt-5 pb-16 ${center ? "grow justify-center" : ""}`}
+            // on a wide screen, a readable column in the middle (lib/wide.ts)
+            contentContainerStyle={columnStyle}
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode="on-drag"
             overScrollMode="never"

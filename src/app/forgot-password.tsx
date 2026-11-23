@@ -1,6 +1,7 @@
 // Forgot password, as the web's pages/ForgotPassword/ForgotPassword.tsx: the
 // recovery email gets a reset link (it opens the website's reset page, or
 // this app's when the link is set up to open it)
+import { columnStyle } from "@/lib/wide";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Platform, ScrollView, Text, View } from "react-native";
@@ -70,6 +71,7 @@ export default function ForgotPassword() {
         <ScrollView
           keyboardShouldPersistTaps="handled"
           contentContainerClassName="gap-5 px-6 pt-6 pb-10"
+          contentContainerStyle={columnStyle}
         >
           {sentTo ? (
             <>

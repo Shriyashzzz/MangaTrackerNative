@@ -2,6 +2,7 @@
 // ResetPassword/ResetPassword.tsx: the link is checked first, then the
 // password twice. Opened by the link itself (mangatracker://reset-password/
 // <token>, or the website's address once the app is set to open it)
+import { columnStyle } from "@/lib/wide";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { Platform, ScrollView, Text } from "react-native";
@@ -219,6 +220,7 @@ export default function ResetPassword() {
         <ScrollView
           keyboardShouldPersistTaps="handled"
           contentContainerClassName="px-6 pt-6 pb-10"
+          contentContainerStyle={columnStyle}
         >
           {body}
         </ScrollView>

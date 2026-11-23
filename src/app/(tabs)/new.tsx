@@ -5,6 +5,7 @@
 // one, or any far behind, is sorted into piles, each a fan of covers that
 // opens to all of them. Nothing new says why. Who's in, where, and the
 // words are all the web's own (core shelfViews, piles, farBehind, newTabLinks)
+import { columnStyle } from "@/lib/wide";
 import { usePlan } from "@/store/plan";
 import { useTourScroll } from "@/lib/tourScroll";
 import TourTarget from "@/components/TourTarget";
@@ -286,6 +287,7 @@ export default function NewScreen() {
         <ScrollView
           ref={scroller}
           contentContainerClassName="gap-4 px-4 pt-5 pb-10"
+          contentContainerStyle={columnStyle}
           overScrollMode="never"
           scrollEventThrottle={16}
           onScroll={pull.track}

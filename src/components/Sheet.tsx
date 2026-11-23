@@ -6,6 +6,7 @@
 // it: dragging up scrolls, dragging down once at the top closes. Built on
 // @gorhom/bottom-sheet, which does that nested drag the way the system's
 // own sheets do
+import { SHEET, useWide } from "@/lib/wide";
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
@@ -82,6 +83,7 @@ export default function Sheet({
 }) {
   const c = useColors();
   const { height: screen } = useWindowDimensions();
+  const sideInset = useWide().sideFor(SHEET);
   const sheet = useRef<BottomSheetModal>(null);
   const list = useRef<BottomSheetScrollViewMethods>(null);
   // in the tree only while it's up: a closed modal left mounted goes on
@@ -125,6 +127,9 @@ export default function Sheet({
         onClose();
       }}
       backdropComponent={Backdrop}
+      // on a wide screen, a card in the middle rather than a drawer as wide
+      // as the screen (lib/wide.ts)
+      style={sideInset ? { marginHorizontal: sideInset } : undefined}
       backgroundStyle={{
         backgroundColor: c.card,
         borderTopLeftRadius: 28,

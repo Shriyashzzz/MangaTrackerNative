@@ -1,6 +1,7 @@
 // The shelf for someone not signed in (the web's pages/Home/GuestHero.tsx):
 // what a shelf is for, and the two ways in. Prices stay open to them along
 // the bottom
+import { columnStyle } from "@/lib/wide";
 import { startPractice } from "@/lib/practice";
 import Tap from "@/components/Tap";
 import { router } from "expo-router";
@@ -129,6 +130,7 @@ export default function GuestShelf() {
     <ScrollView
       className="flex-1"
       contentContainerClassName="grow justify-center gap-6 px-6 py-8"
+      contentContainerStyle={columnStyle}
     >
       <AuthArt
         sfx="A new series begins!"

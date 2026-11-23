@@ -1,6 +1,7 @@
 // Creating an account, as the web's pages/SignUp/SignUp.tsx: username,
 // password and an optional recovery email, the form's own checks first, then
 // the server's words. The picks a shared shelf gave go on the new shelf
+import { columnStyle } from "@/lib/wide";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Platform, ScrollView, Text, View } from "react-native";
@@ -73,6 +74,7 @@ export default function SignUp() {
         <ScrollView
           keyboardShouldPersistTaps="handled"
           contentContainerClassName="gap-5 px-6 pt-6 pb-10"
+          contentContainerStyle={columnStyle}
         >
           <AuthArt
             sfx="A new series begins!"

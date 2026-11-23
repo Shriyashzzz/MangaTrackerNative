@@ -4,6 +4,7 @@
 // it in), stars, and under "More about it" the volumes they own, the type,
 // genre and notes. The checks and the request are the web's own (core
 // seriesFormRules); AniList's matches come through core useCoverSearch
+import { columnStyle } from "@/lib/wide";
 import { isDemo } from "@/core/lib/demo";
 import TourTarget from "@/components/TourTarget";
 import Tap from "@/components/Tap";
@@ -356,6 +357,7 @@ export default function AddScreen() {
       <KeyboardAwareScrollView
         bottomOffset={24}
         contentContainerClassName="gap-5 px-4 pt-4 pb-16"
+        contentContainerStyle={columnStyle}
         keyboardShouldPersistTaps="handled"
       >
         {!chosen ? (

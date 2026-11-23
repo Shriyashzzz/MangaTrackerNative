@@ -4,6 +4,7 @@
 // Canada's), the box-set note, more places to look, the price history,
 // about the series, readers' reviews, and the volumes beside it. Every rule
 // is the web's (core volumePageRules, offerLabels, useVolumeLoad)
+import { columnStyle } from "@/lib/wide";
 import { useShelf } from "@/store/shelf";
 import { useTourScroll } from "@/lib/tourScroll";
 import TourTarget from "@/components/TourTarget";
@@ -264,6 +265,7 @@ export default function PriceVolumeScreen() {
       <ScrollView
         ref={scroller}
         contentContainerClassName="gap-6 px-4 pt-4 pb-16"
+        contentContainerStyle={columnStyle}
         overScrollMode="never"
         scrollEventThrottle={16}
         onScroll={pull.track}

@@ -5,6 +5,7 @@
 // finished. Edit and Delete are in the ⋮ menu. This file loads the series
 // and saves changes to it; each part of the page is its own component, and
 // every rule is the web's own (core pages/Details, core lib)
+import { columnStyle } from "@/lib/wide";
 import { useTourScroll } from "@/lib/tourScroll";
 import TourTarget from "@/components/TourTarget";
 import Tap from "@/components/Tap";
@@ -505,6 +506,7 @@ export default function DetailsScreen() {
         <ScrollView
           ref={scroller}
           contentContainerClassName="gap-6 px-4 pt-4 pb-16"
+          contentContainerStyle={columnStyle}
           overScrollMode="never"
           scrollEventThrottle={16}
           onScroll={(e) => {

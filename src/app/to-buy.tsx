@@ -2,6 +2,7 @@
 // buy, what they'd cost new and used all together, each with its prices,
 // On my shelf, Ordered and Remove, sorted their way, and Clear list.
 // Marking one theirs whose series isn't on the shelf offers to add it
+import { columnStyle } from "@/lib/wide";
 import { coverAt, isNotACover } from "@/lib/coverAt";
 import Tap from "@/components/Tap";
 import { Input } from "@/components/Field";
@@ -703,6 +704,7 @@ export default function ToBuyScreen() {
           // nothing to list (empty, or it didn't load): Kenji and his line sit
           // in the middle of the screen, not up under the header
           contentContainerStyle={{
+            ...columnStyle,
             gap: 16,
             paddingHorizontal: 16,
             paddingTop: 16,

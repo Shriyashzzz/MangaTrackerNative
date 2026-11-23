@@ -3,6 +3,7 @@
 // a row per series. Pull down to load it again. Volumes is its own view
 // (VolumesView). Who's in each tab, the search and the sort are the web's own
 // rules (core filterShelf); it opens on the tab and sort the account chose
+import { columnStyle } from "@/lib/wide";
 import TourTarget from "@/components/TourTarget";
 import { useTour } from "@/store/tour";
 import Tap from "@/components/Tap";
@@ -319,6 +320,7 @@ function SignedInShelf() {
               ItemSeparatorComponent={DashedLine}
               // room under the last row for the floating +
               contentContainerClassName="px-4 pb-28"
+              contentContainerStyle={columnStyle}
               // the first screenful at once, the rest in small batches
               initialNumToRender={9}
               maxToRenderPerBatch={8}

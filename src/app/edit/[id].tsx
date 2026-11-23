@@ -3,6 +3,7 @@
 // volumes they own on the spine picker (an edition's books, for a collector
 // of one). The checks and the request are the web's own (core
 // seriesFormRules)
+import { columnStyle } from "@/lib/wide";
 import Tap from "@/components/Tap";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
@@ -218,6 +219,7 @@ export default function EditScreen() {
         <KeyboardAwareScrollView
           bottomOffset={24}
           contentContainerClassName="gap-5 px-4 pt-4 pb-16"
+          contentContainerStyle={columnStyle}
           keyboardShouldPersistTaps="handled"
         >
           <Text className="font-body text-[14.5px] text-ink-soft">

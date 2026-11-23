@@ -5,6 +5,7 @@
 // gap; a tap on the bar moves it there), and what finishing it costs.
 // One series is open at a time, so its shelf (useSeriesShelf) lives here and
 // a slide's Undo sits at the foot of the screen
+import { columnStyle } from "@/lib/wide";
 import TourTarget from "./TourTarget";
 import { useTourScroll } from "@/lib/tourScroll";
 import { useTour } from "@/store/tour";
@@ -116,6 +117,7 @@ export default function VolumesView({
         extraData={[open, shelf, jump, tools]}
         ItemSeparatorComponent={DashedLine}
         contentContainerClassName="px-4 pt-3 pb-24"
+        contentContainerStyle={columnStyle}
         // the shelf tab's pull to refresh is around this list: it's told
         // how far this one is scrolled
         overScrollMode="never"

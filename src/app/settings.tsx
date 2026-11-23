@@ -3,6 +3,7 @@
 // (light or dark), New releases, Your shelf, Prices, Account (email, the
 // weekly email, alerts, export, delete). Every setting is saved on the
 // account (store/prefs save, the web's savePrefs; store/account)
+import { columnStyle } from "@/lib/wide";
 import { useTourScroll } from "@/lib/tourScroll";
 import Tap from "@/components/Tap";
 import PullPage, { usePullTop } from "@/components/PullRefresh";
@@ -158,6 +159,7 @@ export default function SettingsScreen() {
         <ScrollView
           ref={page}
           contentContainerClassName="gap-7 px-4 pt-5 pb-16"
+          contentContainerStyle={columnStyle}
           keyboardShouldPersistTaps="handled"
           overScrollMode="never"
           scrollEventThrottle={16}

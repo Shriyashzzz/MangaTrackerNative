@@ -4,6 +4,7 @@
 // and the highlights: Popular this season, Latest deals, Prices
 // just checked. A search lists the series found, with Did you mean for a
 // typo. The rules are the web's (core findSeries, nearMatches, askedEdition)
+import { columnStyle } from "@/lib/wide";
 import Tap from "@/components/Tap";
 import PullPage, { pause, usePullTop } from "@/components/PullRefresh";
 import Backdrop from "@/components/Backdrop";
@@ -250,6 +251,7 @@ export default function PricesScreen() {
         <ScrollView
           keyboardShouldPersistTaps="handled"
           contentContainerClassName="px-4 pb-10"
+          contentContainerStyle={columnStyle}
         >
           {recent.length ? (
             <View className="gap-1">
@@ -333,6 +335,7 @@ export default function PricesScreen() {
         <ScrollView
           key={asked}
           contentContainerClassName="gap-5 px-4 pt-5 pb-10"
+          contentContainerStyle={columnStyle}
           keyboardShouldPersistTaps="handled"
           overScrollMode="never"
           scrollEventThrottle={16}
