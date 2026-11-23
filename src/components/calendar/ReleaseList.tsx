@@ -1,6 +1,7 @@
 // Upcoming volumes, one a row (the web's components/calendar/ReleaseList.tsx):
 // the day, the cover (the series' with the volume's on top), the name, and
 // Preorder for one not on the shelf yet; each saves to a calendar
+import DrawnCover from "@/components/DrawnCover";
 import { coverAt } from "@/lib/coverAt";
 import LightNovelBand from "@/components/LightNovelBand";
 import Tap from "@/components/Tap";
@@ -33,13 +34,20 @@ export function VolumeCover({
         overflow: "hidden",
       }}
     >
+      {/* behind the volume's own cover (an upcoming one often has none
+          yet): the series' cover, or with none of that either, the drawn
+          one, never an empty box */}
       {volume.seriesCover ? (
         <Image
           source={{ uri: coverSrc(volume.seriesCover) }}
           style={{ position: "absolute", width: "100%", height: "100%" }}
           contentFit="cover"
         />
-      ) : null}
+      ) : (
+        <View style={{ position: "absolute" }}>
+          <DrawnCover title={volume.name} width={w - 3} />
+        </View>
+      )}
       {volume.coverUrl ? (
         <Image
           source={{ uri: coverAt(volume.coverUrl, w) }}
