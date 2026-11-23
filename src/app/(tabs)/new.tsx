@@ -5,6 +5,7 @@
 // one, or any far behind, is sorted into piles, each a fan of covers that
 // opens to all of them. Nothing new says why. Who's in, where, and the
 // words are all the web's own (core shelfViews, piles, farBehind, newTabLinks)
+import { usePlan } from "@/store/plan";
 import { useTourScroll } from "@/lib/tourScroll";
 import TourTarget from "@/components/TourTarget";
 import Tap from "@/components/Tap";
@@ -117,6 +118,8 @@ export default function NewScreen() {
   const [openList, setOpenList] = useState<number | null>(null);
   // the In Japan row tapped: its sheet says where each edition is
   const [japanOf, setJapanOf] = useState<number | null>(null);
+  const japanOpen = usePlan((s) => s.plan.japan);
+  const showCollector = usePlan((s) => s.showCollector);
   const [askingHideAll, setAskingHideAll] = useState(false);
   const pull = usePullTop();
   // (the tour scrolls this page to what Kenji points at)
@@ -330,7 +333,13 @@ export default function NewScreen() {
               count: allFailed ? undefined : kindCounts[k],
             }))}
             value={kind}
-            onChange={pickKind}
+            // In Japan is Collector's where the limits are on: its sheet
+            // says so, and the tab stays where it was
+            onChange={(next) =>
+              next === "japan" && !japanOpen
+                ? showCollector("japan")
+                : pickKind(next)
+            }
           />
           {viewingHidden ? (
             <Text className="font-body text-[14px] text-ink-soft">

@@ -1,6 +1,7 @@
 // Upcoming Releases, as the web's pages/Calendar/Calendar.tsx: every English
 // volume coming out for the shelf, month by month, each month at a glance
 // with its dates to save, the first two open and the rest folded
+import { usePlan } from "@/store/plan";
 import Tap from "@/components/Tap";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
@@ -43,6 +44,30 @@ function Month({ month }: { month: CalendarMonth }) {
 }
 
 export default function CalendarScreen() {
+  const open = usePlan((s) => s.plan.calendar);
+  return open ? <Calendar /> : <CalendarLocked />;
+}
+
+// Where the limits are on and they aren't a Collector: the New tab already
+// shows the next release; the whole calendar is Collector's
+function CalendarLocked() {
+  const showCollector = usePlan((s) => s.showCollector);
+  return (
+    <Page title="Upcoming Releases" center>
+      <P muted>
+        Every upcoming English volume for your shelf, month by month, and saved
+        to your own calendar. Part of Collector.
+      </P>
+      <Button
+        kind="primary"
+        label="See Collector"
+        onPress={() => showCollector("calendar")}
+      />
+    </Page>
+  );
+}
+
+function Calendar() {
   const c = useColors();
   const [months, setMonths] = useState<CalendarMonth[] | null | undefined>();
   const [open, setOpen] = useState<Set<string>>(() => new Set());

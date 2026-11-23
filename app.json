@@ -8,8 +8,9 @@
     "scheme": "mangatracker",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon",
+      "icon": "./assets/images/icon.png",
       "bundleIdentifier": "xyz.mangatracker.app.rn",
+      "appleTeamId": "84JH94RQR3",
       "supportsTablet": false
     },
     "android": {
