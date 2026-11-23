@@ -1,6 +1,7 @@
 // The shelf for someone not signed in (the web's pages/Home/GuestHero.tsx):
 // what a shelf is for, and the two ways in. Prices stay open to them along
 // the bottom
+import { useTabFoot } from "@/lib/tabHeader";
 import { columnStyle } from "@/lib/wide";
 import { startPractice } from "@/lib/practice";
 import Tap from "@/components/Tap";
@@ -20,32 +21,49 @@ import { Modal, ScrollView, Text, View } from "react-native";
 import AuthArt from "./AuthArt";
 import Button from "./Button";
 
-// one panel: the drawing over a caption, its shout inked across a corner
-function Panel({
-  shout,
-  caption,
-  children,
+// what a shelf does, as four stamps lettered at a slant, each in its own ink
+const STAMPS = [
+  {
+    label: "Keep your place",
+    box: "bg-accent",
+    text: "text-on-accent",
+    tilt: -3,
+  },
+  { label: "Track what you own", box: "bg-ink", text: "text-paper", tilt: 2 },
+  {
+    label: "See what's out",
+    box: "bg-award-market",
+    text: "text-ink",
+    tilt: -2,
+  },
+  {
+    label: "And what it costs",
+    box: "bg-award-set",
+    text: "text-on-award-set",
+    tilt: 3,
+  },
+];
+
+// a practice shelf's button inside Kenji's bubble, drawn like a panel
+function TourButton({
+  label,
+  onPress,
 }: {
-  shout: string;
-  caption: string;
-  children: ReactNode;
+  label: string;
+  onPress: () => void;
 }) {
   return (
-    <View className="min-w-[46%] flex-1 overflow-hidden rounded-[4px] border-[1.5px] border-line bg-card">
-      <View className="h-[72px] items-center justify-end bg-paper-2 px-2.5 pb-2">
-        {children}
-      </View>
-      <Text
-        className="absolute top-1 right-1 bg-accent px-1.5 font-brand pr-[4px] text-[12px] tracking-[0.5px] text-on-accent uppercase"
-        style={{ transform: [{ rotate: "4deg" }] }}
-      >
-        {shout}
+    <Tap
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`Tour a ${label.toLowerCase()}'s practice shelf`}
+      className="flex-1 items-center rounded-[10px] border-2 border-line bg-paper-2 py-2"
+    >
+      <Text className="font-brand pr-[4px] text-[17px] tracking-[0.5px] text-ink uppercase">
+        {label}
         {"\u00A0"}
       </Text>
-      <Text className="border-t-[1.5px] border-line px-2 py-1.5 text-center font-body-medium text-[13px] text-ink">
-        {caption}
-      </Text>
-    </View>
+    </Tap>
   );
 }
 
@@ -117,6 +135,7 @@ function StockingShelf() {
 }
 
 export default function GuestShelf() {
+  const foot = useTabFoot(120);
   // pressed: the loader shows first, then the shelf is put together (the
   // work would otherwise hold the press's own frame back)
   const [starting, setStarting] = useState(false);
@@ -129,101 +148,112 @@ export default function GuestShelf() {
   return (
     <ScrollView
       className="flex-1"
-      contentContainerClassName="grow justify-center gap-6 px-6 pt-8"
-      // room under the last line (About, Questions, Privacy) for the tab
-      // bar that floats over the foot of the screen, and iOS's own inset
-      // for it as well
-      contentContainerStyle={{ ...columnStyle, paddingBottom: 120 }}
-      contentInsetAdjustmentBehavior="automatic"
+      contentContainerClassName="grow justify-center gap-6 px-4 pt-4"
+      // room under the last line (About, Questions, Privacy), clear of the
+      // tab bar
+      contentContainerStyle={{ ...columnStyle, paddingBottom: foot }}
     >
-      <AuthArt
-        sfx="A new series begins!"
-        chapter="1"
-        line="Your shelf lives here once you sign up."
-      />
-      {/* what a shelf does, as four panels of a manga page (the web's
-          GuestHero): a drawing, a shout, and a caption each */}
-      <View
-        className="flex-row flex-wrap gap-2"
-        accessibilityLabel="Keep your place in every series, track the volumes you own, and see when the next one is out and what it costs."
-      >
-        <Panel shout="Bookmarked!" caption="Keep your place">
-          <View className="flex-row items-baseline gap-1">
-            <Text className="font-brand pr-[4px] text-[15px] text-ink">
-              ch.
-              {"\u00A0"}
-            </Text>
-            <Text className="font-brand pr-[7px] text-[28px] leading-[34px] text-ink">
-              374
-              {"\u00A0"}
+      {starting ? <StockingShelf /> : null}
+      {/* the whole welcome as volume one: an inked box with a spine */}
+      <View className="flex-row overflow-hidden rounded-[14px] border-2 border-line bg-card">
+        <View
+          accessible={false}
+          importantForAccessibility="no-hide-descendants"
+          className="w-[34px] items-center justify-end bg-ink pb-3.5"
+        >
+          {/* the spine's title, read from the top down */}
+          <View
+            className="absolute top-[78px] w-[140px] items-center"
+            style={{ left: -53, transform: [{ rotate: "90deg" }] }}
+          >
+            <Text className="font-brand pr-[3px] text-[13px] tracking-[2px] text-paper uppercase">
+              Manga Tracker{"\u00A0"}
             </Text>
           </View>
-        </Panel>
-        <Panel shout="Mine!" caption="Track what you own">
-          <View className="flex-row items-end gap-[3px]">
-            {[true, true, true, false, true, false].map((owned, i) => (
+          <View className="w-[26px] items-center rounded-[3px] bg-award-market pt-[3px]">
+            <Text className="font-brand pr-[2px] text-[18px] text-ink">
+              1{"\u00A0"}
+            </Text>
+          </View>
+        </View>
+        <View className="flex-1 gap-3.5 p-3.5">
+          <AuthArt
+            compact
+            sfx="A new series begins!"
+            chapter="1"
+            line="Your shelf lives here once you sign up."
+          />
+          <View
+            className="flex-row flex-wrap gap-x-1.5 gap-y-2"
+            accessibilityLabel="Keep your place in every series, track the volumes you own, and see what's out and what it costs."
+          >
+            {STAMPS.map((stamp) => (
               <View
-                key={i}
-                className={`w-[11px] ${owned ? "h-[30px] bg-ink" : "h-[24px] border-[1.5px] border-dashed border-muted"}`}
-              />
+                key={stamp.label}
+                className={`border-2 border-line px-2 pt-[3px] ${stamp.box}`}
+                style={{ transform: [{ rotate: `${stamp.tilt}deg` }] }}
+              >
+                <Text
+                  className={`font-brand pr-[3px] text-[15px] tracking-[0.5px] uppercase ${stamp.text}`}
+                >
+                  {stamp.label}
+                  {"\u00A0"}
+                </Text>
+              </View>
             ))}
           </View>
-        </Panel>
-        <Panel shout="It's out!" caption="See what's out">
-          <Text className="font-brand pr-[6px] text-[24px] leading-[30px] text-ink">
-            Vol. 114
-            {"\u00A0"}
+          {/* Kenji offers the tour: the practice shelves, nothing kept */}
+          <View className="flex-row items-end gap-1.5">
+            <View style={{ marginBottom: -2 }}>
+              <Mascot mood="happy" width={72} />
+            </View>
+            <View className="mb-5 flex-1 rounded-[18px] border-2 border-line bg-card px-2.5 pt-2.5 pb-2.5">
+              <Text className="font-brand pr-[4px] text-[21px] leading-[23px] tracking-[0.5px] text-ink uppercase">
+                Want the tour first?{"\u00A0"}
+              </Text>
+              <Text className="mt-0.5 mb-2 font-body text-[12.5px] leading-[17px] text-ink-soft">
+                I&apos;ll walk you round a practice shelf.
+              </Text>
+              <View className="flex-row gap-1.5">
+                <TourButton label="Reader" onPress={() => start("reader")} />
+                <TourButton
+                  label="Collector"
+                  onPress={() => start("collector")}
+                />
+              </View>
+              {/* the bubble's tail, pointing at him */}
+              <View
+                className="absolute h-[18px] w-[18px] border-b-2 border-l-2 border-line bg-card"
+                style={{
+                  left: -10,
+                  bottom: 18,
+                  transform: [{ rotate: "45deg" }],
+                }}
+              />
+            </View>
+          </View>
+          <Text className="text-center font-display text-[14.5px] text-ink">
+            Or keep your own shelf from day one.
           </Text>
-        </Panel>
-        <Panel shout="Deal!" caption="And what it costs">
-          <Text className="font-mono-medium text-[20px] text-ink">
-            $9.58{" "}
-            <Text className="font-mono text-[12.5px] text-muted line-through">
-              $10.79
+          <Button
+            kind="primary"
+            label="Start your shelf"
+            wide
+            onPress={() => router.push("/sign-up")}
+          />
+          <Text className="text-center font-body text-[14px] text-ink-soft">
+            Already have a shelf?{"  "}
+            <Text
+              onPress={() => router.push("/sign-in")}
+              accessibilityRole="link"
+              className="font-body-semibold text-accent"
+            >
+              Sign in
             </Text>
           </Text>
-        </Panel>
-      </View>
-      <View className="gap-3">
-        <Button
-          kind="primary"
-          label="Start your shelf"
-          wide
-          onPress={() => router.push("/sign-up")}
-        />
-        <Button
-          kind="secondary"
-          label="Check a price first"
-          wide
-          onPress={() => router.navigate("/prices")}
-        />
-      </View>
-      {/* try it first: the website's practice shelves, with nothing kept */}
-      <View className="gap-2">
-        <Text className="text-center font-body text-[14.5px] text-ink-soft">
-          Or try it first on a practice shelf, no account needed:
-        </Text>
-        {starting ? <StockingShelf /> : null}
-
-        <View className="flex-row gap-2.5">
-          <Button label="A reader's" grow onPress={() => start("reader")} />
-          <Button
-            label="A collector's"
-            grow
-            onPress={() => start("collector")}
-          />
         </View>
       </View>
-      <Text className="text-center font-body text-[14.5px] text-ink-soft">
-        Already have a shelf?{"  "}
-        <Text
-          onPress={() => router.push("/sign-in")}
-          className="font-body-semibold text-accent"
-        >
-          Sign in
-        </Text>
-      </Text>
-      <View className="flex-row justify-center gap-6 border-t border-line-soft pt-4">
+      <View className="flex-row justify-center gap-6">
         {(
           [
             ["About", "/about"],

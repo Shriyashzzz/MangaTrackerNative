@@ -1,12 +1,13 @@
 // The top bar, as the Android app's masthead (web layouts/header): the logo
 // and name, To buy's bag with how many are on the list, and their picture,
 // which opens the menu (SettingsMenu), over a double rule
-import { useColors } from "@/lib/colors";
+
 import { IOS } from "@/lib/tabHeader";
-import { router, Stack } from "expo-router";
+import { Stack } from "expo-router";
 import Tap from "@/components/Tap";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SvgXml } from "react-native-svg";
 import { LOGO_SVG } from "@/core/assets/logo";
 import { useHasYear } from "@/core/lib/year";
@@ -24,7 +25,7 @@ export default function AppHeader({
   title: string;
 }) {
   const isSignedIn = useAuth((s) => s.isSignedIn);
-  const c = useColors();
+  const insets = useSafeAreaInsets();
   const account = useAccount((s) => s.account);
   const loadAccount = useAccount((s) => s.load);
   const hasYear = useHasYear(Boolean(isSignedIn));
@@ -42,7 +43,7 @@ export default function AppHeader({
     />
   );
   // iOS: Apple's bar draws the top (lib/tabHeader.ts). Signed in, the To buy
-  // bag and their picture are its buttons; signed out, Sign in is
+  // bag and their picture are its buttons; signed out, nothing
   if (IOS)
     return (
       <>
@@ -52,8 +53,9 @@ export default function AppHeader({
             // app's style (iOS clipped Bangers in its bar)
             title: "",
             headerTitle: () => null,
-            // signed out: Apple's own text button, with the room and the
-            // press feel a bar button has
+            // signed out the bar would be empty: none, so the page starts
+            // at the top
+            headerShown: Boolean(isSignedIn),
             // Each is its own item in Apple's bar, apart from the other:
             // To buy's bag in its own round button, their picture on its own
             // with no button behind it. Signed out: Apple's text button
@@ -78,17 +80,13 @@ export default function AppHeader({
                       hidesSharedBackground: true,
                     },
                   ]
-                : [
-                    {
-                      type: "button",
-                      label: "Sign in",
-                      onPress: () => router.push("/sign-in"),
-                      tintColor: c.accentInk,
-                      labelStyle: { fontWeight: "600" },
-                    },
-                  ],
+                : // signed out: no Sign in up here. It's on My shelf, and
+                  // wherever something needs an account
+                  [],
           }}
         />
+        {/* signed out, with no bar: room for the status bar only */}
+        {!isSignedIn ? <View style={{ height: insets.top }} /> : null}
         {menu}
       </>
     );
@@ -106,18 +104,7 @@ export default function AppHeader({
           </Text>
         </View>
         {/* the list and the menu are an account's: nothing to open without one */}
-        {/* signed out: Sign in, now that it isn't a tab */}
-        {!isSignedIn ? (
-          <Tap
-            onPress={() => router.push("/sign-in")}
-            hitSlop={8}
-            accessibilityRole="button"
-          >
-            <Text className="font-body-semibold text-[15px] text-accent-ink">
-              Sign in
-            </Text>
-          </Tap>
-        ) : null}
+
         {isSignedIn ? (
           <>
             <ToBuyBag />

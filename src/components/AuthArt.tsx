@@ -11,9 +11,12 @@ export default function AuthArt({
   sfx,
   line,
   chapter,
+  compact = false,
 }: {
   // the big sound effect lettered across the panel
   sfx: string;
+  // smaller lettering and less room, for the art inside a box
+  compact?: boolean;
   // what the speech bubble says
   line: string;
   // a chapter number drawn in the speed lines, if any
@@ -22,7 +25,9 @@ export default function AuthArt({
   const c = useColors();
   return (
     <View className="gap-3 justify-center  ">
-      <View className="overflow-hidden rounded-[14px] border border-line-soft bg-card px-4 py-5">
+      <View
+        className={`overflow-hidden rounded-[14px] border border-line-soft bg-card ${compact ? "px-3 py-3" : "px-4 py-5"}`}
+      >
         {/* the speed lines, thinner towards the middle */}
         <View className="absolute inset-0 justify-around py-3 opacity-60">
           {Array.from({ length: LINES }, (_, i) => (
@@ -46,7 +51,7 @@ export default function AuthArt({
           </Text>
         ) : null}
         <Text
-          className="font-brand pr-[11px] text-[44px] leading-[50px] tracking-[1px] text-ink uppercase"
+          className={`font-brand tracking-[1px] text-ink uppercase ${compact ? "pr-[8px] text-[30px] leading-[35px]" : "pr-[11px] text-[44px] leading-[50px]"}`}
           style={{ transform: [{ rotate: "-2deg" }] }}
         >
           {sfx}
@@ -55,7 +60,11 @@ export default function AuthArt({
       </View>
       {/* the speech bubble */}
       <View className="self-start rounded-[16px] border-2 border-line bg-card px-4 py-2.5 min-w-full flex items items-center">
-        <Text className="font-display text-[16px] text-ink">{line}</Text>
+        <Text
+          className={`font-display text-ink ${compact ? "text-[14.5px]" : "text-[16px]"}`}
+        >
+          {line}
+        </Text>
       </View>
     </View>
   );

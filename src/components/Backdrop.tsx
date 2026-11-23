@@ -19,6 +19,7 @@ import Svg, {
 import type { Background } from "@/core/lib/types";
 import { useColors } from "@/lib/colors";
 import { usePrefs } from "@/store/prefs";
+import { useAuth } from "@/store/auth";
 
 export const BACKGROUNDS: { value: Background; label: string }[] = [
   { value: "sfx", label: "Comic lettering" },
@@ -48,7 +49,10 @@ function isDark(hex: string) {
 export default function Backdrop() {
   const c = useColors();
   const { width, height } = useWindowDimensions();
-  const picked = usePrefs((s) => s.prefs.background ?? DEFAULT_BACKGROUND);
+  const chosen = usePrefs((s) => s.prefs.background ?? DEFAULT_BACKGROUND);
+  // signed out there's no Settings to pick one in: always the panels
+  const signedIn = useAuth((s) => s.isSignedIn);
+  const picked = signedIn ? chosen : "panels";
   const dark = isDark(c.paper);
 
   let drawing = null;
