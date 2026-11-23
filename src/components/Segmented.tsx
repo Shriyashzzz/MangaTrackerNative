@@ -2,10 +2,11 @@
 // (Still reading / Finished it / Want to read, Volumes / Editions, All / New /
 // Used). The picked one's fill slides to it rather than jumping, with the
 // system's selection tick, as the platforms' own segmented controls do
+import { SegmentedControl } from "@expo/ui/community/segmented-control";
 import Tap from "@/components/Tap";
 import * as Haptics from "expo-haptics";
 import { useEffect, useState } from "react";
-import { Text, View, type LayoutChangeEvent } from "react-native";
+import { Platform, Text, View, type LayoutChangeEvent } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -19,7 +20,52 @@ const SLIDE = { damping: 26, stiffness: 320, mass: 0.7 };
 // the track's own padding round the pill (and Android's outline)
 const BORDER = isAndroid ? 1.5 : look.segmentInset;
 
-export default function Segmented<T extends string>({
+// On an iPhone or iPad: Apple's own segmented control, in the app's accent.
+// A count rides in the label ("Volumes 21"), as Apple's control has no
+// badges
+function AppleSegmented<T extends string>({
+  options,
+  value,
+  onChange,
+  label,
+}: {
+  options: readonly { value: T; label: string; count?: number }[];
+  value: T;
+  onChange: (value: T) => void;
+  label: string;
+}) {
+  const c = useColors();
+  const picked = Math.max(
+    0,
+    options.findIndex((o) => o.value === value),
+  );
+  return (
+    <SegmentedControl
+      values={options.map((o) => (o.count ? `${o.label} ${o.count}` : o.label))}
+      selectedIndex={picked}
+      onChange={(e) => {
+        const next = options[e.nativeEvent.selectedSegmentIndex];
+        if (next && next.value !== value) onChange(next.value);
+      }}
+      tintColor={c.card}
+      accessibilityLabel={label}
+      style={{ height: 34 }}
+    />
+  );
+}
+
+export default function Segmented<T extends string>(
+  props: Parameters<typeof DrawnSegmented<T>>[0],
+) {
+  return Platform.OS === "ios" ? (
+    <AppleSegmented {...props} />
+  ) : (
+    <DrawnSegmented {...props} />
+  );
+}
+
+// Android's: the app's own switch, its fill sliding to the one picked
+function DrawnSegmented<T extends string>({
   options,
   value,
   onChange,
