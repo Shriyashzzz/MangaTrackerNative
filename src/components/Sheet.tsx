@@ -6,7 +6,11 @@
 // it: dragging up scrolls, dragging down once at the top closes. Built on
 // @gorhom/bottom-sheet, which does that nested drag the way the system's
 // own sheets do
-import { BottomSheet, Host, RNHostView } from "@expo/ui/swift-ui";
+import { BottomSheet, Group, Host, RNHostView } from "@expo/ui/swift-ui";
+import {
+  presentationBackground,
+  presentationDragIndicator,
+} from "@expo/ui/swift-ui/modifiers";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SHEET, useWide } from "@/lib/wide";
 import {
@@ -111,29 +115,39 @@ function AppleSheet({
         }}
         fitToContents
       >
-        <RNHostView matchContents={{ vertical: true }}>
-          <GestureHandlerRootView
-            // as wide as the sheet Apple draws, never wider (its width is
-            // the host's; only the height follows what's inside)
-            style={{ width: "100%", backgroundColor: c.card }}
-          >
-            <ScrollView
-              style={{ width: "100%", maxHeight: screen * maxHeight }}
-              contentContainerStyle={{
-                ...padding,
-                paddingTop: (padding.paddingTop ?? 0) + 22,
-                ...(fromTheFoot
-                  ? { flexGrow: 1, justifyContent: "flex-end" as const }
-                  : {}),
-              }}
-              keyboardShouldPersistTaps="handled"
-              // short ones don't bounce: they're not lists
-              alwaysBounceVertical={false}
+        {/* the whole sheet in the app's card colour, grab handle and the
+            strip by the home indicator too: no grey edge round the page's
+            own views */}
+        <Group
+          modifiers={[
+            presentationBackground(c.card),
+            presentationDragIndicator("visible"),
+          ]}
+        >
+          <RNHostView matchContents={{ vertical: true }}>
+            <GestureHandlerRootView
+              // as wide as the sheet Apple draws, never wider (its width is
+              // the host's; only the height follows what's inside)
+              style={{ width: "100%", backgroundColor: c.card }}
             >
-              {children}
-            </ScrollView>
-          </GestureHandlerRootView>
-        </RNHostView>
+              <ScrollView
+                style={{ width: "100%", maxHeight: screen * maxHeight }}
+                contentContainerStyle={{
+                  ...padding,
+                  paddingTop: (padding.paddingTop ?? 0) + 22,
+                  ...(fromTheFoot
+                    ? { flexGrow: 1, justifyContent: "flex-end" as const }
+                    : {}),
+                }}
+                keyboardShouldPersistTaps="handled"
+                // short ones don't bounce: they're not lists
+                alwaysBounceVertical={false}
+              >
+                {children}
+              </ScrollView>
+            </GestureHandlerRootView>
+          </RNHostView>
+        </Group>
       </BottomSheet>
     </Host>
   );
