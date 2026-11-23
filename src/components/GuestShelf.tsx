@@ -123,7 +123,7 @@ export default function GuestShelf() {
     setStarting(true);
     // (long enough for the window to open and the books to start bouncing:
     // putting the shelf together holds everything else still)
-    setTimeout(() => startPractice(kind), 650);
+    setTimeout(() => startPractice(kind), 350);
   };
   return (
     <ScrollView

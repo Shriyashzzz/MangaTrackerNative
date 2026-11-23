@@ -123,6 +123,9 @@ function readKeptShelf(): Manga[] | null {
   }
 }
 
+// release answers are shown in batches this far apart (checkReleases)
+const SHOW_EVERY_MS = 400;
+
 export const useShelf = create<ShelfState>()((set, get) => ({
   manga: null,
   failed: null,
@@ -379,8 +382,34 @@ export const useShelf = create<ShelfState>()((set, get) => ({
         set({ releases, outcomes, checkedAt });
       }
       // the ones most likely to have news first (checkOrder)
+      // Answers are shown a few at a time, not one by one: each showing
+      // redraws the shelf, New and the tab bar, and forty of those in a row
+      // (answers kept on the phone, or the practice shelf's, come at once)
+      // held the whole app still for seconds
+      let waiting: {
+        id: number;
+        status: ReleaseStatus | null;
+        outcome: ReleaseOutcome;
+      }[] = [];
+      let later: ReturnType<typeof setTimeout> | undefined;
+      const show = () => {
+        clearTimeout(later);
+        later = undefined;
+        if (!waiting.length) return;
+        const releases = { ...get().releases };
+        const outcomes = { ...get().outcomes };
+        const checkedAt = { ...get().checkedAt };
+        for (const one of waiting) {
+          releases[one.id] = one.status;
+          outcomes[one.id] = one.outcome;
+          checkedAt[one.id] = Date.now();
+        }
+        waiting = [];
+        set({ releases, outcomes, checkedAt });
+      };
       for (const m of checkOrder(get().manga ?? [])) {
         if (m.id in get().releases) continue;
+        if (waiting.some((one) => one.id === m.id)) continue;
         const found = await askAbout(m);
         const outcome: ReleaseOutcome = !found
           ? "failed"
@@ -389,12 +418,15 @@ export const useShelf = create<ShelfState>()((set, get) => ({
             : found.complete
               ? "notFound"
               : "failed";
-        set({
-          releases: { ...get().releases, [m.id]: found?.releaseStatus ?? null },
-          outcomes: { ...get().outcomes, [m.id]: outcome },
-          checkedAt: { ...get().checkedAt, [m.id]: Date.now() },
+        waiting.push({
+          id: m.id,
+          status: found?.releaseStatus ?? null,
+          outcome,
         });
+        // (on a timer, so a slow answer never holds back the ones before it)
+        later ??= setTimeout(show, SHOW_EVERY_MS);
       }
+      show();
     } finally {
       checking = false;
     }
