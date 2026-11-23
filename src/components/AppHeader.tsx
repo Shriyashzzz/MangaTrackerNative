@@ -1,6 +1,7 @@
 // The top bar, as the Android app's masthead (web layouts/header): the logo
 // and name, To buy's bag with how many are on the list, and their picture,
 // which opens the menu (SettingsMenu), over a double rule
+import { useColors } from "@/lib/colors";
 import { IOS } from "@/lib/tabHeader";
 import { router, Stack } from "expo-router";
 import Tap from "@/components/Tap";
@@ -23,6 +24,7 @@ export default function AppHeader({
   title: string;
 }) {
   const isSignedIn = useAuth((s) => s.isSignedIn);
+  const c = useColors();
   const account = useAccount((s) => s.account);
   const loadAccount = useAccount((s) => s.load);
   const hasYear = useHasYear(Boolean(isSignedIn));
@@ -47,6 +49,19 @@ export default function AppHeader({
         <Stack.Screen
           options={{
             title,
+            // signed out: Apple's own text button, with the room and the
+            // press feel a bar button has
+            unstable_headerRightItems: isSignedIn
+              ? undefined
+              : () => [
+                  {
+                    type: "button",
+                    label: "Sign in",
+                    onPress: () => router.push("/sign-in"),
+                    tintColor: c.accentInk,
+                    labelStyle: { fontWeight: "600" },
+                  },
+                ],
             headerRight: () =>
               isSignedIn ? (
                 <View className="flex-row items-center gap-3">
@@ -59,17 +74,7 @@ export default function AppHeader({
                     <Avatar id={account?.avatar} size={32} />
                   </Tap>
                 </View>
-              ) : (
-                <Tap
-                  onPress={() => router.push("/sign-in")}
-                  hitSlop={8}
-                  accessibilityRole="button"
-                >
-                  <Text className="font-body-semibold text-[17px] text-accent-ink">
-                    Sign in
-                  </Text>
-                </Tap>
-              ),
+              ) : null,
           }}
         />
         {menu}
