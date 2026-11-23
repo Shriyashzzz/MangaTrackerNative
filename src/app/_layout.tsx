@@ -33,7 +33,11 @@ import { loadDeviceStore } from "@/lib/deviceStore";
 import OfflineBar from "@/components/OfflineBar";
 import Tour from "@/components/Tour";
 import { forgetAccountData } from "@/lib/forgetAccount";
-import { openTappedAlerts, refreshPhoneAlerts } from "@/lib/phoneAlerts";
+import {
+  askForAlertsOnce,
+  openTappedAlerts,
+  refreshPhoneAlerts,
+} from "@/lib/phoneAlerts";
 import { useAuth } from "@/store/auth";
 import { usePrefs } from "@/store/prefs";
 
@@ -75,7 +79,10 @@ export default function RootLayout() {
   // phone alerts: the token given again once signed in, and a tapped alert
   // opened once the screens are up
   useEffect(() => {
-    if (isSignedIn && storeLoaded) void refreshPhoneAlerts();
+    if (!isSignedIn || !storeLoaded) return;
+    // (asked for once, the first time; after that, kept up to date)
+    askForAlertsOnce();
+    void refreshPhoneAlerts();
   }, [isSignedIn, storeLoaded]);
   // the opening burst, once each time the app starts (components/Intro.tsx)
   const [introOn, setIntroOn] = useState(true);

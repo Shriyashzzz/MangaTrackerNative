@@ -105,6 +105,20 @@ export async function forgetThisPhone() {
 
 // signed in with alerts on from before: the token is given again, in case
 // it changed or the account did. Never asks the phone anything
+// The first time someone is signed in on this phone, they're asked for
+// alerts straight away (Android's own "Allow notifications?"), and a yes
+// turns them on. Asked once: a no, or a switch they've already set by hand,
+// is never asked about again (Settings, New releases has the switch)
+const ASKED_KEY = "phoneAlertsAsked";
+// after the opening screen has gone, so the question lands on the app
+const ASK_AFTER_MS = 1800;
+export function askForAlertsOnce() {
+  if (!projectId || isDemo()) return;
+  if (readLocal(ASKED_KEY) || readLocal(ON_KEY)) return;
+  writeLocal(ASKED_KEY, "yes");
+  setTimeout(() => void turnOnPhoneAlerts(), ASK_AFTER_MS);
+}
+
 export async function refreshPhoneAlerts() {
   // (nor for the practice shelf, which has no account to alert)
   if (!projectId || !phoneAlertsOn() || isDemo()) return;
