@@ -59,6 +59,11 @@ export default function TabsLayout() {
       badgeBackgroundColor={c.accent}
       badgeTextColor={c.onAccent}
       minimizeBehavior="onScrollDown"
+      // On iPad the tabs are a sidebar down the left, as Apple's own iPad
+      // apps have them, rather than a bar floating over the top of the page.
+      // A phone keeps its bar along the foot
+      sidebarAdaptable
+      preferredPlacement="sidebar"
     >
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Icon
