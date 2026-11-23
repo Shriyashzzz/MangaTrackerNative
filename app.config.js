@@ -22,18 +22,22 @@ module.exports = ({ config }) => ({
     // the session cookie stays out of Android's cloud backups
     allowBackup: false,
   },
-  plugins: (config.plugins ?? []).map((plugin) =>
-    Array.isArray(plugin) && plugin[0] === "expo-build-properties"
-      ? [
-          plugin[0],
-          {
-            ...plugin[1],
-            android: {
-              ...plugin[1]?.android,
-              usesCleartextTraffic: !production,
+  plugins: [
+    ...(config.plugins ?? []).map((plugin) =>
+      Array.isArray(plugin) && plugin[0] === "expo-build-properties"
+        ? [
+            plugin[0],
+            {
+              ...plugin[1],
+              android: {
+                ...plugin[1]?.android,
+                usesCleartextTraffic: !production,
+              },
             },
-          },
-        ]
-      : plugin,
-  ),
+          ]
+        : plugin,
+    ),
+    // (so Play offers the app to devices with no camera or portrait screen)
+    "./plugins/optionalHardware",
+  ],
 });

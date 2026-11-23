@@ -24,7 +24,7 @@
       "googleServicesFile": "./firebase/google-services.json",
       "permissions": ["android.permission.CAMERA"],
       "blockedPermissions": ["android.permission.RECORD_AUDIO"],
-      "versionCode": 12
+      "versionCode": 13
     },
     "web": {
       "output": "server",
