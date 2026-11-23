@@ -12,6 +12,15 @@ const PLAY_PACKAGE = "xyz.mangatracker.app";
 
 module.exports = ({ config }) => ({
   ...config,
+  ios: {
+    ...config.ios,
+    // On the App Store the app is xyz.mangatracker.app, as on Play (the
+    // ID its purchases and Sign in with Apple are made out to). The first
+    // release is iPhone only: an iPad runs it in a phone-sized window. The
+    // iPad layout stays in the code for a later release
+    bundleIdentifier: production ? PLAY_PACKAGE : config.ios.bundleIdentifier,
+    supportsTablet: production ? false : config.ios.supportsTablet,
+  },
   android: {
     ...config.android,
     // On Play the app is the same listing the Chrome app had, so a
