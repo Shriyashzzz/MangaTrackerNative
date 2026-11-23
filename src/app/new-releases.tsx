@@ -4,7 +4,8 @@
 import { router } from "expo-router";
 import { Text, View } from "react-native";
 import Mascot from "@/components/Mascot";
-import Page, { Bullet, H2, H3, P, TextLink } from "@/components/Page";
+import DashedLine from "@/components/DashedLine";
+import Page, { Bullet, H2, H3, P, Rule, TextLink } from "@/components/Page";
 import ReleaseControls from "@/components/settings/ReleaseControls";
 import { PILES_FROM } from "@/core/pages/Home/piles";
 import { usePrefs } from "@/store/prefs";
@@ -161,7 +162,7 @@ const QUESTIONS: { ask: string; answer: React.ReactNode }[] = [
 export default function NewReleasesScreen() {
   const checksOn = usePrefs((s) => s.prefs.releaseChecks !== "off");
   return (
-    <Page title="How New works">
+    <Page title="How New works" ruled>
       <View className="flex-row items-center gap-4">
         <View className="min-w-0 flex-1">
           <Text className="font-display text-[22px] leading-[26px] text-ink">
@@ -196,14 +197,21 @@ export default function NewReleasesScreen() {
           </View>
         ))}
       </View>
+      {/* ruled off between its parts, as the Android app's pages are: a line
+          between sections, a quieter dashed one between the questions */}
+      <Rule />
       <View className="gap-4">
-        {QUESTIONS.map((one) => (
-          <View key={one.ask} className="gap-1">
-            <H3>{one.ask}</H3>
-            {one.answer}
+        {QUESTIONS.map((one, i) => (
+          <View key={one.ask} className="gap-4">
+            {i > 0 ? <DashedLine /> : null}
+            <View className="gap-1">
+              <H3>{one.ask}</H3>
+              {one.answer}
+            </View>
           </View>
         ))}
       </View>
+      <Rule />
       <View className="gap-2">
         <H2>A lot of news? It's sorted into piles</H2>
         <P muted>
@@ -211,6 +219,7 @@ export default function NewReleasesScreen() {
           grouped by how far behind you are. "See all" opens a pile.
         </P>
       </View>
+      <Rule />
       <View className="gap-3">
         <H2>Don't like how it works?</H2>
         <P>By default, New shows:</P>

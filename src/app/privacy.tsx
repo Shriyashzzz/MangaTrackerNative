@@ -139,7 +139,7 @@ function Section({
 
 export default function PrivacyScreen() {
   return (
-    <Page title="Privacy policy">
+    <Page title="Privacy policy" ruled>
       <P muted>Updated {UPDATED}</P>
       <P>
         Your shelf is yours. No ads, nothing sold, and only what Manga Tracker

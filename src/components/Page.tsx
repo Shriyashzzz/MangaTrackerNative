@@ -27,6 +27,7 @@ export default function Page({
   scroll = true,
   onRefresh,
   center = false,
+  ruled = false,
 }: {
   title: string;
   children: ReactNode;
@@ -38,6 +39,9 @@ export default function Page({
   onRefresh?: () => Promise<unknown>;
   // nothing to list: what's said sits in the middle of the screen
   center?: boolean;
+  // a line under the title, as the Android app's title bar has: on an
+  // iPhone or iPad, ruled under the large title (Android has its own)
+  ruled?: boolean;
 }) {
   const pull = usePullTop();
   const c = useColors();
@@ -95,6 +99,7 @@ export default function Page({
             scrollEventThrottle={16}
             onScroll={pull.track}
           >
+            {ruled && ios ? <View className="-mt-1 h-px bg-line" /> : null}
             {children}
           </ScrollView>
         </PullPage>
