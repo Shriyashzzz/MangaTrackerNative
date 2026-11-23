@@ -96,8 +96,14 @@ function AppleSheet({
   const { height: screen, width } = useWindowDimensions();
   // a phone's sheet is as wide as the screen; an iPad's is a card in the
   // middle, about this wide
-  const sheetWidth = width >= 700 ? Math.min(width, 580) : width;
+  // On iOS 26 and later a phone's sheet floats in from the screen's sides
+  // by about this much each side
+  const floatsIn =
+    Platform.OS === "ios" && Number(Platform.Version) >= 26 ? 10 : 0;
+  const sheetWidth = width >= 700 ? Math.min(width, 580) : width - floatsIn * 2;
   const padding = paddingOf(contentClassName);
+  // the sheet's width, once laid out
+  const [room, setRoom] = useState(0);
   // closed by a swipe or a tap outside: said once, as a drawn sheet says it
   const closedBy = useRef(false);
   return (
@@ -124,7 +130,12 @@ function AppleSheet({
             presentationDragIndicator("visible"),
           ]}
         >
-          <RNHostView matchContents={{ vertical: true }}>
+          <RNHostView
+            matchContents={{ vertical: true }}
+            // the width Apple gives the sheet (a floating sheet sits in from
+            // the screen's edges): the views inside are laid out to it
+            onLayout={(e) => setRoom(e.nativeEvent.layout.width)}
+          >
             <GestureHandlerRootView
               // as wide as the sheet Apple draws, never wider (its width is
               // the host's; only the height follows what's inside)
@@ -134,7 +145,13 @@ function AppleSheet({
                 style={{ width: "100%", maxHeight: screen * maxHeight }}
                 contentContainerStyle={{
                   ...padding,
+                  // as wide as the sheet and no wider, so long lines wrap
+                  // rather than push the sheet's views past its edge
+                  width: Math.min(room || sheetWidth, sheetWidth),
                   paddingTop: (padding.paddingTop ?? 0) + 22,
+                  // room under the last thing, clear of the sheet's rounded
+                  // foot and the home bar
+                  paddingBottom: (padding.paddingBottom ?? 0) + 18,
                   ...(fromTheFoot
                     ? { flexGrow: 1, justifyContent: "flex-end" as const }
                     : {}),

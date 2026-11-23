@@ -7,6 +7,8 @@
 // (Android and the website, for now) the table is shown without prices.
 // Buying is through Apple and arrives with the iPhone app: until then the
 // button says so rather than pretending
+import { H2 } from "@/components/Page";
+import Mascot from "./Mascot";
 import {
   buy,
   canBuy,
@@ -19,7 +21,6 @@ import {
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { Linking, Text, View } from "react-native";
-import { H2 } from "@/components/Page";
 import Tap from "@/components/Tap";
 import { usePlan, type Counted } from "@/store/plan";
 import Button from "./Button";
@@ -34,15 +35,6 @@ const ROWS: { name: string; free: string; collector: string }[] = [
   { name: "Release calendar", free: "Next one", collector: "Every one" },
   { name: "In Japan", free: "No", collector: "Yes" },
 ];
-
-// why the sheet came up, said first
-const BECAUSE: Record<Counted | "calendar" | "japan", string> = {
-  series: "Your shelf has its 100 series.",
-  scans: "You've used your 80 scans.",
-  priceAlerts: "You're watching 3 prices.",
-  calendar: "The full calendar is part of Collector.",
-  japan: "In Japan is part of Collector.",
-};
 
 // Yearly comes with a week free (Apple's introductory offer, set on the
 // product in App Store Connect); monthly starts straight away
@@ -101,6 +93,116 @@ function Row({
   );
 }
 
+// What Kenji says as the sheet opens: why it opened, or what they have
+function speech(
+  plan: ReturnType<typeof usePlan.getState>["plan"],
+  reason: Counted | "calendar" | "japan" | null,
+) {
+  if (plan.plan === "early")
+    return {
+      shout: "You joined early!",
+      line: "So everything here is yours, free, for good.",
+    };
+  if (plan.plan === "collector")
+    return {
+      shout: "You're a Collector!",
+      line: "Everything here is yours. Thanks for backing the app.",
+    };
+  if (!plan.limited)
+    return {
+      shout: "Nothing's limited yet!",
+      line: "All of this is open to you here.",
+    };
+  const shout =
+    reason === "series"
+      ? "Your shelf's full!"
+      : reason === "scans"
+        ? "Out of scans!"
+        : reason === "priceAlerts"
+          ? "Three prices watched!"
+          : reason === "calendar"
+            ? "The whole calendar!"
+            : reason === "japan"
+              ? "In Japan!"
+              : "Go Collector!";
+  return {
+    shout,
+    line: "Collector takes the limits off. What you have stays yours.",
+  };
+}
+
+// Kenji in a panel, saying it in a speech bubble
+function KenjiSays({ shout, line }: { shout: string; line: string }) {
+  return (
+    <View className="h-[112px] flex-row items-end gap-2 overflow-hidden rounded-[12px] border-2 border-ink bg-paper-2 px-3 pt-2.5">
+      <View style={{ marginBottom: -6 }}>
+        <Mascot mood="happy" width={72} />
+      </View>
+      <View className="mb-auto flex-1" style={{ flexShrink: 1, minWidth: 0 }}>
+        <View className="rounded-[18px] border-2 border-ink bg-card px-3 py-2.5">
+          <Text className="font-brand pr-[4px] text-[19px] leading-[21px] tracking-[0.5px] text-ink uppercase">
+            {shout}
+            {"\u00A0"}
+          </Text>
+          <Text className="mt-1 font-body text-[12.5px] leading-[17px] text-ink-soft">
+            {line}
+          </Text>
+        </View>
+        {/* the bubble's tail, pointing at him */}
+        <View
+          className="absolute h-3.5 w-3.5 border-b-2 border-l-2 border-ink bg-card"
+          style={{ left: -6, bottom: 18, transform: [{ rotate: "45deg" }] }}
+        />
+      </View>
+    </View>
+  );
+}
+
+// One limit as a shelf of ten spines, inked as far as it's used, ending in
+// a red END! stamp
+function LimitShelf({
+  label,
+  what,
+  plan,
+}: {
+  label: string;
+  what: Counted;
+  plan: ReturnType<typeof usePlan.getState>["plan"];
+}) {
+  const limit = plan.limits?.[what] ?? 0;
+  const used = plan.used[what];
+  const share = limit ? Math.min(1, used / limit) : 0;
+  const inked = used > 0 ? Math.max(1, Math.round(share * 10)) : 0;
+  return (
+    <View
+      accessible
+      accessibilityLabel={`${label}: ${used} of ${limit}`}
+      className="gap-1.5"
+    >
+      <View className="flex-row justify-between">
+        <Text className="font-body-semibold text-[13px] text-ink">{label}</Text>
+        <Text className="font-mono text-[12px] text-muted">
+          {used} of {limit}
+        </Text>
+      </View>
+      <View className="flex-row items-end gap-[3px] border-b-[3px] border-double border-ink pb-[2px]">
+        {Array.from({ length: 10 }, (_, i) => (
+          <View
+            key={i}
+            className={`flex-1 ${i < inked ? "h-[20px] border-2 border-ink bg-ink" : "h-[16px] border-[1.5px] border-dashed border-muted"}`}
+          />
+        ))}
+        <Text
+          className="ml-1.5 font-brand pr-[3px] text-[14px] text-accent"
+          style={{ transform: [{ rotate: "-4deg" }] }}
+        >
+          END!{"\u00A0"}
+        </Text>
+      </View>
+    </View>
+  );
+}
+
 export default function CollectorSheet() {
   const { plan, sheet, hideCollector } = usePlan();
   const [picked, setPicked] = useState<"year" | "month">("year");
@@ -143,69 +245,61 @@ export default function CollectorSheet() {
         : "No Collector subscription on this Apple ID.",
     );
   };
-  const early = plan.plan === "early";
   const collector = plan.plan === "collector";
-  const used = (what: Counted, unit: string) =>
-    plan.limits ? `${plan.used[what]} of ${plan.limits[what]} ${unit}` : null;
 
   return (
     <Sheet
       open={sheet.open}
       onClose={hideCollector}
-      contentClassName="gap-4 px-5 pb-8"
+      // tall enough to show it all without scrolling
+      maxHeight={0.94}
+      contentClassName="gap-3 px-5 pb-2"
     >
-      <H2>Collector</H2>
+      <KenjiSays {...speech(plan, sheet.reason)} />
 
-      {early ? (
-        <Text className="font-body text-[16px] leading-[23px] text-ink">
-          You joined early, so everything below is yours, free, for good.
-        </Text>
-      ) : collector ? (
-        <Text className="font-body text-[16px] leading-[23px] text-ink">
-          You're a Collector. Everything below is yours.
-        </Text>
-      ) : (
-        <View className="gap-1">
-          {sheet.reason ? (
-            <Text className="font-body-semibold text-[16px] leading-[23px] text-ink">
-              {BECAUSE[sheet.reason]}
-            </Text>
-          ) : null}
-          <Text className="font-body text-[15px] leading-[22px] text-ink-soft">
-            {plan.limited
-              ? "Everything on your shelf stays yours. Collector lifts the limits for a big collection."
-              : "Nothing is limited here yet, so all of it is open to you."}
-          </Text>
-        </View>
-      )}
-
-      {/* free beside Collector, one thing a line */}
-      <View>
-        <View className="flex-row gap-3 pb-1">
-          <View className="flex-1" />
-          <Text className="w-[70px] text-right font-mono text-[11px] tracking-[1px] text-muted uppercase">
-            Free
-          </Text>
-          <Text className="w-[84px] text-right font-mono text-[11px] tracking-[1px] text-accent-ink uppercase">
-            Collector
-          </Text>
-        </View>
-        {ROWS.map((row, i) => (
-          <Row key={row.name} {...row} first={i === 0} />
-        ))}
+      {/* the section's title, in the app's lettering with its red rule */}
+      <View className="mt-1">
+        <H2>Collector</H2>
       </View>
 
       {plan.limited ? (
-        <Text className="font-mono text-[12px] leading-[18px] text-muted">
-          {[
-            used("series", "series"),
-            used("scans", "scans"),
-            used("priceAlerts", "alerts"),
-          ]
-            .filter(Boolean)
-            .join("  ·  ")}
-        </Text>
-      ) : null}
+        <>
+          {/* their own limits, drawn as shelves of spines that hit the end */}
+          <View className="gap-2">
+            <LimitShelf label="Series" what="series" plan={plan} />
+            <LimitShelf label="Barcode scans" what="scans" plan={plan} />
+            <LimitShelf label="Price alerts" what="priceAlerts" plan={plan} />
+          </View>
+          <View
+            className="gap-1 rounded-[12px] border-2 border-ink bg-card px-3.5 py-3"
+            style={{ transform: [{ rotate: "-0.8deg" }] }}
+          >
+            <Text className="font-brand pr-[4px] text-[22px] leading-[24px] tracking-[0.5px] text-ink uppercase">
+              Collector takes the end off{"\u00A0"}
+            </Text>
+            <Text className="font-body text-[13.5px] leading-[19px] text-ink-soft">
+              No limits, plus coming soon alerts, the full calendar and In
+              Japan.
+            </Text>
+          </View>
+        </>
+      ) : (
+        // nothing limited for them: what Collector holds, one thing a line
+        <View>
+          <View className="flex-row gap-3 pb-1">
+            <View className="flex-1" />
+            <Text className="w-[70px] text-right font-mono text-[11px] tracking-[1px] text-muted uppercase">
+              Free
+            </Text>
+            <Text className="w-[84px] text-right font-mono text-[11px] tracking-[1px] text-accent-ink uppercase">
+              Collector
+            </Text>
+          </View>
+          {ROWS.map((row, i) => (
+            <Row key={row.name} {...row} first={i === 0} />
+          ))}
+        </View>
+      )}
 
       {/* the prices, only where Collector is sold */}
       {plan.limited ? (
@@ -221,7 +315,7 @@ export default function CollectorSheet() {
                   accessibilityRole="radio"
                   accessibilityState={{ selected: on }}
                   accessibilityLabel={`${p.name}, ${p.price}. ${p.note}`}
-                  className={`flex-1 gap-0.5 rounded-[12px] border-[1.5px] px-3.5 py-3 ${on ? "border-accent bg-accent-wash" : "border-line-soft bg-card"}`}
+                  className={`flex-1 gap-0.5 rounded-[12px] border-2 px-3.5 py-3 ${on ? "border-accent bg-accent-wash" : "border-ink bg-card"}`}
                 >
                   <Text className="font-body-semibold text-[14px] text-ink-soft">
                     {p.name}
@@ -231,7 +325,7 @@ export default function CollectorSheet() {
                     {" "}
                   </Text>
                   <Text className="font-body text-[13px] text-muted">
-                    {p.note}
+                    {p.key === "year" && trial ? `${trial} free` : p.note}
                   </Text>
                 </Tap>
               );
@@ -240,6 +334,7 @@ export default function CollectorSheet() {
           {canBuy() ? (
             <Button
               kind="primary"
+              wide
               label={
                 busy
                   ? "One moment…"
@@ -310,11 +405,12 @@ export default function CollectorSheet() {
         <>
           {collector && canBuy() ? (
             <Button
+              wide
               label="Manage subscription"
               onPress={() => void Linking.openURL(MANAGE)}
             />
           ) : null}
-          <Button label="Done" onPress={hideCollector} />
+          <Button wide label="Done" onPress={hideCollector} />
         </>
       )}
     </Sheet>
