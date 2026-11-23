@@ -4,8 +4,18 @@
 import { startPractice } from "@/lib/practice";
 import Tap from "@/components/Tap";
 import { router } from "expo-router";
-import type { ReactNode } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { useEffect, useState, type ReactNode } from "react";
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
+import Mascot from "./Mascot";
+import { Modal, ScrollView, Text, View } from "react-native";
 import AuthArt from "./AuthArt";
 import Button from "./Button";
 
@@ -38,7 +48,83 @@ function Panel({
   );
 }
 
+// one thing bobbing up and down for as long as it's shown, starting a
+// little after the one before it
+function Bob({
+  children,
+  by,
+  after = 0,
+}: {
+  children: ReactNode;
+  by: number;
+  after?: number;
+}) {
+  const lift = useSharedValue(0);
+  useEffect(() => {
+    lift.set(
+      withDelay(
+        after,
+        withRepeat(
+          withSequence(
+            withTiming(-by, { duration: 220, easing: Easing.out(Easing.quad) }),
+            withTiming(0, { duration: 220, easing: Easing.in(Easing.quad) }),
+            withTiming(0, { duration: 160 }),
+          ),
+          -1,
+        ),
+      ),
+    );
+  }, [lift, by, after]);
+  const lifted = useAnimatedStyle(() => ({
+    transform: [{ translateY: lift.get() }],
+  }));
+  return <Animated.View style={lifted}>{children}</Animated.View>;
+}
+
+// While the practice shelf is being put together (a beat, longer for the
+// collector's forty series): a small window over the page where Kenji hops
+// and a row of spines bobs along the shelf, so the press is answered at once
+const SPINES = [0, 1, 2, 3, 4];
+function StockingShelf() {
+  return (
+    <Modal transparent statusBarTranslucent animationType="none">
+      <View
+        accessibilityRole="progressbar"
+        accessibilityLabel="Setting up the practice shelf"
+        className="flex-1 items-center justify-center bg-black/60 px-10"
+      >
+        <View className="w-full items-center gap-4 rounded-2xl border-[1.5px] border-line bg-card px-6 py-7">
+          <Bob by={12}>
+            <Mascot mood="happy" width={72} />
+          </Bob>
+          <View className="h-14 flex-row items-end gap-1.5 border-b-2 border-line pb-0.5">
+            {SPINES.map((n) => (
+              <Bob key={n} by={16} after={n * 120}>
+                <View
+                  className={`h-8 w-3.5 border-[1.5px] border-line ${n === 2 ? "bg-accent" : "bg-paper-2"}`}
+                />
+              </Bob>
+            ))}
+          </View>
+          <Text className="font-body-semibold text-[16px] text-ink">
+            Kenji is stocking the shelf…
+          </Text>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
 export default function GuestShelf() {
+  // pressed: the loader shows first, then the shelf is put together (the
+  // work would otherwise hold the press's own frame back)
+  const [starting, setStarting] = useState(false);
+  const start = (kind: "reader" | "collector") => {
+    setStarting(true);
+    // (long enough for the window to open and the books to start bouncing:
+    // putting the shelf together holds everything else still)
+    setTimeout(() => startPractice(kind), 650);
+  };
   return (
     <ScrollView
       className="flex-1"
@@ -111,16 +197,14 @@ export default function GuestShelf() {
         <Text className="text-center font-body text-[14.5px] text-ink-soft">
           Or try it first on a practice shelf, no account needed:
         </Text>
+        {starting ? <StockingShelf /> : null}
+
         <View className="flex-row gap-2.5">
-          <Button
-            label="A reader's"
-            grow
-            onPress={() => startPractice("reader")}
-          />
+          <Button label="A reader's" grow onPress={() => start("reader")} />
           <Button
             label="A collector's"
             grow
-            onPress={() => startPractice("collector")}
+            onPress={() => start("collector")}
           />
         </View>
       </View>

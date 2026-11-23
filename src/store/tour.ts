@@ -54,6 +54,9 @@ const RINGED = new Set([
   "upcoming",
   "export",
   "share",
+  "scan",
+  "gaps",
+  "gaps-open",
 ]);
 
 // where the thing he's pointing at is on the screen
@@ -75,6 +78,21 @@ type TourState = {
   hide: (hidden: boolean) => void;
 };
 
+// One step the website's tour doesn't have: the phone's alerts, said after
+// the last step about New (what they're alerts of)
+function withAlerts(steps: TourStep[]): TourStep[] {
+  const last = steps.findLastIndex((step) => step.tab === "new");
+  if (last < 0) return steps;
+  const alerts: TourStep = {
+    path: "/shelf",
+    tab: "new",
+    target: "alerts",
+    part: steps[last]!.part,
+    say: "Your phone can tell you too: when a new volume is out, when one is on its way, and when it opens for preorder. Once a day at most. Turn it on in Settings, under New releases.",
+  };
+  return [...steps.slice(0, last + 1), alerts, ...steps.slice(last + 1)];
+}
+
 export const useTour = create<TourState>()((set, get) => ({
   steps: [],
   at: 0,
@@ -83,9 +101,11 @@ export const useTour = create<TourState>()((set, get) => ({
   point: (box) => set({ box }),
   start: () =>
     set({
-      steps: topToBottom(
-        tourSteps().filter(
-          (step) => !step.skip?.() && !NOT_IN_THE_APP.has(step.target ?? ""),
+      steps: withAlerts(
+        topToBottom(
+          tourSteps().filter(
+            (step) => !step.skip?.() && !NOT_IN_THE_APP.has(step.target ?? ""),
+          ),
         ),
       ),
       at: 0,

@@ -29,10 +29,13 @@ export default function TourTarget({
   name,
   children,
   className = "",
+  round = false,
 }: {
   name: string;
   children: ReactNode;
   className?: string;
+  // around something round (the + button): the ring is a circle
+  round?: boolean;
 }) {
   const pointedAt = useTourTarget() === name;
   const box = useRef<ComponentRef<typeof View>>(null);
@@ -78,7 +81,7 @@ export default function TourTarget({
     <View
       ref={box}
       collapsable={false}
-      className={`${className} ${pointedAt ? "rounded-[10px] bg-accent-wash outline-2 outline-offset-4 outline-accent" : ""}`}
+      className={`${className} ${pointedAt ? `${round ? "rounded-full" : "rounded-[10px]"} bg-accent-wash outline-2 outline-offset-4 outline-accent` : ""}`}
     >
       {children}
     </View>

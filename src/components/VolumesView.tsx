@@ -5,9 +5,12 @@
 // gap; a tap on the bar moves it there), and what finishing it costs.
 // One series is open at a time, so its shelf (useSeriesShelf) lives here and
 // a slide's Undo sits at the foot of the screen
+import TourTarget from "./TourTarget";
+import { useTourScroll } from "@/lib/tourScroll";
+import { useTour } from "@/store/tour";
 import Tap from "@/components/Tap";
 import { Link } from "expo-router";
-import { useState, type Dispatch, type SetStateAction } from "react";
+import { useRef, useState, type Dispatch, type SetStateAction } from "react";
 import { FlatList, Text, View } from "react-native";
 import type { SharedValue } from "react-native-reanimated";
 import { ChevronDownIcon } from "@/core/components/icons/Icons";
@@ -37,6 +40,9 @@ function shortRanges(volumes: number[]) {
   const more = runs.length > 2 ? ` +${runs.length - 2} more` : "";
   return runs.slice(0, 2).join(", ") + more;
 }
+
+// the series the tour's steps on this view are about
+const TOURED = "Haikyu!!";
 
 export default function VolumesView({
   manga,
@@ -80,6 +86,22 @@ export default function VolumesView({
     }),
   );
   const volumes = manga.reduce((sum, m) => sum + ownedCount(m), 0);
+  // Kenji's tour: its steps here are about one series (the one with gaps on
+  // the collector's practice shelf). The list scrolls to it, and the step
+  // about its open shelf opens it
+  const list = useRef<FlatList<Manga>>(null);
+  const tourScroller = useRef({
+    scrollTo: ({ y }: { y: number }) =>
+      list.current?.scrollToOffset({ offset: y, animated: true }),
+  });
+  useTourScroll(tourScroller, scrollTop);
+  const tourStep = useTour((tour) => tour.steps[tour.at]?.target ?? null);
+  const toured = manga.find((m) => m.name === TOURED)?.id ?? null;
+  const [openedFor, setOpenedFor] = useState<string | null>(null);
+  if (tourStep !== openedFor) {
+    setOpenedFor(tourStep);
+    if (tourStep === "gaps-open" && toured != null) setOpenId(toured);
+  }
   const toggle = (id: number) => {
     setOpenId(openId === id ? null : id);
     setJump(null);
@@ -88,6 +110,7 @@ export default function VolumesView({
   return (
     <View className="flex-1">
       <FlatList
+        ref={list}
         data={manga}
         keyExtractor={(m) => String(m.id)}
         extraData={[open, shelf, jump, tools]}
@@ -122,21 +145,45 @@ export default function VolumesView({
           const m = isOpen ? open : item;
           return (
             <View>
-              <SeriesRow
-                manga={m}
-                latest={latestOf(m)}
-                worth={worthOf.get(m.id) ?? null}
-                open={isOpen}
-                onToggle={() => toggle(m.id)}
-                onPick={(at) => setJump({ at, n: (jump?.n ?? 0) + 1 })}
-              />
-              {isOpen ? (
-                <SeriesPanel
+              {m.id === toured ? (
+                <TourTarget name="gaps">
+                  <SeriesRow
+                    manga={m}
+                    latest={latestOf(m)}
+                    worth={worthOf.get(m.id) ?? null}
+                    open={isOpen}
+                    onToggle={() => toggle(m.id)}
+                    onPick={(at) => setJump({ at, n: (jump?.n ?? 0) + 1 })}
+                  />
+                </TourTarget>
+              ) : (
+                <SeriesRow
                   manga={m}
-                  shelf={shelf}
-                  jumpKey={jump?.n ?? 0}
-                  finish={finishOf.get(m.id)}
+                  latest={latestOf(m)}
+                  worth={worthOf.get(m.id) ?? null}
+                  open={isOpen}
+                  onToggle={() => toggle(m.id)}
+                  onPick={(at) => setJump({ at, n: (jump?.n ?? 0) + 1 })}
                 />
+              )}
+              {isOpen ? (
+                m.id === toured ? (
+                  <TourTarget name="gaps-open">
+                    <SeriesPanel
+                      manga={m}
+                      shelf={shelf}
+                      jumpKey={jump?.n ?? 0}
+                      finish={finishOf.get(m.id)}
+                    />
+                  </TourTarget>
+                ) : (
+                  <SeriesPanel
+                    manga={m}
+                    shelf={shelf}
+                    jumpKey={jump?.n ?? 0}
+                    finish={finishOf.get(m.id)}
+                  />
+                )
               ) : null}
             </View>
           );

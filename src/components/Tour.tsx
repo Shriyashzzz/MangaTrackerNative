@@ -34,10 +34,6 @@ const GAP = 22;
 const HEADER = 64;
 // the room at each side of the bubble
 const SIDE = 12;
-// A step about something lower down the screen that has no ring of its own
-// (the + button, Haikyu!!'s row on the Volumes view): the bubble rests at
-// the top, clear of it
-const AT_THE_FOOT = new Set(["scan", "gaps", "gaps-open"]);
 
 export default function Tour({ signedIn }: { signedIn: boolean }) {
   const { steps, at, hidden, box: found, hide } = useTour();
@@ -115,7 +111,9 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
   // the foot: the middle one of the three
   const aboutNewTab =
     step.tab === "new" &&
-    (step.target === "tab-new" || step.target === "shelf");
+    (step.target === "tab-new" ||
+      step.target === "shelf" ||
+      step.target === "alerts");
   const box = aboutNewTab
     ? {
         x: width / 3,
@@ -135,11 +133,9 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
       ? { top: under, tail: "up" }
       : box && height && over >= insets.top + HEADER
         ? { top: over, tail: "down" }
-        : AT_THE_FOOT.has(step.target ?? "")
-          ? { top: insets.top + HEADER + 46, tail: null }
-          : // too tall to sit beside: he rests at the foot and still
-            // points up at it
-            { bottom: foot, tail: box && height ? "up" : null };
+        : // too tall to sit beside: he rests at the foot and still
+          // points up at it
+          { bottom: foot, tail: box && height ? "up" : null };
   // the tail points at the middle of the thing, as far as the bubble's
   // corners (and Kenji, on its top left) allow
   const middle = box ? box.x + box.width / 2 - SIDE : 0;
@@ -228,6 +224,10 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
 const wordsFor = (said: string) =>
   said
     .replace("Tap Hide Kenji to", "Tap the ✕ on this bubble to")
+    .replace(
+      "New haul? The + button scans the barcodes on the spines, one after another.",
+      "The + button adds a manga: scan the barcode on the book, or type its title.",
+    )
     .replace(
       "Import your list, under your avatar at the top right, brings yours over in one go.",
       "To bring your own list in, tap your picture at the top right and pick Import your list.",

@@ -3,6 +3,7 @@
 // a row per series. Pull down to load it again. Volumes is its own view
 // (VolumesView). Who's in each tab, the search and the sort are the web's own
 // rules (core filterShelf); it opens on the tab and sort the account chose
+import TourTarget from "@/components/TourTarget";
 import { useTour } from "@/store/tour";
 import Tap from "@/components/Tap";
 import Backdrop from "@/components/Backdrop";
@@ -338,14 +339,16 @@ function SignedInShelf() {
             fabStyle,
           ]}
         >
-          <Tap
-            onPress={() => setAdding(true)}
-            accessibilityLabel="Add manga"
-            className="h-14 w-14 items-center justify-center rounded-full bg-accent active:opacity-90"
-            style={{ boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.35)" }}
-          >
-            <PlusIcon color={c.onAccent} width={26} height={26} />
-          </Tap>
+          <TourTarget name="scan" round>
+            <Tap
+              onPress={() => setAdding(true)}
+              accessibilityLabel="Add manga"
+              className="h-14 w-14 items-center justify-center rounded-full bg-accent active:opacity-90"
+              style={{ boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.35)" }}
+            >
+              <PlusIcon color={c.onAccent} width={26} height={26} />
+            </Tap>
+          </TourTarget>
         </Animated.View>
       ) : null}
       {adding ? (
