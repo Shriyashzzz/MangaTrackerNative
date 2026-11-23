@@ -8,12 +8,12 @@
     "scheme": "mangatracker",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "buildNumber": "4",
+      "buildNumber": "5",
       "icon": "./assets/images/icon.png",
       "bundleIdentifier": "xyz.mangatracker.app.rn",
       "appleTeamId": "84JH94RQR3",
       "usesAppleSignIn": true,
-      "supportsTablet": false,
+      "supportsTablet": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "UISupportedInterfaceOrientations~ipad": [
@@ -36,7 +36,7 @@
       "googleServicesFile": "./firebase/google-services.json",
       "permissions": ["android.permission.CAMERA"],
       "blockedPermissions": ["android.permission.RECORD_AUDIO"],
-      "versionCode": 18
+      "versionCode": 19
     },
     "web": {
       "output": "single",
