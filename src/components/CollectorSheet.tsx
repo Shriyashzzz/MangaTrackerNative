@@ -26,16 +26,6 @@ import { usePlan, type Counted } from "@/store/plan";
 import Button from "./Button";
 import Sheet from "./Sheet";
 
-// each row: what it is, a free account's share, Collector's
-const ROWS: { name: string; free: string; collector: string }[] = [
-  { name: "Series on your shelf", free: "100", collector: "No limit" },
-  { name: "Barcode scans", free: "80", collector: "No limit" },
-  { name: "Price alerts on To buy", free: "3 books", collector: "Every book" },
-  { name: "Coming soon and preorder alerts", free: "No", collector: "Yes" },
-  { name: "Release calendar", free: "Next one", collector: "Every one" },
-  { name: "In Japan", free: "No", collector: "Yes" },
-];
-
 // Yearly comes with a week free (Apple's introductory offer, set on the
 // product in App Store Connect); monthly starts straight away
 // Apple's standard terms, which App Store subscriptions are sold under, and
@@ -60,44 +50,6 @@ const PRICES = [
     after: "$3.99 a month, starting today.",
   },
 ] as const;
-
-function Row({
-  name,
-  free,
-  collector,
-  first,
-}: {
-  name: string;
-  free: string;
-  collector: string;
-  first?: boolean;
-}) {
-  return (
-    <View
-      className={`flex-row items-center gap-3 py-2.5 ${first ? "" : "border-t border-dotted border-line-soft"}`}
-    >
-      <Text
-        // (wraps rather than pushing the columns off the edge)
-        style={{ flex: 1, flexShrink: 1, minWidth: 0, ...TEXT.plain }}
-        className="font-body text-[15px] leading-[20px] text-ink"
-      >
-        {name}
-      </Text>
-      <Text
-        style={TEXT.plain}
-        className="w-[70px] text-right font-body text-[14px] text-muted"
-      >
-        {free}
-      </Text>
-      <Text
-        style={TEXT.bold}
-        className="w-[84px] text-right font-body-semibold text-[14px] text-accent-ink"
-      >
-        {collector}
-      </Text>
-    </View>
-  );
-}
 
 // On an iPhone the small print is in Apple's own face (San Francisco), as
 // the rest of iOS reads; the headings keep the app's lettering. Android
@@ -177,6 +129,95 @@ function KenjiSays({ shout, line }: { shout: string; line: string }) {
           style={{ left: -6, bottom: 18, transform: [{ rotate: "45deg" }] }}
         />
       </View>
+    </View>
+  );
+}
+
+// A shelf with no limit: what they have, inked, and the shelf running on
+// past the edge with a NO END! stamp
+function OpenShelf({
+  label,
+  count,
+  unit,
+}: {
+  label: string;
+  count: number;
+  unit: string;
+}) {
+  const inked = Math.min(
+    10,
+    Math.max(count > 0 ? 1 : 0, Math.ceil(count / 10)),
+  );
+  return (
+    <View
+      accessible
+      accessibilityLabel={`${label}: ${count} ${unit}, no limit`}
+      className="gap-1.5"
+    >
+      <View className="flex-row justify-between">
+        <Text
+          style={TEXT.bold}
+          className="font-body-semibold text-[13px] text-ink"
+        >
+          {label}
+        </Text>
+        <Text style={TEXT.count} className="font-mono text-[12px] text-muted">
+          {count} {unit}
+        </Text>
+      </View>
+      <View className="flex-row items-end gap-[3px] border-b-[3px] border-double border-ink pb-[2px]">
+        {Array.from({ length: 10 }, (_, i) => (
+          <View
+            key={i}
+            className={`flex-1 ${i < inked ? "h-[20px] border-2 border-ink bg-ink" : "h-[16px] border-[1.5px] border-dashed border-muted"}`}
+          />
+        ))}
+        <Text
+          className="ml-1.5 font-brand pr-[3px] text-[14px] text-accent"
+          style={{ transform: [{ rotate: "-4deg" }] }}
+        >
+          NO END!{"\u00A0"}
+        </Text>
+      </View>
+    </View>
+  );
+}
+
+// One of Collector's extras as a small comic panel with a red stamp, as the
+// welcome screen draws its panels
+function StampPanel({
+  stamp,
+  big,
+  caption,
+}: {
+  stamp: string;
+  big: string;
+  caption: string;
+}) {
+  return (
+    <View className="flex-1 overflow-hidden rounded-[12px] border-2 border-ink bg-card">
+      <View className="h-[54px] items-center justify-center border-b-2 border-ink bg-paper-2">
+        <Text className="font-brand pr-[3px] text-[19px] tracking-[0.5px] text-ink uppercase">
+          {big}
+          {"\u00A0"}
+        </Text>
+        <View
+          className="absolute top-1 right-1 border-[1.5px] border-ink bg-accent px-1"
+          style={{ transform: [{ rotate: "-3deg" }] }}
+        >
+          <Text className="font-brand pr-[2px] text-[10px] tracking-[0.5px] text-on-accent uppercase">
+            {stamp}
+            {"\u00A0"}
+          </Text>
+        </View>
+      </View>
+      <Text
+        style={TEXT.bold}
+        numberOfLines={1}
+        className="py-1.5 text-center font-body-semibold text-[12px] text-ink"
+      >
+        {caption}
+      </Text>
     </View>
   );
 }
@@ -307,27 +348,41 @@ export default function CollectorSheet() {
           </Text>
         </>
       ) : (
-        // nothing limited for them: what Collector holds, one thing a line
-        <View>
-          <View className="flex-row gap-3 pb-1">
-            <View className="flex-1" />
-            <Text
-              style={TEXT.count}
-              className="w-[70px] text-right font-mono text-[11px] tracking-[1px] text-muted uppercase"
-            >
-              Free
-            </Text>
-            <Text
-              style={TEXT.count}
-              className="w-[84px] text-right font-mono text-[11px] tracking-[1px] text-accent-ink uppercase"
-            >
-              Collector
-            </Text>
+        // nothing limited for them (a Collector, an early member, or where
+        // there are no limits yet): their shelf with no end, and the extras
+        // as the welcome screen's stamped panels
+        <>
+          <View className="gap-3.5">
+            <OpenShelf
+              label="Series"
+              count={plan.used.series}
+              unit="on your shelf"
+            />
+            <OpenShelf
+              label="Barcode scans"
+              count={plan.used.scans}
+              unit="scanned"
+            />
+            <OpenShelf
+              label="Price alerts"
+              count={plan.used.priceAlerts}
+              unit="watched"
+            />
           </View>
-          {ROWS.map((row, i) => (
-            <Row key={row.name} {...row} first={i === 0} />
-          ))}
-        </View>
+          <View className="flex-row gap-2.5">
+            <StampPanel
+              stamp="Coming!"
+              big="Vol. 115"
+              caption="Preorder alerts"
+            />
+            <StampPanel
+              stamp="Calendar!"
+              big="Dec 12"
+              caption="Every release"
+            />
+            <StampPanel stamp="Japan!" big="Vol. 31" caption="In Japan" />
+          </View>
+        </>
       )}
 
       {/* the prices, only where Collector is sold */}
