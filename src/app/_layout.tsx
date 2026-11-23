@@ -8,6 +8,14 @@ import Intro from "@/components/Intro";
 import { View, Appearance } from "react-native";
 import "../global.css";
 import { Bangers_400Regular } from "@expo-google-fonts/bangers";
+import { Chewy_400Regular } from "@expo-google-fonts/chewy";
+import { PermanentMarker_400Regular } from "@expo-google-fonts/permanent-marker";
+import { PirataOne_400Regular } from "@expo-google-fonts/pirata-one";
+import { Fredoka_600SemiBold } from "@expo-google-fonts/fredoka";
+import { Creepster_400Regular } from "@expo-google-fonts/creepster";
+import { BebasNeue_400Regular } from "@expo-google-fonts/bebas-neue";
+import { Rajdhani_700Bold } from "@expo-google-fonts/rajdhani";
+
 import { ComicNeue_700Bold } from "@expo-google-fonts/comic-neue";
 import {
   Fraunces_400Regular,
@@ -62,6 +70,14 @@ whenCollectorNeeded((what) => {
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
     Bangers_400Regular,
+    // the manga themes' heading lettering (lib/mangaThemes.ts)
+    Chewy_400Regular,
+    PermanentMarker_400Regular,
+    PirataOne_400Regular,
+    Fredoka_600SemiBold,
+    Creepster_400Regular,
+    BebasNeue_400Regular,
+    Rajdhani_700Bold,
     ComicNeue_700Bold,
     Fraunces_400Regular,
     Fraunces_400Regular_Italic,

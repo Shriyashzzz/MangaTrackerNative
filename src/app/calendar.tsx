@@ -1,6 +1,7 @@
 // Upcoming Releases, as the web's pages/Calendar/Calendar.tsx: every English
 // volume coming out for the shelf, month by month, each month at a glance
 // with its dates to save, the first two open and the rest folded
+import { useCorners } from "@/lib/mangaThemes";
 import { usePlan } from "@/store/plan";
 import Tap from "@/components/Tap";
 import { useEffect, useState } from "react";
@@ -27,6 +28,7 @@ const PEEK = 5;
 const MONTH_LIMIT = 8;
 
 function Month({ month }: { month: CalendarMonth }) {
+  const corners = useCorners();
   return (
     <View className="gap-3">
       <MiniMonth month={month.month} volumes={month.volumes} />
@@ -39,7 +41,10 @@ function Month({ month }: { month: CalendarMonth }) {
         />
       ) : null}
       {/* the month's books, on their own card under the grid */}
-      <View className="rounded-[14px] border border-line-soft bg-card px-4 pt-1 pb-1">
+      <View
+        className="rounded-[14px] border border-line-soft bg-card px-4 pt-1 pb-1"
+        style={corners.panel}
+      >
         <ReleaseList volumes={month.volumes} limit={MONTH_LIMIT} />
       </View>
     </View>

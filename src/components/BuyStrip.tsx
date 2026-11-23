@@ -5,6 +5,7 @@
 // newest out, what's ordered and on its way, and the series' price page.
 // Every rule is the web's: the one to buy next (core useBuyOptions), an
 // edition's plan (core useEditions), what's on sale (core onSale)
+import { useCorners } from "@/lib/mangaThemes";
 import Tap from "@/components/Tap";
 import { H2 } from "@/components/Page";
 import { ChevronDownIcon, InkCrossIcon } from "@/core/components/icons/Icons";
@@ -133,11 +134,13 @@ function NextTicket({
   to?: string;
   pills?: React.ReactNode;
 }) {
+  const corners = useCorners();
   return (
     <Tap
       onPress={to ? () => openWebPath(to) : undefined}
       disabled={!to}
       className="gap-1 rounded-[12px] border-[1.5px] border-accent bg-accent-wash px-3 pt-2 pb-2.5 active:opacity-90"
+      style={corners.box}
     >
       <Kind red>{kind}</Kind>
       <View className="flex-row items-baseline justify-between gap-3">
@@ -194,11 +197,17 @@ const Gap = ({
   </Tap>
 );
 
-const Dashed = ({ children }: { children: React.ReactNode }) => (
-  <View className="gap-1 rounded-[14px] border border-dashed border-line-soft px-3 py-2">
-    {children}
-  </View>
-);
+function Dashed({ children }: { children: React.ReactNode }) {
+  const corners = useCorners();
+  return (
+    <View
+      className="gap-1 rounded-[14px] border border-dashed border-line-soft px-3 py-2"
+      style={corners.panel}
+    >
+      {children}
+    </View>
+  );
+}
 
 export default function BuyStrip({
   options,
@@ -214,6 +223,7 @@ export default function BuyStrip({
   ordered = [],
   onOrdered,
 }: Props) {
+  const corners = useCorners();
   const c = useColors();
   const [open, setOpen] = useState(false);
   const [pickingEdition, setPickingEdition] = useState(false);
@@ -543,6 +553,7 @@ export default function BuyStrip({
                     openWebPath(volumePath(latest.isbn13, latest.title))
                   }
                   className="flex-row items-baseline justify-between gap-3 rounded-[14px] border border-dashed border-line-soft bg-paper px-3 py-2.5 active:bg-accent-wash"
+                  style={corners.panel}
                 >
                   <View>
                     <Kind>Newest</Kind>

@@ -2,6 +2,7 @@
 // ShelfAction pitch): a ticket like Buy next's, with a tear-off stub to tap.
 // It promises a phone alert: push must be set up before this ships (the
 // owner's call, 2026-11-21)
+import { useCorners } from "@/lib/mangaThemes";
 import Tap from "@/components/Tap";
 import { router } from "expo-router";
 import { Text, View } from "react-native";
@@ -39,6 +40,7 @@ export default function TrackPitch({
   // nothing more is coming: every volume is out
   finished?: boolean;
 }) {
+  const corners = useCorners();
   const ripple = useRipple();
   const pitch = PITCH[finished ? "finished" : "coming"];
   const question = pitch.question(shortName(name));
@@ -52,6 +54,7 @@ export default function TrackPitch({
         accessibilityRole="button"
         accessibilityLabel={`${question} Track this series`}
         className="flex-row overflow-hidden rounded-[12px] border-[1.5px] border-accent bg-card active:opacity-90"
+        style={corners.box}
       >
         <View className="min-w-0 flex-1 gap-1 px-3 py-2.5">
           <Text className="font-mono-medium text-[11.5px] tracking-[1.5px] text-accent-ink uppercase">

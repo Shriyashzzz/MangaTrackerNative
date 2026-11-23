@@ -7,6 +7,9 @@
 @layer theme {
   :root {
     @variant light {
+      /* panels and cards: their corners in this look */
+      --radius-panel: 14px;
+      --radius-box: 12px;
       --color-paper: #f3eee2;
       --color-paper-2: #e9e2d1;
       --color-card: #fbf8f0;
@@ -32,6 +35,9 @@
       --color-stamp-get: #f2c9bf;
     }
     @variant dark {
+      /* panels and cards: their corners in this look */
+      --radius-panel: 14px;
+      --radius-box: 12px;
       --color-paper: #16140f;
       --color-paper-2: #211e18;
       --color-card: #1c1914;
@@ -60,6 +66,9 @@
        light or dark as it is (lib/mangaThemes.ts) */
     /* the shonen theme (lib/mangaThemes.ts) */
     @variant shonen {
+      /* panels and cards: their corners in this look */
+      --radius-panel: 3px;
+      --radius-box: 2px;
       --color-paper: #fff4d6;
       --color-paper-2: #f7e6b8;
       --color-card: #fffdf5;
@@ -71,7 +80,7 @@
       --color-accent: #e8361c;
       --color-accent-hover: #c42c15;
       --color-accent-ink: #c42c15;
-      --color-accent-wash: rgba(232,54,28,0.10);
+      --color-accent-wash: rgba(232, 54, 28, 0.1);
       --color-on-accent: #ffffff;
       --color-ok: #2e6b4c;
       --color-star: #ffb400;
@@ -86,6 +95,11 @@
     }
     /* the shojo theme (lib/mangaThemes.ts) */
     @variant shojo {
+      /* panels and cards: their corners in this look */
+      --radius-panel: 22px;
+      --radius-box: 18px;
+      /* its own lettering for headings */
+      --font-brand: "Chewy_400Regular";
       --color-paper: #fdf0f3;
       --color-paper-2: #f8e1e7;
       --color-card: #fffafb;
@@ -97,7 +111,7 @@
       --color-accent: #d4567a;
       --color-accent-hover: #b9446a;
       --color-accent-ink: #b03f63;
-      --color-accent-wash: rgba(212,86,122,0.10);
+      --color-accent-wash: rgba(212, 86, 122, 0.1);
       --color-on-accent: #ffffff;
       --color-ok: #3f7d5c;
       --color-star: #e98aa6;
@@ -112,6 +126,11 @@
     }
     /* the seinen theme (lib/mangaThemes.ts) */
     @variant seinen {
+      /* panels and cards: their corners in this look */
+      --radius-panel: 0px;
+      --radius-box: 0px;
+      /* its own lettering for headings */
+      --font-brand: "PermanentMarker_400Regular";
       --color-paper: #e6e1d6;
       --color-paper-2: #d9d3c6;
       --color-card: #f2eee5;
@@ -123,7 +142,7 @@
       --color-accent: #7a1f14;
       --color-accent-hover: #5e170f;
       --color-accent-ink: #7a1f14;
-      --color-accent-wash: rgba(122,31,20,0.08);
+      --color-accent-wash: rgba(122, 31, 20, 0.08);
       --color-on-accent: #f2eee5;
       --color-ok: #2e5b44;
       --color-star: #0f0e0c;
@@ -138,6 +157,11 @@
     }
     /* the isekai theme (lib/mangaThemes.ts) */
     @variant isekai {
+      /* panels and cards: their corners in this look */
+      --radius-panel: 6px;
+      --radius-box: 4px;
+      /* its own lettering for headings */
+      --font-brand: "PirataOne_400Regular";
       --color-paper: #f1e6cc;
       --color-paper-2: #e8d9b6;
       --color-card: #faf3e1;
@@ -149,7 +173,7 @@
       --color-accent: #2f5fa8;
       --color-accent-hover: #244b86;
       --color-accent-ink: #2a5596;
-      --color-accent-wash: rgba(47,95,168,0.10);
+      --color-accent-wash: rgba(47, 95, 168, 0.1);
       --color-on-accent: #faf3e1;
       --color-ok: #3d6b45;
       --color-star: #c99a2e;
@@ -164,6 +188,11 @@
     }
     /* the cozy theme (lib/mangaThemes.ts) */
     @variant cozy {
+      /* panels and cards: their corners in this look */
+      --radius-panel: 20px;
+      --radius-box: 16px;
+      /* its own lettering for headings */
+      --font-brand: "Fredoka_600SemiBold";
       --color-paper: #f4efe6;
       --color-paper-2: #ebe4d7;
       --color-card: #fbf8f2;
@@ -175,7 +204,7 @@
       --color-accent: #5f7f4d;
       --color-accent-hover: #4f6a40;
       --color-accent-ink: #4f6a40;
-      --color-accent-wash: rgba(95,127,77,0.10);
+      --color-accent-wash: rgba(95, 127, 77, 0.1);
       --color-on-accent: #fbf8f2;
       --color-ok: #4f6a40;
       --color-star: #c9a75c;
@@ -190,6 +219,11 @@
     }
     /* the horror theme (lib/mangaThemes.ts) */
     @variant horror {
+      /* panels and cards: their corners in this look */
+      --radius-panel: 0px;
+      --radius-box: 0px;
+      /* its own lettering for headings */
+      --font-brand: "Creepster_400Regular";
       --color-paper: #141210;
       --color-paper-2: #1f1b17;
       --color-card: #1c1916;
@@ -201,7 +235,7 @@
       --color-accent: #b3241f;
       --color-accent-hover: #c93a33;
       --color-accent-ink: #e0574f;
-      --color-accent-wash: rgba(179,36,31,0.16);
+      --color-accent-wash: rgba(179, 36, 31, 0.16);
       --color-on-accent: #f3ece0;
       --color-ok: #7fb38f;
       --color-star: #c93a33;
@@ -216,6 +250,11 @@
     }
     /* the sports theme (lib/mangaThemes.ts) */
     @variant sports {
+      /* panels and cards: their corners in this look */
+      --radius-panel: 12px;
+      --radius-box: 10px;
+      /* its own lettering for headings */
+      --font-brand: "BebasNeue_400Regular";
       --color-paper: #eef3f7;
       --color-paper-2: #dfe8ef;
       --color-card: #ffffff;
@@ -227,7 +266,7 @@
       --color-accent: #c94f0c;
       --color-accent-hover: #a84009;
       --color-accent-ink: #b3460a;
-      --color-accent-wash: rgba(201,79,12,0.10);
+      --color-accent-wash: rgba(201, 79, 12, 0.1);
       --color-on-accent: #ffffff;
       --color-ok: #2e7d4f;
       --color-star: #ff6b1a;
@@ -242,6 +281,11 @@
     }
     /* the mecha theme (lib/mangaThemes.ts) */
     @variant mecha {
+      /* panels and cards: their corners in this look */
+      --radius-panel: 0px;
+      --radius-box: 0px;
+      /* its own lettering for headings */
+      --font-brand: "Rajdhani_700Bold";
       --color-paper: #1b2026;
       --color-paper-2: #232a32;
       --color-card: #222932;
@@ -253,7 +297,7 @@
       --color-accent: #3fd0ff;
       --color-accent-hover: #6bdcff;
       --color-accent-ink: #6bdcff;
-      --color-accent-wash: rgba(63,208,255,0.12);
+      --color-accent-wash: rgba(63, 208, 255, 0.12);
       --color-on-accent: #0c1116;
       --color-ok: #5fd38f;
       --color-star: #ffd23f;
@@ -287,4 +331,8 @@
   --font-mono-bold: "IBMPlexMono_600SemiBold";
   /* comic lettering, for a quoted line (the web's --font-letter) */
   --font-letter: "ComicNeue_700Bold";
+  /* panels and cards (rounded-panel, rounded-box): each look sets its own
+     in the theme layer above */
+  --radius-panel: 14px;
+  --radius-box: 12px;
 }

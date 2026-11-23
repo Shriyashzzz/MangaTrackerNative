@@ -7,6 +7,7 @@
 // (Android and the website, for now) the table is shown without prices.
 // Buying is through Apple and arrives with the iPhone app: until then the
 // button says so rather than pretending
+import { themeOf, useCorners, useWornTheme } from "@/lib/mangaThemes";
 import { useAccount } from "@/store/account";
 import { H2 } from "@/components/Page";
 import Mascot from "./Mascot";
@@ -101,8 +102,12 @@ function speech(
 
 // Kenji in a panel, saying it in a speech bubble
 function KenjiSays({ shout, line }: { shout: string; line: string }) {
+  const corners = useCorners();
   return (
-    <View className="min-h-[104px] flex-row items-end gap-2 overflow-hidden rounded-[12px] border-2 border-ink bg-paper-2 px-3 pt-2.5">
+    <View
+      className="min-h-[104px] flex-row items-end gap-2 overflow-hidden rounded-[12px] border-2 border-ink bg-paper-2 px-3 pt-2.5"
+      style={corners.box}
+    >
       <View style={{ marginBottom: -6 }}>
         <Mascot mood="happy" width={72} />
       </View>
@@ -110,7 +115,10 @@ function KenjiSays({ shout, line }: { shout: string; line: string }) {
         className="mb-3 flex-1 self-start"
         style={{ flexShrink: 1, minWidth: 0 }}
       >
-        <View className="rounded-[18px] border-2 border-ink bg-card px-3 py-2.5">
+        <View
+          className="rounded-[18px] border-2 border-ink bg-card px-3 py-2.5"
+          style={corners.panel}
+        >
           <Text className="font-brand pr-[4px] text-[19px] leading-[21px] tracking-[0.5px] text-ink uppercase">
             {shout}
             {"\u00A0"}
@@ -149,6 +157,9 @@ const dayOf = (iso: string) =>
 // when, what they keep on it, and how the plan runs. Lines the server
 // doesn't know are left out
 function MemberCard({ plan }: { plan: Plan }) {
+  // a manga theme stamps the card with its own word
+  const worn = useWornTheme();
+  const corners = useCorners();
   const account = useAccount((s) => s.account);
   const name = account?.displayName || account?.username;
   const member = plan.member;
@@ -190,7 +201,7 @@ function MemberCard({ plan }: { plan: Plan }) {
   return (
     <View
       className="mt-2 items-center overflow-visible rounded-[14px] border-2 border-ink bg-card px-4 pt-3.5"
-      style={{ transform: [{ rotate: "-1deg" }] }}
+      style={[{ transform: [{ rotate: "-1deg" }] }, corners.panel]}
     >
       <Text className="font-mono text-[10.5px] tracking-[1.5px] text-muted uppercase">
         Member card
@@ -252,7 +263,7 @@ function MemberCard({ plan }: { plan: Plan }) {
         style={{ transform: [{ rotate: "4deg" }] }}
       >
         <Text className="font-brand pr-[3px] text-[14px] tracking-[0.5px] text-on-accent uppercase">
-          {early ? "Free for good!" : "All in!"}
+          {worn ? themeOf(worn)!.stamp : early ? "Free for good!" : "All in!"}
           {"\u00A0"}
         </Text>
       </View>
@@ -429,6 +440,7 @@ function LimitReached({
 }
 
 export default function CollectorSheet() {
+  const corners = useCorners();
   const { plan, sheet, hideCollector } = usePlan();
   const [picked, setPicked] = useState<"year" | "month">("year");
   const [busy, setBusy] = useState(false);
@@ -547,6 +559,7 @@ export default function CollectorSheet() {
                       accessibilityState={{ selected: on }}
                       accessibilityLabel={`${p.name}, ${p.price}. ${p.note}`}
                       className={`flex-1 gap-0.5 rounded-[12px] border-2 px-3.5 py-3 ${on ? "border-accent bg-accent-wash" : "border-ink bg-card"}`}
+                      style={corners.box}
                     >
                       <Text
                         style={TEXT.bold}

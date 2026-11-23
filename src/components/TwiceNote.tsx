@@ -1,6 +1,7 @@
 // The same series on the shelf twice: said on its page, with one button
 // that makes them one (the web's pages/Details/TwiceNote.tsx). The server
 // keeps everything either had (POST /api/manga/:id/merge)
+import { useCorners } from "@/lib/mangaThemes";
 import Tap from "@/components/Tap";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
@@ -16,6 +17,7 @@ export default function TwiceNote({
   manga: Manga;
   onMerged: () => void;
 }) {
+  const corners = useCorners();
   const shelf = useShelf((s) => s.manga);
   const [merging, setMerging] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -49,7 +51,10 @@ export default function TwiceNote({
   };
 
   return (
-    <View className="gap-1 rounded-[14px] bg-accent-wash px-3 py-2">
+    <View
+      className="gap-1 rounded-[14px] bg-accent-wash px-3 py-2"
+      style={corners.panel}
+    >
       <View className="flex-row flex-wrap items-baseline gap-x-3">
         <Text className="font-body text-[14.5px] text-ink">
           This series is on your shelf twice.

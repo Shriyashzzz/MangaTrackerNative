@@ -5,6 +5,7 @@
 // To read and To get as tabs over a searched, sorted list of rows or
 // covers. A series opens as a sheet with its facts, synopsis, notes, spines
 // and the way to its prices. The rules are the web's (core SharedShelf)
+import { useCorners } from "@/lib/mangaThemes";
 import TextBox from "@/components/TextBox";
 import Tap from "@/components/Tap";
 import { openOutside } from "@/lib/openOutside";
@@ -203,12 +204,16 @@ const GENRE_INKS = [
   "bg-line-soft",
 ];
 function ShelfFacts({ manga }: { manga: SharedManga[] }) {
+  const corners = useCorners();
   const { ownsAll, longestRun, mostly, genres } = shelfNumbers(manga);
   const hasNumbers = ownsAll > 0 || longestRun || mostly;
   if (!hasNumbers && !genres.length) return null;
   const withGenre = genres.reduce((n, g) => n + g.count, 0);
   return (
-    <View className="gap-2 rounded-[14px] border border-dashed border-line-soft p-3">
+    <View
+      className="gap-2 rounded-[14px] border border-dashed border-line-soft p-3"
+      style={corners.panel}
+    >
       {hasNumbers ? (
         <View className="gap-0.5">
           {ownsAll > 0 ? (
@@ -276,6 +281,7 @@ function FollowBar({
   name: string;
   following: boolean;
 }) {
+  const corners = useCorners();
   const [on, setOn] = useState(following);
   const [saving, setSaving] = useState(false);
   const [failed, setFailed] = useState("");
@@ -291,7 +297,10 @@ function FollowBar({
     }
   };
   return (
-    <View className="flex-row items-center gap-3 rounded-[14px] border border-line-soft bg-card px-3 py-2.5">
+    <View
+      className="flex-row items-center gap-3 rounded-[14px] border border-line-soft bg-card px-3 py-2.5"
+      style={corners.panel}
+    >
       <Text className="min-w-0 flex-1 font-body text-[14.5px] text-ink">
         {on ? (
           <>
@@ -592,6 +601,7 @@ function SeriesSheet({
 }
 
 export default function SharedShelfScreen() {
+  const corners = useCorners();
   const c = useColors();
   const { code, series: openParam } = useLocalSearchParams<{
     code: string;
@@ -790,7 +800,10 @@ export default function SharedShelfScreen() {
         />
       ) : null}
       {shelf.yours ? (
-        <View className="gap-1 rounded-[14px] bg-accent-wash px-3 py-2">
+        <View
+          className="gap-1 rounded-[14px] bg-accent-wash px-3 py-2"
+          style={corners.panel}
+        >
           <Text className="font-body text-[14px] text-ink">
             Others see this page, as{" "}
             <Text className="font-body-semibold">{shelf.displayName}</Text>.

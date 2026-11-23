@@ -2,6 +2,7 @@
 // for volumes and for chapters, every series or only the ones they're
 // nearly caught up on, and how nearly. Each choice shows an example of what
 // New would say. Saved a moment after the last change
+import { useCorners } from "@/lib/mangaThemes";
 import StepSlider from "@/components/StepSlider";
 import { useEffect, useRef, useState } from "react";
 import { Text, View } from "react-native";
@@ -119,6 +120,7 @@ const MODES = [
 const FIRST_KIND = Object.keys(KINDS)[0];
 
 export default function ReleaseControls() {
+  const corners = useCorners();
   const [settings, setSettings] = useState<ReleaseSettings | null>(null);
   const [status, setStatus] = useState<
     "" | "saving" | "saved" | "failed" | "unloaded"
@@ -172,7 +174,10 @@ export default function ReleaseControls() {
   return (
     // one box for both, as on the website: volumes over chapters, a line
     // between them
-    <View className="rounded-[14px] border-2 border-accent bg-card px-3.5">
+    <View
+      className="rounded-[14px] border-2 border-accent bg-card px-3.5"
+      style={corners.panel}
+    >
       {/* these decide what the New tab and the alerts are about: the box
           is drawn to be noticed */}
       <View className="-mx-3.5 rounded-t-[12px] bg-accent px-3.5 py-2">
@@ -234,7 +239,10 @@ export default function ReleaseControls() {
                 </Text>
               </View>
             ) : null}
-            <View className="gap-1 rounded-[14px] border border-dashed border-line-soft px-3 py-2">
+            <View
+              className="gap-1 rounded-[14px] border border-dashed border-line-soft px-3 py-2"
+              style={corners.panel}
+            >
               <Text className="font-body-medium text-[13.5px] text-ink">
                 {example.newest}
               </Text>

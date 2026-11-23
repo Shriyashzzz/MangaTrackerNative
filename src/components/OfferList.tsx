@@ -4,6 +4,7 @@
 // first, then box sets, then ebooks, five shown until "Show all". A row opens
 // the store. Which copy gets which stamp is the web's own rule (core
 // offerLabels awardsOf)
+import { useCorners } from "@/lib/mangaThemes";
 import Tap from "@/components/Tap";
 import { openOutside } from "@/lib/openOutside";
 import { useState } from "react";
@@ -75,6 +76,7 @@ export default function OfferList({
   offers: Offer[];
   formatPrice: (cents: number) => string;
 }) {
+  const corners = useCorners();
   const c = useColors();
   const [open, setOpen] = useState(false);
   const [copies, setCopies] = useState<"all" | "new" | "used">("all");
@@ -128,7 +130,10 @@ export default function OfferList({
           onChange={setCopies}
         />
       ) : null}
-      <View className="overflow-hidden rounded-[14px] border border-line-soft bg-card">
+      <View
+        className="overflow-hidden rounded-[14px] border border-line-soft bg-card"
+        style={corners.panel}
+      >
         {shown.map((o, i) => (
           <Tap
             key={`${o.store}-${o.priceCents}-${i}`}

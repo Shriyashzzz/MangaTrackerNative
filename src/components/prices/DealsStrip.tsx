@@ -1,6 +1,7 @@
 // "Sales right now", across the top of the price pages (the web's
 // components/deals/DealsStrip.tsx): the stores' sales, each a link, a code
 // copied with a tap, hidden with its cross until the sales change
+import { useCorners } from "@/lib/mangaThemes";
 import Tap from "@/components/Tap";
 import { openOutside } from "@/lib/openOutside";
 import * as Clipboard from "expo-clipboard";
@@ -23,6 +24,7 @@ const loadDeals = () =>
   }));
 
 export default function DealsStrip() {
+  const corners = useCorners();
   const c = useColors();
   const [deals, setDeals] = useState<Deal[]>([]);
   const [hidden, setHidden] = useState(() => readLocal(HIDDEN_KEY) ?? "");
@@ -41,7 +43,10 @@ export default function DealsStrip() {
     setTimeout(() => setCopied((now) => (now === code ? null : now)), 2000);
   };
   return (
-    <View className="gap-2 rounded-[14px] border border-line-soft bg-card px-3 py-2.5">
+    <View
+      className="gap-2 rounded-[14px] border border-line-soft bg-card px-3 py-2.5"
+      style={corners.panel}
+    >
       <View className="flex-row items-center justify-between">
         <Text className="font-brand pr-[4px] text-[16px] tracking-[1px] text-ink uppercase">
           Sales right now

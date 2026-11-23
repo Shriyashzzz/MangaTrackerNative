@@ -8,6 +8,7 @@
 //                    the volume's number on an inked stub and smaller
 //                    stars. About the last volume they've read, until it's
 //                    rated; its cross hides it until they read on
+import { useCorners } from "@/lib/mangaThemes";
 import Tap from "@/components/Tap";
 import { Text, View } from "react-native";
 import { InkCrossIcon } from "@/core/components/icons/Icons";
@@ -88,11 +89,15 @@ export default function RateVolume({ volume, onWrite }: Props) {
 }
 
 export function RateVolumeCard({ volume, onWrite }: Props) {
+  const corners = useCorners();
   const c = useColors();
   const { asked, rating, problem, rate, closeBanner } = volume;
   if (!asked) return null;
   return (
-    <View className="gap-3 rounded-[14px] border border-line-soft bg-card px-4 py-3 pr-10">
+    <View
+      className="gap-3 rounded-[14px] border border-line-soft bg-card px-4 py-3 pr-10"
+      style={corners.panel}
+    >
       <View className="gap-1">
         <Text className="font-display text-[20px] text-ink">
           {rating

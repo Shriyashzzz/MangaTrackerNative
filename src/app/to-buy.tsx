@@ -2,6 +2,7 @@
 // buy, what they'd cost new and used all together, each with its prices,
 // On my shelf, Ordered and Remove, sorted their way, and Clear list.
 // Marking one theirs whose series isn't on the shelf offers to add it
+import { useCorners } from "@/lib/mangaThemes";
 import LimitCount from "@/components/LimitCount";
 import { columnStyle } from "@/lib/wide";
 import { coverAt, isNotACover } from "@/lib/coverAt";
@@ -246,6 +247,7 @@ function Card({
   // "My order" is showing: the ways up and down (null at an end)
   move: { up: (() => void) | null; down: (() => void) | null } | null;
 }) {
+  const corners = useCorners();
   const c = useColors();
   const [menuOpen, setMenuOpen] = useState(false);
   const coverUrl = item.coverUrl ?? item.seriesCoverUrl;
@@ -292,7 +294,10 @@ function Card({
     { label: "Remove from the list", onPress: onRemove, danger: true },
   ];
   return (
-    <View className="gap-2.5 rounded-[16px] border border-line-soft bg-card p-3">
+    <View
+      className="gap-2.5 rounded-[16px] border border-line-soft bg-card p-3"
+      style={corners.panel}
+    >
       <View className="flex-row gap-3">
         {/* as tall as the cover and no taller: stretched to the row's
             height, the band at its foot hung below the picture */}
@@ -444,6 +449,7 @@ function Card({
               accessibilityRole="link"
               accessibilityLabel={`${formatCents(other.cents)} ${other.kind} at ${other.store}. Open the store`}
               className="min-h-[44px] flex-row items-center justify-between gap-2 rounded-[12px] bg-ink/10 px-3 py-1.5"
+              style={corners.box}
             >
               <Text className="font-brand pr-[6px] text-[21px] leading-[26px] text-ink">
                 {formatCents(other.cents)}
@@ -466,6 +472,7 @@ function Card({
           accessibilityRole="link"
           accessibilityLabel={`${formatCents(best.cents)} ${best.kind} at ${best.store}. Open the store`}
           className="min-h-[46px] flex-row items-center justify-between gap-3 rounded-[12px] bg-accent px-3.5 py-2"
+          style={corners.box}
         >
           <Text className="font-brand pr-[6px] text-[23px] leading-[28px] text-on-accent">
             {formatCents(best.cents)}
@@ -484,6 +491,7 @@ function Card({
           onPress={open}
           accessibilityRole="link"
           className="min-h-[46px] flex-row items-center justify-between gap-3 rounded-[12px] bg-ink/10 px-3.5 py-2"
+          style={corners.box}
         >
           {item.outOn ? (
             <Text className="font-brand pr-[6px] text-[21px] leading-[28px] text-ink uppercase">

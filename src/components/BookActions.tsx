@@ -1,6 +1,7 @@
 // What a row of "Your books" can do besides its price and date (the web's
 // pages/Details/BookActions.tsx): a ⋮ sheet (Lend…, Got it back, Remove
 // book), the lend question, and the question before removing several
+import { useCorners } from "@/lib/mangaThemes";
 import Tap from "@/components/Tap";
 import { useState } from "react";
 import { Modal, Text, TextInput, View } from "react-native";
@@ -81,6 +82,7 @@ function Dialog({
   children: React.ReactNode;
   onClose: () => void;
 }) {
+  const corners = useCorners();
   return (
     <Modal visible transparent animationType="fade" onRequestClose={onClose}>
       <Tap
@@ -92,6 +94,7 @@ function Dialog({
           feel="none"
           className="w-full max-w-[400px] gap-3 rounded-[16px] border border-line-soft bg-card p-5"
           onPress={() => {}}
+          style={corners.panel}
         >
           <Text className="font-display text-[20px] text-ink">{title}</Text>
           {children}

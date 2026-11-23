@@ -1,6 +1,7 @@
 // Beside a series' title: a whole run in one buy, its box sets, and its
 // editions' bigger books, in one box with a pick between them (the web's
 // SetsBox with EditionsBox). The pick is remembered per series on this device
+import { useCorners } from "@/lib/mangaThemes";
 import Tap from "@/components/Tap";
 import { useState } from "react";
 import { Text, View } from "react-native";
@@ -43,6 +44,7 @@ function EditionsBox({
   owned: number[];
   onSeeAll: () => void;
 }) {
+  const corners = useCorners();
   const leading = leadBooksOf(line, owned);
   if (!leading) return null;
   const { theirs, shown } = leading;
@@ -58,6 +60,7 @@ function EditionsBox({
               openWebPath(volumePath(book.isbn13!, book.title ?? label))
             }
             className={`flex-row items-baseline justify-between gap-3 rounded-[12px] border-[1.5px] px-3 py-2.5 active:opacity-90 ${first ? "border-accent bg-accent-wash" : "border-dashed border-line-soft"}`}
+            style={corners.box}
           >
             <View className="min-w-0 flex-1">
               <Text
@@ -108,6 +111,7 @@ export default function SetsBox({
   owned: number[];
   onSeeAllBooks: (key: string) => void;
 }) {
+  const corners = useCorners();
   const c = useColors();
   const sets = shownSets(found, lines.length > 0);
   const showable = lines.filter((line) => leadBooksOf(line, owned) !== null);
@@ -129,7 +133,10 @@ export default function SetsBox({
   if (alone) title = line ? editionTitle(line) : setsTitle(sets);
   else if (sets.length) title = "Box sets & editions";
   return (
-    <View className="gap-2 rounded-[14px] border border-line-soft bg-card p-3">
+    <View
+      className="gap-2 rounded-[14px] border border-line-soft bg-card p-3"
+      style={corners.panel}
+    >
       <View className="flex-row items-center justify-between gap-3">
         <Text className="shrink font-brand pr-[4px] text-[18px] tracking-[1px] text-ink uppercase">
           {title}

@@ -1,5 +1,6 @@
 // The small pieces every settings tab is made of: a section with its
 // heading, a radio list, a tick row, and the note that says a save went
+import { useCorners } from "@/lib/mangaThemes";
 import Tap from "@/components/Tap";
 import type { ReactNode } from "react";
 import { Text, View } from "react-native";
@@ -52,11 +53,13 @@ export function Radios<T extends string>({
   onChange: (v: T) => void;
   label: string;
 }) {
+  const corners = useCorners();
   return (
     <View
       accessibilityRole="radiogroup"
       accessibilityLabel={label}
       className="overflow-hidden rounded-[14px] border border-line-soft bg-card"
+      style={corners.panel}
     >
       {options.map((o, i) => {
         const on = o.value === value;

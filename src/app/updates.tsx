@@ -1,5 +1,6 @@
 // What's new, as the web's pages/Updates/Updates.tsx: what's been added,
 // newest first, and what's coming
+import { useCorners } from "@/lib/mangaThemes";
 import { router } from "expo-router";
 import { Text, View } from "react-native";
 import Button from "@/components/Button";
@@ -91,6 +92,7 @@ const UPDATES = [
 ];
 
 export default function UpdatesScreen() {
+  const corners = useCorners();
   const checksOn = usePrefs((s) => s.prefs.releaseChecks !== "off");
   return (
     <Page title="What's new">
@@ -119,7 +121,10 @@ export default function UpdatesScreen() {
           </View>
         ))}
       </View>
-      <View className="gap-1 rounded-[14px] border border-dashed border-line-soft p-3">
+      <View
+        className="gap-1 rounded-[14px] border border-dashed border-line-soft p-3"
+        style={corners.panel}
+      >
         <Text className="self-start bg-accent px-1.5 font-brand pr-[4px] text-[14px] tracking-[1px] text-on-accent uppercase">
           Soon!
           {"\u00A0"}

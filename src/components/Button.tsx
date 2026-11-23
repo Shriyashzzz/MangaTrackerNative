@@ -2,6 +2,7 @@
 // tinted fill for the rest, a quiet outline for a destructive one. Rounded
 // and pressed like a platform button (PressScale), in the app's own colours
 // and type. Small for a line of text, wide for a row of its own
+import { useCorners } from "@/lib/mangaThemes";
 import { Text } from "react-native";
 import { look as platform } from "@/lib/platformLook";
 import PressScale from "./PressScale";
@@ -37,6 +38,8 @@ export default function Button({
   disabled?: boolean;
 }) {
   const look = KINDS[kind];
+  // a manga theme's own corners (lib/mangaThemes.ts)
+  const corners = useCorners();
   return (
     <PressScale
       onPress={onPress}
@@ -47,6 +50,7 @@ export default function Button({
         alignSelf: wide || grow ? "stretch" : center ? "center" : "flex-start",
         ...(grow ? { flex: 1 } : {}),
         opacity: disabled ? 0.45 : 1,
+        ...corners.box,
       }}
       className={`items-center justify-center overflow-hidden ${platform.buttonRadius} ${look.box} ${small ? "min-h-[36px] px-3.5 py-2" : "min-h-[48px] px-5 py-3"}`}
     >

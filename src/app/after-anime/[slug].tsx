@@ -1,6 +1,7 @@
 // A show's page, as the web's pages/AfterAnime/AfterAnimeShow.tsx: where the
 // anime leaves off and the chapter and volume to start the manga at, what to
 // buy and its price, what's left to read, every season, and the questions
+import { useCorners } from "@/lib/mangaThemes";
 import { openOutside } from "@/lib/openOutside";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
@@ -123,6 +124,7 @@ const Foot = ({ children }: { children: React.ReactNode }) => (
 );
 
 export default function AfterAnimeShowScreen() {
+  const corners = useCorners();
   const params = useLocalSearchParams<{ slug: string; name?: string }>();
   const asked = params.name ?? (params.slug ?? "").replace(/-/g, " ");
   const { loading, show, problem } = useAfterAnime(asked);
@@ -281,7 +283,10 @@ export default function AfterAnimeShowScreen() {
       {show && show.stops.length > 0 ? (
         <>
           {left ? (
-            <View className="gap-2 rounded-[14px] border border-dashed border-line-soft px-3 py-3">
+            <View
+              className="gap-2 rounded-[14px] border border-dashed border-line-soft px-3 py-3"
+              style={corners.panel}
+            >
               <Text className="font-brand pr-[4px] text-[18px] tracking-[1px] text-ink uppercase">
                 What's left to read
                 {"\u00A0"}

@@ -2,6 +2,7 @@
 // UpcomingReleases.tsx): the next release day and this month's count, with
 // three covers; opened, the month at a glance, the dates to save, the first
 // few releases, and the way to the full calendar
+import { useCorners } from "@/lib/mangaThemes";
 import { usePlan } from "@/store/plan";
 import Tap from "@/components/Tap";
 import { router, useFocusEffect } from "expo-router";
@@ -20,6 +21,7 @@ import ReleaseList, { VolumeCover } from "./calendar/ReleaseList";
 const SHOWN = 4;
 
 export default function UpcomingReleases() {
+  const corners = useCorners();
   const [months, setMonths] = useState<CalendarMonth[] | null>(null);
   const [open, setOpen] = useState(false);
   // Asked again each time New comes into view, not only the first time:
@@ -49,7 +51,10 @@ export default function UpcomingReleases() {
   const inMonth = month.volumes.length;
   const more = all.length - shown.length;
   return (
-    <View className="overflow-hidden rounded-[14px] bg-accent">
+    <View
+      className="overflow-hidden rounded-[14px] bg-accent"
+      style={corners.panel}
+    >
       <Tap
         onPress={() => setOpen(!open)}
         accessibilityState={{ expanded: open }}
@@ -69,7 +74,12 @@ export default function UpcomingReleases() {
           ))}
         </View>
         <View className="min-w-0 flex-1">
-          <Text className="font-brand pr-[4px] text-[18px] tracking-[1px] text-on-accent uppercase">
+          <Text
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.7}
+            className="font-brand pr-[4px] text-[18px] tracking-[1px] text-on-accent uppercase"
+          >
             Upcoming Releases
             {"\u00A0"}
           </Text>
@@ -97,6 +107,7 @@ export default function UpcomingReleases() {
               accessibilityRole="button"
               accessibilityLabel={`${more} more upcoming releases, with Premium`}
               className="mx-3 mb-3 mt-1 flex-row items-center justify-between rounded-[8px] border-2 border-dashed border-muted px-3 py-3"
+              style={corners.box}
             >
               <Text className="font-body-semibold text-[14.5px] text-ink">
                 {more} more upcoming {more === 1 ? "release" : "releases"}

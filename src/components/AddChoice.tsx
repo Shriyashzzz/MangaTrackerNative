@@ -1,5 +1,6 @@
 // "Add manga": type its name, or scan the barcode on the back of a volume
 // (the web's components/scanSheet/AddChoice.tsx), as a sheet
+import { useCorners } from "@/lib/mangaThemes";
 import Tap from "@/components/Tap";
 import { Text, View } from "react-native";
 import { BarcodeIcon, TypeIcon } from "@/core/components/icons/Icons";
@@ -15,6 +16,7 @@ export default function AddChoice({
   onScan: () => void;
   onClose: () => void;
 }) {
+  const corners = useCorners();
   const c = useColors();
   const choice = (
     Icon: typeof TypeIcon,
@@ -28,6 +30,7 @@ export default function AddChoice({
         run();
       }}
       className="flex-row items-center gap-3 rounded-[14px] border border-line-soft bg-card p-3 active:bg-accent-wash"
+      style={corners.panel}
     >
       <Icon color={c.ink} width={28} height={28} />
       <View className="min-w-0 flex-1">

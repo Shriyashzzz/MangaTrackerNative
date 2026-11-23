@@ -1,6 +1,7 @@
 // After the anime, as the web's pages/AfterAnime/AfterAnimeIndex.tsx: search
 // an anime or manga, or pick a show from the list, to find the chapter and
 // volume to read next
+import { useCorners } from "@/lib/mangaThemes";
 import Tap from "@/components/Tap";
 import { useEffect, useState } from "react";
 import { Text, TextInput, View } from "react-native";
@@ -22,6 +23,7 @@ const CARDS_A_PAGE = 12;
 const COLUMNS = 3;
 
 export default function AfterAnimeIndex() {
+  const corners = useCorners();
   const c = useColors();
   const [shows, setShows] = useState<AfterAnimeShow[] | null>(null);
   const [shownCount, setShownCount] = useState(CARDS_A_PAGE);
@@ -78,7 +80,10 @@ export default function AfterAnimeIndex() {
 
       {/* the search sits in the page, over the shows to pick from */}
       <View className="gap-1">
-        <View className="flex-row items-center gap-2 rounded-[14px] border border-line-soft bg-card px-3">
+        <View
+          className="flex-row items-center gap-2 rounded-[14px] border border-line-soft bg-card px-3"
+          style={corners.panel}
+        >
           <SearchIcon color={c.inkSoft} width={18} height={18} />
           <TextInput
             value={text}
@@ -160,6 +165,7 @@ export default function AfterAnimeIndex() {
             <Tap
               onPress={() => setShownCount(shownCount + CARDS_A_PAGE)}
               className="self-center rounded-[14px] border border-line-soft bg-card px-4 py-2.5 active:opacity-80"
+              style={corners.panel}
             >
               <Text className="font-body-semibold text-[15px] text-ink">
                 Show {Math.min(CARDS_A_PAGE, shows.length - shownCount)} more

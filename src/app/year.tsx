@@ -4,6 +4,7 @@
 // spent, the highlights, and the shelf as it stands. The numbers and words
 // are the web's (core lib/year). The web also draws the year as a magazine
 // cover to share; the app shares the words for now
+import { useCorners } from "@/lib/mangaThemes";
 import Tap from "@/components/Tap";
 import { router } from "expo-router";
 import { useEffect, useState, type ReactNode } from "react";
@@ -45,13 +46,17 @@ function Card({
   width: number;
   children: ReactNode;
 }) {
+  const corners = useCorners();
   return (
     <View
-      style={{
-        width,
-        backgroundColor: INKS[ink % INKS.length],
-        transform: [{ rotate: ink % 2 ? "0.6deg" : "-0.6deg" }],
-      }}
+      style={[
+        {
+          width,
+          backgroundColor: INKS[ink % INKS.length],
+          transform: [{ rotate: ink % 2 ? "0.6deg" : "-0.6deg" }],
+        },
+        corners.box,
+      ]}
       className="min-h-[300px] justify-between gap-3 rounded-[8px] border-2 border-line p-4"
     >
       {children}

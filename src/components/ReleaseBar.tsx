@@ -2,6 +2,7 @@
 // when), as the web's pages/Details/ReleaseBar.tsx: a red bar with the news,
 // a Psst! stamp on its top edge (clear of the button under it), the white button to buy or preorder the book,
 // and an × that silences this one release
+import { useCorners } from "@/lib/mangaThemes";
 import Tap from "@/components/Tap";
 import { Text, View } from "react-native";
 import { InkCrossIcon } from "@/core/components/icons/Icons";
@@ -16,9 +17,13 @@ export default function ReleaseBar({
   link: { to: string; label: string } | null;
   onClose: () => void;
 }) {
+  const corners = useCorners();
   return (
     <View className="mt-5">
-      <View className="flex-row flex-wrap items-center gap-x-2.5 gap-y-1.5 rounded-[14px] bg-accent py-2 pr-10 pl-3">
+      <View
+        className="flex-row flex-wrap items-center gap-x-2.5 gap-y-1.5 rounded-[14px] bg-accent py-2 pr-10 pl-3"
+        style={corners.panel}
+      >
         <Text className="min-w-0 flex-1 font-brand pr-[5px] text-[21px] leading-[24px] tracking-[1px] text-on-accent">
           {headline}
           {"\u00A0"}

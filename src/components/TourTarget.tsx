@@ -6,6 +6,7 @@
 // hidden under him (lib/tourGo.ts controlUsed). The
 // names are the website's own (its data-tour marks), so his script needs no
 // changes. With no tour on, it's just its children
+import { useCorners } from "@/lib/mangaThemes";
 import { useEffect, useRef, type ComponentRef, type ReactNode } from "react";
 import { useWindowDimensions, View } from "react-native";
 import { scrollTourBy } from "@/lib/tourScroll";
@@ -37,6 +38,7 @@ export default function TourTarget({
   // around something round (the + button): the ring is a circle
   round?: boolean;
 }) {
+  const corners = useCorners();
   const pointedAt = useTourTarget() === name;
   const box = useRef<ComponentRef<typeof View>>(null);
   const { height: screen } = useWindowDimensions();
@@ -82,6 +84,7 @@ export default function TourTarget({
       ref={box}
       collapsable={false}
       className={`${className} ${pointedAt ? `${round ? "rounded-full" : "rounded-[10px]"} bg-accent-wash outline-2 outline-offset-4 outline-accent` : ""}`}
+      style={corners.box}
     >
       {children}
     </View>

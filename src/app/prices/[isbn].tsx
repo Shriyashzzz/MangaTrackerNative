@@ -4,6 +4,7 @@
 // Canada's), the box-set note, more places to look, the price history,
 // about the series, readers' reviews, and the volumes beside it. Every rule
 // is the web's (core volumePageRules, offerLabels, useVolumeLoad)
+import { useCorners } from "@/lib/mangaThemes";
 import { columnStyle } from "@/lib/wide";
 import { useShelf } from "@/store/shelf";
 import { useTourScroll } from "@/lib/tourScroll";
@@ -87,6 +88,7 @@ const WHY_NONE_CA: Record<string, string> = {
 };
 
 export default function PriceVolumeScreen() {
+  const corners = useCorners();
   const { isbn } = useLocalSearchParams<{ isbn: string }>();
   const c = useColors();
   const country = usePrefs((s) => (s.prefs.country === "ca" ? "ca" : "us"));
@@ -516,7 +518,10 @@ export default function PriceVolumeScreen() {
             <>
               {preorder ? (
                 <View className="gap-3">
-                  <View className="gap-1 rounded-[14px] bg-accent-wash px-4 py-3.5">
+                  <View
+                    className="gap-1 rounded-[14px] bg-accent-wash px-4 py-3.5"
+                    style={corners.panel}
+                  >
                     <Text className="self-start bg-accent px-1.5 pt-0.5 font-brand pr-[4px] text-[13px] tracking-[1px] text-on-accent uppercase">
                       Preorder
                       {"\u00A0"}
@@ -540,7 +545,10 @@ export default function PriceVolumeScreen() {
               ) : (
                 // no prices to list: the same box the prices come in, so the
                 // page keeps its shape
-                <View className="rounded-[14px] border border-line-soft bg-card px-4 py-3.5">
+                <View
+                  className="rounded-[14px] border border-line-soft bg-card px-4 py-3.5"
+                  style={corners.panel}
+                >
                   <Text className="font-body text-[14.5px] leading-[21px] text-ink-soft">
                     {page.refreshing
                       ? "Checking stores for prices…"
@@ -613,6 +621,7 @@ export default function PriceVolumeScreen() {
                   <View
                     key={k.kind}
                     className="gap-3 rounded-[14px] border border-line-soft bg-card p-4"
+                    style={corners.panel}
                   >
                     <Text
                       className={`self-start px-1.5 pt-0.5 font-brand pr-[4px] text-[13px] tracking-[1px] uppercase ${k.kind === "new" ? "bg-award-new text-on-award-new" : "bg-award-market text-stamp-ink"}`}

@@ -4,6 +4,7 @@
 // and the highlights: Popular this season, Latest deals, Prices
 // just checked. A search lists the series found, with Did you mean for a
 // typo. The rules are the web's (core findSeries, nearMatches, askedEdition)
+import { useCorners } from "@/lib/mangaThemes";
 import { IOS, useTabFoot } from "@/lib/tabHeader";
 import { columnStyle, gridOf, useWide } from "@/lib/wide";
 import Tap from "@/components/Tap";
@@ -138,6 +139,7 @@ function HighlightsStrip() {
 }
 
 export default function PricesScreen() {
+  const corners = useCorners();
   const foot = useTabFoot(40);
   const c = useColors();
   const pull = usePullTop();
@@ -249,7 +251,10 @@ export default function PricesScreen() {
           >
             <ChevronLeftIcon color={c.ink} width={24} height={24} />
           </Tap>
-          <View className="flex-1 flex-row items-center gap-2 rounded-[14px] border border-line-soft bg-card px-3">
+          <View
+            className="flex-1 flex-row items-center gap-2 rounded-[14px] border border-line-soft bg-card px-3"
+            style={corners.panel}
+          >
             <SearchIcon color={c.inkSoft} width={18} height={18} />
             <TextInput
               autoFocus
@@ -359,7 +364,10 @@ export default function PricesScreen() {
         >
           {!searching ? <DealsStrip /> : null}
           {/* Price check, from its name to the names to try, in one box */}
-          <View className="gap-3 rounded-[16px] border border-line-soft bg-card p-4">
+          <View
+            className="gap-3 rounded-[16px] border border-line-soft bg-card p-4"
+            style={corners.panel}
+          >
             <Text className="font-brand pr-[7px] text-[30px] tracking-[1px] text-ink uppercase">
               Price check
               {"\u00A0"}
@@ -376,6 +384,7 @@ export default function PricesScreen() {
               onPress={() => setFull(true)}
               className="flex-row items-center gap-2 rounded-[12px] border border-line-soft bg-paper px-3"
               accessibilityLabel="Search a series or an ISBN"
+              style={corners.box}
             >
               <SearchIcon color={c.inkSoft} width={20} height={20} />
               <Text
@@ -415,6 +424,7 @@ export default function PricesScreen() {
               onPress={() => router.push("/after-anime")}
               accessibilityRole="link"
               className="gap-2 rounded-[14px] border border-line-soft bg-card px-4 pt-3.5 pb-3.5"
+              style={corners.panel}
             >
               {/* the door to After the anime: a small stamped title, the
                 words, the way in; a side door, not the main one */}

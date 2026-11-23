@@ -27,11 +27,17 @@ export const MANGA_THEMES: {
   // its stamp word
   stamp: string;
   dark: boolean;
+  // its heading lettering (src/global.css sets it as font-brand)
+  font: string;
+  // its panels' and cards' corners, and smaller boxes' (buttons, fields)
+  corners: { panel: number; box: number };
   // for its card in Settings: paper, ink, accent
   swatch: [string, string, string];
 }[] = [
   {
     id: "shonen",
+    corners: { panel: 3, box: 2 },
+    font: "Bangers_400Regular",
     name: "Shōnen",
     tagline: "Hype, every chapter",
     sfx: "ドドド",
@@ -41,6 +47,8 @@ export const MANGA_THEMES: {
   },
   {
     id: "shojo",
+    corners: { panel: 22, box: 18 },
+    font: "Chewy_400Regular",
     name: "Shōjo",
     tagline: "Hearts in every panel",
     sfx: "キラキラ",
@@ -50,6 +58,8 @@ export const MANGA_THEMES: {
   },
   {
     id: "seinen",
+    corners: { panel: 0, box: 0 },
+    font: "PermanentMarker_400Regular",
     name: "Seinen",
     tagline: "Ink, rain and quiet",
     sfx: "ゴゴゴ",
@@ -59,6 +69,8 @@ export const MANGA_THEMES: {
   },
   {
     id: "isekai",
+    corners: { panel: 6, box: 4 },
+    font: "PirataOne_400Regular",
     name: "Isekai",
     tagline: "Your shelf, another world",
     sfx: "",
@@ -68,6 +80,8 @@ export const MANGA_THEMES: {
   },
   {
     id: "cozy",
+    corners: { panel: 20, box: 16 },
+    font: "Fredoka_600SemiBold",
     name: "Slice of life",
     tagline: "Tea, rain, one more chapter",
     sfx: "ほっ",
@@ -77,6 +91,8 @@ export const MANGA_THEMES: {
   },
   {
     id: "horror",
+    corners: { panel: 0, box: 0 },
+    font: "Creepster_400Regular",
     name: "Horror",
     tagline: "Read with the lights on",
     sfx: "ゾクッ",
@@ -86,6 +102,8 @@ export const MANGA_THEMES: {
   },
   {
     id: "sports",
+    corners: { panel: 12, box: 10 },
+    font: "BebasNeue_400Regular",
     name: "Sports",
     tagline: "One more match, one more volume",
     sfx: "バシッ",
@@ -95,6 +113,8 @@ export const MANGA_THEMES: {
   },
   {
     id: "mecha",
+    corners: { panel: 0, box: 0 },
+    font: "Rajdhani_700Bold",
     name: "Mecha",
     tagline: "Systems online. Shelf loaded.",
     sfx: "ガシャン",
@@ -141,4 +161,21 @@ export function useWornTheme(): MangaTheme | null {
   const picked = useLook((s) => s.picked);
   const premium = usePlan((s) => !s.plan.limited);
   return THEMES_HERE && premium ? picked : null;
+}
+
+// the corners panels and boxes take now: the worn theme's, or the app's own
+// (rounded-[14px] and rounded-[12px] in the class names stay as the
+// fallback; these are laid over them as a style)
+const NO_CORNERS = { panel: undefined, box: undefined };
+export function useCorners(): {
+  panel: { borderRadius: number } | undefined;
+  box: { borderRadius: number } | undefined;
+} {
+  const worn = useWornTheme();
+  const corners = worn ? themeOf(worn)!.corners : null;
+  if (!corners) return NO_CORNERS;
+  return {
+    panel: { borderRadius: corners.panel },
+    box: { borderRadius: corners.box },
+  };
 }

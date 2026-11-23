@@ -44,12 +44,16 @@ function ThemeCard({
       accessibilityState={{ selected: on }}
       accessibilityLabel={`${t.name}: ${t.tagline}${locked ? ". Premium" : ""}`}
       className={`w-[48%] overflow-hidden rounded-[10px] ${on ? "border-[3px] border-accent" : "border-2 border-line"}`}
-      style={{ backgroundColor: paper }}
+      // its own corners, as it would wear them
+      style={{ backgroundColor: paper, borderRadius: t.corners.panel }}
     >
       <View className="gap-1 px-3 pt-3 pb-2.5">
         <Text
-          className="font-brand pr-[4px] text-[22px] tracking-[0.5px] uppercase"
-          style={{ color: ink }}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.7}
+          className="pr-[4px] text-[22px] tracking-[0.5px] uppercase"
+          style={{ color: ink, fontFamily: t.font }}
         >
           {t.name}
           {" "}

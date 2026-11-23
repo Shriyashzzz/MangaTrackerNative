@@ -1,5 +1,6 @@
 // "Collect every volume" (the web's SeriesCostBox): what the whole series
 // costs new at the lowest prices found, and used copies on sale now
+import { useCorners } from "@/lib/mangaThemes";
 import { Text, View } from "react-native";
 import { runTotal, type SeriesCost } from "@/core/lib/finishCost";
 import { formatCents, wholeMoney } from "@/core/lib/prices";
@@ -63,6 +64,7 @@ export default function SeriesCostBox({
   used: { volumes: number; cents: number } | null;
   comingSoon: boolean;
 }) {
+  const corners = useCorners();
   const run = runTotal(cost);
   // too few priced for the real estimate: the priced ones' average, times
   // the run, said as the rough guess it is
@@ -72,7 +74,10 @@ export default function SeriesCostBox({
       : 0;
   if (!run && !used && !rough) return null;
   return (
-    <View className="gap-1.5 rounded-[14px] border border-line-soft bg-card p-3">
+    <View
+      className="gap-1.5 rounded-[14px] border border-line-soft bg-card p-3"
+      style={corners.panel}
+    >
       <Text className="font-brand pr-[4px] text-[18px] tracking-[1px] text-ink uppercase">
         Collect every volume
         {"\u00A0"}

@@ -1,5 +1,6 @@
 // A month at a glance (the web's components/calendar/MiniMonth.tsx): the
 // days in a grid, today marked, each release day circled in red ink
+import { useCorners } from "@/lib/mangaThemes";
 import { Text, View } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import {
@@ -22,6 +23,7 @@ export default function MiniMonth({
   // it sits on a card already (the New tab's panel): the page colour then
   onCard?: boolean;
 }) {
+  const corners = useCorners();
   const c = useColors();
   const today = todayIso();
   const byDay = new Map<string, CalendarVolume[]>();
@@ -30,6 +32,7 @@ export default function MiniMonth({
   return (
     <View
       className={`gap-2.5 rounded-[14px] border border-line-soft p-4 ${onCard ? "bg-paper" : "bg-card"}`}
+      style={corners.panel}
     >
       <View className="flex-row items-baseline justify-between">
         <Text className="font-brand pr-[5px] text-[19px] tracking-[1px] text-ink uppercase">

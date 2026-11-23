@@ -10,6 +10,7 @@
 // (or a pill beside the button) also says it's a practice shelf, with the
 // two ways out. The lines are the website's (core components/tour/
 // steps.ts), the phone's wording where it has one
+import { useCorners } from "@/lib/mangaThemes";
 import { usePathname } from "expo-router";
 import { useState } from "react";
 import { Text, useWindowDimensions, View } from "react-native";
@@ -36,6 +37,7 @@ const HEADER = 64;
 const SIDE = 12;
 
 export default function Tour({ signedIn }: { signedIn: boolean }) {
+  const corners = useCorners();
   const { steps, at, hidden, box: found, hide } = useTour();
   const here = usePathname();
   const insets = useSafeAreaInsets();
@@ -184,7 +186,7 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
     >
       <View
         className="rounded-[18px] border-[1.5px] border-line bg-card px-3.5 pt-3 pb-2.5"
-        style={{ elevation: 8 }}
+        style={[{ elevation: 8 }, corners.panel]}
       >
         {place.tail ? tail(place.tail) : null}
         {/* Kenji leans on the bubble's top corner, half outside it */}

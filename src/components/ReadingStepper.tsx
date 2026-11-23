@@ -3,6 +3,7 @@
 // edition they collect. Typed or stepped, it saves a moment after the last
 // change, saves in order, and puts the saved number back when one fails.
 // Leaving the page with a change not yet sent still sends it
+import { useCorners } from "@/lib/mangaThemes";
 import Tap from "@/components/Tap";
 import * as Haptics from "expo-haptics";
 import { useEffect, useRef, useState } from "react";
@@ -57,6 +58,7 @@ export default function ReadingStepper({
   // counting the edition's books, not volumes
   books?: BookCounting;
 }) {
+  const corners = useCorners();
   const c = useColors();
   const max = books ? books.count : UNITS[unit].max;
   const counted = books ? "book" : unit;
@@ -192,7 +194,10 @@ export default function ReadingStepper({
     <View
       className={books ? "items-start gap-1" : "flex-row items-center gap-2.5"}
     >
-      <View className="flex-row items-center overflow-hidden rounded-[12px] bg-ink/10">
+      <View
+        className="flex-row items-center overflow-hidden rounded-[12px] bg-ink/10"
+        style={corners.box}
+      >
         {button(-1, `One ${counted} back`, "−", current <= 0)}
         <TextInput
           value={draft}

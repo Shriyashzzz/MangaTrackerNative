@@ -3,6 +3,7 @@
 // a row per series. Pull down to load it again. Volumes is its own view
 // (VolumesView). Who's in each tab, the search and the sort are the web's own
 // rules (core filterShelf); it opens on the tab and sort the account chose
+import { useCorners } from "@/lib/mangaThemes";
 import { useLimit } from "@/components/LimitCount";
 import { IOS, useTabFoot } from "@/lib/tabHeader";
 import { columnStyle } from "@/lib/wide";
@@ -68,6 +69,7 @@ type TabId = (typeof TABS)[number]["value"];
 const isTab = (tab: unknown): tab is TabId => TABS.some((t) => t.value === tab);
 
 function SignedInShelf() {
+  const corners = useCorners();
   const foot = useTabFoot(112, 64);
   const seriesLimit = useLimit("series");
   const c = useColors();
@@ -209,7 +211,10 @@ function SignedInShelf() {
           and sort on the right */}
         <View className="h-[64px] flex-row items-center gap-2 px-4 pt-3">
           {searching ? (
-            <View className="flex-1 flex-row items-center gap-2 rounded-[14px] border border-line-soft bg-card px-3">
+            <View
+              className="flex-1 flex-row items-center gap-2 rounded-[14px] border border-line-soft bg-card px-3"
+              style={corners.panel}
+            >
               <SearchIcon color={c.inkSoft} width={18} height={18} />
               <TextInput
                 autoFocus

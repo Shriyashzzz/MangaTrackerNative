@@ -3,6 +3,7 @@
 // complete it is and where the biggest gaps are, the genres, and the
 // longest runs. Every figure is from lib/collectionStats.ts or the server's
 // own shelf totals; a number the app can't know isn't shown as one
+import { useCorners } from "@/lib/mangaThemes";
 import Tap from "@/components/Tap";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
@@ -26,15 +27,21 @@ const GENRES_SHOWN = 6;
 const RUNS_SHOWN = 5;
 
 // one figure with what it counts under it
-const Figure = ({ value, label }: { value: string; label: string }) => (
-  <View className="min-w-[46%] flex-1 gap-0.5 rounded-[14px] border border-line-soft bg-card px-4 py-3">
-    <Text className="font-brand pr-[7px] text-[28px] leading-[32px] text-ink">
-      {value}
-      {" "}
-    </Text>
-    <Text className="font-body text-[13px] text-ink-soft">{label}</Text>
-  </View>
-);
+function Figure({ value, label }: { value: string; label: string }) {
+  const corners = useCorners();
+  return (
+    <View
+      className="min-w-[46%] flex-1 gap-0.5 rounded-[14px] border border-line-soft bg-card px-4 py-3"
+      style={corners.panel}
+    >
+      <Text className="font-brand pr-[7px] text-[28px] leading-[32px] text-ink">
+        {value}
+        {" "}
+      </Text>
+      <Text className="font-body text-[13px] text-ink-soft">{label}</Text>
+    </View>
+  );
+}
 
 // a named row with its bar: how big it is against the biggest in its list
 function BarRow({

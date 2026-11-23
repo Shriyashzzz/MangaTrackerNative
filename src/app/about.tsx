@@ -1,4 +1,5 @@
 import { openOutside } from "@/lib/openOutside";
+import { useCorners } from "@/lib/mangaThemes";
 import Button from "@/components/Button";
 import Mascot from "@/components/Mascot";
 import Page, { H2, H3, P, Rule, TextLink } from "@/components/Page";
@@ -57,6 +58,7 @@ const STORY: { title: string; words: string; priceCheck?: boolean }[] = [
 ];
 
 export default function AboutScreen() {
+  const corners = useCorners();
   const [priced, setPriced] = useState(0);
 
   useEffect(() => {
@@ -72,7 +74,10 @@ export default function AboutScreen() {
   return (
     <Page title="About">
       {/* Hero */}
-      <View className="items-center gap-3 rounded-[14px] border border-line-soft bg-card p-5">
+      <View
+        className="items-center gap-3 rounded-[14px] border border-line-soft bg-card p-5"
+        style={corners.panel}
+      >
         <Mascot mood="happy" width={120} />
 
         <Text className="text-center font-brand pr-[7px] text-[30px] leading-[34px] tracking-[1px] text-ink uppercase">
@@ -92,9 +97,11 @@ export default function AboutScreen() {
           <View
             key={part.title}
             className="overflow-hidden rounded-[14px] bg-card"
+            style={corners.panel}
           >
             <View
               className={`gap-1.5 rounded-[14px] border p-4 ${i % 2 ? "border-accent/30 bg-accent-wash" : "border-line-soft"}`}
+              style={corners.panel}
             >
               <Text className="font-mono-medium text-[11.5px] tracking-[1.5px] text-accent-ink uppercase">
                 Ch. {String(i + 1).padStart(2, "0")}
@@ -117,7 +124,10 @@ export default function AboutScreen() {
           </View>
         ))}
         {/* the author's note at the back of the volume */}
-        <View className="flex-row items-center gap-3 rounded-[14px] border border-dashed border-line bg-paper-2 p-4">
+        <View
+          className="flex-row items-center gap-3 rounded-[14px] border border-dashed border-line bg-paper-2 p-4"
+          style={corners.panel}
+        >
           <Mascot mood="reading" width={64} />
           <View className="min-w-0 flex-1 gap-1">
             <Text className="font-mono-medium text-[11.5px] tracking-[1.5px] text-ink-soft uppercase">

@@ -2,6 +2,7 @@
 // ReviewScore and ReviewItem): the score and its spread, their own review
 // with Edit and Delete, the others with spoilers inked out until tapped,
 // Spoiler? and Report, and the way to write one (if they've read it)
+import { useCorners } from "@/lib/mangaThemes";
 import Tap from "@/components/Tap";
 import { useState } from "react";
 import { Text, View } from "react-native";
@@ -169,6 +170,7 @@ export default function VolumeReviews({
   data: Data;
   reload: () => Promise<void>;
 }) {
+  const corners = useCorners();
   const [writing, setWriting] = useState(false);
   const [most, setMost] = useState(FIRST);
   const [turnedAway, setTurnedAway] = useState(false);
@@ -261,7 +263,10 @@ export default function VolumeReviews({
       ) : null}
       {others.length === 0 && data.average === null ? (
         !writing && !yours ? (
-          <View className="gap-2 rounded-[14px] border border-dashed border-line-soft p-3">
+          <View
+            className="gap-2 rounded-[14px] border border-dashed border-line-soft p-3"
+            style={corners.panel}
+          >
             <Text className="font-body-semibold text-[15px] text-ink">
               Read this one?
             </Text>

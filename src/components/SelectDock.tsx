@@ -2,6 +2,7 @@
 // SelectDock.tsx): how many are picked, Select all, Move to, Delete, Done.
 // Under it, or on its own once selecting is over, the note of the last move
 // with its Undo
+import { useCorners } from "@/lib/mangaThemes";
 import Tap from "@/components/Tap";
 import { useState } from "react";
 import { Text, View } from "react-native";
@@ -52,6 +53,7 @@ export default function SelectDock({
   shown: Manga[];
   tab: string;
 }) {
+  const corners = useCorners();
   const c = useColors();
   const insets = useSafeAreaInsets();
   const [movePicking, setMovePicking] = useState(false);
@@ -64,7 +66,10 @@ export default function SelectDock({
       style={{ bottom: insets.bottom + 16 }}
     >
       <MovedNote select={select} />
-      <View className="w-full flex-row items-center justify-between rounded-[18px] border border-line-soft bg-card px-4 py-1.5">
+      <View
+        className="w-full flex-row items-center justify-between rounded-[18px] border border-line-soft bg-card px-4 py-1.5"
+        style={corners.panel}
+      >
         <Text className="font-brand pr-[5px] text-[22px] text-ink">
           {count}
           {"\u00A0"}

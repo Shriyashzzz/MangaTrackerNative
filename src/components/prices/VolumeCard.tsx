@@ -90,12 +90,14 @@ export function VolTab({
       className={`absolute top-0 left-0 flex-row items-baseline gap-0.5 bg-ink ${small ? "px-1 pb-px" : "px-1.5 pb-0.5"}`}
     >
       <Text
+        numberOfLines={1}
         className={`font-brand pr-[3px] tracking-[0.5px] text-paper uppercase ${small ? "text-[8px]" : "text-[10px]"}`}
       >
         {many ? "Vols." : "Vol."}
         {"\u00A0"}
       </Text>
       <Text
+        numberOfLines={1}
         className={`font-brand pr-[3px] text-paper ${small ? "text-[11px]" : "text-[15px]"}`}
       >
         {number}

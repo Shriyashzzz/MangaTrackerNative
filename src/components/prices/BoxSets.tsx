@@ -1,6 +1,7 @@
 // A series' box sets (the web's BoxSets.tsx): the cheapest as a ticket, the
 // rest a price list, and the stores to look in; or, with none priced, where
 // to look for one (BoxSetSearch). A volume page's "Also in a box set" note
+import { useCorners } from "@/lib/mangaThemes";
 import Tap from "@/components/Tap";
 import { openOutside } from "@/lib/openOutside";
 import { Text, View } from "react-native";
@@ -67,6 +68,7 @@ export default function BoxSets({
   editionsListed: boolean;
   bare?: boolean;
 }) {
+  const corners = useCorners();
   const sets = shownSets(found, editionsListed);
   if (!sets.length) return null;
   const affiliate = [...sets, ...links].some((l) => l.affiliate);
@@ -83,6 +85,7 @@ export default function BoxSets({
       <Tap
         onPress={cheapest!.url ? () => openOutside(cheapest!.url!) : undefined}
         className="flex-row items-baseline justify-between gap-3 rounded-[12px] border-[1.5px] border-accent bg-accent-wash px-3 py-2.5 active:opacity-90"
+        style={corners.box}
       >
         <View className="min-w-0 flex-1">
           <Text className="font-mono-medium text-[11.5px] tracking-[1px] text-accent-ink uppercase">
