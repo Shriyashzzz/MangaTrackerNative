@@ -333,7 +333,7 @@ export default function CollectorSheet() {
       {/* the prices, only where Collector is sold */}
       {plan.limited ? (
         <>
-          <View className="flex-row gap-2.5">
+          <View className="mt-1.5 flex-row gap-2.5">
             {PRICES.map((p) => {
               const on = picked === p.key;
               return (
@@ -360,8 +360,22 @@ export default function CollectorSheet() {
                     style={TEXT.plain}
                     className="font-body text-[13px] text-muted"
                   >
-                    {p.key === "year" && trial ? `${trial} free` : p.note}
+                    {p.key === "year" ? "Best value" : p.note}
                   </Text>
+                  {/* the free trial, stamped on the yearly card as the
+                      app's other stamps are (only once Apple says there is
+                      one, and that this Apple ID can have it) */}
+                  {p.key === "year" && trial ? (
+                    <View
+                      pointerEvents="none"
+                      className="absolute -top-3 right-2.5 border-[1.5px] border-ink bg-accent px-1.5"
+                      style={{ transform: [{ rotate: "-3deg" }] }}
+                    >
+                      <Text className="font-brand pr-[3px] text-[13px] tracking-[0.5px] text-on-accent uppercase">
+                        {trial} free!{"\u00A0"}
+                      </Text>
+                    </View>
+                  ) : null}
                 </Tap>
               );
             })}
