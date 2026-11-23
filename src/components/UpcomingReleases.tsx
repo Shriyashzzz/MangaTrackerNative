@@ -3,8 +3,8 @@
 // three covers; opened, the month at a glance, the dates to save, the first
 // few releases, and the way to the full calendar
 import Tap from "@/components/Tap";
-import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 import { Text, View } from "react-native";
 import { ChevronDownIcon } from "@/core/components/icons/Icons";
 import {
@@ -23,13 +23,19 @@ const SHOWN = 6;
 export default function UpcomingReleases() {
   const [months, setMonths] = useState<CalendarMonth[] | null>(null);
   const [open, setOpen] = useState(false);
-  useEffect(() => {
-    const controller = new AbortController();
-    getCalendar(controller.signal)
-      .then(setMonths)
-      .catch(() => {});
-    return () => controller.abort();
-  }, []);
+  // Asked again each time New comes into view, not only the first time:
+  // the tab stays alive while the app is open, so an answer from days ago
+  // (or one missed while there was no connection) kept a new release out
+  // of the list until the app was closed
+  useFocusEffect(
+    useCallback(() => {
+      const controller = new AbortController();
+      getCalendar(controller.signal)
+        .then(setMonths)
+        .catch(() => {});
+      return () => controller.abort();
+    }, []),
+  );
   const first = months?.[0];
   if (!first?.volumes.length) return null;
   const next = first.volumes[0]!;
