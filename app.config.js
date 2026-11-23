@@ -21,6 +21,19 @@ module.exports = ({ config }) => ({
     package: production ? PLAY_PACKAGE : config.android.package,
     // the session cookie stays out of Android's cloud backups
     allowBackup: false,
+    // Left out of a production build: drawing over other apps is only for
+    // the development menu, and nothing in the app unlocks with a
+    // fingerprint (the libraries that bring these along never use them)
+    blockedPermissions: [
+      ...(config.android.blockedPermissions ?? []),
+      ...(production
+        ? [
+            "android.permission.SYSTEM_ALERT_WINDOW",
+            "android.permission.USE_BIOMETRIC",
+            "android.permission.USE_FINGERPRINT",
+          ]
+        : []),
+    ],
   },
   plugins: [
     ...(config.plugins ?? []).map((plugin) =>
