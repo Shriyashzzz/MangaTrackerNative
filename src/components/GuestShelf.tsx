@@ -2,7 +2,7 @@
 // what a shelf is for, and the two ways in. Prices stay open to them along
 // the bottom
 import { useTabFoot } from "@/lib/tabHeader";
-import { columnStyle } from "@/lib/wide";
+import { columnStyle, useWide } from "@/lib/wide";
 import { startPractice } from "@/lib/practice";
 import Tap from "@/components/Tap";
 import { router } from "expo-router";
@@ -52,20 +52,29 @@ const STAMPS = [
 
 // a practice shelf's button inside Kenji's bubble, drawn like a panel
 function TourButton({
-  label,
+  kind,
   onPress,
 }: {
-  label: string;
+  kind: "Reader" | "Collector";
   onPress: () => void;
 }) {
+  const label = `${kind}'s tour`;
   return (
     <Tap
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`Tour a ${label.toLowerCase()}'s practice shelf`}
-      className="flex-1 items-center rounded-[10px] border-2 border-line bg-paper-2 py-2"
+      accessibilityLabel={`Tour a ${kind.toLowerCase()}'s practice shelf`}
+      // room inside the outline, so the words never touch it
+      className="flex-1 items-center justify-center rounded-[10px] border-2 border-line bg-paper-2 px-2.5 py-2"
     >
-      <Text className="font-brand pr-[4px] text-[17px] tracking-[0.5px] text-ink uppercase">
+      <Text
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.8}
+        // one size for both, so the pair matches ("Collector's" is the
+        // longer and sets it)
+        className="text-center font-brand pr-[4px] text-[15px] tracking-[0.5px] text-ink uppercase"
+      >
         {label}
         {"\u00A0"}
       </Text>
@@ -140,12 +149,19 @@ function StockingShelf() {
   );
 }
 
+// the box's widest on an iPad
+const TALL_WIDTH = 580;
+
 export default function GuestShelf() {
   const foot = useTabFoot(120);
   // a small screen (an iPhone app in an iPad's window, a small phone): the
   // box set tighter, so it still fits without its lines wrapping
   const { width, height } = useWindowDimensions();
   const small = width < 380 || height < 760;
+  // an iPad: the box stands tall, like a volume on the shelf, its parts
+  // spread down it rather than bunched in the middle of the screen
+  const { wide } = useWide();
+  const tall = wide && height >= 900;
   // pressed: the loader shows first, then the shelf is put together (the
   // work would otherwise hold the press's own frame back)
   const [starting, setStarting] = useState(false);
@@ -161,11 +177,19 @@ export default function GuestShelf() {
       contentContainerClassName="grow justify-center gap-6 px-4 pt-4"
       // room under the last line (About, Questions, Privacy), clear of the
       // tab bar
-      contentContainerStyle={{ ...columnStyle, paddingBottom: foot }}
+      contentContainerStyle={{
+        ...columnStyle,
+        // on an iPad, a volume's width rather than the whole column
+        ...(tall ? { maxWidth: TALL_WIDTH } : {}),
+        paddingBottom: foot,
+      }}
     >
       {starting ? <StockingShelf /> : null}
       {/* the whole welcome as volume one: an inked box with a spine */}
-      <View className="flex-row overflow-hidden rounded-[14px] border-2 border-line bg-card">
+      <View
+        className="flex-row overflow-hidden rounded-[14px] border-2 border-line bg-card"
+        style={tall ? { minHeight: Math.min(height * 0.56, 780) } : undefined}
+      >
         <View
           accessible={false}
           importantForAccessibility="no-hide-descendants"
@@ -186,9 +210,11 @@ export default function GuestShelf() {
             </Text>
           </View>
         </View>
-        <View className={`flex-1 ${small ? "gap-2.5 p-3" : "gap-3.5 p-3.5"}`}>
+        <View
+          className={`flex-1 ${small ? "gap-2.5 p-3" : tall ? "justify-center gap-7 px-7 py-8" : "gap-3.5 p-3.5"}`}
+        >
           <AuthArt
-            compact
+            compact={!tall}
             sfx="A new series begins!"
             chapter="1"
             line="Your shelf lives here once you sign up."
@@ -204,7 +230,7 @@ export default function GuestShelf() {
                 style={{ transform: [{ rotate: `${stamp.tilt}deg` }] }}
               >
                 <Text
-                  className={`font-brand pr-[3px] tracking-[0.5px] uppercase ${small ? "text-[13px]" : "text-[15px]"} ${stamp.text}`}
+                  className={`font-brand pr-[3px] tracking-[0.5px] uppercase ${small ? "text-[13px]" : tall ? "text-[18px]" : "text-[15px]"} ${stamp.text}`}
                 >
                   {stamp.label}
                   {"\u00A0"}
@@ -215,7 +241,7 @@ export default function GuestShelf() {
           {/* Kenji offers the tour: the practice shelves, nothing kept */}
           <View className="flex-row items-end gap-1.5">
             <View style={{ marginBottom: -2 }}>
-              <Mascot mood="happy" width={small ? 56 : 72} />
+              <Mascot mood="happy" width={small ? 56 : tall ? 96 : 72} />
             </View>
             <View className="mb-5 flex-1 rounded-[18px] border-2 border-line bg-card px-2.5 pt-2.5 pb-2.5">
               <Text
@@ -227,9 +253,9 @@ export default function GuestShelf() {
                 I&apos;ll walk you round a practice shelf.
               </Text>
               <View className="flex-row gap-1.5">
-                <TourButton label="Reader" onPress={() => start("reader")} />
+                <TourButton kind="Reader" onPress={() => start("reader")} />
                 <TourButton
-                  label="Collector"
+                  kind="Collector"
                   onPress={() => start("collector")}
                 />
               </View>
@@ -244,25 +270,29 @@ export default function GuestShelf() {
               />
             </View>
           </View>
-          <Text className="text-center font-display text-[14.5px] text-ink">
-            Or keep your own shelf from day one.
-          </Text>
-          <Button
-            kind="primary"
-            label="Start your shelf"
-            wide
-            onPress={() => router.push("/sign-up")}
-          />
-          <Text className="text-center font-body text-[14px] text-ink-soft">
-            Already have a shelf?{"  "}
-            <Text
-              onPress={() => router.push("/sign-in")}
-              accessibilityRole="link"
-              className="font-body-semibold text-accent"
-            >
-              Sign in
+          {/* the way to start a real shelf, kept together so on a tall
+              box the line sits right over its button */}
+          <View className={small ? "gap-2.5" : "gap-3.5"}>
+            <Text className="text-center font-display text-[14.5px] text-ink">
+              Or keep your own shelf from day one.
             </Text>
-          </Text>
+            <Button
+              kind="primary"
+              label="Start your shelf"
+              wide
+              onPress={() => router.push("/sign-up")}
+            />
+            <Text className="text-center font-body text-[14px] text-ink-soft">
+              Already have a shelf?{"  "}
+              <Text
+                onPress={() => router.push("/sign-in")}
+                accessibilityRole="link"
+                className="font-body-semibold text-accent"
+              >
+                Sign in
+              </Text>
+            </Text>
+          </View>
         </View>
       </View>
       <View className="flex-row justify-center gap-6">

@@ -34,7 +34,10 @@ whenPracticeGoes((to) => {
   useTour.getState().end();
   forgetAccountData();
   useAuth.setState({ isSignedIn: false });
-  router.replace(to === "/sign-up" ? "/sign-up" : "/");
+  // to sign up: the shelf goes under it, so Back and the swipe back return
+  // to the signed-out shelf rather than leaving nowhere to go
+  router.replace("/");
+  if (to === "/sign-up") router.push("/sign-up");
 });
 
 // the reader's small shelf, or the collector's big one
