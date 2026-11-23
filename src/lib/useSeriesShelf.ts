@@ -3,6 +3,7 @@
 // the shelf has, saving a tap or a slide, and a slide's Undo. One hook, so the
 // two places can't behave differently, as the web's ShelfBox serves both.
 // The rules are the web's own (core pages/Details hooks, core editionShelf)
+import { shortEditionName } from "@/core/lib/editionShort";
 import {
   useCallback,
   useRef,
@@ -174,6 +175,10 @@ export function useSeriesShelf(
             n > 1 &&
             runOf(slots[n - 1]!, editions.line!, editions.books).label !==
               runOf(slots[n - 2]!, editions.line!, editions.books).label,
+          shortRunName: (n) =>
+            shortEditionName(
+              runOf(slots[n - 1]!, editions.line!, editions.books).label,
+            ),
           thick: (n) =>
             THICK[runOf(slots[n - 1]!, editions.line!, editions.books).kind],
         }

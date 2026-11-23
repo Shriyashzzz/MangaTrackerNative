@@ -29,6 +29,10 @@ import {
 const NAV = 36;
 // a book's padding either side (web .vshelf-page .vshelf-book)
 const GAP = 3;
+// how far a new run of books stands from the run before it
+const APART = 7;
+// about what one letter of a run's name takes
+const LETTER = 7.5;
 
 export type StripSlots = {
   // a book at full size: thicker than a single volume
@@ -41,6 +45,8 @@ export type StripSlots = {
   runName: (slot: number) => string;
   // where an edition's books give way to singles (or back)
   startsRun: (slot: number) => boolean;
+  // the same name cut short ("Def."), for a run too narrow for all of it
+  shortRunName?: (slot: number) => string;
   // how thick its spine is drawn, as a share of a full book: a deluxe book
   // the thickest, an omnibus a little less, a single volume thin
   thick?: (slot: number) => number;
@@ -104,12 +110,46 @@ export default function VolumeStrip({
     { length: Math.max(0, to - from + 1) },
     (_, i) => from + i,
   );
-  const pageWidth = page.length * full;
+  // Each book takes the room its own thickness needs (a thin single less
+  // than a deluxe book), so books of a kind stand close together; a new
+  // run stands a little apart from the one before
+  const thickOf = (v: number) => slots?.thick?.(v) ?? 1;
+  const apartAt = (v: number) =>
+    v !== page[0] && slots?.startsRun(v) ? APART : 0;
+  const roomOf = (v: number) =>
+    (slots?.bookWidth ?? BOOK) * thickOf(v) + 2 * GAP + apartAt(v);
+  const pageWidth = page.reduce((sum, v) => sum + roomOf(v), 0);
   // where the books start in the gesture's area (between the arrows), centred
   const pageLeft = Math.max(0, (width - 2 * NAV - pageWidth) / 2);
+  // A run's name hangs over its first book, and has the run's own width to
+  // be read in: up to the next run on this page. Too long for that (one
+  // Definitive beside a VIZBIG), it's said short, so two never overlap
+  const startsHere = (v: number) =>
+    Boolean(slots && (v === page[0] || slots.startsRun(v)));
+  const runRoomAt = (v: number) => {
+    let room = 0;
+    for (let n = v; n <= to; n++) {
+      if (n !== v && startsHere(n)) break;
+      room += roomOf(n) - apartAt(n);
+    }
+    return room;
+  };
+  const runNameAt = (v: number) => {
+    if (!slots || !startsHere(v)) return null;
+    const name = slots.runName(v);
+    return name.length * LETTER > runRoomAt(v)
+      ? (slots.shortRunName?.(v) ?? name)
+      : name;
+  };
+  // the book under a finger: each one's room walked along from the left
   const bookAt = (x: number) => {
-    const i = Math.floor((x - pageLeft) / full);
-    return i >= 0 && i < page.length ? page[i]! : null;
+    let left = pageLeft;
+    if (x < left) return null;
+    for (const v of page) {
+      left += roomOf(v);
+      if (x < left) return v;
+    }
+    return null;
   };
 
   // a slide under way: where it started, which way, what they had
@@ -213,19 +253,16 @@ export default function VolumeStrip({
               <Book
                 key={v}
                 v={v}
-                width={full}
+                width={roomOf(v) - apartAt(v)}
                 theirs={yours.has(v)}
                 ordered={!yours.has(v) && onTheWay.has(v)}
                 here={here === v}
                 spine={slots?.spine(v) ?? String(v)}
                 share={!yours.has(v) && slots ? slots.share(v) : 0}
-                runName={
-                  slots && (v === page[0] || slots.startsRun(v))
-                    ? slots.runName(v)
-                    : null
-                }
-                apart={Boolean(slots?.startsRun(v))}
-                thick={slots?.thick?.(v) ?? 1}
+                runName={runNameAt(v)}
+                runRoom={runRoomAt(v)}
+                apart={apartAt(v)}
+                thin={thickOf(v) < 0.75}
               />
             ))}
           </View>
@@ -261,7 +298,8 @@ function Book({
   runName,
   apart,
   ordered = false,
-  thick = 1,
+  thin = false,
+  runRoom = 120,
 }: {
   v: number;
   width: number;
@@ -271,8 +309,12 @@ function Book({
   spine: string;
   share: number;
   runName: string | null;
-  apart: boolean;
-  thick?: number;
+  // the width that name has before the next run's begins
+  runRoom?: number;
+  // how far it stands from the book before it, when it starts a run
+  apart: number;
+  // a thin spine: its number is set smaller
+  thin?: boolean;
 }) {
   let height = 42;
   let look = "border-[1.5px] border-dashed border-muted bg-paper";
@@ -297,7 +339,7 @@ function Book({
   }
   return (
     <View
-      style={{ width, paddingHorizontal: GAP / 2, marginLeft: apart ? 7 : 0 }}
+      style={{ width, paddingHorizontal: GAP / 2, marginLeft: apart }}
       accessibilityLabel={`Vol. ${v}, ${theirs ? "yours" : ordered ? "ordered" : "not yours yet"}`}
     >
       {/* the run's name hangs over its first spines at full width, as the
@@ -305,7 +347,7 @@ function Book({
       {runName ? (
         <Text
           numberOfLines={1}
-          style={{ width: 120 }}
+          style={{ width: Math.max(runRoom, 34) }}
           className="absolute -top-4 left-0 font-brand pr-[4px] text-[11px] tracking-[1px] text-ink-soft uppercase"
         >
           {runName}
@@ -313,8 +355,7 @@ function Book({
         </Text>
       ) : null}
       <View
-        // (a thinner spine stands in the middle of its place on the shelf)
-        style={{ height, width: `${thick * 100}%`, alignSelf: "center" }}
+        style={{ height }}
         className={`items-center justify-end overflow-hidden pb-[3px] ${look} ${here ? "outline-2 outline-ink" : ""}`}
       >
         {/* part of an edition's book theirs: inked part of the way down */}
@@ -326,7 +367,7 @@ function Book({
         ) : null}
         {/* one line always: on a thin spine the number is set smaller,
             with no room spent either side of it */}
-        {thick < 0.75 ? (
+        {thin ? (
           <Text
             numberOfLines={1}
             adjustsFontSizeToFit

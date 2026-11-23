@@ -51,6 +51,8 @@ const ENTRIES = [
   "lib/reading.ts",
   "lib/editions.ts",
   "lib/editionShelf.ts",
+  // an edition's name cut short for a narrow place ("Def.")
+  "lib/editionShort.ts",
   "lib/chapterVolumes.ts",
   "lib/ownedBar.ts",
   "lib/toGetLines.ts",
