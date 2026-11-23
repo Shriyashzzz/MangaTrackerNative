@@ -3,7 +3,7 @@
 // a row per series. Pull down to load it again. Volumes is its own view
 // (VolumesView). Who's in each tab, the search and the sort are the web's own
 // rules (core filterShelf); it opens on the tab and sort the account chose
-import { IOS } from "@/lib/tabHeader";
+import { IOS, useTabFoot } from "@/lib/tabHeader";
 import { columnStyle } from "@/lib/wide";
 import TourTarget from "@/components/TourTarget";
 import { useTour } from "@/store/tour";
@@ -67,6 +67,7 @@ type TabId = (typeof TABS)[number]["value"];
 const isTab = (tab: unknown): tab is TabId => TABS.some((t) => t.value === tab);
 
 function SignedInShelf() {
+  const foot = useTabFoot(112, 64);
   const c = useColors();
   const insets = useSafeAreaInsets();
   const manga = useShelf((s) => s.manga);
@@ -319,9 +320,12 @@ function SignedInShelf() {
                 </Animated.View>
               )}
               ItemSeparatorComponent={DashedLine}
-              // room under the last row for the floating +
-              contentContainerClassName="px-4 pb-28"
+              // room under the last row for the floating + (and on an
+              // iPhone the tab bar it sits above)
+              contentContainerClassName="px-4"
               contentContainerStyle={columnStyle}
+              // room under the last row, clear of the + and the tab bar
+              ListFooterComponent={<View style={{ height: foot }} />}
               // the first screenful at once, the rest in small batches
               initialNumToRender={9}
               maxToRenderPerBatch={8}

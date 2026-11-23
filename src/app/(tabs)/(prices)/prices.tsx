@@ -4,7 +4,7 @@
 // and the highlights: Popular this season, Latest deals, Prices
 // just checked. A search lists the series found, with Did you mean for a
 // typo. The rules are the web's (core findSeries, nearMatches, askedEdition)
-import { IOS } from "@/lib/tabHeader";
+import { IOS, useTabFoot } from "@/lib/tabHeader";
 import { columnStyle, gridOf, useWide } from "@/lib/wide";
 import Tap from "@/components/Tap";
 import PullPage, { pause, usePullTop } from "@/components/PullRefresh";
@@ -138,6 +138,7 @@ function HighlightsStrip() {
 }
 
 export default function PricesScreen() {
+  const foot = useTabFoot(40);
   const c = useColors();
   const pull = usePullTop();
   // bumped by a pull to refresh: the page's strips load again
@@ -265,8 +266,8 @@ export default function PricesScreen() {
         </View>
         <ScrollView
           keyboardShouldPersistTaps="handled"
-          contentContainerClassName="px-4 pb-10"
-          contentContainerStyle={columnStyle}
+          contentContainerClassName="px-4"
+          contentContainerStyle={{ ...columnStyle, paddingBottom: foot }}
         >
           {recent.length ? (
             <View className="gap-1">
@@ -349,8 +350,8 @@ export default function PricesScreen() {
       >
         <ScrollView
           key={asked}
-          contentContainerClassName="gap-5 px-4 pt-5 pb-10"
-          contentContainerStyle={columnStyle}
+          contentContainerClassName="gap-5 px-4 pt-5"
+          contentContainerStyle={{ ...columnStyle, paddingBottom: foot }}
           keyboardShouldPersistTaps="handled"
           overScrollMode="never"
           scrollEventThrottle={16}

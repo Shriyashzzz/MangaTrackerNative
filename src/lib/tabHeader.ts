@@ -4,6 +4,7 @@
 // the right (components/AppHeader.tsx). On Android there's no system bar
 // here: the app's own masthead is drawn instead, as before
 import { Platform } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Stack } from "expo-router";
 import type { ComponentProps } from "react";
 
@@ -35,4 +36,17 @@ export function tabHeaderOptions(c: { paper: string; ink: string }): Options {
       color: c.ink,
     },
   };
+}
+
+// The room a tab page keeps under its last line. On an iPhone the tab bar
+// floats over the foot of the page (it doesn't push the page up, as
+// Android's does), so the page scrolls on far enough for its end to come
+// clear of it: the home bar, the floating bar, and a little air. Android
+// keeps the room each page asks for
+const FLOATING_BAR = 50;
+// `above`: room for something that floats over the bar as well (the
+// shelf's + button)
+export function useTabFoot(androidRoom: number, above = 0) {
+  const insets = useSafeAreaInsets();
+  return IOS ? insets.bottom + FLOATING_BAR + above : androidRoom;
 }

@@ -5,6 +5,7 @@
 // gap; a tap on the bar moves it there), and what finishing it costs.
 // One series is open at a time, so its shelf (useSeriesShelf) lives here and
 // a slide's Undo sits at the foot of the screen
+import { useTabFoot } from "@/lib/tabHeader";
 import { columnStyle } from "@/lib/wide";
 import TourTarget from "./TourTarget";
 import { useTourScroll } from "@/lib/tourScroll";
@@ -54,6 +55,7 @@ export default function VolumesView({
   // how far it's scrolled, for the shelf tab's pull to refresh
   scrollTop: SharedValue<number>;
 }) {
+  const foot = useTabFoot(96, 64);
   const releases = useShelf((s) => s.releases);
   const tools = useShelfTools();
   const [openId, setOpenId] = useState<number | null>(null);
@@ -116,8 +118,8 @@ export default function VolumesView({
         keyExtractor={(m) => String(m.id)}
         extraData={[open, shelf, jump, tools]}
         ItemSeparatorComponent={DashedLine}
-        contentContainerClassName="px-4 pt-3 pb-24"
-        contentContainerStyle={columnStyle}
+        contentContainerClassName="px-4 pt-3"
+        contentContainerStyle={{ ...columnStyle, paddingBottom: foot }}
         // the shelf tab's pull to refresh is around this list: it's told
         // how far this one is scrolled
         overScrollMode="never"

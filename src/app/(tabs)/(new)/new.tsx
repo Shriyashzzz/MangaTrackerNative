@@ -5,7 +5,7 @@
 // one, or any far behind, is sorted into piles, each a fan of covers that
 // opens to all of them. Nothing new says why. Who's in, where, and the
 // words are all the web's own (core shelfViews, piles, farBehind, newTabLinks)
-import { IOS } from "@/lib/tabHeader";
+import { IOS, useTabFoot } from "@/lib/tabHeader";
 import { columnStyle } from "@/lib/wide";
 import { usePlan } from "@/store/plan";
 import { useTourScroll } from "@/lib/tourScroll";
@@ -103,6 +103,7 @@ const Word = ({
 );
 
 export default function NewScreen() {
+  const foot = useTabFoot(40);
   const manga = useShelf((s) => s.manga);
   const rawReleases = useShelf((s) => s.releases);
   const outcomes = useShelf((s) => s.outcomes);
@@ -287,8 +288,8 @@ export default function NewScreen() {
       <PullPage refresh={load} scrollTop={pull.top}>
         <ScrollView
           ref={scroller}
-          contentContainerClassName="gap-4 px-4 pt-5 pb-10"
-          contentContainerStyle={columnStyle}
+          contentContainerClassName="gap-4 px-4 pt-5"
+          contentContainerStyle={{ ...columnStyle, paddingBottom: foot }}
           overScrollMode="never"
           scrollEventThrottle={16}
           onScroll={pull.track}
