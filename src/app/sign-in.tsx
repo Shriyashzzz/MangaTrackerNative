@@ -1,5 +1,6 @@
 // Signing in, as the web's pages/SignIn: username and password, the
 // server's own words when it says no
+import AppleButton from "@/components/AppleButton";
 import Tap from "@/components/Tap";
 import AuthArt from "@/components/AuthArt";
 import GoogleButton from "@/components/GoogleButton";
@@ -52,6 +53,7 @@ export default function SignIn() {
           line="Your shelf is right where you left it."
         />
 
+        <AppleButton onBusy={setLoading} onError={setError} />
         <GoogleButton onBusy={setLoading} onError={setError} />
         <View className="gap-1.5">
           <Text className="font-body-medium text-[15px] text-ink">

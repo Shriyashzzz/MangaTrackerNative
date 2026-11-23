@@ -20,6 +20,11 @@ type AuthState = {
   ) => Promise<string[]>;
   // Google's token for the server to check; the response, for its words
   signInWithGoogle: (credential: string) => Promise<Response>;
+  // Apple's identity token, and the first name Apple gave (first time only)
+  signInWithApple: (
+    identityToken: string,
+    name: string | null,
+  ) => Promise<Response>;
   logOut: () => Promise<void>;
 };
 
@@ -71,6 +76,15 @@ export const useAuth = create<AuthState>()((set) => ({
     const res = await apiFetch("/api/auth/google", {
       method: "POST",
       body: { credential },
+    });
+    if (res.ok) set({ isSignedIn: true });
+    return res;
+  },
+
+  signInWithApple: async (identityToken, name) => {
+    const res = await apiFetch("/api/auth/apple", {
+      method: "POST",
+      body: { identityToken, name },
     });
     if (res.ok) set({ isSignedIn: true });
     return res;

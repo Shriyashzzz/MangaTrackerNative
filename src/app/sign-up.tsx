@@ -1,6 +1,7 @@
 // Creating an account, as the web's pages/SignUp/SignUp.tsx: username,
 // password and an optional recovery email, the form's own checks first, then
 // the server's words. The picks a shared shelf gave go on the new shelf
+import AppleButton from "@/components/AppleButton";
 import { columnStyle } from "@/lib/wide";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -80,6 +81,11 @@ export default function SignUp() {
             sfx="A new series begins!"
             chapter="1"
             line="Volume 1 of your shelf starts here."
+          />
+          <AppleButton
+            signUp
+            onBusy={setLoading}
+            onError={(message) => setErrors(message ? [message] : [])}
           />
           <GoogleButton
             onBusy={setLoading}

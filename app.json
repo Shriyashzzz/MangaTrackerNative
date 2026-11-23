@@ -11,6 +11,7 @@
       "icon": "./assets/images/icon.png",
       "bundleIdentifier": "xyz.mangatracker.app.rn",
       "appleTeamId": "84JH94RQR3",
+      "usesAppleSignIn": true,
       "supportsTablet": true,
       "infoPlist": {
         "UISupportedInterfaceOrientations~ipad": [
@@ -54,6 +55,7 @@
         }
       ],
       "expo-secure-store",
+      "expo-apple-authentication",
       [
         "expo-build-properties",
         {
