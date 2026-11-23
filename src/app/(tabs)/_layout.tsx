@@ -65,7 +65,7 @@ export default function TabsLayout() {
       sidebarAdaptable
       preferredPlacement="sidebar"
     >
-      <NativeTabs.Trigger name="index">
+      <NativeTabs.Trigger name="(shelf)">
         <NativeTabs.Trigger.Icon
           sf={{ default: "books.vertical", selected: "books.vertical.fill" }}
           md="shelves"
@@ -73,7 +73,7 @@ export default function TabsLayout() {
         <NativeTabs.Trigger.Label>My shelf</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       {/* New is an account's; without one the third tab is Sign in */}
-      <NativeTabs.Trigger name="new" hidden={!isSignedIn}>
+      <NativeTabs.Trigger name="(new)" hidden={!isSignedIn}>
         <NativeTabs.Trigger.Icon
           sf={{ default: "bell", selected: "bell.fill" }}
           md="notifications"
@@ -87,14 +87,17 @@ export default function TabsLayout() {
       </NativeTabs.Trigger>
       {/* while Kenji's tour is on, only he opens price pages: wandering into
           Prices mid-tour loses the thread (pressing the tab does nothing) */}
-      <NativeTabs.Trigger name="prices" disabled={touring}>
+      <NativeTabs.Trigger name="(prices)" disabled={touring}>
         <NativeTabs.Trigger.Icon
           sf={{ default: "tag", selected: "tag.fill" }}
           md="sell"
         />
         <NativeTabs.Trigger.Label>Prices</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="account" hidden={isSignedIn}>
+      {/* Signing in is an action, not a place: the shelf's welcome and the
+          header's Sign in button lead to it (Apple's tabs are places). The
+          screen stays for links to it */}
+      <NativeTabs.Trigger name="account" hidden>
         <NativeTabs.Trigger.Icon
           sf={{
             default: "person.crop.circle",

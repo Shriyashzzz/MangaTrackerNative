@@ -5,6 +5,7 @@
 // one, or any far behind, is sorted into piles, each a fan of covers that
 // opens to all of them. Nothing new says why. Who's in, where, and the
 // words are all the web's own (core shelfViews, piles, farBehind, newTabLinks)
+import { IOS } from "@/lib/tabHeader";
 import { columnStyle } from "@/lib/wide";
 import { usePlan } from "@/store/plan";
 import { useTourScroll } from "@/lib/tourScroll";
@@ -280,9 +281,9 @@ export default function NewScreen() {
       </Text>
     ) : null;
   return (
-    <Safe edges={["top"]} className="flex-1 bg-paper">
+    <Safe edges={IOS ? [] : ["top"]} className="flex-1 bg-paper">
       <Backdrop />
-      <AppHeader />
+      <AppHeader title="New" />
       <PullPage refresh={load} scrollTop={pull.top}>
         <ScrollView
           ref={scroller}

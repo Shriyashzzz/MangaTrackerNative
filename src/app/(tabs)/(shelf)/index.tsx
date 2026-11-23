@@ -3,6 +3,7 @@
 // a row per series. Pull down to load it again. Volumes is its own view
 // (VolumesView). Who's in each tab, the search and the sort are the web's own
 // rules (core filterShelf); it opens on the tab and sort the account chose
+import { IOS } from "@/lib/tabHeader";
 import { columnStyle } from "@/lib/wide";
 import TourTarget from "@/components/TourTarget";
 import { useTour } from "@/store/tour";
@@ -196,9 +197,9 @@ function SignedInShelf() {
   };
 
   return (
-    <Safe edges={["top"]} className="flex-1 bg-paper">
+    <Safe edges={IOS ? [] : ["top"]} className="flex-1 bg-paper">
       <Backdrop />
-      <AppHeader />
+      <AppHeader title="My shelf" />
       {/* everything under the header pulls down to refresh */}
       <PullPage refresh={load} scrollTop={scrollTop}>
         {/* the shelf's bar: which tab and how many, or the search box; search
@@ -429,9 +430,12 @@ export default function ShelfScreen() {
   const insets = useSafeAreaInsets();
   if (isSignedIn) return <SignedInShelf />;
   return (
-    <View className="flex-1 bg-paper" style={{ paddingTop: insets.top }}>
+    <View
+      className="flex-1 bg-paper"
+      style={{ paddingTop: IOS ? 0 : insets.top }}
+    >
       <Backdrop />
-      <AppHeader />
+      <AppHeader title="My shelf" />
       <GuestShelf />
     </View>
   );

@@ -4,6 +4,7 @@
 // and the highlights: Popular this season, Latest deals, Prices
 // just checked. A search lists the series found, with Did you mean for a
 // typo. The rules are the web's (core findSeries, nearMatches, askedEdition)
+import { IOS } from "@/lib/tabHeader";
 import { columnStyle } from "@/lib/wide";
 import Tap from "@/components/Tap";
 import PullPage, { pause, usePullTop } from "@/components/PullRefresh";
@@ -221,7 +222,7 @@ export default function PricesScreen() {
   // the box, full screen: suggestions, or the recent searches
   if (full)
     return (
-      <Safe edges={["top"]} className="flex-1 bg-paper">
+      <Safe edges={IOS ? [] : ["top"]} className="flex-1 bg-paper">
         <Backdrop />
         <View className="flex-row items-center gap-2 px-2 pt-2 pb-2">
           <Tap
@@ -320,9 +321,9 @@ export default function PricesScreen() {
     );
 
   return (
-    <Safe edges={["top"]} className="flex-1 bg-paper">
+    <Safe edges={IOS ? [] : ["top"]} className="flex-1 bg-paper">
       <Backdrop />
-      <AppHeader />
+      <AppHeader title="Prices" />
       <PullPage
         refresh={async () => {
           // the strips under the search (deals, popular, just checked) are

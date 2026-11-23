@@ -1,6 +1,8 @@
 // The top bar, as the Android app's masthead (web layouts/header): the logo
 // and name, To buy's bag with how many are on the list, and their picture,
 // which opens the menu (SettingsMenu), over a double rule
+import { IOS } from "@/lib/tabHeader";
+import { router, Stack } from "expo-router";
 import Tap from "@/components/Tap";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
@@ -14,7 +16,12 @@ import DoubleRule from "./DoubleRule";
 import SettingsMenu from "./SettingsMenu";
 import ToBuyBag from "./ToBuyBag";
 
-export default function AppHeader() {
+export default function AppHeader({
+  // the tab's name, as Apple's large title says it on iOS
+  title,
+}: {
+  title: string;
+}) {
   const isSignedIn = useAuth((s) => s.isSignedIn);
   const account = useAccount((s) => s.account);
   const loadAccount = useAccount((s) => s.load);
@@ -25,6 +32,49 @@ export default function AppHeader() {
       if (!account) void loadAccount();
     }
   }, [isSignedIn, account, loadAccount]);
+  const menu = (
+    <SettingsMenu
+      open={menuOpen}
+      onClose={() => setMenuOpen(false)}
+      hasYear={hasYear}
+    />
+  );
+  // iOS: Apple's bar draws the top (lib/tabHeader.ts). Signed in, the To buy
+  // bag and their picture are its buttons; signed out, Sign in is
+  if (IOS)
+    return (
+      <>
+        <Stack.Screen
+          options={{
+            title,
+            headerRight: () =>
+              isSignedIn ? (
+                <View className="flex-row items-center gap-3">
+                  <ToBuyBag />
+                  <Tap
+                    onPress={() => setMenuOpen(true)}
+                    hitSlop={8}
+                    accessibilityLabel="Menu"
+                  >
+                    <Avatar id={account?.avatar} size={32} />
+                  </Tap>
+                </View>
+              ) : (
+                <Tap
+                  onPress={() => router.push("/sign-in")}
+                  hitSlop={8}
+                  accessibilityRole="button"
+                >
+                  <Text className="font-body-semibold text-[17px] text-accent-ink">
+                    Sign in
+                  </Text>
+                </Tap>
+              ),
+          }}
+        />
+        {menu}
+      </>
+    );
   return (
     <View className="bg-paper">
       <View className="h-[62px] flex-row items-center gap-3 px-4">
@@ -39,6 +89,18 @@ export default function AppHeader() {
           </Text>
         </View>
         {/* the list and the menu are an account's: nothing to open without one */}
+        {/* signed out: Sign in, now that it isn't a tab */}
+        {!isSignedIn ? (
+          <Tap
+            onPress={() => router.push("/sign-in")}
+            hitSlop={8}
+            accessibilityRole="button"
+          >
+            <Text className="font-body-semibold text-[15px] text-accent-ink">
+              Sign in
+            </Text>
+          </Tap>
+        ) : null}
         {isSignedIn ? (
           <>
             <ToBuyBag />
@@ -53,11 +115,7 @@ export default function AppHeader() {
         ) : null}
       </View>
       <DoubleRule />
-      <SettingsMenu
-        open={menuOpen}
-        onClose={() => setMenuOpen(false)}
-        hasYear={hasYear}
-      />
+      {menu}
     </View>
   );
 }

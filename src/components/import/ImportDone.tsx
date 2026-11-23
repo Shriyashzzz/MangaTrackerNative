@@ -42,7 +42,7 @@ export default function ImportDone({
         center
         kind="primary"
         label="Go to my shelf"
-        onPress={() => router.replace("/(tabs)")}
+        onPress={() => router.replace("/")}
       />
     </View>
   );
