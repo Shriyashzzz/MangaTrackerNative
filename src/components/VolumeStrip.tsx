@@ -356,7 +356,7 @@ function Book({
           <Text
             numberOfLines={1}
             style={{ width: Math.max(runRoom, 34) }}
-            className="absolute -top-4 left-0 text-center font-brand text-[11px] tracking-[1px] text-ink-soft uppercase"
+            className="absolute -top-[19px] left-0 text-center font-brand text-[11px] tracking-[1px] text-ink-soft uppercase"
           >
             {runName}
           </Text>
@@ -364,7 +364,7 @@ function Book({
           <Text
             numberOfLines={1}
             style={{ width: Math.max(runRoom, 34) }}
-            className="absolute -top-4 left-0 font-brand pr-[4px] text-[11px] tracking-[1px] text-ink-soft uppercase"
+            className="absolute -top-[19px] left-0 font-brand pr-[4px] text-[11px] tracking-[1px] text-ink-soft uppercase"
           >
             {runName}
             {"\u00A0"}
