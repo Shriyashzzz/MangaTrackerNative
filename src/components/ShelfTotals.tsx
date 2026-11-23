@@ -13,29 +13,6 @@ import { useColors } from "@/lib/colors";
 const plural = (n: number, one: string, many = `${one}s`) =>
   `${n.toLocaleString()} ${n === 1 ? one : many}`;
 
-const FILL_IN = "The rest fill in over a few days.";
-const SOLD_USED = "If sold used, at today's prices.";
-
-const pricedSoFar = (priced: number, of: number) => [
-  `${priced.toLocaleString()} of ${of.toLocaleString()} priced so far.`,
-  FILL_IN,
-];
-
-// under "To finish your series", one sentence a line
-function finishNote(tools: ShelfTools, hasTotal: boolean) {
-  const unit = tools.finish.some((f) => f.edition) ? "book" : "volume";
-  const lines = [
-    `For the ${plural(tools.finishMissing, unit)} you don't have yet.`,
-  ];
-  if (tools.finishUncosted && hasTotal)
-    lines.push(
-      `${plural(tools.finishUncosted, "series", "series")} not counted yet.`,
-    );
-  if (tools.finishPriced < tools.finishMissing)
-    lines.push(...pricedSoFar(tools.finishPriced, tools.finishMissing));
-  return lines;
-}
-
 function Total({
   label,
   value,
@@ -91,14 +68,11 @@ export default function ShelfTotals({
   const spent = tools.spent?.books ? tools.spent : null;
   if (!ownedVolumes && !tools.finishMissing && !spent) return null;
 
-  const worthNotes = !worth
-    ? pricedSoFar(value.priced, ownedVolumes)
-    : value.priced >= ownedVolumes
-      ? [SOLD_USED]
-      : [
-          `An estimate for all ${plural(ownedVolumes, "volume")}, if sold used at today's prices.`,
-          `${value.priced.toLocaleString()} priced so far, the rest at their series' usual price.`,
-        ];
+  // a total says nothing under it; only a missing one says when to look again
+  const notYet = [
+    "Prices for your shelf are still coming in. Check back tomorrow for the total.",
+  ];
+  const worthNotes = worth ? [] : notYet;
 
   return (
     <View className="mb-3 border-y border-dashed border-line-soft">
@@ -136,9 +110,9 @@ export default function ShelfTotals({
           ) : null}
           {tools.finishMissing > 0 ? (
             <Total
-              label="To finish your series"
+              label="To finish all your series"
               value={finish ?? "no total yet"}
-              notes={finishNote(tools, Boolean(finish))}
+              notes={finish ? [] : notYet}
             />
           ) : null}
         </View>

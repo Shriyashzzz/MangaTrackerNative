@@ -5,6 +5,7 @@
 // the ISBN works when the camera can't. The phone's camera does the reading
 // (expo-camera), and a buzz says a scan landed; what a scan does to the
 // shelf is the web's own (core lib/scan)
+import LimitCount from "@/components/LimitCount";
 import { columnStyle } from "@/lib/wide";
 import Tap from "@/components/Tap";
 import { StatusBar } from "expo-status-bar";
@@ -14,7 +15,10 @@ import * as Haptics from "expo-haptics";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Linking, ScrollView, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 import Button from "@/components/Button";
 import { Input } from "@/components/Field";
@@ -60,6 +64,7 @@ const CHROME = "#16140f";
 const ON_CHROME = "#fffaf2";
 
 export default function ScanScreen() {
+  const insets = useSafeAreaInsets();
   const { isbn: firstIsbn } = useLocalSearchParams<{ isbn?: string }>();
   const [permission, askPermission] = useCameraPermissions();
   const [rows, setRows] = useState<Row[]>([]);
@@ -173,12 +178,15 @@ export default function ScanScreen() {
     >
       <StatusBar style="light" />
       <View className="h-[56px] flex-row items-center justify-between px-2">
+        {/* typing an ISBN: back to the camera; on the camera: out */}
         <Tap
           feel="round"
-          onPress={close}
+          onPress={typing && !blocked ? () => setTyping(false) : close}
           hitSlop={8}
           className="p-2"
-          accessibilityLabel="Close the scanner"
+          accessibilityLabel={
+            typing && !blocked ? "Back to the camera" : "Close the scanner"
+          }
         >
           <CloseIcon color="#fffaf2" width={24} height={24} />
         </Tap>
@@ -261,6 +269,11 @@ export default function ScanScreen() {
           >
             Keep going for a whole stack.
           </Text>
+          <LimitCount
+            what="scans"
+            className="text-center font-mono text-[12.5px] opacity-70"
+            style={{ color: ON_CHROME }}
+          />
         </View>
       ) : (
         <View className="gap-3 px-4">
@@ -318,7 +331,11 @@ export default function ScanScreen() {
           />
         ))}
       </ScrollView>
-      <View className="flex-row items-center justify-between gap-3 border-t border-line-soft bg-paper px-4 py-3">
+      <View
+        className="flex-row items-center justify-between gap-3 border-t border-line-soft bg-paper px-4 pt-3"
+        // clear of the home bar, with room under the buttons
+        style={{ paddingBottom: Math.max(insets.bottom - 10, 12) }}
+      >
         {!blocked ? (
           <Tap onPress={() => setTyping((on) => !on)} hitSlop={6}>
             <Text className="font-body-medium text-[14px] text-ink border-b pb-[2px] border-ink self-start">

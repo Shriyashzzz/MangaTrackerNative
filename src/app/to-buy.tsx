@@ -2,6 +2,7 @@
 // buy, what they'd cost new and used all together, each with its prices,
 // On my shelf, Ordered and Remove, sorted their way, and Clear list.
 // Marking one theirs whose series isn't on the shelf offers to add it
+import LimitCount from "@/components/LimitCount";
 import { columnStyle } from "@/lib/wide";
 import { coverAt, isNotACover } from "@/lib/coverAt";
 import Tap from "@/components/Tap";
@@ -717,6 +718,7 @@ export default function ToBuyScreen() {
           scrollEventThrottle={16}
           onScroll={pull.track}
         >
+          {items?.length ? <LimitCount what="priceAlerts" /> : null}
           {!items && loadFailed ? (
             <View className="items-center gap-3 py-8">
               <Mascot mood="panic" width={100} />
