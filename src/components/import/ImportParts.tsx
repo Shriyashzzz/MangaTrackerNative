@@ -8,27 +8,118 @@ import { Text, View } from "react-native";
 import Button from "@/components/Button";
 import { ChevronDownIcon } from "@/core/components/icons/Icons";
 import { useColors } from "@/lib/colors";
+import { useCorners } from "@/lib/mangaThemes";
 import { useBookImport } from "@/store/bookImport";
 import { useShelf } from "@/store/shelf";
 
-// "1" in a ring, then what to do
-export function Step({ n, children }: { n: number; children: ReactNode }) {
+// The steps sit on one inked sheet, as the web's import page has them: a
+// card with a heavy ink border
+export function InkSheet({
+  children,
+  label,
+}: {
+  children: ReactNode;
+  label?: string;
+}) {
+  const corners = useCorners();
+  return (
+    <View
+      accessibilityLabel={label}
+      className="gap-6 border-[3px] border-line bg-card p-5"
+      style={corners.panel}
+    >
+      {children}
+    </View>
+  );
+}
+
+// a step: its number on a small tilted block of ink, then its title (when
+// it has one) and what to do
+export function Step({
+  n,
+  title,
+  children,
+}: {
+  n: number;
+  title?: string;
+  children: ReactNode;
+}) {
   return (
     <View className="flex-row gap-3">
-      <View className="h-7 w-7 items-center justify-center rounded-full bg-accent">
-        <Text
-          className="font-body-semibold text-[14px] text-on-accent"
-          style={{
-            lineHeight: 18,
-            textAlign: "center",
-            includeFontPadding: false,
-          }}
-        >
+      <View
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+        className="h-9 w-9 items-center justify-center bg-ink"
+        style={{ transform: [{ rotate: "-3deg" }] }}
+      >
+        <Text className="font-brand pr-[3px] text-[21px] leading-[24px] text-paper">
           {n}
+          {"\u00A0"}
         </Text>
       </View>
-      <View className="min-w-0 flex-1 gap-2 pt-[3px]">{children}</View>
+      <View className="min-w-0 flex-1 gap-2 pt-[5px]">
+        {title ? (
+          <Text
+            accessibilityRole="header"
+            className="font-display text-[19px] leading-[24px] text-ink"
+          >
+            {title}
+          </Text>
+        ) : null}
+        {children}
+      </View>
     </View>
+  );
+}
+
+// a link out of a step: underlined in the accent, as the web's step links
+export function StepLink({
+  label,
+  onPress,
+}: {
+  label: string;
+  onPress: () => void;
+}) {
+  return (
+    <Tap
+      onPress={onPress}
+      accessibilityRole="link"
+      hitSlop={8}
+      className="self-start border-b-2 border-accent pb-[1px]"
+    >
+      <Text className="font-body-semibold text-[15px] text-ink">{label} →</Text>
+    </Tap>
+  );
+}
+
+// the file to add: the whole dashed box is the button
+export function FileBox({
+  title,
+  hint,
+  disabled = false,
+  onPress,
+}: {
+  title: string;
+  hint: string;
+  disabled?: boolean;
+  onPress: () => void;
+}) {
+  return (
+    <Tap
+      onPress={onPress}
+      disabled={disabled}
+      accessibilityRole="button"
+      accessibilityLabel={`${title}. ${hint}`}
+      className={`min-h-[128px] items-center justify-center gap-1 border-[2.5px] border-dashed border-line-soft bg-paper px-4 py-6 active:border-line ${disabled ? "opacity-50" : ""}`}
+    >
+      <Text className="font-brand pr-[4px] text-[22px] tracking-[0.5px] text-ink uppercase">
+        {title}
+        {"\u00A0"}
+      </Text>
+      <Text className="text-center font-body text-[14px] leading-[20px] text-ink-soft">
+        {hint}
+      </Text>
+    </Tap>
   );
 }
 

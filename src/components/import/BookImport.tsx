@@ -29,7 +29,9 @@ import ImportDone from "./ImportDone";
 import ImportList from "./ImportList";
 import {
   CompleteSets,
+  FileBox,
   FilesInImport,
+  InkSheet,
   Note,
   Problem,
   ProgressBar,
@@ -187,7 +189,7 @@ export default function BookImport({ source }: { source: BookSource }) {
 
   return (
     <View className="gap-6">
-      <View className="gap-5">
+      <InkSheet label="How to import">
         <Step n={1}>
           <Note>{how.step}</Note>
           {how.points?.map((point) => (
@@ -198,23 +200,19 @@ export default function BookImport({ source }: { source: BookSource }) {
           ) : null}
         </Step>
 
-        <Step n={2}>
-          <Text className="font-body-semibold text-[15px] text-ink">
-            {found ? "Add another file" : "Add the file here"}
-          </Text>
-          <Button
-            kind="primary"
+        <Step n={2} title={found ? "Add another file" : "Add the file here"}>
+          <FileBox
+            title={found ? "Choose another file" : "Choose your file"}
+            hint={
+              found
+                ? source === "csv"
+                  ? "Another export from the same app joins this one, matched as it goes"
+                  : `Another ${APP_NAME[source]} export joins this one, matched as it goes`
+                : "Pick one, or several. They end in .csv"
+            }
             disabled={importing}
-            label={found ? "Choose another file" : "Choose your file"}
             onPress={() => void open()}
           />
-          <Note>
-            {found
-              ? source === "csv"
-                ? "Another export from the same app joins this one, matched as it goes"
-                : `Another ${APP_NAME[source]} export joins this one, matched as it goes`
-              : "Pick one, or several. They end in .csv"}
-          </Note>
           {fileErrors.map((error) => (
             <Problem key={error}>{error}</Problem>
           ))}
@@ -233,10 +231,10 @@ export default function BookImport({ source }: { source: BookSource }) {
             comes over exactly right. Check the list before you add it.
           </Note>
         ) : null}
-      </View>
+      </InkSheet>
 
       {found ? (
-        <View className="gap-4 border-t-2 border-line pt-5">
+        <InkSheet>
           <H2>{foundLine(rows!)}</H2>
           <FilesInImport names={fileNames} />
 
@@ -344,7 +342,7 @@ export default function BookImport({ source }: { source: BookSource }) {
               anything already added will be skipped.
             </Problem>
           ) : null}
-        </View>
+        </InkSheet>
       ) : null}
     </View>
   );
