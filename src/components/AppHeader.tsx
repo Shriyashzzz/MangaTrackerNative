@@ -48,9 +48,10 @@ export default function AppHeader({
       <>
         <Stack.Screen
           options={{
-            // (Bangers leans out of its box both ways: a narrow space either
-            // side keeps the first and last letters whole)
-            title: `\u202F${title}\u00A0`,
+            // no title in Apple's bar: the page letters its own, in the
+            // app's style (iOS clipped Bangers in its bar)
+            title: "",
+            headerTitle: () => null,
             // signed out: Apple's own text button, with the room and the
             // press feel a bar button has
             // Each is its own item in Apple's bar, apart from the other:

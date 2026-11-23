@@ -16,7 +16,8 @@ export function tabHeaderOptions(c: { paper: string; ink: string }): Options {
   if (!IOS) return { headerShown: false };
   return {
     headerShown: true,
-    headerLargeTitle: true,
+    // the bar holds only the tab's buttons: the page letters its own title
+    headerLargeTitle: false,
     headerTransparent: false,
     headerShadowVisible: false,
     headerLargeTitleShadowVisible: false,
@@ -30,7 +31,7 @@ export function tabHeaderOptions(c: { paper: string; ink: string }): Options {
     },
     headerLargeTitleStyle: {
       fontFamily: "Bangers_400Regular",
-      fontSize: 40,
+      fontSize: 38,
       color: c.ink,
     },
   };
