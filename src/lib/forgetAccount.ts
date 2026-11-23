@@ -5,7 +5,7 @@ import { useAccount } from "@/store/account";
 import { useBookImport } from "@/store/bookImport";
 import { usePrefs } from "@/store/prefs";
 import { forgetChanges } from "@/core/lib/offlineChanges";
-import { KEPT_SHELF, useShelf } from "@/store/shelf";
+import { KEPT_SHELF, KEPT_TOTALS, useShelf } from "@/store/shelf";
 import { removeLocal } from "./deviceStore";
 import { forgetAnswers } from "./keptAnswers";
 import { useToBuy } from "@/store/toBuy";
@@ -18,6 +18,7 @@ export function forgetAccountData() {
   usePrefs.getState().reset();
   // what was kept for offline: the last shelf, the pages they opened, and changes not sent yet
   removeLocal(KEPT_SHELF);
+  removeLocal(KEPT_TOTALS);
   void forgetChanges();
   void forgetAnswers();
 }

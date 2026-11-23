@@ -71,6 +71,7 @@ function SignedInShelf() {
   const failed = useShelf((s) => s.failed);
   const load = useShelf((s) => s.load);
   const releases = useShelf((s) => s.releases);
+  const totals = useShelf((s) => s.totals);
   const checkReleases = useShelf((s) => s.checkReleases);
   const prefs = usePrefs((s) => s.prefs);
   const checksOn = prefs.releaseChecks !== "off";
@@ -298,8 +299,16 @@ function SignedInShelf() {
                   <ShelfRow
                     manga={item}
                     trackBy={trackBy}
-                    latestChapter={releases[item.id]?.latestChapter}
-                    latestVolume={releases[item.id]?.latestVolume}
+                    // the fresh answer once it's in; until then (or if the
+                    // check failed) how far the series went last time,
+                    // kept on the phone
+                    latestChapter={
+                      releases[item.id]?.latestChapter ??
+                      totals[item.id]?.chapter
+                    }
+                    latestVolume={
+                      releases[item.id]?.latestVolume ?? totals[item.id]?.volume
+                    }
                     selecting={select.selectOn}
                     checked={select.selectOn && select.picked.has(item.id)}
                     onToggle={select.toggle}

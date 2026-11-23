@@ -47,6 +47,11 @@ type ShelfState = {
   // next time), and when, for "Checked 6 h ago"
   outcomes: Record<number, ReleaseOutcome>;
   checkedAt: Record<number, number>;
+  // How far each series goes, as last heard and kept on the phone: a row
+  // draws its bar from this at once, before its fresh answer is in. Only
+  // ever for the bar: what's new (the red bar, New, alerts) comes from
+  // `releases` alone, so nothing old is ever told as news
+  totals: Record<number, KeptTotal>;
   load: () => Promise<void>;
   // the server's saved answers first (one request), then every series it has
   // none for, one at a time, as the web does
@@ -111,6 +116,38 @@ async function askAbout(m: Manga) {
   }
 }
 
+// how far a series goes: its newest chapter and volume out
+export type KeptTotal = { chapter: number | null; volume: number | null };
+export const KEPT_TOTALS = "keptTotals";
+function readKeptTotals(): Record<number, KeptTotal> {
+  try {
+    const kept = JSON.parse(readLocal(KEPT_TOTALS) ?? "null") as unknown;
+    return kept && typeof kept === "object"
+      ? (kept as Record<number, KeptTotal>)
+      : {};
+  } catch {
+    return {};
+  }
+}
+// the totals with what these answers say, for the series still on the shelf
+// (never the practice shelf's: they aren't theirs to come back to)
+function totalsWith(
+  totals: Record<number, KeptTotal>,
+  answers: Record<number, ReleaseStatus | null>,
+  shelf: Manga[] | null,
+) {
+  const next: Record<number, KeptTotal> = {};
+  for (const m of shelf ?? []) {
+    const heard = answers[m.id];
+    const kept = heard
+      ? { chapter: heard.latestChapter, volume: heard.latestVolume }
+      : totals[m.id];
+    if (kept) next[m.id] = kept;
+  }
+  if (!isDemo()) writeLocal(KEPT_TOTALS, JSON.stringify(next));
+  return next;
+}
+
 // the last shelf the server sent, kept on the phone for when there's no
 // connection (forgotten at sign-out: lib/forgetAccount.ts)
 export const KEPT_SHELF = "keptShelf";
@@ -130,6 +167,7 @@ export const useShelf = create<ShelfState>()((set, get) => ({
   manga: null,
   failed: null,
   releases: {},
+  totals: {},
   outcomes: {},
   checkedAt: {},
   lastDeleted: null,
@@ -290,6 +328,7 @@ export const useShelf = create<ShelfState>()((set, get) => ({
       manga: null,
       failed: null,
       releases: {},
+      totals: {},
       lastDeleted: null,
       undoMessage: "",
     }),
@@ -302,6 +341,9 @@ export const useShelf = create<ShelfState>()((set, get) => ({
       const changes = await waitingChanges();
       return changes.length ? manga.map((m) => withChanges(m, changes)) : manga;
     };
+    // (what was kept from last time, for the rows' bars meanwhile)
+    if (!Object.keys(get().totals).length && !isDemo())
+      set({ totals: readKeptTotals() });
     try {
       const data = await getJson<{ manga: Manga[] } | Manga[]>("/api/manga");
       const manga = Array.isArray(data) ? data : data.manga;
@@ -379,7 +421,12 @@ export const useShelf = create<ShelfState>()((set, get) => ({
           outcomes[id] = answer.releaseStatus ? "news" : "notFound";
           checkedAt[id] = now;
         }
-        set({ releases, outcomes, checkedAt });
+        set({
+          releases,
+          outcomes,
+          checkedAt,
+          totals: totalsWith(get().totals, releases, get().manga),
+        });
       }
       // the ones most likely to have news first (checkOrder)
       // Answers are shown a few at a time, not one by one: each showing
@@ -405,7 +452,12 @@ export const useShelf = create<ShelfState>()((set, get) => ({
           checkedAt[one.id] = Date.now();
         }
         waiting = [];
-        set({ releases, outcomes, checkedAt });
+        set({
+          releases,
+          outcomes,
+          checkedAt,
+          totals: totalsWith(get().totals, releases, get().manga),
+        });
       };
       for (const m of checkOrder(get().manga ?? [])) {
         if (m.id in get().releases) continue;
