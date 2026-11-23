@@ -15,11 +15,9 @@ module.exports = ({ config }) => ({
   ios: {
     ...config.ios,
     // On the App Store the app is xyz.mangatracker.app, as on Play (the
-    // ID its purchases and Sign in with Apple are made out to). The first
-    // release is iPhone only: an iPad runs it in a phone-sized window. The
-    // iPad layout stays in the code for a later release
+    // ID its purchases and Sign in with Apple are made out to). iPhone and
+    // iPad are one app: app.json's supportsTablet says so for every build
     bundleIdentifier: production ? PLAY_PACKAGE : config.ios.bundleIdentifier,
-    supportsTablet: production ? false : config.ios.supportsTablet,
   },
   android: {
     ...config.android,
