@@ -7,8 +7,17 @@
 // (Android and the website, for now) the table is shown without prices.
 // Buying is through Apple and arrives with the iPhone app: until then the
 // button says so rather than pretending
-import { useState } from "react";
-import { Text, View } from "react-native";
+import {
+  buy,
+  canBuy,
+  MONTHLY,
+  restore,
+  storePrices,
+  YEARLY,
+} from "@/lib/purchases";
+import { router } from "expo-router";
+import { useEffect, useState } from "react";
+import { Linking, Text, View } from "react-native";
 import { H2 } from "@/components/Page";
 import Tap from "@/components/Tap";
 import { usePlan, type Counted } from "@/store/plan";
@@ -36,6 +45,12 @@ const BECAUSE: Record<Counted | "calendar" | "japan", string> = {
 
 // Yearly comes with a week free (Apple's introductory offer, set on the
 // product in App Store Connect); monthly starts straight away
+// Apple's standard terms, which App Store subscriptions are sold under, and
+// where an Apple ID's subscriptions are managed
+const APPLE_TERMS =
+  "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/";
+const MANAGE = "https://apps.apple.com/account/subscriptions";
+
 const PRICES = [
   {
     key: "year",
@@ -88,6 +103,42 @@ function Row({
 export default function CollectorSheet() {
   const { plan, sheet, hideCollector } = usePlan();
   const [picked, setPicked] = useState<"year" | "month">("year");
+  const [busy, setBusy] = useState(false);
+  const [said, setSaid] = useState("");
+  // the prices as Apple shows them in this country, once it's said
+  const [store, setStore] = useState<Record<string, string> | null>(null);
+  useEffect(() => {
+    if (sheet.open && plan.limited) void storePrices().then(setStore);
+  }, [sheet.open, plan.limited]);
+  // a line said last time it was open isn't said again
+  const [saidFor, setSaidFor] = useState(sheet.open);
+  if (saidFor !== sheet.open) {
+    setSaidFor(sheet.open);
+    if (!sheet.open) setSaid("");
+  }
+  const priceOf = (key: "year" | "month") =>
+    store?.[key === "year" ? YEARLY : MONTHLY] ??
+    PRICES.find((p) => p.key === key)!.price;
+  const subscribe = async () => {
+    setBusy(true);
+    setSaid("");
+    const outcome = await buy(picked === "year" ? YEARLY : MONTHLY);
+    setBusy(false);
+    if (outcome === "bought") setSaid("You're a Collector. Thank you!");
+    if (outcome === "failed")
+      setSaid("That didn't go through. You weren't charged; try again.");
+  };
+  const restoreIt = async () => {
+    setBusy(true);
+    setSaid("");
+    const found = await restore().catch(() => false);
+    setBusy(false);
+    setSaid(
+      found
+        ? "Restored. You're a Collector."
+        : "No Collector subscription on this Apple ID.",
+    );
+  };
   const early = plan.plan === "early";
   const collector = plan.plan === "collector";
   const used = (what: Counted, unit: string) =>
@@ -182,24 +233,81 @@ export default function CollectorSheet() {
               );
             })}
           </View>
-          <Button
-            kind="primary"
-            label="Subscriptions open soon"
-            disabled
-            onPress={() => {}}
-          />
+          {canBuy() ? (
+            <Button
+              kind="primary"
+              label={
+                busy
+                  ? "One moment…"
+                  : picked === "year"
+                    ? "Start 7 days free"
+                    : `Subscribe for ${priceOf("month")} a month`
+              }
+              disabled={busy}
+              onPress={() => void subscribe()}
+            />
+          ) : (
+            <Text className="text-center font-body text-[14px] text-ink-soft">
+              Collector is bought in the iPhone app for now.
+            </Text>
+          )}
+          {said ? (
+            <Text className="text-center font-body-semibold text-[14px] text-ink">
+              {said}
+            </Text>
+          ) : null}
           <Text className="text-center font-body text-[13px] leading-[18px] text-muted">
             {/* what is charged and when, said plainly (Apple asks for the
                 price after a trial to be clear) */}
-            {PRICES.find((p) => p.key === picked)!.after} Paid through the App
-            Store and renews until you cancel in your Apple account settings.
+            {picked === "year"
+              ? `7 days free, then ${priceOf("year")} a year.`
+              : `${priceOf("month")} a month, starting today.`}{" "}
+            Paid through the App Store and renews until you cancel in your Apple
+            account settings.
             {picked === "year"
               ? " Cancel before the week ends and you won't be charged."
               : ""}
           </Text>
+          {/* Restore, and the terms Apple asks to be a tap away */}
+          {canBuy() ? (
+            <View className="flex-row flex-wrap justify-center gap-x-5 gap-y-2">
+              <Tap onPress={() => void restoreIt()} hitSlop={8}>
+                <Text className="font-body-semibold text-[13px] text-accent-ink">
+                  Restore purchases
+                </Text>
+              </Tap>
+              <Tap
+                onPress={() => void Linking.openURL(APPLE_TERMS)}
+                hitSlop={8}
+              >
+                <Text className="font-body text-[13px] text-ink-soft underline">
+                  Terms of Use
+                </Text>
+              </Tap>
+              <Tap
+                onPress={() => {
+                  hideCollector();
+                  router.push("/privacy");
+                }}
+                hitSlop={8}
+              >
+                <Text className="font-body text-[13px] text-ink-soft underline">
+                  Privacy
+                </Text>
+              </Tap>
+            </View>
+          ) : null}
         </>
       ) : (
-        <Button label="Done" onPress={hideCollector} />
+        <>
+          {collector && canBuy() ? (
+            <Button
+              label="Manage subscription"
+              onPress={() => void Linking.openURL(MANAGE)}
+            />
+          ) : null}
+          <Button label="Done" onPress={hideCollector} />
+        </>
       )}
     </Sheet>
   );
