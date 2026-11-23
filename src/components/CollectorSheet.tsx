@@ -34,9 +34,23 @@ const BECAUSE: Record<Counted | "calendar" | "japan", string> = {
   japan: "In Japan is part of Collector.",
 };
 
+// Yearly comes with a week free (Apple's introductory offer, set on the
+// product in App Store Connect); monthly starts straight away
 const PRICES = [
-  { key: "year", name: "Yearly", price: "$24.99", note: "About $2.08 a month" },
-  { key: "month", name: "Monthly", price: "$3.99", note: "Cancel any time" },
+  {
+    key: "year",
+    name: "Yearly",
+    price: "$24.99",
+    note: "7 days free first",
+    after: "7 days free, then $24.99 a year.",
+  },
+  {
+    key: "month",
+    name: "Monthly",
+    price: "$3.99",
+    note: "Cancel any time",
+    after: "$3.99 a month, starting today.",
+  },
 ] as const;
 
 function Row({
@@ -171,8 +185,13 @@ export default function CollectorSheet() {
             onPress={() => {}}
           />
           <Text className="text-center font-body text-[13px] leading-[18px] text-muted">
-            Paid through the App Store. Renews until you cancel in your Apple
-            account settings.
+            {/* what is charged and when, said plainly (Apple asks for the
+                price after a trial to be clear) */}
+            {PRICES.find((p) => p.key === picked)!.after} Paid through the App
+            Store and renews until you cancel in your Apple account settings.
+            {picked === "year"
+              ? " Cancel before the week ends and you won't be charged."
+              : ""}
           </Text>
         </>
       ) : (
