@@ -1,5 +1,6 @@
 // The app's frame: the fonts the web uses, the session checked once, then
 // the tabs for everyone; the pages that need an account only when signed in
+import Intro from "@/components/Intro";
 import { View } from "react-native";
 import "../global.css";
 import { Bangers_400Regular } from "@expo-google-fonts/bangers";
@@ -24,7 +25,7 @@ import { Stack } from "expo-router";
 import { Uniwind } from "uniwind";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
@@ -76,6 +77,9 @@ export default function RootLayout() {
   useEffect(() => {
     if (isSignedIn && storeLoaded) void refreshPhoneAlerts();
   }, [isSignedIn, storeLoaded]);
+  // the opening burst, once each time the app starts (components/Intro.tsx)
+  const [introOn, setIntroOn] = useState(true);
+  const introDone = useCallback(() => setIntroOn(false), []);
   const ready =
     (fontsLoaded || fontError) && isSignedIn !== null && storeLoaded;
   useEffect(() => {
@@ -145,6 +149,7 @@ export default function RootLayout() {
               <Stack.Screen name="reset-password/[token]" />
             </Stack>
             <Tour signedIn={Boolean(isSignedIn)} />
+            {introOn ? <Intro onDone={introDone} /> : null}
           </View>
           {/* no connection, or kept changes just sent: said along the foot */}
           <OfflineBar signedIn={Boolean(isSignedIn)} />
