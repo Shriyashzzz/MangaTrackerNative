@@ -60,6 +60,10 @@ export default function AppHeader({
             unstable_headerRightItems: () =>
               isSignedIn
                 ? [
+                    // the bag, then their picture at the bar's edge (the
+                    // items are laid out in this order, left to right)
+                    { type: "custom", element: <ToBuyBag /> },
+                    { type: "spacing", spacing: 10 },
                     {
                       type: "custom",
                       element: (
@@ -73,8 +77,6 @@ export default function AppHeader({
                       ),
                       hidesSharedBackground: true,
                     },
-                    { type: "spacing", spacing: 10 },
-                    { type: "custom", element: <ToBuyBag /> },
                   ]
                 : [
                     {
