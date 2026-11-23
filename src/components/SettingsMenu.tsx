@@ -83,6 +83,21 @@ export default function SettingsMenu({
   onClose: () => void;
   hasYear: boolean;
 }) {
+  return (
+    <Sheet open={open} onClose={onClose} contentClassName="px-2 pt-2 pb-8">
+      <MenuList onClose={onClose} hasYear={hasYear} />
+    </Sheet>
+  );
+}
+
+// everything the menu holds: in its sheet, or on an iPhone's Me tab
+export function MenuList({
+  onClose,
+  hasYear,
+}: {
+  onClose: () => void;
+  hasYear: boolean;
+}) {
   const c = useColors();
   const { theme } = useUniwind();
   const account = useAccount((s) => s.account);
@@ -96,7 +111,7 @@ export default function SettingsMenu({
     router.push(to);
   };
   return (
-    <Sheet open={open} onClose={onClose} contentClassName="px-2 pt-2 pb-8">
+    <>
       {/* who's signed in, and the way to everything about them */}
       <Tap
         onPress={() => go("/settings")}
@@ -216,6 +231,6 @@ export default function SettingsMenu({
           });
         }}
       />
-    </Sheet>
+    </>
   );
 }

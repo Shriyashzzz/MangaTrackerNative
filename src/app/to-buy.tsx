@@ -2,6 +2,7 @@
 // buy, what they'd cost new and used all together, each with its prices,
 // On my shelf, Ordered and Remove, sorted their way, and Clear list.
 // Marking one theirs whose series isn't on the shelf offers to add it
+import { useTabFoot } from "@/lib/tabHeader";
 import { useCorners } from "@/lib/mangaThemes";
 import LimitCount from "@/components/LimitCount";
 import { columnStyle } from "@/lib/wide";
@@ -522,7 +523,15 @@ function Card({
 const SORTS = [...TO_BUY_SORTS, { value: "mine", label: "My order" }] as const;
 type ListSort = ToBuySort | "mine";
 
-export default function ToBuyScreen() {
+// the page on the app's stack (opened from the bag)
+export default function ToBuyRoute() {
+  return <ToBuyScreen />;
+}
+
+// the list itself; `inTab` on an iPhone, where it's a tab of its own: no
+// way back, and room under it for the floating tab bar
+export function ToBuyScreen({ inTab = false }: { inTab?: boolean }) {
+  const foot = useTabFoot(96);
   const c = useColors();
   const { list, loadFailed, load, remove, drop, clear } = useToBuy();
   const offerAdd = usePrefs((s) => s.prefs.offerAdd !== "off");
@@ -690,15 +699,19 @@ export default function ToBuyScreen() {
     <Safe edges={["top"]} className="flex-1 bg-paper">
       <Backdrop />
       <View className="h-[62px] flex-row items-center gap-3 px-2">
-        <Tap
-          feel="round"
-          onPress={() => router.back()}
-          hitSlop={8}
-          className="p-2"
-          accessibilityLabel="Back"
-        >
-          <ChevronLeftIcon color={c.ink} width={24} height={24} />
-        </Tap>
+        {inTab ? (
+          <View className="w-2" />
+        ) : (
+          <Tap
+            feel="round"
+            onPress={() => router.back()}
+            hitSlop={8}
+            className="p-2"
+            accessibilityLabel="Back"
+          >
+            <ChevronLeftIcon color={c.ink} width={24} height={24} />
+          </Tap>
+        )}
         <Text className="flex-1 font-brand pr-[6px] text-[24px] tracking-[1px] text-ink uppercase">
           To buy
           {"\u00A0"}
@@ -717,7 +730,7 @@ export default function ToBuyScreen() {
             gap: 16,
             paddingHorizontal: 16,
             paddingTop: 16,
-            paddingBottom: 96,
+            paddingBottom: inTab ? foot : 96,
             ...(items?.length === 0 || (!items && loadFailed)
               ? { flexGrow: 1, justifyContent: "center" as const }
               : {}),

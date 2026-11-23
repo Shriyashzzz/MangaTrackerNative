@@ -42,52 +42,14 @@ export default function AppHeader({
       hasYear={hasYear}
     />
   );
-  // iOS: Apple's bar draws the top (lib/tabHeader.ts). Signed in, the To buy
-  // bag and their picture are its buttons; signed out, nothing
+  // iOS: no bar of its own. To buy and the menu are tabs there (To buy and
+  // Me), so the page's own title is the top; here only room for the
+  // status bar
   if (IOS)
     return (
       <>
-        <Stack.Screen
-          options={{
-            // no title in Apple's bar: the page letters its own, in the
-            // app's style (iOS clipped Bangers in its bar)
-            title: "",
-            headerTitle: () => null,
-            // signed out the bar would be empty: none, so the page starts
-            // at the top
-            headerShown: Boolean(isSignedIn),
-            // Each is its own item in Apple's bar, apart from the other:
-            // To buy's bag in its own round button, their picture on its own
-            // with no button behind it. Signed out: Apple's text button
-            unstable_headerRightItems: () =>
-              isSignedIn
-                ? [
-                    // the bag, then their picture at the bar's edge (the
-                    // items are laid out in this order, left to right)
-                    { type: "custom", element: <ToBuyBag /> },
-                    { type: "spacing", spacing: 10 },
-                    {
-                      type: "custom",
-                      element: (
-                        <Tap
-                          onPress={() => setMenuOpen(true)}
-                          hitSlop={8}
-                          accessibilityLabel="Menu"
-                        >
-                          <Avatar id={account?.avatar} size={34} />
-                        </Tap>
-                      ),
-                      hidesSharedBackground: true,
-                    },
-                  ]
-                : // signed out: no Sign in up here. It's on My shelf, and
-                  // wherever something needs an account
-                  [],
-          }}
-        />
-        {/* signed out, with no bar: room for the status bar only */}
-        {!isSignedIn ? <View style={{ height: insets.top }} /> : null}
-        {menu}
+        <Stack.Screen options={{ headerShown: false }} />
+        <View style={{ height: insets.top }} />
       </>
     );
   return (

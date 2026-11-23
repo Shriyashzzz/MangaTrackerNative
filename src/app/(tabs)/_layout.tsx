@@ -2,6 +2,10 @@
 // My shelf, Prices, Sign in for someone without an account). The
 // tab bar is the platform's own (Expo Router's native tabs): Material 3 on
 // Android, UIKit's on an iPhone, with the system's icons for each
+import { useAccount } from "@/store/account";
+import { avatarTabIcon } from "@/lib/avatarTabIcons";
+import { useToBuy } from "@/store/toBuy";
+import { IOS } from "@/lib/tabHeader";
 import { useTour } from "@/store/tour";
 import { router, usePathname } from "expo-router";
 import { NativeTabs } from "expo-router/native-tabs";
@@ -41,6 +45,8 @@ export default function TabsLayout() {
   // New's badge: the series with news, as the web's bar counts them
   const manga = useShelf((st) => st.manga);
   const releases = useShelf((st) => st.releases);
+  const toBuyCount = useToBuy((st) => st.list?.items.length ?? 0);
+  const avatarId = useAccount((st) => st.account?.avatar);
   const newCount = manga
     ? countNew(manga, editionReleases(manga, releases))
     : 0;
@@ -93,6 +99,39 @@ export default function TabsLayout() {
           md="sell"
         />
         <NativeTabs.Trigger.Label>Prices</NativeTabs.Trigger.Label>
+      </NativeTabs.Trigger>
+      {/* on an iPhone, To buy and Me are tabs: nothing sits on top of the
+          pages (Android keeps the bag and the menu in its masthead) */}
+      <NativeTabs.Trigger name="(tobuy)" hidden={!IOS}>
+        <NativeTabs.Trigger.Icon
+          sf={{ default: "bag", selected: "bag.fill" }}
+          md="shopping_bag"
+        />
+        <NativeTabs.Trigger.Label>To buy</NativeTabs.Trigger.Label>
+        {toBuyCount > 0 ? (
+          <NativeTabs.Trigger.Badge>
+            {String(toBuyCount)}
+          </NativeTabs.Trigger.Badge>
+        ) : null}
+      </NativeTabs.Trigger>
+      {/* Me is an account's: signed out, there's none */}
+      <NativeTabs.Trigger name="(me)" hidden={!IOS || !isSignedIn}>
+        {/* their own picture, in colour; signed out, a person */}
+        {isSignedIn ? (
+          <NativeTabs.Trigger.Icon
+            src={avatarTabIcon(avatarId)}
+            renderingMode="original"
+          />
+        ) : (
+          <NativeTabs.Trigger.Icon
+            sf={{
+              default: "person.crop.circle",
+              selected: "person.crop.circle.fill",
+            }}
+            md="person"
+          />
+        )}
+        <NativeTabs.Trigger.Label>Me</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       {/* (Signing in is an action, not a place: the shelf's welcome and
           the header's Sign in button lead to it, as Apple's tabs are
