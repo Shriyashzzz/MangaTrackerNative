@@ -48,8 +48,9 @@ export default function AppHeader({
       <>
         <Stack.Screen
           options={{
-            // (Bangers leans: a space after it keeps the last letter whole)
-            title: `${title}\u00A0`,
+            // (Bangers leans out of its box both ways: a narrow space either
+            // side keeps the first and last letters whole)
+            title: `\u202F${title}\u00A0`,
             // signed out: Apple's own text button, with the room and the
             // press feel a bar button has
             // Each is its own item in Apple's bar, apart from the other:
