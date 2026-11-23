@@ -51,12 +51,22 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
   const waysOut = (
     <>
       <Tap onPress={() => leavePractice("/sign-up")} hitSlop={14}>
-        <Text className="font-body-semibold text-[14px] text-accent-ink">
+        <Text
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.75}
+          className="font-body-semibold text-[14px] text-accent-ink"
+        >
           Start mine
         </Text>
       </Tap>
       <Tap onPress={() => leavePractice("/")} hitSlop={14}>
-        <Text className="font-body-semibold text-[14px] text-ink-soft">
+        <Text
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.75}
+          className="font-body-semibold text-[14px] text-ink-soft"
+        >
           Leave
         </Text>
       </Tap>
@@ -69,7 +79,7 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
     return (
       <View
         pointerEvents="box-none"
-        className="absolute left-3 flex-row items-center gap-2"
+        className="absolute right-3 left-3 flex-row items-center gap-2"
         style={{ bottom: foot }}
         onTouchStart={touchIsKenjis}
       >
@@ -83,23 +93,38 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
           <Mascot mood="happy" width={44} />
         </Tap>
         <View
-          className="min-h-[54px] flex-row items-center gap-4 rounded-full border-[1.5px] border-line bg-card px-4"
+          className="min-h-[54px] shrink flex-row items-center gap-3 self-center rounded-full border-[1.5px] border-line bg-card px-4"
           style={{ elevation: 6 }}
         >
           {/* leaving first, coming back last: the way back to the tour
               sits where the thumb ends up */}
           <Tap onPress={() => leavePractice("/")} hitSlop={14}>
-            <Text className="font-body-semibold text-[14px] text-ink-soft">
+            <Text
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.75}
+              className="font-body-semibold text-[14px] text-ink-soft"
+            >
               Leave
             </Text>
           </Tap>
           <Tap onPress={() => leavePractice("/sign-up")} hitSlop={14}>
-            <Text className="font-body-semibold text-[14px] text-accent-ink">
+            <Text
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.75}
+              className="font-body-semibold text-[14px] text-accent-ink"
+            >
               Start mine
             </Text>
           </Tap>
           <Tap onPress={tourBack} hitSlop={14}>
-            <Text className="font-body-semibold text-[14px] text-ink">
+            <Text
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.75}
+              className="font-body-semibold text-[14px] text-ink"
+            >
               Back to the tour
             </Text>
           </Tap>

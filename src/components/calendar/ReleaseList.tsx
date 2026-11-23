@@ -6,6 +6,7 @@ import { coverAt } from "@/lib/coverAt";
 import LightNovelBand from "@/components/LightNovelBand";
 import Tap from "@/components/Tap";
 import { Image } from "expo-image";
+import { VolTab } from "@/components/prices/VolumeCard";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Text, View } from "react-native";
@@ -55,6 +56,9 @@ export function VolumeCover({
           contentFit="cover"
         />
       ) : null}
+      {volume.volume !== null ? (
+        <VolTab number={String(volume.volume)} small={!big} />
+      ) : null}
       {novelParts(volume.title).lightNovel ||
       novelParts(volume.name).lightNovel ? (
         <LightNovelBand width={w} />
@@ -78,51 +82,65 @@ export default function ReleaseList({
   return (
     <View>
       {shown.map((v, i) => {
-        const sameDay = i > 0 && shown[i - 1]!.published === v.published;
         const named = `${v.name}${v.volume !== null ? ` Vol. ${v.volume}` : ""}`;
         return (
           <View
             key={v.isbn13}
             // a rule between rows, none under the last
-            className={`flex-row items-center gap-3 py-3 ${i < shown.length - 1 ? "border-b border-line-soft" : ""}`}
+            className={`flex-row gap-3 py-3 ${i < shown.length - 1 ? "border-b border-line-soft" : ""}`}
           >
-            <View className="w-[62px] flex-row items-center gap-1">
-              <Text className="flex-1 font-mono-medium text-[12px] text-ink">
-                {sameDay ? "" : dayName(v.published)}
-              </Text>
-              <AddToCalendar volumes={[v]} label={`Add ${named} to calendar`} />
-            </View>
             <Tap
               onPress={() => router.push(`/prices/${v.isbn13}`)}
-              className="min-w-0 flex-1 flex-row items-center gap-3 active:opacity-70"
+              className="active:opacity-70"
               accessibilityLabel={`${named}: out ${dayName(v.published)}${v.owned ? ", on your shelf" : ""}`}
             >
               <VolumeCover volume={v} big={roomy} />
-              <View className="min-w-0 flex-1">
+            </Tap>
+            {/* the name and volume, and under them the date to save */}
+            <View className="min-w-0 flex-1 justify-between gap-2">
+              <Tap onPress={() => router.push(`/prices/${v.isbn13}`)}>
                 <Text
                   numberOfLines={1}
-                  className="font-body-semibold text-[14.5px] text-ink"
+                  className="font-body-semibold text-[16px] leading-[22px] text-ink"
                 >
                   {v.name}
                 </Text>
                 <Text
                   numberOfLines={1}
-                  className="font-mono text-[12px] text-muted"
+                  className="font-mono text-[13px] text-muted"
                 >
                   {v.volume !== null ? `Vol. ${v.volume}` : v.title}
                 </Text>
-              </View>
-            </Tap>
-            {v.owned ? null : (
-              <Tap
-                onPress={() => router.push(`/prices/${v.isbn13}`)}
-                hitSlop={6}
-              >
-                <Text className="font-body-semibold text-[13.5px] text-accent border-b pb-[2px] border-accent self-start">
-                  Preorder →
-                </Text>
               </Tap>
-            )}
+              <AddToCalendar
+                plain
+                text="Save date"
+                volumes={[v]}
+                label={`Add ${named} to calendar`}
+              />
+            </View>
+            {/* when it's out, big, over the way to preorder it */}
+            <View className="min-w-[112px] items-center justify-between gap-2">
+              <Text className="font-brand pr-[4px] text-[26px] leading-[28px] tracking-[1px] text-ink uppercase">
+                {dayName(v.published)}
+                {"\u00A0"}
+              </Text>
+              {v.owned ? (
+                <Text className="min-h-[32px] font-body text-[13px] leading-[32px] text-muted">
+                  On your shelf
+                </Text>
+              ) : (
+                <Tap
+                  onPress={() => router.push(`/prices/${v.isbn13}`)}
+                  accessibilityRole="button"
+                  className="min-h-[34px] justify-center rounded-full border-[1.5px] border-ink bg-accent px-3.5"
+                >
+                  <Text className="font-body-semibold text-[14px] text-on-accent">
+                    Preorder →
+                  </Text>
+                </Tap>
+              )}
+            </View>
           </View>
         );
       })}

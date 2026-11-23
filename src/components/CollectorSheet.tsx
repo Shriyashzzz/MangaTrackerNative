@@ -74,7 +74,7 @@ function speech(
   if (plan.plan === "early")
     return {
       shout: "It's on the house!",
-      line: "Thanks for being one of the first. Collector is free for you, for good.",
+      line: "Thanks for being one of the first. Premium is free for you, for good.",
     };
   if (plan.plan === "collector")
     return {
@@ -92,21 +92,24 @@ function speech(
             ? "The whole calendar!"
             : reason === "japan"
               ? "In Japan!"
-              : "Go Collector!";
+              : "Go Premium!";
   return {
     shout,
-    line: "Collector takes the limits off. What you have stays yours.",
+    line: "Premium takes the limits off. What you have stays yours.",
   };
 }
 
 // Kenji in a panel, saying it in a speech bubble
 function KenjiSays({ shout, line }: { shout: string; line: string }) {
   return (
-    <View className="h-[112px] flex-row items-end gap-2 overflow-hidden rounded-[12px] border-2 border-ink bg-paper-2 px-3 pt-2.5">
+    <View className="min-h-[104px] flex-row items-end gap-2 overflow-hidden rounded-[12px] border-2 border-ink bg-paper-2 px-3 pt-2.5">
       <View style={{ marginBottom: -6 }}>
         <Mascot mood="happy" width={72} />
       </View>
-      <View className="mb-auto flex-1" style={{ flexShrink: 1, minWidth: 0 }}>
+      <View
+        className="mb-3 flex-1 self-start"
+        style={{ flexShrink: 1, minWidth: 0 }}
+      >
         <View className="rounded-[18px] border-2 border-ink bg-card px-3 py-2.5">
           <Text className="font-brand pr-[4px] text-[19px] leading-[21px] tracking-[0.5px] text-ink uppercase">
             {shout}
@@ -152,7 +155,7 @@ function MemberCard({ plan }: { plan: Plan }) {
   const early = plan.plan === "early";
   const since = member
     ? member.sinceKind === "collector"
-      ? `Collector since ${monthOf(member.since)}`
+      ? `Premium since ${monthOf(member.since)}`
       : `Reading with us since ${monthOf(member.since)}`
     : null;
   // their numbers, each on its own line in its own colour, so they stay
@@ -193,7 +196,7 @@ function MemberCard({ plan }: { plan: Plan }) {
         Member card
       </Text>
       <Text className="mt-1.5 font-brand pl-[4px] pr-[4px] text-[32px] leading-[34px] tracking-[0.5px] text-ink uppercase">
-        Collector{"\u00A0"}
+        Premium{"\u00A0"}
       </Text>
       {name ? (
         <Text
@@ -307,6 +310,124 @@ function LimitShelf({
   );
 }
 
+// The shout panel of the website's pages: speed lines from the middle, a
+// sound effect lettered across them, and what it's about under it
+function Shout({ shout, under }: { shout: string; under: string }) {
+  return (
+    <View className="items-center overflow-hidden rounded-[6px] border-2 border-ink bg-card px-3.5 py-4">
+      <View className="absolute inset-0 items-center justify-center opacity-50">
+        {Array.from({ length: 15 }, (_, i) => (
+          <View
+            key={i}
+            className="absolute h-[1.5px] w-[560px] bg-line-soft"
+            style={{ transform: [{ rotate: `${i * 12}deg` }] }}
+          />
+        ))}
+      </View>
+      <Text
+        className="font-brand pr-[6px] text-[38px] leading-[42px] tracking-[1px] text-ink uppercase"
+        style={{ transform: [{ rotate: "-2deg" }] }}
+      >
+        {shout}
+        {"\u00A0"}
+      </Text>
+      <Text
+        style={TEXT.count}
+        className="mt-1 font-mono text-[12px] tracking-[1px] text-muted uppercase"
+      >
+        {under}
+      </Text>
+    </View>
+  );
+}
+
+// a shelf of ten spines, every one inked, ending in FULL!
+function FullShelf() {
+  return (
+    <View className="flex-row items-end gap-[3px] border-b-[3px] border-double border-ink pb-[2px]">
+      {Array.from({ length: 10 }, (_, i) => (
+        <View key={i} className="h-[20px] flex-1 border-2 border-ink bg-ink" />
+      ))}
+      <Text
+        className="ml-1.5 font-brand pr-[3px] text-[14px] text-accent"
+        style={{ transform: [{ rotate: "-4deg" }] }}
+      >
+        FULL!{"\u00A0"}
+      </Text>
+    </View>
+  );
+}
+
+// What a free reader sees on hitting a limit, before any prices: what's
+// full, that nothing is lost, the free way on when there is one, and
+// Premium. Out of scans with room on the shelf, they can still type a
+// title; with the shelf full too, they can't, so it isn't offered
+function LimitReached({
+  plan,
+  what,
+  prices,
+  onPremium,
+  onDone,
+}: {
+  plan: Plan;
+  what: "scans" | "series";
+  prices: string;
+  onPremium: () => void;
+  onDone: () => void;
+}) {
+  const limits = plan.limits!;
+  const shelfFull = plan.used.series >= limits.series;
+  const scans = `${plan.used.scans} of ${limits.scans}`;
+  const series = `${plan.used.series} of ${limits.series}`;
+  const typeInstead = what === "scans" && !shelfFull;
+  const said =
+    what === "series"
+      ? "A free shelf holds 100 series, and yours is full. Everything on it stays yours. Premium lets the shelf keep growing."
+      : shelfFull
+        ? "You've used every scan and filled your shelf, all a free account has. Everything on it stays yours. Premium lifts both limits."
+        : "That's every scan a free account has. You can still type a title to add it, or get Premium to scan without a limit.";
+  return (
+    <>
+      <Shout
+        shout={what === "series" ? "Shelf's full!" : "Out of scans!"}
+        under={
+          what === "series"
+            ? `${series} series`
+            : shelfFull
+              ? `${scans} scans · ${series} series`
+              : `${scans} barcodes scanned`
+        }
+      />
+      <FullShelf />
+      <Text
+        style={TEXT.plain}
+        className="font-body text-[14.5px] leading-[21px] text-ink-soft"
+      >
+        {said}
+      </Text>
+      <Button kind="primary" wide label="Get Premium" onPress={onPremium} />
+      <Button
+        wide
+        label={typeInstead ? "Type the title instead" : "Not now"}
+        onPress={
+          typeInstead
+            ? () => {
+                onDone();
+                router.replace("/add");
+              }
+            : onDone
+        }
+      />
+      <Text
+        style={TEXT.plain}
+        className="text-center font-body text-[12.5px] text-muted"
+      >
+        {prices}
+      </Text>
+    </>
+  );
+}
+
 export default function CollectorSheet() {
   const { plan, sheet, hideCollector } = usePlan();
   const [picked, setPicked] = useState<"year" | "month">("year");
@@ -334,7 +455,7 @@ export default function CollectorSheet() {
     setSaid("");
     const outcome = await buy(picked === "year" ? YEARLY : MONTHLY);
     setBusy(false);
-    if (outcome === "bought") setSaid("You're a Collector. Thank you!");
+    if (outcome === "bought") setSaid("You're on Premium. Thank you!");
     if (outcome === "failed")
       setSaid("That didn't go through. You weren't charged; try again.");
   };
@@ -345,16 +466,25 @@ export default function CollectorSheet() {
     setBusy(false);
     setSaid(
       found
-        ? "Restored. You're a Collector."
-        : "No Collector subscription on this Apple ID.",
+        ? "Restored. You're on Premium."
+        : "No Premium subscription on this Apple ID.",
     );
   };
   const collector = plan.plan === "collector";
+  const [pricesFor, setPricesFor] = useState(-1);
+  const limitHit =
+    plan.limited &&
+    plan.limits !== null &&
+    pricesFor !== sheet.n &&
+    (sheet.reason === "scans" || sheet.reason === "series")
+      ? sheet.reason
+      : null;
   // free where nothing is limited (Android, the website): nothing to say
   if (!plan.limited && !collector && plan.plan !== "early") return null;
 
   return (
     <Sheet
+      key={sheet.n}
       open={sheet.open}
       onClose={hideCollector}
       // tall enough to show it all without scrolling
@@ -362,180 +492,196 @@ export default function CollectorSheet() {
       contentClassName="gap-5 px-6 pb-0"
       footRoom={2}
     >
-      <KenjiSays {...speech(plan, sheet.reason)} />
-
-      {plan.limited ? (
-        <>
-          {/* the section's title, in the app's lettering with its red rule */}
-          <View className="mt-2">
-            <H2>Collector</H2>
-          </View>
-          {/* their own limits, drawn as shelves of spines that hit the end */}
-          <View className="gap-3.5">
-            <LimitShelf label="Series" what="series" plan={plan} />
-            <LimitShelf label="Barcode scans" what="scans" plan={plan} />
-            <LimitShelf label="Price alerts" what="priceAlerts" plan={plan} />
-          </View>
-          <Text
-            style={TEXT.plain}
-            className="font-body text-[14px] leading-[20px] text-ink-soft"
-          >
-            Collector takes the end off: no limits, plus coming soon alerts, the
-            full calendar and In Japan.
-          </Text>
-        </>
+      {limitHit ? (
+        <LimitReached
+          plan={plan}
+          what={limitHit}
+          prices={`${priceOf("year")} a year or ${priceOf("month")} a month. Cancel any time.`}
+          onPremium={() => setPricesFor(sheet.n)}
+          onDone={hideCollector}
+        />
       ) : (
-        <MemberCard plan={plan} />
-      )}
-
-      {/* the prices, only where Collector is sold */}
-      {plan.limited ? (
         <>
-          <View className="mt-1.5 flex-row gap-2.5">
-            {PRICES.map((p) => {
-              const on = picked === p.key;
-              return (
-                <Tap
-                  key={p.key}
-                  feel="none"
-                  onPress={() => setPicked(p.key)}
-                  accessibilityRole="radio"
-                  accessibilityState={{ selected: on }}
-                  accessibilityLabel={`${p.name}, ${p.price}. ${p.note}`}
-                  className={`flex-1 gap-0.5 rounded-[12px] border-2 px-3.5 py-3 ${on ? "border-accent bg-accent-wash" : "border-ink bg-card"}`}
-                >
-                  <Text
-                    style={TEXT.bold}
-                    className="font-body-semibold text-[14px] text-ink-soft"
-                  >
-                    {p.name}
-                  </Text>
-                  <Text className="font-brand pr-[4px] text-[26px] text-ink">
-                    {p.price}
-                    {" "}
-                  </Text>
-                  <Text
-                    style={TEXT.plain}
-                    className="font-body text-[13px] text-muted"
-                  >
-                    {p.key === "year" ? "Best value" : p.note}
-                  </Text>
-                  {/* the free trial, stamped on the yearly card as the
+          <KenjiSays {...speech(plan, sheet.reason)} />
+
+          {plan.limited ? (
+            <>
+              {/* the section's title, in the app's lettering with its red rule */}
+              <View className="mt-2">
+                <H2>Premium</H2>
+              </View>
+              {/* their own limits, drawn as shelves of spines that hit the end */}
+              <View className="gap-3.5">
+                <LimitShelf label="Series" what="series" plan={plan} />
+                <LimitShelf label="Barcode scans" what="scans" plan={plan} />
+                <LimitShelf
+                  label="Price alerts"
+                  what="priceAlerts"
+                  plan={plan}
+                />
+              </View>
+              <Text
+                style={TEXT.plain}
+                className="font-body text-[14px] leading-[20px] text-ink-soft"
+              >
+                Premium takes the end off: no limits, plus coming soon alerts,
+                the full calendar and In Japan.
+              </Text>
+            </>
+          ) : (
+            <MemberCard plan={plan} />
+          )}
+
+          {/* the prices, only where Premium is sold */}
+          {plan.limited ? (
+            <>
+              <View className="mt-1.5 flex-row gap-2.5">
+                {PRICES.map((p) => {
+                  const on = picked === p.key;
+                  return (
+                    <Tap
+                      key={p.key}
+                      feel="none"
+                      onPress={() => setPicked(p.key)}
+                      accessibilityRole="radio"
+                      accessibilityState={{ selected: on }}
+                      accessibilityLabel={`${p.name}, ${p.price}. ${p.note}`}
+                      className={`flex-1 gap-0.5 rounded-[12px] border-2 px-3.5 py-3 ${on ? "border-accent bg-accent-wash" : "border-ink bg-card"}`}
+                    >
+                      <Text
+                        style={TEXT.bold}
+                        className="font-body-semibold text-[14px] text-ink-soft"
+                      >
+                        {p.name}
+                      </Text>
+                      <Text className="font-brand pr-[4px] text-[26px] text-ink">
+                        {p.price}
+                        {" "}
+                      </Text>
+                      <Text
+                        style={TEXT.plain}
+                        className="font-body text-[13px] text-muted"
+                      >
+                        {p.key === "year" ? "Best value" : p.note}
+                      </Text>
+                      {/* the free trial, stamped on the yearly card as the
                       app's other stamps are (only once Apple says there is
                       one, and that this Apple ID can have it) */}
-                  {p.key === "year" && trial ? (
-                    <View
-                      pointerEvents="none"
-                      className="absolute -top-3 right-2.5 border-[1.5px] border-ink bg-accent px-1.5"
-                      style={{ transform: [{ rotate: "-3deg" }] }}
-                    >
-                      <Text className="font-brand pr-[3px] text-[13px] tracking-[0.5px] text-on-accent uppercase">
-                        {trial} free!{"\u00A0"}
-                      </Text>
-                    </View>
-                  ) : null}
-                </Tap>
-              );
-            })}
-          </View>
-          {canBuy() ? (
-            <Button
-              kind="primary"
-              wide
-              label={
-                busy
-                  ? "One moment…"
-                  : picked === "year"
-                    ? trial
-                      ? `Start ${trial} free`
-                      : `Subscribe for ${priceOf("year")} a year`
-                    : `Subscribe for ${priceOf("month")} a month`
-              }
-              disabled={busy}
-              onPress={() => void subscribe()}
-            />
-          ) : (
-            <Text
-              style={TEXT.plain}
-              className="text-center font-body text-[14px] text-ink-soft"
-            >
-              Collector is bought in the iPhone app for now.
-            </Text>
-          )}
-          {said ? (
-            <Text
-              style={TEXT.bold}
-              className="text-center font-body-semibold text-[14px] text-ink"
-            >
-              {said}
-            </Text>
-          ) : null}
-          <Text
-            style={TEXT.plain}
-            className="text-center font-body text-[13px] leading-[18px] text-muted"
-          >
-            {/* what is charged and when, said plainly (Apple asks for the
-                price after a trial to be clear) */}
-            {picked === "year"
-              ? trial
-                ? `${trial} free, then ${priceOf("year")} a year.`
-                : `${priceOf("year")} a year, starting today.`
-              : `${priceOf("month")} a month, starting today.`}{" "}
-            Paid through the App Store and renews until you cancel in your Apple
-            account settings.
-            {picked === "year" && trial
-              ? " Cancel before the free time ends and you won't be charged."
-              : ""}
-          </Text>
-          {/* Restore, and the terms Apple asks to be a tap away */}
-          {canBuy() ? (
-            <View className="flex-row flex-wrap justify-center gap-x-5 gap-y-2">
-              <Tap onPress={() => void restoreIt()} hitSlop={8}>
+                      {p.key === "year" && trial ? (
+                        <View
+                          pointerEvents="none"
+                          className="absolute -top-3 right-2.5 border-[1.5px] border-ink bg-accent px-1.5"
+                          style={{ transform: [{ rotate: "-3deg" }] }}
+                        >
+                          <Text className="font-brand pr-[3px] text-[13px] tracking-[0.5px] text-on-accent uppercase">
+                            {trial} free!{"\u00A0"}
+                          </Text>
+                        </View>
+                      ) : null}
+                    </Tap>
+                  );
+                })}
+              </View>
+              {canBuy() ? (
+                <Button
+                  kind="primary"
+                  wide
+                  label={
+                    busy
+                      ? "One moment…"
+                      : picked === "year"
+                        ? trial
+                          ? `Start ${trial} free`
+                          : `Subscribe for ${priceOf("year")} a year`
+                        : `Subscribe for ${priceOf("month")} a month`
+                  }
+                  disabled={busy}
+                  onPress={() => void subscribe()}
+                />
+              ) : (
+                <Text
+                  style={TEXT.plain}
+                  className="text-center font-body text-[14px] text-ink-soft"
+                >
+                  Premium is bought in the iPhone app for now.
+                </Text>
+              )}
+              {said ? (
                 <Text
                   style={TEXT.bold}
-                  className="font-body-semibold text-[13px] text-accent-ink"
+                  className="text-center font-body-semibold text-[14px] text-ink"
                 >
-                  Restore purchases
+                  {said}
                 </Text>
-              </Tap>
-              <Tap
-                onPress={() => void Linking.openURL(APPLE_TERMS)}
-                hitSlop={8}
+              ) : null}
+              <Text
+                style={TEXT.plain}
+                className="text-center font-body text-[13px] leading-[18px] text-muted"
               >
-                <Text
-                  style={TEXT.plain}
-                  className="font-body text-[13px] text-ink-soft underline"
-                >
-                  Terms of Use
-                </Text>
-              </Tap>
-              <Tap
-                onPress={() => {
-                  hideCollector();
-                  router.push("/privacy");
-                }}
-                hitSlop={8}
-              >
-                <Text
-                  style={TEXT.plain}
-                  className="font-body text-[13px] text-ink-soft underline"
-                >
-                  Privacy
-                </Text>
-              </Tap>
-            </View>
-          ) : null}
-        </>
-      ) : (
-        <>
-          {collector && canBuy() ? (
-            <Button
-              wide
-              label="Manage subscription"
-              onPress={() => void Linking.openURL(MANAGE)}
-            />
-          ) : null}
-          <Button wide label="Done" onPress={hideCollector} />
+                {/* what is charged and when, said plainly (Apple asks for the
+                price after a trial to be clear) */}
+                {picked === "year"
+                  ? trial
+                    ? `${trial} free, then ${priceOf("year")} a year.`
+                    : `${priceOf("year")} a year, starting today.`
+                  : `${priceOf("month")} a month, starting today.`}{" "}
+                Paid through the App Store and renews until you cancel in your
+                Apple account settings.
+                {picked === "year" && trial
+                  ? " Cancel before the free time ends and you won't be charged."
+                  : ""}
+              </Text>
+              {/* Restore, and the terms Apple asks to be a tap away */}
+              {canBuy() ? (
+                <View className="flex-row flex-wrap justify-center gap-x-5 gap-y-2">
+                  <Tap onPress={() => void restoreIt()} hitSlop={8}>
+                    <Text
+                      style={TEXT.bold}
+                      className="font-body-semibold text-[13px] text-accent-ink"
+                    >
+                      Restore purchases
+                    </Text>
+                  </Tap>
+                  <Tap
+                    onPress={() => void Linking.openURL(APPLE_TERMS)}
+                    hitSlop={8}
+                  >
+                    <Text
+                      style={TEXT.plain}
+                      className="font-body text-[13px] text-ink-soft underline"
+                    >
+                      Terms of Use
+                    </Text>
+                  </Tap>
+                  <Tap
+                    onPress={() => {
+                      hideCollector();
+                      router.push("/privacy");
+                    }}
+                    hitSlop={8}
+                  >
+                    <Text
+                      style={TEXT.plain}
+                      className="font-body text-[13px] text-ink-soft underline"
+                    >
+                      Privacy
+                    </Text>
+                  </Tap>
+                </View>
+              ) : null}
+            </>
+          ) : (
+            <>
+              {collector && canBuy() ? (
+                <Button
+                  wide
+                  label="Manage subscription"
+                  onPress={() => void Linking.openURL(MANAGE)}
+                />
+              ) : null}
+              <Button wide label="Done" onPress={hideCollector} />
+            </>
+          )}
         </>
       )}
     </Sheet>

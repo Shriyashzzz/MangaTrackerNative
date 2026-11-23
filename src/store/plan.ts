@@ -43,7 +43,11 @@ const OPEN: Plan = {
 type PlanState = {
   plan: Plan;
   // the Collector sheet: open, and what brought it up (null: from Settings)
-  sheet: { open: boolean; reason: Counted | "calendar" | "japan" | null };
+  sheet: {
+    open: boolean;
+    reason: Counted | "calendar" | "japan" | null;
+    n: number;
+  };
   load: () => Promise<void>;
   showCollector: (reason?: PlanState["sheet"]["reason"]) => void;
   hideCollector: () => void;
@@ -52,7 +56,7 @@ type PlanState = {
 
 export const usePlan = create<PlanState>()((set) => ({
   plan: OPEN,
-  sheet: { open: false, reason: null },
+  sheet: { open: false, reason: null, n: 0 },
   load: async () => {
     try {
       set({ plan: await getJson<Plan>("/api/account/plan") });
@@ -60,7 +64,15 @@ export const usePlan = create<PlanState>()((set) => ({
       // kept as it was: the next load tries again
     }
   },
-  showCollector: (reason = null) => set({ sheet: { open: true, reason } }),
+  // each opening is a new sheet (n): Apple's payment window can close the
+  // last one without our state hearing of it, and a sheet still marked open
+  // would never open again
+  showCollector: (reason = null) =>
+    set((s) => ({ sheet: { open: true, reason, n: s.sheet.n + 1 } })),
   hideCollector: () => set((s) => ({ sheet: { ...s.sheet, open: false } })),
-  reset: () => set({ plan: OPEN, sheet: { open: false, reason: null } }),
+  reset: () =>
+    set((s) => ({
+      plan: OPEN,
+      sheet: { open: false, reason: null, n: s.sheet.n },
+    })),
 }));

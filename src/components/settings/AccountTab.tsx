@@ -80,9 +80,9 @@ function PlanRow() {
   const show = usePlan((s) => s.showCollector);
   const said =
     plan.plan === "early"
-      ? "Collector, on the house, for good."
+      ? "Premium, on the house, for good."
       : plan.plan === "collector"
-        ? "Collector. Thanks for your support."
+        ? "Premium. Thanks for your support."
         : plan.limited && plan.limits
           ? `Free: ${plan.used.series} of ${plan.limits.series} series, ${plan.used.scans} of ${plan.limits.scans} scans.`
           : "Free, with every feature open to you.";
@@ -93,7 +93,7 @@ function PlanRow() {
         <Button
           small
           // those who have it open their member card; the rest see Collector
-          label={plan.plan === "free" ? "See Collector" : "Show my card"}
+          label={plan.plan === "free" ? "Manage subscription" : "Show my card"}
           onPress={() => show()}
         />
       ) : null}

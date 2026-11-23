@@ -17,7 +17,13 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import Mascot from "./Mascot";
-import { Modal, ScrollView, Text, View } from "react-native";
+import {
+  Modal,
+  ScrollView,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import AuthArt from "./AuthArt";
 import Button from "./Button";
 
@@ -136,6 +142,10 @@ function StockingShelf() {
 
 export default function GuestShelf() {
   const foot = useTabFoot(120);
+  // a small screen (an iPhone app in an iPad's window, a small phone): the
+  // box set tighter, so it still fits without its lines wrapping
+  const { width, height } = useWindowDimensions();
+  const small = width < 380 || height < 760;
   // pressed: the loader shows first, then the shelf is put together (the
   // work would otherwise hold the press's own frame back)
   const [starting, setStarting] = useState(false);
@@ -176,7 +186,7 @@ export default function GuestShelf() {
             </Text>
           </View>
         </View>
-        <View className="flex-1 gap-3.5 p-3.5">
+        <View className={`flex-1 ${small ? "gap-2.5 p-3" : "gap-3.5 p-3.5"}`}>
           <AuthArt
             compact
             sfx="A new series begins!"
@@ -194,7 +204,7 @@ export default function GuestShelf() {
                 style={{ transform: [{ rotate: `${stamp.tilt}deg` }] }}
               >
                 <Text
-                  className={`font-brand pr-[3px] text-[15px] tracking-[0.5px] uppercase ${stamp.text}`}
+                  className={`font-brand pr-[3px] tracking-[0.5px] uppercase ${small ? "text-[13px]" : "text-[15px]"} ${stamp.text}`}
                 >
                   {stamp.label}
                   {"\u00A0"}
@@ -205,10 +215,12 @@ export default function GuestShelf() {
           {/* Kenji offers the tour: the practice shelves, nothing kept */}
           <View className="flex-row items-end gap-1.5">
             <View style={{ marginBottom: -2 }}>
-              <Mascot mood="happy" width={72} />
+              <Mascot mood="happy" width={small ? 56 : 72} />
             </View>
             <View className="mb-5 flex-1 rounded-[18px] border-2 border-line bg-card px-2.5 pt-2.5 pb-2.5">
-              <Text className="font-brand pr-[4px] text-[21px] leading-[23px] tracking-[0.5px] text-ink uppercase">
+              <Text
+                className={`font-brand pr-[4px] tracking-[0.5px] text-ink uppercase ${small ? "text-[18px] leading-[20px]" : "text-[21px] leading-[23px]"}`}
+              >
                 Want the tour first?{"\u00A0"}
               </Text>
               <Text className="mt-0.5 mb-2 font-body text-[12.5px] leading-[17px] text-ink-soft">

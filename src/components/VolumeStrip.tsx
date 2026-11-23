@@ -355,6 +355,8 @@ function Book({
         runCentred ? (
           <Text
             numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.6}
             style={{ width: Math.max(runRoom, 34) }}
             className="absolute -top-[19px] left-0 text-center font-brand text-[11px] tracking-[1px] text-ink-soft uppercase"
           >
@@ -363,6 +365,8 @@ function Book({
         ) : (
           <Text
             numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.6}
             style={{ width: Math.max(runRoom, 34) }}
             className="absolute -top-[19px] left-0 font-brand pr-[4px] text-[11px] tracking-[1px] text-ink-soft uppercase"
           >
@@ -396,6 +400,8 @@ function Book({
         ) : (
           <Text
             numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.6}
             className={`font-brand pr-[4px] text-[13px] ${ink}`}
           >
             {"\u00A0"}

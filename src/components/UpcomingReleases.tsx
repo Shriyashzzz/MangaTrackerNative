@@ -2,6 +2,7 @@
 // UpcomingReleases.tsx): the next release day and this month's count, with
 // three covers; opened, the month at a glance, the dates to save, the first
 // few releases, and the way to the full calendar
+import { usePlan } from "@/store/plan";
 import Tap from "@/components/Tap";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
@@ -10,15 +11,13 @@ import { ChevronDownIcon } from "@/core/components/icons/Icons";
 import {
   dayName,
   getCalendar,
-  monthName,
   monthOnly,
   type CalendarMonth,
 } from "@/core/lib/collector";
 import AddToCalendar from "./calendar/AddToCalendar";
-import MiniMonth from "./calendar/MiniMonth";
 import ReleaseList, { VolumeCover } from "./calendar/ReleaseList";
 
-const SHOWN = 6;
+const SHOWN = 4;
 
 export default function UpcomingReleases() {
   const [months, setMonths] = useState<CalendarMonth[] | null>(null);
@@ -36,10 +35,19 @@ export default function UpcomingReleases() {
       return () => controller.abort();
     }, []),
   );
-  const first = months?.[0];
-  if (!first?.volumes.length) return null;
-  const next = first.volumes[0]!;
-  const count = first.volumes.length;
+  // without Premium (where the limits are on), only the next release:
+  // the rest is the full calendar's
+  const everyRelease = usePlan((s) => s.plan.calendar);
+  const month = months?.[0];
+  if (!month?.volumes.length) return null;
+  // every upcoming one, in date order; the panel shows the first few (only
+  // the next one without Premium) and the full calendar has the rest
+  const all = months!.flatMap((m) => m.volumes);
+  const shown = all.slice(0, everyRelease ? SHOWN : 1);
+  const first = { ...month, volumes: shown.slice(0, 3) };
+  const next = all[0]!;
+  const inMonth = month.volumes.length;
+  const more = all.length - shown.length;
   return (
     <View className="overflow-hidden rounded-[14px] bg-accent">
       <Tap
@@ -66,8 +74,11 @@ export default function UpcomingReleases() {
             {"\u00A0"}
           </Text>
           <Text className="font-body text-[13.5px] text-on-accent">
-            Next: {dayName(next.published)} · {count} in{" "}
-            {monthOnly(first.month)}
+            {!everyRelease
+              ? `Next: ${dayName(next.published)}`
+              : all.length > inMonth
+                ? `${inMonth} in ${monthOnly(month.month)}, ${all.length} in all`
+                : `${inMonth} in ${monthOnly(month.month)}`}
           </Text>
         </View>
         <View style={{ transform: [{ rotate: open ? "180deg" : "0deg" }] }}>
@@ -75,22 +86,58 @@ export default function UpcomingReleases() {
         </View>
       </Tap>
       {open ? (
-        <View className="mx-[1.5px] mb-[1.5px] gap-4 rounded-b-[13px] bg-card px-4 pt-4 pb-3">
-          <MiniMonth onCard month={first.month} volumes={first.volumes} />
-          <View className="flex-row flex-wrap items-center gap-3">
+        <View className="mx-[1.5px] mb-[1.5px] overflow-hidden rounded-b-[13px] bg-card">
+          <View className="px-3">
+            <ReleaseList volumes={shown} />
+          </View>
+          {/* without Premium: how many more there are, the rest is Premium's */}
+          {!everyRelease && more > 0 ? (
+            <Tap
+              onPress={() => router.push("/calendar")}
+              accessibilityRole="button"
+              accessibilityLabel={`${more} more upcoming releases, with Premium`}
+              className="mx-3 mb-3 mt-1 flex-row items-center justify-between rounded-[8px] border-2 border-dashed border-muted px-3 py-3"
+            >
+              <Text className="font-body-semibold text-[14.5px] text-ink">
+                {more} more upcoming {more === 1 ? "release" : "releases"}
+              </Text>
+              <Text className="font-body-semibold text-[15px] text-accent-ink">
+                →
+              </Text>
+              <View
+                className="absolute -top-2.5 right-3 border-[1.5px] border-ink bg-accent px-1.5 pt-[1px]"
+                style={{ transform: [{ rotate: "3deg" }] }}
+              >
+                <Text className="font-brand pr-[3px] text-[12px] tracking-[0.5px] text-on-accent uppercase">
+                  Premium{"\u00A0"}
+                </Text>
+              </View>
+            </Tap>
+          ) : null}
+          {/* the dates to save, and the way to the full calendar */}
+          <View className="flex-row flex-wrap items-center justify-center gap-2.5 border-t-2 border-line bg-paper-2 px-3.5 pt-2.5 pb-3.5">
             <AddToCalendar
               big
-              volumes={first.volumes}
-              label={`Save ${monthName(first.month)}'s release dates to your calendar`}
-              text={`Save ${first.volumes.length > 1 ? `${first.volumes.length} dates` : "the date"}`}
+              volumes={shown}
+              label="Save these release dates to your calendar"
+              text={
+                shown.length > 1
+                  ? `Save all ${shown.length} dates`
+                  : "Save the date"
+              }
             />
-            <Tap onPress={() => router.push("/calendar")} hitSlop={6}>
-              <Text className="font-body-semibold text-[14px] text-ink border-b pb-[2px] border-ink self-start">
-                Full calendar
+            <Tap
+              onPress={() => router.push("/calendar")}
+              accessibilityRole="button"
+              className="min-h-[36px] items-center justify-center rounded-full bg-ink px-3.5 py-2"
+            >
+              <Text className="font-body-semibold text-[14px] text-paper">
+                {everyRelease && more > 0
+                  ? `See all ${all.length} →`
+                  : "Full calendar →"}
               </Text>
             </Tap>
           </View>
-          <ReleaseList volumes={first.volumes.slice(0, SHOWN)} />
         </View>
       ) : null}
     </View>

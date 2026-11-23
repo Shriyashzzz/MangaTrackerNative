@@ -22,11 +22,14 @@ export default function AddToCalendar({
   volumes,
   label,
   big = false,
+  plain = false,
   text,
 }: {
   volumes: CalendarVolume[];
   label: string;
   big?: boolean;
+  // the icon and the words, with no pill behind them
+  plain?: boolean;
   text?: string;
 }) {
   const c = useColors();
@@ -34,9 +37,10 @@ export default function AddToCalendar({
   const dated = volumes.filter(hasDay);
   const one = dated.length === 1 ? dated[0]! : null;
   if (!dated.length) return null;
-  const word = big
-    ? (text ?? (one ? "Save the date" : `Save all ${dated.length} dates`))
-    : "Add";
+  const word =
+    big || plain
+      ? (text ?? (one ? "Save the date" : `Save all ${dated.length} dates`))
+      : "Add";
   const shareFile = () =>
     void Share.share({ title: label, message: buildIcs(dated, pageFor) }).catch(
       () => {},
@@ -47,11 +51,15 @@ export default function AddToCalendar({
         onPress={() => setOpen(true)}
         accessibilityLabel={label}
         hitSlop={6}
-        className={`flex-row items-center gap-1.5 ${big ? "min-h-[36px] self-start rounded-full bg-ink/10 px-3.5 py-2" : "p-1"}`}
+        className={`flex-row items-center gap-1.5 ${plain ? "min-h-[32px] self-start" : big ? "min-h-[36px] self-start rounded-full bg-ink/10 px-3.5 py-2" : "p-1"}`}
       >
         <CalendarPlusIcon color={c.ink} width={18} height={18} />
-        {big ? (
-          <Text className="font-body-medium text-[14px] text-ink">{word}</Text>
+        {big || plain ? (
+          <Text
+            className={`text-[14px] text-ink ${plain ? "font-body-semibold" : "font-body-medium"}`}
+          >
+            {word}
+          </Text>
         ) : null}
       </Tap>
       <MenuSheet

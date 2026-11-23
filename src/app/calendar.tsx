@@ -13,10 +13,13 @@ import Mascot from "@/components/Mascot";
 import Page, { P } from "@/components/Page";
 import { ChevronDownIcon } from "@/core/components/icons/Icons";
 import {
+  dayName,
   getCalendar,
   monthName,
+  monthOnly,
   type CalendarMonth,
 } from "@/core/lib/collector";
+import DoubleRule from "@/components/DoubleRule";
 import { useColors } from "@/lib/colors";
 
 const OPEN_MONTHS = 2;
@@ -48,21 +51,137 @@ export default function CalendarScreen() {
   return open ? <Calendar /> : <CalendarLocked />;
 }
 
-// Where the limits are on and they aren't a Collector: the New tab already
-// shows the next release; the whole calendar is Collector's
+// Where the limits are on and they haven't Premium: their next release is
+// shown (the New tab shows it too), and the months after it as closed
+// panels that say how many of their volumes each holds. Drawn as the
+// website's pages are: the headline with words knocked out in ink, the
+// double rule, a speed-line panel, a stamped label
 function CalendarLocked() {
   const showCollector = usePlan((s) => s.showCollector);
+  const [months, setMonths] = useState<CalendarMonth[] | null>(null);
+  useEffect(() => {
+    getCalendar()
+      .then(setMonths)
+      .catch(() => setMonths([]));
+  }, []);
+  const all = months?.flatMap((m) => m.volumes) ?? [];
+  const next = all[0];
+  // after the next one: each month's count, the third on as one line
+  const later = (months ?? [])
+    .map((m) => ({
+      month: m.month,
+      count: m.volumes.filter((v) => v !== next).length,
+    }))
+    .filter((m) => m.count > 0);
+  const rows = [
+    ...later.slice(0, 2).map((m) => ({
+      name: monthOnly(m.month),
+      count: m.count,
+    })),
+    ...(later.length > 2
+      ? [
+          {
+            name: `${monthOnly(later[2]!.month)} on`,
+            count: later.slice(2).reduce((n, m) => n + m.count, 0),
+          },
+        ]
+      : []),
+  ];
+  const more = all.length - 1;
   return (
-    <Page title="Upcoming Releases" center>
-      <P muted>
-        Every upcoming English volume for your shelf, month by month, and saved
-        to your own calendar. Part of Collector.
-      </P>
-      <Button
-        kind="primary"
-        label="See Collector"
-        onPress={() => showCollector("calendar")}
-      />
+    <Page title="Upcoming Releases">
+      <View className="gap-3.5">
+        <View className="flex-row flex-wrap items-center gap-x-1.5 gap-y-1">
+          {["Every release,", "month", "by", "month"].map((word, i) => {
+            const boxed = word === "month";
+            return (
+              <View
+                key={i}
+                className={boxed ? "bg-ink px-1.5" : ""}
+                style={boxed ? { transform: [{ rotate: "-1.5deg" }] } : null}
+              >
+                <Text
+                  className={`font-brand pr-[4px] text-[38px] leading-[42px] tracking-[1px] uppercase ${boxed ? "text-paper" : "text-ink"}`}
+                >
+                  {word}
+                  {"\u00A0"}
+                </Text>
+              </View>
+            );
+          })}
+        </View>
+        <DoubleRule />
+        <P muted>
+          Your next release is free. Premium shows the rest of the year for your
+          shelf, and saves it to your phone&apos;s calendar.
+        </P>
+        {next ? (
+          <View className="flex-row items-center gap-3 overflow-hidden rounded-[6px] border-2 border-line bg-card p-3">
+            <View className="absolute inset-0 items-center justify-center opacity-50">
+              {Array.from({ length: 15 }, (_, i) => (
+                <View
+                  key={i}
+                  className="absolute h-[1.5px] w-[560px] bg-line-soft"
+                  style={{ transform: [{ rotate: `${i * 12}deg` }] }}
+                />
+              ))}
+            </View>
+            <VolumeCover volume={next} />
+            <View className="min-w-0 flex-1 gap-1">
+              <Text className="font-mono text-[11px] tracking-[1px] text-muted uppercase">
+                Next · {dayName(next.published)}
+              </Text>
+              <Text className="font-body-semibold text-[16px] text-ink">
+                {next.name}
+                {next.volume !== null ? `, Vol. ${next.volume}` : ""}
+              </Text>
+              <View
+                className="self-start border-[1.5px] border-ink bg-award-market px-1.5 pt-[2px]"
+                style={{ transform: [{ rotate: "-2deg" }] }}
+              >
+                <Text className="font-brand pr-[3px] text-[13px] tracking-[0.5px] text-ink uppercase">
+                  Next up!{"\u00A0"}
+                </Text>
+              </View>
+            </View>
+          </View>
+        ) : null}
+        {rows.length > 0 ? (
+          <View className="overflow-hidden rounded-[6px] border-2 border-line bg-paper-2">
+            <View className="flex-row items-center justify-between border-b-2 border-line px-3 py-2">
+              <View className="bg-accent px-2 pt-[2px]">
+                <Text className="font-brand pr-[3px] text-[15px] tracking-[1px] text-on-accent uppercase">
+                  With Premium{"\u00A0"}
+                </Text>
+              </View>
+              <Text className="font-mono text-[11px] text-muted uppercase">
+                {more} more on the way
+              </Text>
+            </View>
+            {rows.map((row, i) => (
+              <View
+                key={row.name}
+                className={`flex-row items-center gap-3 px-3 py-3 ${i ? "border-t border-dashed border-line-soft" : ""}`}
+              >
+                <Text className="w-[104px] font-brand pr-[3px] text-[20px] tracking-[1px] text-ink uppercase">
+                  {row.name}
+                  {"\u00A0"}
+                </Text>
+                <Text className="flex-1 font-body text-[13.5px] text-ink-soft">
+                  {row.count} {row.count === 1 ? "volume" : "volumes"} for your
+                  shelf
+                </Text>
+              </View>
+            ))}
+          </View>
+        ) : null}
+        <Button
+          kind="primary"
+          wide
+          label="Get Premium"
+          onPress={() => showCollector("calendar")}
+        />
+      </View>
     </Page>
   );
 }

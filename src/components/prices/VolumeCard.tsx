@@ -74,6 +74,37 @@ export function CoverFallback({
   );
 }
 
+// The "Vol. 27" tab inked across a cover's top left corner, as the
+// website's covers carry it. `small` for the little covers in a list
+export function VolTab({
+  number,
+  many = false,
+  small = false,
+}: {
+  number: string;
+  many?: boolean;
+  small?: boolean;
+}) {
+  return (
+    <View
+      className={`absolute top-0 left-0 flex-row items-baseline gap-0.5 bg-ink ${small ? "px-1 pb-px" : "px-1.5 pb-0.5"}`}
+    >
+      <Text
+        className={`font-brand pr-[3px] tracking-[0.5px] text-paper uppercase ${small ? "text-[8px]" : "text-[10px]"}`}
+      >
+        {many ? "Vols." : "Vol."}
+        {"\u00A0"}
+      </Text>
+      <Text
+        className={`font-brand pr-[3px] text-paper ${small ? "text-[11px]" : "text-[15px]"}`}
+      >
+        {number}
+        {"\u00A0"}
+      </Text>
+    </View>
+  );
+}
+
 export default function VolumeCard({
   isbn13,
   title,
@@ -211,16 +242,10 @@ export default function VolumeCard({
             <LightNovelBand width={width} />
           ) : null}
           {holds || volume != null ? (
-            <View className="absolute top-0 left-0 flex-row items-baseline gap-0.5 bg-ink px-1.5 pb-0.5">
-              <Text className="font-brand pr-[4px] text-[10px] tracking-[0.5px] text-paper uppercase">
-                {holds ? "Vols." : "Vol."}
-                {"\u00A0"}
-              </Text>
-              <Text className="font-brand pr-[4px] text-[15px] text-paper">
-                {holds ? `${holds.from}–${holds.to}` : volume}
-                {"\u00A0"}
-              </Text>
-            </View>
+            <VolTab
+              many={Boolean(holds)}
+              number={holds ? `${holds.from}–${holds.to}` : String(volume)}
+            />
           ) : null}
           {mark ? (
             <View
