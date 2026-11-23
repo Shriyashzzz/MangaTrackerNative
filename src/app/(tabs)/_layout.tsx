@@ -94,19 +94,10 @@ export default function TabsLayout() {
         />
         <NativeTabs.Trigger.Label>Prices</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
-      {/* Signing in is an action, not a place: the shelf's welcome and the
-          header's Sign in button lead to it (Apple's tabs are places). The
-          screen stays for links to it */}
-      <NativeTabs.Trigger name="account" hidden>
-        <NativeTabs.Trigger.Icon
-          sf={{
-            default: "person.crop.circle",
-            selected: "person.crop.circle.fill",
-          }}
-          md="account_circle"
-        />
-        <NativeTabs.Trigger.Label>Sign in</NativeTabs.Trigger.Label>
-      </NativeTabs.Trigger>
+      {/* (Signing in is an action, not a place: the shelf's welcome and
+          the header's Sign in button lead to it, as Apple's tabs are
+          places only. A hidden tab beside a hidden New threw the bar's
+          taps out by one, so there is no Sign in tab at all) */}
     </NativeTabs>
   );
 }

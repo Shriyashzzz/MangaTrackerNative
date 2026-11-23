@@ -359,10 +359,13 @@ export default function PricesScreen() {
           {!searching ? <DealsStrip /> : null}
           {/* Price check, from its name to the names to try, in one box */}
           <View className="gap-3 rounded-[16px] border border-line-soft bg-card p-4">
-            <Text className="font-brand pr-[7px] text-[30px] tracking-[1px] text-ink uppercase">
-              Price check
-              {"\u00A0"}
-            </Text>
+            {/* (on iOS the page's title, Prices, says it already) */}
+            {IOS ? null : (
+              <Text className="font-brand pr-[7px] text-[30px] tracking-[1px] text-ink uppercase">
+                Price check
+                {"\u00A0"}
+              </Text>
+            )}
             <Text className="font-body text-[14.5px] text-ink-soft">
               Find a series, then see what{" "}
               {country === "ca" ? "stores in Canada" : "US stores"} charge for

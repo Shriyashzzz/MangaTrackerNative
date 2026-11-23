@@ -283,7 +283,7 @@ export default function NewScreen() {
   return (
     <Safe edges={IOS ? [] : ["top"]} className="flex-1 bg-paper">
       <Backdrop />
-      <AppHeader title="New" />
+      <AppHeader title={viewingHidden ? "Hidden" : "New"} />
       <PullPage refresh={load} scrollTop={pull.top}>
         <ScrollView
           ref={scroller}
@@ -293,17 +293,20 @@ export default function NewScreen() {
           scrollEventThrottle={16}
           onScroll={pull.track}
         >
-          <View className="flex-row items-baseline gap-2">
-            <Text className="font-brand pr-[7px] text-[30px] tracking-[1px] text-ink uppercase">
-              {viewingHidden ? "Hidden" : "New"}
-              {"\u00A0"}
-            </Text>
-            {/* the same number as the tab's badge: every series listed here,
+          {/* (on iOS Apple's title above says it: the page doesn't again) */}
+          {IOS ? null : (
+            <View className="flex-row items-baseline gap-2">
+              <Text className="font-brand pr-[7px] text-[30px] tracking-[1px] text-ink uppercase">
+                {viewingHidden ? "Hidden" : "New"}
+                {"\u00A0"}
+              </Text>
+              {/* the same number as the tab's badge: every series listed here,
                 volumes and chapters together (core releaseMath countNew) */}
-            <Text className="font-mono text-[14px] text-muted">
-              {viewingHidden ? list.length : counts.new}
-            </Text>
-          </View>
+              <Text className="font-mono text-[14px] text-muted">
+                {viewingHidden ? list.length : counts.new}
+              </Text>
+            </View>
+          )}
 
           {/* the check, while answers are missing */}
           {checking && total > 0 ? (

@@ -48,33 +48,41 @@ export default function AppHeader({
       <>
         <Stack.Screen
           options={{
-            title,
+            // (Bangers leans: a space after it keeps the last letter whole)
+            title: `${title}\u00A0`,
             // signed out: Apple's own text button, with the room and the
             // press feel a bar button has
-            unstable_headerRightItems: isSignedIn
-              ? undefined
-              : () => [
-                  {
-                    type: "button",
-                    label: "Sign in",
-                    onPress: () => router.push("/sign-in"),
-                    tintColor: c.accentInk,
-                    labelStyle: { fontWeight: "600" },
-                  },
-                ],
-            headerRight: () =>
-              isSignedIn ? (
-                <View className="flex-row items-center gap-3">
-                  <ToBuyBag />
-                  <Tap
-                    onPress={() => setMenuOpen(true)}
-                    hitSlop={8}
-                    accessibilityLabel="Menu"
-                  >
-                    <Avatar id={account?.avatar} size={32} />
-                  </Tap>
-                </View>
-              ) : null,
+            // Each is its own item in Apple's bar, apart from the other:
+            // To buy's bag in its own round button, their picture on its own
+            // with no button behind it. Signed out: Apple's text button
+            unstable_headerRightItems: () =>
+              isSignedIn
+                ? [
+                    {
+                      type: "custom",
+                      element: (
+                        <Tap
+                          onPress={() => setMenuOpen(true)}
+                          hitSlop={8}
+                          accessibilityLabel="Menu"
+                        >
+                          <Avatar id={account?.avatar} size={34} />
+                        </Tap>
+                      ),
+                      hidesSharedBackground: true,
+                    },
+                    { type: "spacing", spacing: 10 },
+                    { type: "custom", element: <ToBuyBag /> },
+                  ]
+                : [
+                    {
+                      type: "button",
+                      label: "Sign in",
+                      onPress: () => router.push("/sign-in"),
+                      tintColor: c.accentInk,
+                      labelStyle: { fontWeight: "600" },
+                    },
+                  ],
           }}
         />
         {menu}

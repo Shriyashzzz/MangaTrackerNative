@@ -25,7 +25,7 @@ import Mascot from "./Mascot";
 import Tap from "./Tap";
 
 // the pages with the tab bar along their foot: Kenji rests above it there
-const TAB_PAGES = new Set(["/", "/new", "/prices", "/account"]);
+const TAB_PAGES = new Set(["/", "/new", "/prices"]);
 const TAB_BAR = 84;
 // the room left between the bubble and what it sits beside (the thing he
 // points at, the tab bar, the screen's foot)
