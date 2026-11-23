@@ -6,6 +6,8 @@
 // it: dragging up scrolls, dragging down once at the top closes. Built on
 // @gorhom/bottom-sheet, which does that nested drag the way the system's
 // own sheets do
+import { BottomSheet, Host, RNHostView } from "@expo/ui/swift-ui";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SHEET, useWide } from "@/lib/wide";
 import {
   BottomSheetBackdrop,
@@ -24,7 +26,12 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { BackHandler, useWindowDimensions } from "react-native";
+import {
+  BackHandler,
+  Platform,
+  ScrollView,
+  useWindowDimensions,
+} from "react-native";
 import { useColors } from "@/lib/colors";
 
 // the few paddings sheets ask for, as Tailwind classes ("px-4 pb-8"), in
@@ -61,6 +68,77 @@ const Backdrop = (props: BottomSheetBackdropProps) => (
   />
 );
 
+// On an iPhone or iPad the sheet is Apple's own (SwiftUI's, through Expo
+// UI): it rises from the foot with the page behind it dimmed and drawn back,
+// sizes itself to what it holds, swipes down to close, and is a card in the
+// middle on an iPad. The app's views are hosted inside it. Elsewhere it's
+// the drawn sheet below
+function AppleSheet({
+  open,
+  onClose,
+  children,
+  fromTheFoot,
+  maxHeight,
+  contentClassName,
+}: {
+  open: boolean;
+  onClose: () => void;
+  children: ReactNode;
+  fromTheFoot: boolean;
+  maxHeight: number;
+  contentClassName: string;
+}) {
+  const c = useColors();
+  const { height: screen, width } = useWindowDimensions();
+  // a phone's sheet is as wide as the screen; an iPad's is a card in the
+  // middle, about this wide
+  const sheetWidth = width >= 700 ? Math.min(width, 580) : width;
+  const padding = paddingOf(contentClassName);
+  // closed by a swipe or a tap outside: said once, as a drawn sheet says it
+  const closedBy = useRef(false);
+  return (
+    // (the host takes no room on the page, but is as wide as a sheet can
+    // be: the views inside are laid out within its width)
+    <Host style={{ position: "absolute", width: sheetWidth, height: 0 }}>
+      <BottomSheet
+        isPresented={open}
+        onIsPresentedChange={(shown) => {
+          if (!shown && !closedBy.current) {
+            closedBy.current = true;
+            onClose();
+          }
+          if (shown) closedBy.current = false;
+        }}
+        fitToContents
+      >
+        <RNHostView matchContents={{ vertical: true }}>
+          <GestureHandlerRootView
+            // as wide as the sheet Apple draws, never wider (its width is
+            // the host's; only the height follows what's inside)
+            style={{ width: "100%", backgroundColor: c.card }}
+          >
+            <ScrollView
+              style={{ width: "100%", maxHeight: screen * maxHeight }}
+              contentContainerStyle={{
+                ...padding,
+                paddingTop: (padding.paddingTop ?? 0) + 22,
+                ...(fromTheFoot
+                  ? { flexGrow: 1, justifyContent: "flex-end" as const }
+                  : {}),
+              }}
+              keyboardShouldPersistTaps="handled"
+              // short ones don't bounce: they're not lists
+              alwaysBounceVertical={false}
+            >
+              {children}
+            </ScrollView>
+          </GestureHandlerRootView>
+        </RNHostView>
+      </BottomSheet>
+    </Host>
+  );
+}
+
 export default function Sheet({
   open,
   onClose,
@@ -80,6 +158,50 @@ export default function Sheet({
   fromTheFoot?: boolean;
   maxHeight?: number;
   contentClassName?: string;
+}) {
+  if (Platform.OS === "ios")
+    return (
+      <AppleSheet
+        open={open}
+        onClose={onClose}
+        fromTheFoot={fromTheFoot}
+        maxHeight={maxHeight}
+        contentClassName={contentClassName}
+      >
+        {children}
+      </AppleSheet>
+    );
+  return (
+    <DrawnSheet
+      open={open}
+      onClose={onClose}
+      scroll={scroll}
+      fromTheFoot={fromTheFoot}
+      maxHeight={maxHeight}
+      contentClassName={contentClassName}
+    >
+      {children}
+    </DrawnSheet>
+  );
+}
+
+// Android's: the app's own sheet, drawn by the bottom sheet library
+function DrawnSheet({
+  open,
+  onClose,
+  children,
+  scroll,
+  fromTheFoot,
+  maxHeight,
+  contentClassName,
+}: {
+  open: boolean;
+  onClose: () => void;
+  children: ReactNode;
+  scroll: boolean;
+  fromTheFoot: boolean;
+  maxHeight: number;
+  contentClassName: string;
 }) {
   const c = useColors();
   const { height: screen } = useWindowDimensions();

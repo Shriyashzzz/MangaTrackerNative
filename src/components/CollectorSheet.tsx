@@ -68,7 +68,11 @@ function Row({
     <View
       className={`flex-row items-center gap-3 py-2.5 ${first ? "" : "border-t border-dotted border-line-soft"}`}
     >
-      <Text className="flex-1 font-body text-[15px] leading-[20px] text-ink">
+      <Text
+        // (wraps rather than pushing the columns off the edge)
+        style={{ flex: 1, flexShrink: 1, minWidth: 0 }}
+        className="font-body text-[15px] leading-[20px] text-ink"
+      >
         {name}
       </Text>
       <Text className="w-[70px] text-right font-body text-[14px] text-muted">
