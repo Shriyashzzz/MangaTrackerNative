@@ -3,7 +3,6 @@
 // nearly caught up on, and how nearly. Each choice shows an example of what
 // New would say. Saved a moment after the last change
 import StepSlider from "@/components/StepSlider";
-import Tap from "@/components/Tap";
 import { useEffect, useRef, useState } from "react";
 import { Text, View } from "react-native";
 import { apiFetch } from "@/core/lib/api";

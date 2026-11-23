@@ -190,7 +190,7 @@ export default function AddScreen() {
       return true;
     });
     return () => back.remove();
-  }, [guarded]);
+  }, [guarded, navigation]);
   useEffect(() => {
     if (leaving) router.back();
   }, [leaving]);
