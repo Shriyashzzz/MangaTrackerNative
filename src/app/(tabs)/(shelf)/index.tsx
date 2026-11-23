@@ -5,8 +5,9 @@
 // rules (core filterShelf); it opens on the tab and sort the account chose
 import { useCorners } from "@/lib/mangaThemes";
 import { useLimit } from "@/components/LimitCount";
-import { IOS, useTabFoot } from "@/lib/tabHeader";
+import { IOS, useTabFoot, useTabsOnTop } from "@/lib/tabHeader";
 import { columnStyle } from "@/lib/wide";
+import EmptyShelf from "@/components/EmptyShelf";
 import TourTarget from "@/components/TourTarget";
 import { useTour } from "@/store/tour";
 import Tap from "@/components/Tap";
@@ -74,6 +75,7 @@ function SignedInShelf() {
   const seriesLimit = useLimit("series");
   const c = useColors();
   const insets = useSafeAreaInsets();
+  const tabsOnTop = useTabsOnTop();
   const manga = useShelf((s) => s.manga);
   const failed = useShelf((s) => s.failed);
   const load = useShelf((s) => s.load);
@@ -208,90 +210,95 @@ function SignedInShelf() {
       {/* everything under the header pulls down to refresh */}
       <PullPage refresh={load} scrollTop={scrollTop}>
         {/* the shelf's bar: which tab and how many, or the search box; search
-          and sort on the right */}
-        <View className="h-[64px] flex-row items-center gap-2 px-4 pt-3">
-          {searching ? (
-            <View
-              className="flex-1 flex-row items-center gap-2 rounded-[14px] border border-line-soft bg-card px-3"
-              style={corners.panel}
-            >
-              <SearchIcon color={c.inkSoft} width={18} height={18} />
-              <TextInput
-                autoFocus
-                value={query}
-                onChangeText={setQuery}
-                placeholder="Search your shelf"
-                placeholderTextColorClassName="accent-muted"
-                autoCorrect={false}
-                returnKeyType="search"
-                className="flex-1 py-2 font-body text-[16px] text-ink"
-              />
+          and sort on the right. On a wide screen it keeps to the list's
+          column, so the two line up */}
+        <View style={columnStyle}>
+          <View className="h-[64px] flex-row items-center gap-2 px-4 pt-3">
+            {searching ? (
+              <View
+                className="flex-1 flex-row items-center gap-2 rounded-[14px] border border-line-soft bg-card px-3"
+                style={corners.panel}
+              >
+                <SearchIcon color={c.inkSoft} width={18} height={18} />
+                <TextInput
+                  autoFocus
+                  value={query}
+                  onChangeText={setQuery}
+                  placeholder="Search your shelf"
+                  placeholderTextColorClassName="accent-muted"
+                  autoCorrect={false}
+                  returnKeyType="search"
+                  className="flex-1 py-2 font-body text-[16px] text-ink"
+                />
+                <Tap
+                  feel="round"
+                  onPress={closeSearch}
+                  hitSlop={10}
+                  accessibilityLabel="Close search"
+                >
+                  <CloseIcon color={c.inkSoft} width={18} height={18} />
+                </Tap>
+              </View>
+            ) : (
+              <Tap
+                onPress={() => setPicking("tab")}
+                className="flex-1 flex-row items-baseline gap-2"
+                accessibilityLabel={`Showing ${shown.label}, ${counts[tab]}. Change what's shown`}
+              >
+                <Text className="font-brand pr-[7px] text-[30px] tracking-[1px] text-ink uppercase">
+                  {shown.label}
+                  {"\u00A0"}
+                </Text>
+                <Text className="font-mono text-[14px] text-muted">
+                  {counts[tab]}
+                  {/* a free shelf's size, beside the whole shelf's count */}
+                  {tab === "all" && seriesLimit
+                    ? ` / ${seriesLimit.limit}`
+                    : ""}
+                </Text>
+                <ChevronDownIcon color={c.inkSoft} width={18} height={18} />
+              </Tap>
+            )}
+            {searching ? null : (
               <Tap
                 feel="round"
-                onPress={closeSearch}
-                hitSlop={10}
-                accessibilityLabel="Close search"
+                onPress={() => setSearching(true)}
+                hitSlop={8}
+                className="p-2"
+                accessibilityLabel="Search your shelf"
               >
-                <CloseIcon color={c.inkSoft} width={18} height={18} />
+                <SearchIcon color={c.ink} width={22} height={22} />
               </Tap>
-            </View>
-          ) : (
-            <Tap
-              onPress={() => setPicking("tab")}
-              className="flex-1 flex-row items-baseline gap-2"
-              accessibilityLabel={`Showing ${shown.label}, ${counts[tab]}. Change what's shown`}
-            >
-              <Text className="font-brand pr-[7px] text-[30px] tracking-[1px] text-ink uppercase">
-                {shown.label}
-                {"\u00A0"}
-              </Text>
-              <Text className="font-mono text-[14px] text-muted">
-                {counts[tab]}
-                {/* a free shelf's size, beside the whole shelf's count */}
-                {tab === "all" && seriesLimit ? ` / ${seriesLimit.limit}` : ""}
-              </Text>
-              <ChevronDownIcon color={c.inkSoft} width={18} height={18} />
-            </Tap>
-          )}
-          {searching ? null : (
+            )}
             <Tap
               feel="round"
-              onPress={() => setSearching(true)}
+              onPress={() => setPicking("sort")}
               hitSlop={8}
               className="p-2"
-              accessibilityLabel="Search your shelf"
+              accessibilityLabel={`Sorted by ${sortLabel}. Change the order`}
             >
-              <SearchIcon color={c.ink} width={22} height={22} />
+              <SortIcon
+                color={sortBy ? c.accent : c.ink}
+                width={22}
+                height={22}
+              />
             </Tap>
-          )}
-          <Tap
-            feel="round"
-            onPress={() => setPicking("sort")}
-            hitSlop={8}
-            className="p-2"
-            accessibilityLabel={`Sorted by ${sortLabel}. Change the order`}
-          >
-            <SortIcon
-              color={sortBy ? c.accent : c.ink}
-              width={22}
-              height={22}
-            />
-          </Tap>
-          {tab !== "volumes" && !select.selectOn && !searching ? (
-            <Tap
-              // on the way down, not on release: it answers at once
-              onPressIn={select.start}
-              hitSlop={8}
-              className="py-2 pl-1"
-              accessibilityLabel="Select several"
-            >
-              <Text className="font-body-semibold text-[14.5px] text-ink">
-                Select
-              </Text>
-            </Tap>
-          ) : null}
+            {tab !== "volumes" && !select.selectOn && !searching ? (
+              <Tap
+                // on the way down, not on release: it answers at once
+                onPressIn={select.start}
+                hitSlop={8}
+                className="py-2 pl-1"
+                accessibilityLabel="Select several"
+              >
+                <Text className="font-body-semibold text-[14.5px] text-ink">
+                  Select
+                </Text>
+              </Tap>
+            ) : null}
+          </View>
+          <View className="mx-4 h-px bg-line" />
         </View>
-        <View className="mx-4 h-px bg-line" />
         {failed && !manga ? (
           <Text className="px-4 pt-6 font-body text-[15px] text-ink-soft">
             {failed}
@@ -332,7 +339,13 @@ function SignedInShelf() {
               // room under the last row for the floating + (and on an
               // iPhone the tab bar it sits above)
               contentContainerClassName="px-4"
-              contentContainerStyle={columnStyle}
+              // an empty shelf: the list fills the screen, so its first look
+              // can sit in the middle of it
+              contentContainerStyle={
+                manga?.length === 0
+                  ? [columnStyle, { flexGrow: 1 }]
+                  : columnStyle
+              }
               // room under the last row, clear of the + and the tab bar
               ListFooterComponent={<View style={{ height: foot }} />}
               // the first screenful at once, the rest in small batches
@@ -344,13 +357,19 @@ function SignedInShelf() {
               scrollEventThrottle={16}
               onScroll={onShelfScroll}
               ListEmptyComponent={
-                manga ? (
+                !manga ? undefined : manga.length === 0 ? (
+                  // nothing on the shelf at all: the ways to start it, in the
+                  // middle of the screen
+                  <View className="flex-1 justify-center py-6">
+                    <EmptyShelf />
+                  </View>
+                ) : (
                   <Text className="pt-6 font-body text-[15px] text-ink-soft">
                     {query.trim()
                       ? "Nothing on your shelf matches that."
                       : "Nothing here yet."}
                   </Text>
-                ) : undefined
+                )
               }
             />
           </LayoutAnimationConfig>
@@ -360,7 +379,11 @@ function SignedInShelf() {
       {tab !== "volumes" && !select.selectOn ? (
         <Animated.View
           style={[
-            { position: "absolute", right: 16, bottom: insets.bottom + 20 },
+            // an iPad's screen is wider and its corners rounder: more room
+            // around it, so it doesn't sit in the corner
+            tabsOnTop
+              ? { position: "absolute", right: 36, bottom: insets.bottom + 36 }
+              : { position: "absolute", right: 16, bottom: insets.bottom + 20 },
             fabStyle,
           ]}
         >
