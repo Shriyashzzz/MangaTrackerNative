@@ -56,6 +56,216 @@
       --color-stamp-ink: #16140f;
       --color-stamp-get: #e59a8b;
     }
+    /* Premium's manga themes, iPhone only: each a whole palette of its own,
+       light or dark as it is (lib/mangaThemes.ts) */
+    /* the shonen theme (lib/mangaThemes.ts) */
+    @variant shonen {
+      --color-paper: #fff4d6;
+      --color-paper-2: #f7e6b8;
+      --color-card: #fffdf5;
+      --color-ink: #141414;
+      --color-ink-soft: #3d3424;
+      --color-muted: #6d6047;
+      --color-line: #141414;
+      --color-line-soft: #e8d29a;
+      --color-accent: #e8361c;
+      --color-accent-hover: #c42c15;
+      --color-accent-ink: #c42c15;
+      --color-accent-wash: rgba(232,54,28,0.10);
+      --color-on-accent: #ffffff;
+      --color-ok: #2e6b4c;
+      --color-star: #ffb400;
+      --color-star-off: #9a8a5c;
+      --color-award-new: #2e6b4c;
+      --color-on-award-new: #ffffff;
+      --color-award-market: #ffb400;
+      --color-award-set: #1f4fb5;
+      --color-on-award-set: #ffffff;
+      --color-stamp-ink: #141414;
+      --color-stamp-get: #ffd0c4;
+    }
+    /* the shojo theme (lib/mangaThemes.ts) */
+    @variant shojo {
+      --color-paper: #fdf0f3;
+      --color-paper-2: #f8e1e7;
+      --color-card: #fffafb;
+      --color-ink: #4a2a36;
+      --color-ink-soft: #7a5664;
+      --color-muted: #8a6b77;
+      --color-line: #4a2a36;
+      --color-line-soft: #f1c9d4;
+      --color-accent: #d4567a;
+      --color-accent-hover: #b9446a;
+      --color-accent-ink: #b03f63;
+      --color-accent-wash: rgba(212,86,122,0.10);
+      --color-on-accent: #ffffff;
+      --color-ok: #3f7d5c;
+      --color-star: #e98aa6;
+      --color-star-off: #c4a5b0;
+      --color-award-new: #3f7d5c;
+      --color-on-award-new: #ffffff;
+      --color-award-market: #e0a21b;
+      --color-award-set: #7a5fb0;
+      --color-on-award-set: #ffffff;
+      --color-stamp-ink: #4a2a36;
+      --color-stamp-get: #f8c9d6;
+    }
+    /* the seinen theme (lib/mangaThemes.ts) */
+    @variant seinen {
+      --color-paper: #e6e1d6;
+      --color-paper-2: #d9d3c6;
+      --color-card: #f2eee5;
+      --color-ink: #0f0e0c;
+      --color-ink-soft: #3a3631;
+      --color-muted: #625c53;
+      --color-line: #0f0e0c;
+      --color-line-soft: #c4bdae;
+      --color-accent: #7a1f14;
+      --color-accent-hover: #5e170f;
+      --color-accent-ink: #7a1f14;
+      --color-accent-wash: rgba(122,31,20,0.08);
+      --color-on-accent: #f2eee5;
+      --color-ok: #2e5b44;
+      --color-star: #0f0e0c;
+      --color-star-off: #9a9385;
+      --color-award-new: #2e5b44;
+      --color-on-award-new: #f2eee5;
+      --color-award-market: #8a6a1c;
+      --color-award-set: #2f3d5c;
+      --color-on-award-set: #f2eee5;
+      --color-stamp-ink: #0f0e0c;
+      --color-stamp-get: #d8b8b0;
+    }
+    /* the isekai theme (lib/mangaThemes.ts) */
+    @variant isekai {
+      --color-paper: #f1e6cc;
+      --color-paper-2: #e8d9b6;
+      --color-card: #faf3e1;
+      --color-ink: #2b2016;
+      --color-ink-soft: #5c4a35;
+      --color-muted: #776450;
+      --color-line: #2b2016;
+      --color-line-soft: #d9c391;
+      --color-accent: #2f5fa8;
+      --color-accent-hover: #244b86;
+      --color-accent-ink: #2a5596;
+      --color-accent-wash: rgba(47,95,168,0.10);
+      --color-on-accent: #faf3e1;
+      --color-ok: #3d6b45;
+      --color-star: #c99a2e;
+      --color-star-off: #a8946c;
+      --color-award-new: #3d6b45;
+      --color-on-award-new: #faf3e1;
+      --color-award-market: #c99a2e;
+      --color-award-set: #7a3fa0;
+      --color-on-award-set: #faf3e1;
+      --color-stamp-ink: #2b2016;
+      --color-stamp-get: #c9d6ef;
+    }
+    /* the cozy theme (lib/mangaThemes.ts) */
+    @variant cozy {
+      --color-paper: #f4efe6;
+      --color-paper-2: #ebe4d7;
+      --color-card: #fbf8f2;
+      --color-ink: #3a3328;
+      --color-ink-soft: #615747;
+      --color-muted: #7a705f;
+      --color-line: #3a3328;
+      --color-line-soft: #ddd3c2;
+      --color-accent: #5f7f4d;
+      --color-accent-hover: #4f6a40;
+      --color-accent-ink: #4f6a40;
+      --color-accent-wash: rgba(95,127,77,0.10);
+      --color-on-accent: #fbf8f2;
+      --color-ok: #4f6a40;
+      --color-star: #c9a75c;
+      --color-star-off: #b3a892;
+      --color-award-new: #4f6a40;
+      --color-on-award-new: #fbf8f2;
+      --color-award-market: #c9a75c;
+      --color-award-set: #5b7aa0;
+      --color-on-award-set: #fbf8f2;
+      --color-stamp-ink: #3a3328;
+      --color-stamp-get: #d9e4cd;
+    }
+    /* the horror theme (lib/mangaThemes.ts) */
+    @variant horror {
+      --color-paper: #141210;
+      --color-paper-2: #1f1b17;
+      --color-card: #1c1916;
+      --color-ink: #e9e2d3;
+      --color-ink-soft: #b9b0a0;
+      --color-muted: #8f8576;
+      --color-line: #cfc5ae;
+      --color-line-soft: #3a332c;
+      --color-accent: #b3241f;
+      --color-accent-hover: #c93a33;
+      --color-accent-ink: #e0574f;
+      --color-accent-wash: rgba(179,36,31,0.16);
+      --color-on-accent: #f3ece0;
+      --color-ok: #7fb38f;
+      --color-star: #c93a33;
+      --color-star-off: #6e655a;
+      --color-award-new: #7fb38f;
+      --color-on-award-new: #141210;
+      --color-award-market: #d9a441;
+      --color-award-set: #9fb0ec;
+      --color-on-award-set: #141210;
+      --color-stamp-ink: #141210;
+      --color-stamp-get: #e0574f;
+    }
+    /* the sports theme (lib/mangaThemes.ts) */
+    @variant sports {
+      --color-paper: #eef3f7;
+      --color-paper-2: #dfe8ef;
+      --color-card: #ffffff;
+      --color-ink: #0f2238;
+      --color-ink-soft: #3b5068;
+      --color-muted: #5d6f84;
+      --color-line: #0f2238;
+      --color-line-soft: #c9d6e2;
+      --color-accent: #c94f0c;
+      --color-accent-hover: #a84009;
+      --color-accent-ink: #b3460a;
+      --color-accent-wash: rgba(201,79,12,0.10);
+      --color-on-accent: #ffffff;
+      --color-ok: #2e7d4f;
+      --color-star: #ff6b1a;
+      --color-star-off: #9aa9b8;
+      --color-award-new: #2e7d4f;
+      --color-on-award-new: #ffffff;
+      --color-award-market: #e0a21b;
+      --color-award-set: #1f4fb5;
+      --color-on-award-set: #ffffff;
+      --color-stamp-ink: #0f2238;
+      --color-stamp-get: #ffd2b8;
+    }
+    /* the mecha theme (lib/mangaThemes.ts) */
+    @variant mecha {
+      --color-paper: #1b2026;
+      --color-paper-2: #232a32;
+      --color-card: #222932;
+      --color-ink: #dfe7ee;
+      --color-ink-soft: #a9b5c0;
+      --color-muted: #7f8b97;
+      --color-line: #9fb3c4;
+      --color-line-soft: #33404d;
+      --color-accent: #3fd0ff;
+      --color-accent-hover: #6bdcff;
+      --color-accent-ink: #6bdcff;
+      --color-accent-wash: rgba(63,208,255,0.12);
+      --color-on-accent: #0c1116;
+      --color-ok: #5fd38f;
+      --color-star: #ffd23f;
+      --color-star-off: #5b6670;
+      --color-award-new: #5fd38f;
+      --color-on-award-new: #0c1116;
+      --color-award-market: #ffd23f;
+      --color-award-set: #b59cff;
+      --color-on-award-set: #0c1116;
+      --color-stamp-ink: #0c1116;
+      --color-stamp-get: #7fe0ff;
+    }
   }
 }
 

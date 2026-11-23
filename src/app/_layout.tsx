@@ -1,10 +1,11 @@
 // The app's frame: the fonts the web uses, the session checked once, then
 // the tabs for everyone; the pages that need an account only when signed in
+import { loadLook, themeOf, useWornTheme } from "@/lib/mangaThemes";
 import { whenCollectorNeeded } from "@/core/lib/api";
 import { usePlan } from "@/store/plan";
 import CollectorSheet from "@/components/CollectorSheet";
 import Intro from "@/components/Intro";
-import { View } from "react-native";
+import { View, Appearance } from "react-native";
 import "../global.css";
 import { Bangers_400Regular } from "@expo-google-fonts/bangers";
 import { ComicNeue_700Bold } from "@expo-google-fonts/comic-neue";
@@ -76,15 +77,36 @@ export default function RootLayout() {
   const check = useAuth((s) => s.check);
   // light, dark, or the device's own, as the account chose (Settings)
   const theme = usePrefs((s) => s.prefs.theme);
+  // or a manga theme picked on this iPhone, worn while Premium is theirs
+  // (lib/mangaThemes.ts): where the limits hold, a free account is light
+  // or dark again
+  const wearing = useWornTheme();
   useEffect(() => {
-    Uniwind.setTheme(theme === "light" || theme === "dark" ? theme : "system");
-  }, [theme]);
+    Uniwind.setTheme(
+      wearing ?? (theme === "light" || theme === "dark" ? theme : "system"),
+    );
+    // Apple's own parts (the tab bar, the bar buttons, sheets) follow
+    // light or dark: a theme says which it is; otherwise the account's
+    // choice, or the device's
+    Appearance.setColorScheme(
+      wearing
+        ? themeOf(wearing)!.dark
+          ? "dark"
+          : "light"
+        : theme === "light" || theme === "dark"
+          ? theme
+          : "unspecified",
+    );
+  }, [theme, wearing]);
 
   // what this device remembers (lib/deviceStore.ts): read before any screen
   const [storeLoaded, setStoreLoaded] = useState(false);
   useEffect(() => {
     void check();
-    void loadDeviceStore().then(() => setStoreLoaded(true));
+    void loadDeviceStore().then(() => {
+      loadLook();
+      setStoreLoaded(true);
+    });
   }, [check]);
 
   // signed out, however it happened: the account's data leaves memory
@@ -118,7 +140,11 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <KeyboardProvider>
         <BottomSheetModalProvider>
-          <StatusBar style="auto" />
+          <StatusBar
+            style={
+              wearing ? (themeOf(wearing)!.dark ? "light" : "dark") : "auto"
+            }
+          />
           {/* Collector, opened from Settings or by a full limit */}
           <CollectorSheet />
           {/* the pages, with Kenji's tour floating over them (never

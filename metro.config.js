@@ -8,4 +8,15 @@ const config = getDefaultConfig(__dirname);
 module.exports = withUniwindConfig(config, {
   cssEntryFile: "./src/global.css",
   dtsFile: "./src/uniwind-types.d.ts",
+  // Premium's manga themes (src/lib/mangaThemes.ts), beside light and dark
+  extraThemes: [
+    "shonen",
+    "shojo",
+    "seinen",
+    "isekai",
+    "cozy",
+    "horror",
+    "sports",
+    "mecha",
+  ],
 });

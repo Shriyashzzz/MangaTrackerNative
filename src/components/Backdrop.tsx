@@ -3,6 +3,8 @@
 // lettering "ドン" (the default), an ink brush circle, a stack of pages, or manga
 // panels. Which one is the account's choice (Settings, Appearance). Nothing
 // here takes a touch
+import { useWornTheme } from "@/lib/mangaThemes";
+import ThemeBackdrop from "./ThemeBackdrop";
 import { useWindowDimensions, View } from "react-native";
 import Svg, {
   ClipPath,
@@ -47,6 +49,13 @@ function isDark(hex: string) {
 }
 
 export default function Backdrop() {
+  // a manga theme brings its own drawing (components/ThemeBackdrop.tsx)
+  const worn = useWornTheme();
+  if (worn) return <ThemeBackdrop theme={worn} />;
+  return <ChosenBackdrop />;
+}
+
+function ChosenBackdrop() {
   const c = useColors();
   const { width, height } = useWindowDimensions();
   const chosen = usePrefs((s) => s.prefs.background ?? DEFAULT_BACKGROUND);

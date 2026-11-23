@@ -525,7 +525,7 @@ export default function CollectorSheet() {
                 className="font-body text-[14px] leading-[20px] text-ink-soft"
               >
                 Premium takes the end off: no limits, plus coming soon alerts,
-                the full calendar and In Japan.
+                the full calendar, In Japan and eight manga themes.
               </Text>
             </>
           ) : (
