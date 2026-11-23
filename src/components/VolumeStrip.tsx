@@ -134,11 +134,14 @@ export default function VolumeStrip({
     }
     return room;
   };
+  const isShortAt = (v: number) =>
+    Boolean(slots) && slots!.runName(v).length * LETTER > runRoomAt(v);
   const runNameAt = (v: number) => {
     if (!slots || !startsHere(v)) return null;
     const name = slots.runName(v);
-    return name.length * LETTER > runRoomAt(v)
-      ? (slots.shortRunName?.(v) ?? name)
+    // (the short form without its full stop: "DEF" over the one book)
+    return isShortAt(v)
+      ? (slots.shortRunName?.(v) ?? name).replace(/\.$/, "")
       : name;
   };
   // the book under a finger: each one's room walked along from the left
@@ -261,6 +264,7 @@ export default function VolumeStrip({
                 share={!yours.has(v) && slots ? slots.share(v) : 0}
                 runName={runNameAt(v)}
                 runRoom={runRoomAt(v)}
+                runCentred={isShortAt(v)}
                 apart={apartAt(v)}
                 thin={thickOf(v) < 0.75}
               />
@@ -300,6 +304,7 @@ function Book({
   ordered = false,
   thin = false,
   runRoom = 120,
+  runCentred = false,
 }: {
   v: number;
   width: number;
@@ -311,6 +316,8 @@ function Book({
   runName: string | null;
   // the width that name has before the next run's begins
   runRoom?: number;
+  // a short name sits over the middle of its book
+  runCentred?: boolean;
   // how far it stands from the book before it, when it starts a run
   apart: number;
   // a thin spine: its number is set smaller
@@ -345,14 +352,24 @@ function Book({
       {/* the run's name hangs over its first spines at full width, as the
           web's: never cut down to one book's width */}
       {runName ? (
-        <Text
-          numberOfLines={1}
-          style={{ width: Math.max(runRoom, 34) }}
-          className="absolute -top-4 left-0 font-brand pr-[4px] text-[11px] tracking-[1px] text-ink-soft uppercase"
-        >
-          {runName}
-          {"\u00A0"}
-        </Text>
+        runCentred ? (
+          <Text
+            numberOfLines={1}
+            style={{ width: Math.max(runRoom, 34) }}
+            className="absolute -top-4 left-0 text-center font-brand text-[11px] tracking-[1px] text-ink-soft uppercase"
+          >
+            {runName}
+          </Text>
+        ) : (
+          <Text
+            numberOfLines={1}
+            style={{ width: Math.max(runRoom, 34) }}
+            className="absolute -top-4 left-0 font-brand pr-[4px] text-[11px] tracking-[1px] text-ink-soft uppercase"
+          >
+            {runName}
+            {"\u00A0"}
+          </Text>
+        )
       ) : null}
       <View
         style={{ height }}
