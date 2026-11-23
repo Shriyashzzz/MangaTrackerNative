@@ -9,6 +9,7 @@ import {
   finishTransaction,
   getAvailablePurchases,
   initConnection,
+  isEligibleForIntroOfferIOS,
   isUserCancelledError,
   purchaseErrorListener,
   purchaseUpdatedListener,
@@ -62,18 +63,51 @@ function connect() {
   return ready;
 }
 
-// the two prices as Apple shows them in this person's country ("$3.99",
-// "3,99 €"), or null while unknown
-export async function storePrices(): Promise<Record<string, string> | null> {
+// What the store says, so the sheet never promises what App Store Connect
+// doesn't: each price as Apple shows it in this person's country ("$3.99",
+// "3,99 €"), and the free trial on each, said as "1 week" or "2 weeks",
+// only when it's free and this Apple ID can still have it
+export type StoreOffer = { price: string; trial: string | null };
+type StoreProduct = {
+  id: string;
+  displayPrice: string;
+  subscriptionGroupIdIOS?: string | null;
+  introductoryPricePaymentModeIOS?: string;
+  introductoryPriceNumberOfPeriodsIOS?: string | null;
+  introductoryPriceSubscriptionPeriodIOS?: string | null;
+};
+const trialText = (p: StoreProduct) => {
+  const unit = p.introductoryPriceSubscriptionPeriodIOS;
+  const count = Number(p.introductoryPriceNumberOfPeriodsIOS ?? 1) || 1;
+  if (p.introductoryPricePaymentModeIOS !== "free-trial" || !unit) return null;
+  if (!["day", "week", "month", "year"].includes(unit)) return null;
+  return `${count} ${unit}${count === 1 ? "" : "s"}`;
+};
+export async function storeOffers(): Promise<Record<
+  string,
+  StoreOffer
+> | null> {
   if (!canBuy()) return null;
   try {
     await connect();
-    const products =
-      (await fetchProducts({ skus: COLLECTOR, type: "subs" })) ?? [];
-    const prices: Record<string, string> = {};
-    for (const product of products as { id: string; displayPrice: string }[])
-      prices[product.id] = product.displayPrice;
-    return Object.keys(prices).length ? prices : null;
+    const products = ((await fetchProducts({
+      skus: COLLECTOR,
+      type: "subs",
+    })) ?? []) as StoreProduct[];
+    if (!products.length) return null;
+    const group = products.find(
+      (p) => p.subscriptionGroupIdIOS,
+    )?.subscriptionGroupIdIOS;
+    // someone who has had the trial before isn't offered it again
+    const eligible = group
+      ? await isEligibleForIntroOfferIOS(group).catch(() => true)
+      : true;
+    return Object.fromEntries(
+      products.map((p) => [
+        p.id,
+        { price: p.displayPrice, trial: eligible ? trialText(p) : null },
+      ]),
+    );
   } catch {
     return null;
   }

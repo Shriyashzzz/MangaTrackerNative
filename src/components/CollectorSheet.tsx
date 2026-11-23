@@ -12,7 +12,8 @@ import {
   canBuy,
   MONTHLY,
   restore,
-  storePrices,
+  storeOffers,
+  type StoreOffer,
   YEARLY,
 } from "@/lib/purchases";
 import { router } from "expo-router";
@@ -56,7 +57,7 @@ const PRICES = [
     key: "year",
     name: "Yearly",
     price: "$24.99",
-    note: "7 days free first",
+    note: "Best value",
     after: "7 days free, then $24.99 a year.",
   },
   {
@@ -106,10 +107,13 @@ export default function CollectorSheet() {
   const [busy, setBusy] = useState(false);
   const [said, setSaid] = useState("");
   // the prices as Apple shows them in this country, once it's said
-  const [store, setStore] = useState<Record<string, string> | null>(null);
+  const [store, setStore] = useState<Record<string, StoreOffer> | null>(null);
   useEffect(() => {
-    if (sheet.open && plan.limited) void storePrices().then(setStore);
+    if (sheet.open && plan.limited) void storeOffers().then(setStore);
   }, [sheet.open, plan.limited]);
+  // the yearly trial as App Store Connect has it ("1 week"), or none. Until
+  // the store has answered, none is promised
+  const trial = store?.[YEARLY]?.trial ?? null;
   // a line said last time it was open isn't said again
   const [saidFor, setSaidFor] = useState(sheet.open);
   if (saidFor !== sheet.open) {
@@ -117,7 +121,7 @@ export default function CollectorSheet() {
     if (!sheet.open) setSaid("");
   }
   const priceOf = (key: "year" | "month") =>
-    store?.[key === "year" ? YEARLY : MONTHLY] ??
+    store?.[key === "year" ? YEARLY : MONTHLY]?.price ??
     PRICES.find((p) => p.key === key)!.price;
   const subscribe = async () => {
     setBusy(true);
@@ -240,7 +244,9 @@ export default function CollectorSheet() {
                 busy
                   ? "One moment…"
                   : picked === "year"
-                    ? "Start 7 days free"
+                    ? trial
+                      ? `Start ${trial} free`
+                      : `Subscribe for ${priceOf("year")} a year`
                     : `Subscribe for ${priceOf("month")} a month`
               }
               disabled={busy}
@@ -260,12 +266,14 @@ export default function CollectorSheet() {
             {/* what is charged and when, said plainly (Apple asks for the
                 price after a trial to be clear) */}
             {picked === "year"
-              ? `7 days free, then ${priceOf("year")} a year.`
+              ? trial
+                ? `${trial} free, then ${priceOf("year")} a year.`
+                : `${priceOf("year")} a year, starting today.`
               : `${priceOf("month")} a month, starting today.`}{" "}
             Paid through the App Store and renews until you cancel in your Apple
             account settings.
-            {picked === "year"
-              ? " Cancel before the week ends and you won't be charged."
+            {picked === "year" && trial
+              ? " Cancel before the free time ends and you won't be charged."
               : ""}
           </Text>
           {/* Restore, and the terms Apple asks to be a tap away */}
