@@ -20,7 +20,7 @@ import {
 } from "@/lib/purchases";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Linking, Text, View } from "react-native";
+import { Linking, Platform, Text, View } from "react-native";
 import Tap from "@/components/Tap";
 import { usePlan, type Counted } from "@/store/plan";
 import Button from "./Button";
@@ -78,20 +78,40 @@ function Row({
     >
       <Text
         // (wraps rather than pushing the columns off the edge)
-        style={{ flex: 1, flexShrink: 1, minWidth: 0 }}
+        style={{ flex: 1, flexShrink: 1, minWidth: 0, ...TEXT.plain }}
         className="font-body text-[15px] leading-[20px] text-ink"
       >
         {name}
       </Text>
-      <Text className="w-[70px] text-right font-body text-[14px] text-muted">
+      <Text
+        style={TEXT.plain}
+        className="w-[70px] text-right font-body text-[14px] text-muted"
+      >
         {free}
       </Text>
-      <Text className="w-[84px] text-right font-body-semibold text-[14px] text-accent-ink">
+      <Text
+        style={TEXT.bold}
+        className="w-[84px] text-right font-body-semibold text-[14px] text-accent-ink"
+      >
         {collector}
       </Text>
     </View>
   );
 }
+
+// On an iPhone the small print is in Apple's own face (San Francisco), as
+// the rest of iOS reads; the headings keep the app's lettering. Android
+// keeps the app's faces
+const IOS_TEXT = Platform.OS === "ios";
+const TEXT = {
+  plain: IOS_TEXT ? { fontFamily: "System" } : undefined,
+  bold: IOS_TEXT
+    ? { fontFamily: "System", fontWeight: "600" as const }
+    : undefined,
+  count: IOS_TEXT
+    ? { fontFamily: "System", fontVariant: ["tabular-nums" as const] }
+    : undefined,
+};
 
 // What Kenji says as the sheet opens: why it opened, or what they have
 function speech(
@@ -144,7 +164,10 @@ function KenjiSays({ shout, line }: { shout: string; line: string }) {
             {shout}
             {"\u00A0"}
           </Text>
-          <Text className="mt-1 font-body text-[12.5px] leading-[17px] text-ink-soft">
+          <Text
+            style={TEXT.plain}
+            className="mt-1 font-body text-[12.5px] leading-[17px] text-ink-soft"
+          >
             {line}
           </Text>
         </View>
@@ -180,8 +203,13 @@ function LimitShelf({
       className="gap-1.5"
     >
       <View className="flex-row justify-between">
-        <Text className="font-body-semibold text-[13px] text-ink">{label}</Text>
-        <Text className="font-mono text-[12px] text-muted">
+        <Text
+          style={TEXT.bold}
+          className="font-body-semibold text-[13px] text-ink"
+        >
+          {label}
+        </Text>
+        <Text style={TEXT.count} className="font-mono text-[12px] text-muted">
           {used} of {limit}
         </Text>
       </View>
@@ -253,45 +281,46 @@ export default function CollectorSheet() {
       onClose={hideCollector}
       // tall enough to show it all without scrolling
       maxHeight={0.94}
-      contentClassName="gap-3 px-5 pb-2"
+      contentClassName="gap-5 px-6 pb-4"
     >
       <KenjiSays {...speech(plan, sheet.reason)} />
 
       {/* the section's title, in the app's lettering with its red rule */}
-      <View className="mt-1">
+      <View className="mt-2">
         <H2>Collector</H2>
       </View>
 
       {plan.limited ? (
         <>
           {/* their own limits, drawn as shelves of spines that hit the end */}
-          <View className="gap-2">
+          <View className="gap-3.5">
             <LimitShelf label="Series" what="series" plan={plan} />
             <LimitShelf label="Barcode scans" what="scans" plan={plan} />
             <LimitShelf label="Price alerts" what="priceAlerts" plan={plan} />
           </View>
-          <View
-            className="gap-1 rounded-[12px] border-2 border-ink bg-card px-3.5 py-3"
-            style={{ transform: [{ rotate: "-0.8deg" }] }}
+          <Text
+            style={TEXT.plain}
+            className="font-body text-[14px] leading-[20px] text-ink-soft"
           >
-            <Text className="font-brand pr-[4px] text-[22px] leading-[24px] tracking-[0.5px] text-ink uppercase">
-              Collector takes the end off{"\u00A0"}
-            </Text>
-            <Text className="font-body text-[13.5px] leading-[19px] text-ink-soft">
-              No limits, plus coming soon alerts, the full calendar and In
-              Japan.
-            </Text>
-          </View>
+            Collector takes the end off: no limits, plus coming soon alerts, the
+            full calendar and In Japan.
+          </Text>
         </>
       ) : (
         // nothing limited for them: what Collector holds, one thing a line
         <View>
           <View className="flex-row gap-3 pb-1">
             <View className="flex-1" />
-            <Text className="w-[70px] text-right font-mono text-[11px] tracking-[1px] text-muted uppercase">
+            <Text
+              style={TEXT.count}
+              className="w-[70px] text-right font-mono text-[11px] tracking-[1px] text-muted uppercase"
+            >
               Free
             </Text>
-            <Text className="w-[84px] text-right font-mono text-[11px] tracking-[1px] text-accent-ink uppercase">
+            <Text
+              style={TEXT.count}
+              className="w-[84px] text-right font-mono text-[11px] tracking-[1px] text-accent-ink uppercase"
+            >
               Collector
             </Text>
           </View>
@@ -317,14 +346,20 @@ export default function CollectorSheet() {
                   accessibilityLabel={`${p.name}, ${p.price}. ${p.note}`}
                   className={`flex-1 gap-0.5 rounded-[12px] border-2 px-3.5 py-3 ${on ? "border-accent bg-accent-wash" : "border-ink bg-card"}`}
                 >
-                  <Text className="font-body-semibold text-[14px] text-ink-soft">
+                  <Text
+                    style={TEXT.bold}
+                    className="font-body-semibold text-[14px] text-ink-soft"
+                  >
                     {p.name}
                   </Text>
                   <Text className="font-brand pr-[4px] text-[26px] text-ink">
                     {p.price}
                     {" "}
                   </Text>
-                  <Text className="font-body text-[13px] text-muted">
+                  <Text
+                    style={TEXT.plain}
+                    className="font-body text-[13px] text-muted"
+                  >
                     {p.key === "year" && trial ? `${trial} free` : p.note}
                   </Text>
                 </Tap>
@@ -348,16 +383,25 @@ export default function CollectorSheet() {
               onPress={() => void subscribe()}
             />
           ) : (
-            <Text className="text-center font-body text-[14px] text-ink-soft">
+            <Text
+              style={TEXT.plain}
+              className="text-center font-body text-[14px] text-ink-soft"
+            >
               Collector is bought in the iPhone app for now.
             </Text>
           )}
           {said ? (
-            <Text className="text-center font-body-semibold text-[14px] text-ink">
+            <Text
+              style={TEXT.bold}
+              className="text-center font-body-semibold text-[14px] text-ink"
+            >
               {said}
             </Text>
           ) : null}
-          <Text className="text-center font-body text-[13px] leading-[18px] text-muted">
+          <Text
+            style={TEXT.plain}
+            className="text-center font-body text-[13px] leading-[18px] text-muted"
+          >
             {/* what is charged and when, said plainly (Apple asks for the
                 price after a trial to be clear) */}
             {picked === "year"
@@ -375,7 +419,10 @@ export default function CollectorSheet() {
           {canBuy() ? (
             <View className="flex-row flex-wrap justify-center gap-x-5 gap-y-2">
               <Tap onPress={() => void restoreIt()} hitSlop={8}>
-                <Text className="font-body-semibold text-[13px] text-accent-ink">
+                <Text
+                  style={TEXT.bold}
+                  className="font-body-semibold text-[13px] text-accent-ink"
+                >
                   Restore purchases
                 </Text>
               </Tap>
@@ -383,7 +430,10 @@ export default function CollectorSheet() {
                 onPress={() => void Linking.openURL(APPLE_TERMS)}
                 hitSlop={8}
               >
-                <Text className="font-body text-[13px] text-ink-soft underline">
+                <Text
+                  style={TEXT.plain}
+                  className="font-body text-[13px] text-ink-soft underline"
+                >
                   Terms of Use
                 </Text>
               </Tap>
@@ -394,7 +444,10 @@ export default function CollectorSheet() {
                 }}
                 hitSlop={8}
               >
-                <Text className="font-body text-[13px] text-ink-soft underline">
+                <Text
+                  style={TEXT.plain}
+                  className="font-body text-[13px] text-ink-soft underline"
+                >
                   Privacy
                 </Text>
               </Tap>

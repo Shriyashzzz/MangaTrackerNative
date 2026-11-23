@@ -40,6 +40,8 @@ import { useColors } from "@/lib/colors";
 
 // the few paddings sheets ask for, as Tailwind classes ("px-4 pb-8"), in
 // points: the sheet's content view takes plain styles only
+// the sheet's room as its class names say it ("gap-5 px-6 pb-4"): its
+// sides, top, foot, and the space between the things in it
 function paddingOf(classes: string) {
   const points = (side: string) => {
     const found = classes.match(
@@ -51,6 +53,7 @@ function paddingOf(classes: string) {
     paddingHorizontal: points("px"),
     paddingTop: points("pt"),
     paddingBottom: points("pb"),
+    gap: points("gap"),
   };
 }
 
@@ -148,6 +151,12 @@ function AppleSheet({
                   // as wide as the sheet and no wider, so long lines wrap
                   // rather than push the sheet's views past its edge
                   width: Math.min(room || sheetWidth, sheetWidth),
+                  // a floating sheet's corners are round and deep: its views
+                  // keep at least 24 points from either side
+                  paddingHorizontal: Math.max(
+                    padding.paddingHorizontal ?? 0,
+                    24,
+                  ),
                   paddingTop: (padding.paddingTop ?? 0) + 22,
                   // room under the last thing, clear of the sheet's rounded
                   // foot and the home bar
