@@ -1,5 +1,8 @@
 // The app's frame: the fonts the web uses, the session checked once, then
 // the tabs for everyone; the pages that need an account only when signed in
+import { whenCollectorNeeded } from "@/core/lib/api";
+import { usePlan } from "@/store/plan";
+import CollectorSheet from "@/components/CollectorSheet";
 import Intro from "@/components/Intro";
 import { View } from "react-native";
 import "../global.css";
@@ -43,6 +46,18 @@ import { usePrefs } from "@/store/prefs";
 
 SplashScreen.preventAutoHideAsync();
 
+// a limit the server says is full: the Collector sheet, saying which, and
+// the plan read again so its counts are right
+whenCollectorNeeded((what) => {
+  const plan = usePlan.getState();
+  void plan.load();
+  plan.showCollector(
+    what === "series" || what === "scans" || what === "priceAlerts"
+      ? what
+      : null,
+  );
+});
+
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
     Bangers_400Regular,
@@ -80,6 +95,8 @@ export default function RootLayout() {
   // opened once the screens are up
   useEffect(() => {
     if (!isSignedIn || !storeLoaded) return;
+    // what their plan allows on this device (store/plan.ts)
+    void usePlan.getState().load();
     // (asked for once, the first time; after that, kept up to date)
     askForAlertsOnce();
     void refreshPhoneAlerts();
@@ -102,6 +119,8 @@ export default function RootLayout() {
       <KeyboardProvider>
         <BottomSheetModalProvider>
           <StatusBar style="auto" />
+          {/* Collector, opened from Settings or by a full limit */}
+          <CollectorSheet />
           {/* the pages, with Kenji's tour floating over them (never
               pushing them about) */}
           <View style={{ flex: 1 }}>

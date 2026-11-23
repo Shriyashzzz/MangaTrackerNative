@@ -6,6 +6,7 @@
 // sends it back, as a browser does. While developing it's the local server
 // (the phone's localhost:8080, passed to the Mac by adb reverse); a release
 // build uses the real site. EXPO_PUBLIC_API_URL overrides either
+import { Platform } from "react-native";
 import { keepAnswer, keptAnswer } from "@/lib/keptAnswers";
 import { withCountry } from "./country";
 import { demoResponse, isDemo } from "./demo";
@@ -44,6 +45,20 @@ export const whenSignedOut = (run: () => void) => {
 };
 
 // fetch that always sends the session cookie and serialises JSON bodies
+// a 402 from a Collector limit opens the Collector sheet, saying what was
+// full (its answer: { code: "collector", what: "series" })
+let collectorOffer: ((what: string | null) => void) | null = null;
+export const whenCollectorNeeded = (run: (what: string | null) => void) => {
+  collectorOffer = run;
+};
+async function offerCollector(res: Response) {
+  const body = (await res.json().catch(() => null)) as {
+    code?: string;
+    what?: string;
+  } | null;
+  if (body?.code === "collector") collectorOffer?.(body.what ?? null);
+}
+
 export function apiFetch(
   path: string,
   { body, headers, ...options }: FetchOptions = {},
@@ -67,10 +82,13 @@ export function apiFetch(
     credentials: "include",
     ...options,
     signal: limit.signal,
-    headers:
-      body !== undefined
-        ? { "Content-Type": "application/json", ...headers }
-        : headers,
+    // which app is asking: the server holds the Collector tier's limits only
+    // where they're switched on, platform by platform (server src/plan/)
+    headers: {
+      "X-App": Platform.OS === "ios" ? "ios" : "android",
+      ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
+      ...headers,
+    },
     body: body !== undefined ? JSON.stringify(body) : undefined,
   }).then(
     (res) => {
@@ -79,6 +97,8 @@ export function apiFetch(
       setOffline(false);
       noteAnswer(res);
       if (res.status === 401 && !path.startsWith("/api/auth/")) signedOut?.();
+      // refused for want of Collector: its sheet says what it adds
+      if (res.status === 402) void offerCollector(res.clone());
       // kept on the phone, for opening this page with no connection
       if (method === "GET" && res.ok) void keepAnswer(path, res.clone());
       return res;

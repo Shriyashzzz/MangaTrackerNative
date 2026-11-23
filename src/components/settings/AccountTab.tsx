@@ -2,6 +2,7 @@
 // their email, export, and deleting (the weekly email is with the alerts,
 // under New releases)
 // the account with its confirmation
+import { usePlan } from "@/store/plan";
 import TourTarget from "@/components/TourTarget";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -73,6 +74,26 @@ function SignInSection({ account }: { account: Account }) {
   );
 }
 
+// their plan, said in a line, and Collector's sheet a tap away
+function PlanRow() {
+  const plan = usePlan((s) => s.plan);
+  const show = usePlan((s) => s.showCollector);
+  const said =
+    plan.plan === "early"
+      ? "Early member: everything is yours, free, for good."
+      : plan.plan === "collector"
+        ? "Collector: no limits."
+        : plan.limited && plan.limits
+          ? `Free: ${plan.used.series} of ${plan.limits.series} series, ${plan.used.scans} of ${plan.limits.scans} scans.`
+          : "Free: nothing is limited here yet.";
+  return (
+    <>
+      <Help>{said}</Help>
+      <Button small label="See Collector" onPress={() => show()} />
+    </>
+  );
+}
+
 export default function AccountTab({ account }: { account: Account }) {
   const logOut = useAuth((s) => s.logOut);
   const saveAccount = useAccount((s) => s.save);
@@ -141,6 +162,9 @@ export default function AccountTab({ account }: { account: Account }) {
         <Text className="font-body-semibold">{account.username}</Text>.
       </Text>
       <SignInSection account={account} />
+      <Section title="Your plan">
+        <PlanRow />
+      </Section>
       <Section title="Email">
         <Input
           value={email}
