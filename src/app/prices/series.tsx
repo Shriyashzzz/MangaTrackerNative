@@ -5,6 +5,7 @@
 // card with its price, Yours and Next, Not on your shelf to see only the
 // gaps with what they cost. The rules are the web's (core seriesPageRules,
 // finishCost, useSeriesData)
+import { gridOf } from "@/lib/wide";
 import { columnStyle } from "@/lib/wide";
 import { useTourScroll } from "@/lib/tourScroll";
 import { todayOf } from "@/core/lib/editionNews";
@@ -226,9 +227,8 @@ export default function PriceSeriesScreen() {
   const list = toGetShown ? toGet : volumes;
   const shown = list.slice(0, grownCount);
   const named = novelParts(info?.name ?? data.name);
-  const tileWidth = Math.floor(
-    (screenWidth - PAGE_SIDE * 2 - GRID_GAP * (COLUMNS - 1)) / COLUMNS,
-  );
+  // (within the page's column, and more across on a wide screen)
+  const { tile: tileWidth } = gridOf(screenWidth, PAGE_SIDE, GRID_GAP, COLUMNS);
 
   return frame(
     named.title,

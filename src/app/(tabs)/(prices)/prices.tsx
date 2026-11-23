@@ -5,7 +5,7 @@
 // just checked. A search lists the series found, with Did you mean for a
 // typo. The rules are the web's (core findSeries, nearMatches, askedEdition)
 import { IOS } from "@/lib/tabHeader";
-import { columnStyle } from "@/lib/wide";
+import { columnStyle, gridOf, useWide } from "@/lib/wide";
 import Tap from "@/components/Tap";
 import PullPage, { pause, usePullTop } from "@/components/PullRefresh";
 import Backdrop from "@/components/Backdrop";
@@ -54,16 +54,24 @@ function HighlightsStrip() {
     return () => controller.abort();
   }, []);
   const canada = inCanada();
+  const { wide, width: screenWidth } = useWide();
+  // on a wide screen, covers as wide as fills the column's rows evenly
+  const tile = gridOf(screenWidth, 16, 12, 3).tile;
   if (!data) return null;
-  const row = (children: React.ReactNode) => (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={{ gap: 12, paddingBottom: 4 }}
-    >
-      {children}
-    </ScrollView>
-  );
+  // a row of covers to swipe along; on a wide screen there's room to show
+  // them all, so they wrap instead
+  const row = (children: React.ReactNode) =>
+    wide ? (
+      <View className="flex-row flex-wrap gap-3 pb-1">{children}</View>
+    ) : (
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ gap: 12, paddingBottom: 4 }}
+      >
+        {children}
+      </ScrollView>
+    );
   return (
     <>
       {data.trending.length ? (
@@ -77,7 +85,13 @@ function HighlightsStrip() {
             </Tap>
           </View>
           {row(
-            data.trending.map((s) => <SeriesCard key={s.slug} series={s} />),
+            data.trending.map((s) => (
+              <SeriesCard
+                key={s.slug}
+                series={s}
+                width={wide ? tile : undefined}
+              />
+            )),
           )}
         </View>
       ) : null}
@@ -98,7 +112,7 @@ function HighlightsStrip() {
                 {...d}
                 priceCents={d.priceCents}
                 wasCents={d.avgCents}
-                width={104}
+                width={wide ? tile : 104}
               />
             )),
           )}
@@ -113,7 +127,7 @@ function HighlightsStrip() {
                 key={r.isbn13}
                 {...r}
                 priceCents={r.priceCents}
-                width={104}
+                width={wide ? tile : 104}
               />
             )),
           )}

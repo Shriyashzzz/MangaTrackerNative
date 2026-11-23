@@ -1,6 +1,7 @@
 // A series' other editions (the web's OtherEditions.tsx, the app's layout):
 // each line's books as cards, which book holds a volume, the lines to switch
 // between, and what a whole run costs against the singles
+import { gridOf } from "@/lib/wide";
 import Tap from "@/components/Tap";
 import { H2 } from "@/components/Page";
 import { nextVolumeFor } from "@/core/lib/editionLookup";
@@ -56,9 +57,8 @@ export default function OtherEditions({
   const loose = runTotal(singles);
   // a plain omnibus is a pile of books; a named edition one big book
   const piled = /omnibus|in-1/i.test(line.label);
-  const tileWidth = Math.floor(
-    (screenWidth - PAGE_SIDE * 2 - GRID_GAP * (COLUMNS - 1)) / COLUMNS,
-  );
+  // (within the page's column, and more across on a wide screen)
+  const { tile: tileWidth } = gridOf(screenWidth, PAGE_SIDE, GRID_GAP, COLUMNS);
   const said = (run: { cents: number; exact: boolean }) =>
     run.exact ? formatCents(run.cents) : `about ${wholeMoney(run.cents)}`;
   return (

@@ -29,3 +29,23 @@ export const columnStyle = {
   maxWidth: COLUMN,
   alignSelf: "center",
 } as const;
+
+// A grid of covers inside the column: how many across, and each one's width.
+// A phone keeps its count; a wide screen fits more, about as wide each as a
+// phone's, so covers never grow into posters
+export function gridOf(
+  screenWidth: number,
+  side: number,
+  gap: number,
+  phoneColumns: number,
+) {
+  const room = Math.min(screenWidth, COLUMN) - side * 2;
+  const columns =
+    screenWidth >= WIDE_FROM
+      ? Math.max(phoneColumns, Math.floor((room + gap) / (100 + gap)))
+      : phoneColumns;
+  return {
+    columns,
+    tile: Math.floor((room - gap * (columns - 1)) / columns),
+  };
+}
