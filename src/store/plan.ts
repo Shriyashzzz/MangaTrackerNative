@@ -45,7 +45,7 @@ type PlanState = {
   // the Collector sheet: open, and what brought it up (null: from Settings)
   sheet: {
     open: boolean;
-    reason: Counted | "calendar" | "japan" | null;
+    reason: Counted | "calendar" | "japan" | "theme" | null;
     n: number;
   };
   load: () => Promise<void>;

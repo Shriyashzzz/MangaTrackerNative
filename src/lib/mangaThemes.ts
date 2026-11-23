@@ -131,11 +131,22 @@ const KEY = "mangaTheme";
 const isTheme = (v: string | null): v is MangaTheme =>
   MANGA_THEMES.some((t) => t.id === v);
 
+// how long a free reader may try a theme on
+export const TRY_FOR_MS = 2 * 60 * 1000;
+
 type LookState = {
   // the one picked on this phone, worn while Premium is theirs
   picked: MangaTheme | null;
   pick: (theme: MangaTheme | null) => void;
+  // a free reader trying one on, and when the try ends (in memory only:
+  // closing the app ends it too)
+  trying: MangaTheme | null;
+  tryUntil: number;
+  tryOn: (theme: MangaTheme) => void;
+  takeOff: () => void;
 };
+
+let tryTimer: ReturnType<typeof setTimeout> | null = null;
 
 export const useLook = create<LookState>()((set) => ({
   picked: null,
@@ -143,6 +154,22 @@ export const useLook = create<LookState>()((set) => ({
     if (theme) writeLocal(KEY, theme);
     else removeLocal(KEY);
     set({ picked: theme });
+  },
+  trying: null,
+  tryUntil: 0,
+  tryOn: (theme) => {
+    if (tryTimer) clearTimeout(tryTimer);
+    set({ trying: theme, tryUntil: Date.now() + TRY_FOR_MS });
+    // time's up: their own look again, and Premium offered to keep it
+    tryTimer = setTimeout(() => {
+      set({ trying: null, tryUntil: 0 });
+      usePlan.getState().showCollector("theme");
+    }, TRY_FOR_MS);
+  },
+  takeOff: () => {
+    if (tryTimer) clearTimeout(tryTimer);
+    tryTimer = null;
+    set({ trying: null, tryUntil: 0 });
   },
 }));
 
@@ -157,10 +184,13 @@ export const themeOf = (id: MangaTheme | null) =>
 
 // the theme being worn now: one picked here, on an iPhone, with Premium
 // (where the limits hold, a free account wears none)
+// or one a free reader is trying on for two minutes
 export function useWornTheme(): MangaTheme | null {
   const picked = useLook((s) => s.picked);
+  const trying = useLook((s) => s.trying);
   const premium = usePlan((s) => !s.plan.limited);
-  return THEMES_HERE && premium ? picked : null;
+  if (!THEMES_HERE) return null;
+  return premium ? picked : trying;
 }
 
 // the corners panels and boxes take now: the worn theme's, or the app's own

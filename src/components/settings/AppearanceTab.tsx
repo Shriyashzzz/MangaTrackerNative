@@ -60,7 +60,8 @@ function ThemeCard({
         </Text>
         <Text
           numberOfLines={2}
-          className="font-body text-[12px] leading-[16px]"
+          // room on the right for the PREMIUM stamp
+          className={`font-body text-[12px] leading-[16px] ${locked ? "pr-[58px]" : ""}`}
           style={{ color: ink, opacity: 0.75 }}
         >
           {t.tagline}
@@ -69,7 +70,7 @@ function ThemeCard({
       <View style={{ height: 8, backgroundColor: accent }} />
       {locked ? (
         <View
-          className="absolute top-2 right-2 border-[1.5px] border-ink bg-accent px-1.5 pt-[1px]"
+          className="absolute right-2 bottom-1 border-[1.5px] border-ink bg-accent px-1.5 pt-[1px]"
           style={{ transform: [{ rotate: "4deg" }] }}
         >
           <Text className="font-brand pr-[3px] text-[11px] tracking-[0.5px] text-on-accent uppercase">
@@ -89,14 +90,16 @@ export default function AppearanceTab() {
   const pick = useLook((s) => s.pick);
   const worn = useWornTheme();
   const premium = usePlan((s) => !s.plan.limited);
-  const showCollector = usePlan((s) => s.showCollector);
+  const tryOn = useLook((s) => s.tryOn);
+  const takeOff = useLook((s) => s.takeOff);
   return (
     <>
       {THEMES_HERE ? (
         <Section first title="Manga themes">
           <Help>
-            A whole new look for the app, each one a manga genre. Part of
-            Premium.
+            {premium
+              ? "A whole new look for the app, each one a manga genre."
+              : "A whole new look for the app, each one a manga genre. Part of Premium: tap one to try it for 2 minutes."}
           </Help>
           <View className="flex-row flex-wrap justify-between gap-y-3">
             {MANGA_THEMES.map((t) => (
@@ -105,10 +108,13 @@ export default function AppearanceTab() {
                 id={t.id}
                 on={worn === t.id}
                 locked={!premium}
+                // without Premium: worn for two minutes to try it on
                 onPress={() =>
                   premium
                     ? pick(picked === t.id ? null : t.id)
-                    : showCollector()
+                    : worn === t.id
+                      ? takeOff()
+                      : tryOn(t.id)
                 }
               />
             ))}
@@ -125,6 +131,7 @@ export default function AppearanceTab() {
           value={worn ? ("" as never) : theme}
           onChange={(value) => {
             pick(null);
+            takeOff();
             void save({ theme: value }).catch(() => {});
           }}
         />

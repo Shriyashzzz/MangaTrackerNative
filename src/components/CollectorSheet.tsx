@@ -70,7 +70,7 @@ const TEXT = {
 // What Kenji says as the sheet opens: why it opened, or what they have
 function speech(
   plan: ReturnType<typeof usePlan.getState>["plan"],
-  reason: Counted | "calendar" | "japan" | null,
+  reason: Counted | "calendar" | "japan" | "theme" | null,
 ) {
   if (plan.plan === "early")
     return {
@@ -93,10 +93,15 @@ function speech(
             ? "The whole calendar!"
             : reason === "japan"
               ? "In Japan!"
-              : "Go Premium!";
+              : reason === "theme"
+                ? "Like the look?"
+                : "Go Premium!";
   return {
     shout,
-    line: "Premium takes the limits off. What you have stays yours.",
+    line:
+      reason === "theme"
+        ? "Premium keeps your theme for good, with all eight to pick from."
+        : "Premium takes the limits off. What you have stays yours.",
   };
 }
 

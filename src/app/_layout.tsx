@@ -1,5 +1,6 @@
 // The app's frame: the fonts the web uses, the session checked once, then
 // the tabs for everyone; the pages that need an account only when signed in
+import TryingTheme from "@/components/TryingTheme";
 import { loadLook, themeOf, useWornTheme } from "@/lib/mangaThemes";
 import { whenCollectorNeeded } from "@/core/lib/api";
 import { usePlan } from "@/store/plan";
@@ -221,6 +222,9 @@ export default function RootLayout() {
           </View>
           {/* no connection, or kept changes just sent: said along the foot */}
           <OfflineBar signedIn={Boolean(isSignedIn)} />
+          {/* a free reader trying a manga theme on: the time left, over
+              every page */}
+          <TryingTheme />
         </BottomSheetModalProvider>
       </KeyboardProvider>
     </GestureHandlerRootView>
