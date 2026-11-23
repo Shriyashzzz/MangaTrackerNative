@@ -16,6 +16,9 @@ const ANDROID = Platform.OS === "android";
 // how far the round ripple reaches from the icon's middle
 const ROUND_REACH = 22;
 
+// how long a touch is held back in case it is the start of a scroll
+export const SCROLL_BEAT_MS = 90;
+
 export default function Tap({
   feel = "ripple",
   className,
@@ -50,6 +53,10 @@ export default function Tap({
         : classes;
     return (
       <Pressable
+        // a beat before a touch counts as a press, as Android's own
+        // buttons wait inside a list: a finger landing to scroll moves on
+        // before it, so sliding over a row doesn't ripple it
+        unstable_pressDelay={SCROLL_BEAT_MS}
         {...pressable}
         onPress={pressed}
         style={style}

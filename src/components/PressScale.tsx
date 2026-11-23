@@ -1,6 +1,7 @@
 // Something that gives under the finger: it eases down a touch while held
 // and springs back on release, as iOS buttons and cards do. Android also
 // draws its ripple over it. The one press feel every card and button shares
+import { SCROLL_BEAT_MS } from "./Tap";
 import type { ReactNode } from "react";
 import {
   Pressable,
@@ -41,6 +42,8 @@ export default function PressScale({
   return (
     <Animated.View style={[look, style]}>
       <Pressable
+        // (a touch that turns out to be a scroll doesn't ripple: Tap.tsx)
+        unstable_pressDelay={SCROLL_BEAT_MS}
         {...pressable}
         // (Kenji's tour steps aside when something is pressed)
         onPress={
