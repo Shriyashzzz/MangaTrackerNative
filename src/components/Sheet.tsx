@@ -87,6 +87,7 @@ function AppleSheet({
   fromTheFoot,
   maxHeight,
   contentClassName,
+  footRoom,
 }: {
   open: boolean;
   onClose: () => void;
@@ -94,6 +95,7 @@ function AppleSheet({
   fromTheFoot: boolean;
   maxHeight: number;
   contentClassName: string;
+  footRoom: number;
 }) {
   const c = useColors();
   const { height: screen, width } = useWindowDimensions();
@@ -160,7 +162,7 @@ function AppleSheet({
                   paddingTop: (padding.paddingTop ?? 0) + 22,
                   // room under the last thing, clear of the sheet's rounded
                   // foot and the home bar
-                  paddingBottom: (padding.paddingBottom ?? 0) + 18,
+                  paddingBottom: (padding.paddingBottom ?? 0) + footRoom,
                   ...(fromTheFoot
                     ? { flexGrow: 1, justifyContent: "flex-end" as const }
                     : {}),
@@ -190,6 +192,8 @@ export default function Sheet({
   // as tall as the menu sheet at most, so no sheet ever fills the screen
   maxHeight = 0.7,
   contentClassName = "px-4 pb-8",
+  // on iPhone, room kept under the last thing in the sheet
+  footRoom = 18,
 }: {
   open: boolean;
   onClose: () => void;
@@ -198,6 +202,7 @@ export default function Sheet({
   fromTheFoot?: boolean;
   maxHeight?: number;
   contentClassName?: string;
+  footRoom?: number;
 }) {
   if (Platform.OS === "ios")
     return (
@@ -207,6 +212,7 @@ export default function Sheet({
         fromTheFoot={fromTheFoot}
         maxHeight={maxHeight}
         contentClassName={contentClassName}
+        footRoom={footRoom}
       >
         {children}
       </AppleSheet>

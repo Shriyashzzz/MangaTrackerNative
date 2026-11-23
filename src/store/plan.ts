@@ -15,6 +15,17 @@ export type Plan = {
   soonAlerts: boolean;
   calendar: boolean;
   japan: boolean;
+  // for a Collector or an early member, what their member card shows
+  // (server src/plan/membership.ts); missing from an older server
+  member?: Member | null;
+};
+export type Member = {
+  since: string;
+  sinceKind: "collector" | "account";
+  period: "year" | "month" | null;
+  until: string | null;
+  renews: boolean | null;
+  caughtOnSale: number;
 };
 
 // what everyone has while nothing is known: nothing locked, so a slow or

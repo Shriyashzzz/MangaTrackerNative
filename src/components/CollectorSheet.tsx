@@ -7,6 +7,7 @@
 // (Android and the website, for now) the table is shown without prices.
 // Buying is through Apple and arrives with the iPhone app: until then the
 // button says so rather than pretending
+import { useAccount } from "@/store/account";
 import { H2 } from "@/components/Page";
 import Mascot from "./Mascot";
 import {
@@ -22,7 +23,7 @@ import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { Linking, Platform, Text, View } from "react-native";
 import Tap from "@/components/Tap";
-import { usePlan, type Counted } from "@/store/plan";
+import { usePlan, type Counted, type Plan } from "@/store/plan";
 import Button from "./Button";
 import Sheet from "./Sheet";
 
@@ -72,18 +73,13 @@ function speech(
 ) {
   if (plan.plan === "early")
     return {
-      shout: "You joined early!",
-      line: "So everything here is yours, free, for good.",
+      shout: "It's on the house!",
+      line: "Thanks for being one of the first. Collector is free for you, for good.",
     };
   if (plan.plan === "collector")
     return {
-      shout: "You're a Collector!",
-      line: "Everything here is yours. Thanks for backing the app.",
-    };
-  if (!plan.limited)
-    return {
-      shout: "Nothing's limited yet!",
-      line: "All of this is open to you here.",
+      shout: "Shelf's got no end!",
+      line: "Thanks for supporting a solo developer.",
     };
   const shout =
     reason === "series"
@@ -133,91 +129,130 @@ function KenjiSays({ shout, line }: { shout: string; line: string }) {
   );
 }
 
-// A shelf with no limit: what they have, inked, and the shelf running on
-// past the edge with a NO END! stamp
-function OpenShelf({
-  label,
-  count,
-  unit,
-}: {
-  label: string;
-  count: number;
-  unit: string;
-}) {
-  const inked = Math.min(
-    10,
-    Math.max(count > 0 ? 1 : 0, Math.ceil(count / 10)),
-  );
+// "Nov 2026", "23 Nov 2027"
+const monthOf = (iso: string) =>
+  new Date(iso).toLocaleDateString(undefined, {
+    month: "short",
+    year: "numeric",
+  });
+const dayOf = (iso: string) =>
+  new Date(iso).toLocaleDateString(undefined, {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+
+// Their membership as a card, all of it their own: whose it is, since
+// when, what they keep on it, and how the plan runs. Lines the server
+// doesn't know are left out
+function MemberCard({ plan }: { plan: Plan }) {
+  const account = useAccount((s) => s.account);
+  const name = account?.displayName || account?.username;
+  const member = plan.member;
+  const early = plan.plan === "early";
+  const since = member
+    ? member.sinceKind === "collector"
+      ? `Collector since ${monthOf(member.since)}`
+      : `Reading with us since ${monthOf(member.since)}`
+    : null;
+  // their numbers, each on its own line in its own colour, so they stay
+  // readable however big they grow
+  const stats = [
+    { label: "Series", value: plan.used.series, color: "text-accent" },
+    { label: "Watched", value: plan.used.priceAlerts, color: "text-star" },
+    ...(member
+      ? [
+          {
+            label: "Caught on sale",
+            value: member.caughtOnSale,
+            color: "text-award-set",
+          },
+        ]
+      : []),
+  ];
+  const period =
+    member?.period === "year"
+      ? "yearly"
+      : member?.period === "month"
+        ? "monthly"
+        : null;
+  // how the plan runs, said as a sentence
+  const runs = early
+    ? "On the house, for good"
+    : member?.until
+      ? member.renews === false
+        ? `Ends ${dayOf(member.until)}`
+        : `Renews ${period ? `${period} ` : ""}on ${dayOf(member.until)}`
+      : null;
   return (
     <View
-      accessible
-      accessibilityLabel={`${label}: ${count} ${unit}, no limit`}
-      className="gap-1.5"
+      className="mt-2 items-center overflow-visible rounded-[14px] border-2 border-ink bg-card px-4 pt-3.5"
+      style={{ transform: [{ rotate: "-1deg" }] }}
     >
-      <View className="flex-row justify-between">
+      <Text className="font-mono text-[10.5px] tracking-[1.5px] text-muted uppercase">
+        Member card
+      </Text>
+      <Text className="mt-1.5 font-brand pl-[4px] pr-[4px] text-[32px] leading-[34px] tracking-[0.5px] text-ink uppercase">
+        Collector{"\u00A0"}
+      </Text>
+      {name ? (
         <Text
           style={TEXT.bold}
-          className="font-body-semibold text-[13px] text-ink"
+          className="font-body-semibold text-[14px] text-ink"
         >
-          {label}
+          {name}
         </Text>
-        <Text style={TEXT.count} className="font-mono text-[12px] text-muted">
-          {count} {unit}
-        </Text>
-      </View>
-      <View className="flex-row items-end gap-[3px] border-b-[3px] border-double border-ink pb-[2px]">
-        {Array.from({ length: 10 }, (_, i) => (
-          <View
-            key={i}
-            className={`flex-1 ${i < inked ? "h-[20px] border-2 border-ink bg-ink" : "h-[16px] border-[1.5px] border-dashed border-muted"}`}
-          />
-        ))}
+      ) : null}
+      {since ? (
         <Text
-          className="ml-1.5 font-brand pr-[3px] text-[14px] text-accent"
-          style={{ transform: [{ rotate: "-4deg" }] }}
+          style={TEXT.plain}
+          className="mt-0.5 font-body text-[13px] text-ink-soft"
         >
-          NO END!{"\u00A0"}
+          {since}
         </Text>
+      ) : null}
+      <View className="mt-3 self-stretch border-t-[1.5px] border-dashed border-line-soft" />
+      <View className="self-stretch pt-1">
+        {stats.map((stat, i) => (
+          <View
+            key={stat.label}
+            className={`flex-row items-center justify-between py-1.5 ${i ? "border-t-[1.5px] border-dotted border-line-soft" : ""}`}
+          >
+            <Text style={TEXT.plain} className="font-body text-[14px] text-ink">
+              {stat.label}
+            </Text>
+            <Text
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              className={`font-brand pr-[3px] text-[26px] leading-[30px] tracking-[0.5px] ${stat.color}`}
+            >
+              {stat.value.toLocaleString()}
+              {"\u00A0"}
+            </Text>
+          </View>
+        ))}
       </View>
-    </View>
-  );
-}
-
-// One of Collector's extras as a small comic panel with a red stamp, as the
-// welcome screen draws its panels
-function StampPanel({
-  stamp,
-  big,
-  caption,
-}: {
-  stamp: string;
-  big: string;
-  caption: string;
-}) {
-  return (
-    <View className="flex-1 overflow-hidden rounded-[12px] border-2 border-ink bg-card">
-      <View className="h-[54px] items-center justify-center border-b-2 border-ink bg-paper-2">
-        <Text className="font-brand pr-[3px] text-[19px] tracking-[0.5px] text-ink uppercase">
-          {big}
-          {"\u00A0"}
-        </Text>
-        <View
-          className="absolute top-1 right-1 border-[1.5px] border-ink bg-accent px-1"
-          style={{ transform: [{ rotate: "-3deg" }] }}
-        >
-          <Text className="font-brand pr-[2px] text-[10px] tracking-[0.5px] text-on-accent uppercase">
-            {stamp}
-            {"\u00A0"}
+      {runs ? (
+        // the stub torn off the bottom: how the plan runs
+        <View className="-mx-4 mt-2 self-stretch rounded-b-[12px] border-t-2 border-dashed border-ink bg-accent-wash py-2.5">
+          <Text
+            style={TEXT.bold}
+            className="text-center font-body-semibold text-[13px] text-ink"
+          >
+            {runs}
           </Text>
         </View>
-      </View>
-      <Text
-        style={TEXT.bold}
-        numberOfLines={1}
-        className="py-1.5 text-center font-body-semibold text-[12px] text-ink"
+      ) : null}
+      <View
+        pointerEvents="none"
+        className="absolute -top-3 right-3 border-[1.5px] border-ink bg-accent px-2"
+        style={{ transform: [{ rotate: "4deg" }] }}
       >
-        {caption}
-      </Text>
+        <Text className="font-brand pr-[3px] text-[14px] tracking-[0.5px] text-on-accent uppercase">
+          {early ? "Free for good!" : "All in!"}
+          {"\u00A0"}
+        </Text>
+      </View>
     </View>
   );
 }
@@ -315,6 +350,8 @@ export default function CollectorSheet() {
     );
   };
   const collector = plan.plan === "collector";
+  // free where nothing is limited (Android, the website): nothing to say
+  if (!plan.limited && !collector && plan.plan !== "early") return null;
 
   return (
     <Sheet
@@ -322,17 +359,17 @@ export default function CollectorSheet() {
       onClose={hideCollector}
       // tall enough to show it all without scrolling
       maxHeight={0.94}
-      contentClassName="gap-5 px-6 pb-4"
+      contentClassName="gap-5 px-6 pb-0"
+      footRoom={2}
     >
       <KenjiSays {...speech(plan, sheet.reason)} />
 
-      {/* the section's title, in the app's lettering with its red rule */}
-      <View className="mt-2">
-        <H2>Collector</H2>
-      </View>
-
       {plan.limited ? (
         <>
+          {/* the section's title, in the app's lettering with its red rule */}
+          <View className="mt-2">
+            <H2>Collector</H2>
+          </View>
           {/* their own limits, drawn as shelves of spines that hit the end */}
           <View className="gap-3.5">
             <LimitShelf label="Series" what="series" plan={plan} />
@@ -348,41 +385,7 @@ export default function CollectorSheet() {
           </Text>
         </>
       ) : (
-        // nothing limited for them (a Collector, an early member, or where
-        // there are no limits yet): their shelf with no end, and the extras
-        // as the welcome screen's stamped panels
-        <>
-          <View className="gap-3.5">
-            <OpenShelf
-              label="Series"
-              count={plan.used.series}
-              unit="on your shelf"
-            />
-            <OpenShelf
-              label="Barcode scans"
-              count={plan.used.scans}
-              unit="scanned"
-            />
-            <OpenShelf
-              label="Price alerts"
-              count={plan.used.priceAlerts}
-              unit="watched"
-            />
-          </View>
-          <View className="flex-row gap-2.5">
-            <StampPanel
-              stamp="Coming!"
-              big="Vol. 115"
-              caption="Preorder alerts"
-            />
-            <StampPanel
-              stamp="Calendar!"
-              big="Dec 12"
-              caption="Every release"
-            />
-            <StampPanel stamp="Japan!" big="Vol. 31" caption="In Japan" />
-          </View>
-        </>
+        <MemberCard plan={plan} />
       )}
 
       {/* the prices, only where Collector is sold */}
