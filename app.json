@@ -2,13 +2,13 @@
   "expo": {
     "name": "Manga Tracker",
     "slug": "manga-tracker-native",
-    "version": "2.0.0",
+    "version": "3.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "mangatracker",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "buildNumber": "2",
+      "buildNumber": "3",
       "icon": "./assets/images/icon.png",
       "bundleIdentifier": "xyz.mangatracker.app.rn",
       "appleTeamId": "84JH94RQR3",
@@ -36,7 +36,7 @@
       "googleServicesFile": "./firebase/google-services.json",
       "permissions": ["android.permission.CAMERA"],
       "blockedPermissions": ["android.permission.RECORD_AUDIO"],
-      "versionCode": 17
+      "versionCode": 18
     },
     "web": {
       "output": "single",
