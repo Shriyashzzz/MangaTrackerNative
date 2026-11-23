@@ -41,6 +41,9 @@ export type StripSlots = {
   runName: (slot: number) => string;
   // where an edition's books give way to singles (or back)
   startsRun: (slot: number) => boolean;
+  // how thick its spine is drawn, as a share of a full book: a deluxe book
+  // the thickest, an omnibus a little less, a single volume thin
+  thick?: (slot: number) => number;
 };
 
 type Props = {
@@ -222,6 +225,7 @@ export default function VolumeStrip({
                     : null
                 }
                 apart={Boolean(slots?.startsRun(v))}
+                thick={slots?.thick?.(v) ?? 1}
               />
             ))}
           </View>
@@ -257,6 +261,7 @@ function Book({
   runName,
   apart,
   ordered = false,
+  thick = 1,
 }: {
   v: number;
   width: number;
@@ -267,6 +272,7 @@ function Book({
   share: number;
   runName: string | null;
   apart: boolean;
+  thick?: number;
 }) {
   let height = 42;
   let look = "border-[1.5px] border-dashed border-muted bg-paper";
@@ -307,7 +313,8 @@ function Book({
         </Text>
       ) : null}
       <View
-        style={{ height }}
+        // (a thinner spine stands in the middle of its place on the shelf)
+        style={{ height, width: `${thick * 100}%`, alignSelf: "center" }}
         className={`items-center justify-end overflow-hidden pb-[3px] ${look} ${here ? "outline-2 outline-ink" : ""}`}
       >
         {/* part of an edition's book theirs: inked part of the way down */}
@@ -317,11 +324,27 @@ function Book({
             style={{ height: `${20 + share * 35}%` }}
           />
         ) : null}
-        <Text className={`font-brand pr-[4px] text-[13px] ${ink}`}>
-          {"\u00A0"}
-          {spine}
-          {"\u00A0"}
-        </Text>
+        {/* one line always: on a thin spine the number is set smaller,
+            with no room spent either side of it */}
+        {thick < 0.75 ? (
+          <Text
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.7}
+            className={`w-full text-center font-brand text-[11.5px] ${ink}`}
+          >
+            {spine}
+          </Text>
+        ) : (
+          <Text
+            numberOfLines={1}
+            className={`font-brand pr-[4px] text-[13px] ${ink}`}
+          >
+            {"\u00A0"}
+            {spine}
+            {"\u00A0"}
+          </Text>
+        )}
       </View>
     </View>
   );

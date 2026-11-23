@@ -149,6 +149,7 @@ export default function DetailsScreen() {
     ordered,
     readingFrom: releaseStatus?.nextChapterVolume ?? null,
     volumeStarts: releaseData?.volumeStarts ?? [],
+    booksChanged,
   });
   const { buyOptions, editions } = shelf;
 
@@ -687,7 +688,8 @@ export default function DetailsScreen() {
                 lines={editions.lines}
                 collects={shelf.editionShelf}
                 onAdded={(now) => setManga((was) => was && withOwned(was, now))}
-                booksChanged={booksChanged}
+                // (a spine ticked counts: it may have recorded a book)
+                booksChanged={shelf.booksTick}
               />
             </TourTarget>
             <YourReviews written={reviews.written} onEdit={setReviewing} />

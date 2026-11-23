@@ -16,6 +16,8 @@ import { todayOf } from "@/core/lib/editionNews";
 import {
   ownedCaption,
   placeInSlots,
+  runOf,
+  type RunKind,
   shareOwned,
   slotsIn,
   slotsOf,
@@ -57,6 +59,16 @@ type Options = {
   readingFrom?: number | null;
   // where each volume starts, by chapter, for their place on the shelf
   volumeStarts?: { volume: number; firstChapter: number }[];
+  // goes up when the page itself changed their recorded books (one added
+  // from Buy next or Your books): they're read again
+  booksChanged?: number;
+};
+
+// how thick each kind of book stands on the shelf, of a full book's width
+const THICK: Record<RunKind, number> = {
+  deluxe: 1,
+  omnibus: 0.8,
+  single: 0.64,
 };
 
 export function useSeriesShelf(
@@ -68,6 +80,7 @@ export function useSeriesShelf(
     ordered = [],
     readingFrom = null,
     volumeStarts = [],
+    booksChanged = 0,
   }: Options = {},
 ) {
   const trackBy = usePrefs((s) => s.prefs.trackBy ?? DEFAULT_TRACK_BY);
@@ -90,6 +103,10 @@ export function useSeriesShelf(
         },
     readingFrom,
   );
+  // their recorded books are read again after a save here, or a change the
+  // page made itself
+  const [savedTicks, setSavedTicks] = useState(0);
+  const booksTick = savedTicks + booksChanged;
   const editions = useEditions(
     manga && !manga.lightNovel ? priceName(manga) : null,
     manga?.id ?? null,
@@ -98,12 +115,16 @@ export function useSeriesShelf(
     [...owned, ...ordered],
     buyOptions.volumes.map((v) => v.isbn13),
     readingFrom,
+    booksTick,
   );
   const ownedVolumes = useOwnedVolumes({
     manga,
     setManga,
     onTick: () => setSaveFailed(false),
     onFailed: () => setSaveFailed(true),
+    // a tick that completed a book of their edition recorded it (server
+    // util/shelf/tickedBooks.ts)
+    onSaved: () => setSavedTicks((n) => n + 1),
   });
 
   const highest = Math.floor(Math.max(0, ...owned));
@@ -145,11 +166,16 @@ export function useSeriesShelf(
           bookWidth: 30,
           spine: (n) => spineOf(slots[n - 1]!),
           share: (n) => shareOwned(slots, owned, n),
+          // each book named by the edition it really is, when it's one
+          // they've recorded: a Definitive beside a VIZBIG beside singles
           runName: (n) =>
-            slots[n - 1]?.book ? editions.line!.label : "Singles",
+            runOf(slots[n - 1]!, editions.line!, editions.books).label,
           startsRun: (n) =>
             n > 1 &&
-            Boolean(slots[n - 1]?.book) !== Boolean(slots[n - 2]?.book),
+            runOf(slots[n - 1]!, editions.line!, editions.books).label !==
+              runOf(slots[n - 2]!, editions.line!, editions.books).label,
+          thick: (n) =>
+            THICK[runOf(slots[n - 1]!, editions.line!, editions.books).kind],
         }
       : undefined;
   // everything the strip takes, for singles or the edition's books
@@ -207,6 +233,8 @@ export function useSeriesShelf(
     total,
     buyOptions,
     editions,
+    // for anything else on the page that lists their books (Your books)
+    booksTick,
     highest,
     gaps,
     count,
