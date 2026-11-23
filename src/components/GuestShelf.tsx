@@ -129,8 +129,12 @@ export default function GuestShelf() {
   return (
     <ScrollView
       className="flex-1"
-      contentContainerClassName="grow justify-center gap-6 px-6 py-8"
-      contentContainerStyle={columnStyle}
+      contentContainerClassName="grow justify-center gap-6 px-6 pt-8"
+      // room under the last line (About, Questions, Privacy) for the tab
+      // bar that floats over the foot of the screen, and iOS's own inset
+      // for it as well
+      contentContainerStyle={{ ...columnStyle, paddingBottom: 120 }}
+      contentInsetAdjustmentBehavior="automatic"
     >
       <AuthArt
         sfx="A new series begins!"
