@@ -21,6 +21,7 @@ import { useColors } from "@/lib/colors";
 import { inPractice, leavePractice } from "@/lib/practice";
 import { tourBack, tourGo, touchIsKenjis } from "@/lib/tourGo";
 import { useTour } from "@/store/tour";
+import { useTabsOnTop } from "@/lib/tabHeader";
 import Button from "./Button";
 import Mascot from "./Mascot";
 import Tap from "./Tap";
@@ -35,6 +36,14 @@ const GAP = 22;
 const HEADER = 64;
 // the room at each side of the bubble
 const SIDE = 12;
+// the bubble's widest: on an iPad it stays a speech bubble in the middle,
+// not a banner across the screen
+const BUBBLE_MOST = 540;
+// On an iPad the tabs are a bar along the top, centred: New is the second of
+// five, a little left of the middle (measured on the iPad simulators)
+const NEW_TAB_FROM_MIDDLE = -58;
+const TOP_TAB_WIDTH = 64;
+const TOP_TAB_HEIGHT = 44;
 
 export default function Tour({ signedIn }: { signedIn: boolean }) {
   const corners = useCorners();
@@ -44,9 +53,16 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
   const { height: screen, width } = useWindowDimensions();
   const c = useColors();
   const [height, setHeight] = useState(0);
+  const tabsOnTop = useTabsOnTop();
   const step = steps[at];
   if (!signedIn || !inPractice() || !step) return null;
-  const foot = (TAB_PAGES.has(here) ? TAB_BAR : 0) + GAP;
+  // above the tab bar where it runs along the foot; on an iPad, where it
+  // runs along the top, just clear of the home bar
+  const foot = tabsOnTop
+    ? insets.bottom + GAP
+    : (TAB_PAGES.has(here) ? TAB_BAR : 0) + GAP;
+  // the room either side: a phone's 12, more on a wide screen
+  const side = Math.max(SIDE, (width - BUBBLE_MOST) / 2);
 
   // the two ways out of the practice shelf: an account of their own, or
   // just leaving. Always within reach, in the bubble or beside Kenji's button
@@ -81,8 +97,8 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
     return (
       <View
         pointerEvents="box-none"
-        className="absolute right-3 left-3 flex-row items-center gap-2"
-        style={{ bottom: foot }}
+        className="absolute flex-row items-center gap-2"
+        style={{ bottom: foot, left: side, right: side }}
         onTouchStart={touchIsKenjis}
       >
         <Tap
@@ -141,14 +157,21 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
     (step.target === "tab-new" ||
       step.target === "shelf" ||
       step.target === "alerts");
-  const box = aboutNewTab
-    ? {
-        x: width / 3,
-        width: width / 3,
-        y: screen - insets.bottom - 62,
-        height: 62,
-      }
-    : found;
+  const box = !aboutNewTab
+    ? found
+    : tabsOnTop
+      ? {
+          x: width / 2 + NEW_TAB_FROM_MIDDLE - TOP_TAB_WIDTH / 2,
+          width: TOP_TAB_WIDTH,
+          y: insets.top,
+          height: TOP_TAB_HEIGHT,
+        }
+      : {
+          x: width / 3,
+          width: width / 3,
+          y: screen - insets.bottom - 62,
+          height: 62,
+        };
   // Where the bubble goes: under the thing he points at, with its tail up;
   // over it, tail down, when there's no room under; at the foot, with no
   // tail, when there's nothing to point at (or it's too tall for either)
@@ -163,10 +186,21 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
         : // too tall to sit beside: he rests at the foot and still
           // points up at it
           { bottom: foot, tail: box && height ? "up" : null };
+  // On a wide screen the bubble is narrower than the screen: it slides
+  // towards what he points at (the + in the corner, a tab), as far as the
+  // screen's edge allows, so the tail can reach it. On a phone it spans the
+  // screen anyway
+  const bubbleWidth = width - 2 * side;
+  const target = box ? box.x + box.width / 2 : width / 2;
+  const left = Math.min(
+    Math.max(target - bubbleWidth / 2, SIDE),
+    width - bubbleWidth - SIDE,
+  );
+  const right = width - left - bubbleWidth;
   // the tail points at the middle of the thing, as far as the bubble's
   // corners (and Kenji, on its top left) allow
-  const middle = box ? box.x + box.width / 2 - SIDE : 0;
-  const tailAt = Math.min(Math.max(middle, 84), width - 2 * SIDE - 34) - 7;
+  const middle = target - left;
+  const tailAt = Math.min(Math.max(middle, 84), bubbleWidth - 34) - 7;
   const tail = (side: "up" | "down") => (
     <View
       style={{ left: tailAt }}
@@ -177,8 +211,8 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
   return (
     <Animated.View
       pointerEvents="box-none"
-      className="absolute right-3 left-3"
-      style={{ top: place.top, bottom: place.bottom }}
+      className="absolute"
+      style={{ top: place.top, bottom: place.bottom, left, right }}
       // it glides to its next place: a hop would read as a stutter
       layout={LinearTransition.duration(180)}
       onLayout={(e) => setHeight(e.nativeEvent.layout.height)}

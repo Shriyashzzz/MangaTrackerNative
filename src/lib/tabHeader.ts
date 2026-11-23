@@ -3,7 +3,7 @@
 // scrolls, lettered in Bangers so the brand stays, with the tab's buttons on
 // the right (components/AppHeader.tsx). On Android there's no system bar
 // here: the app's own masthead is drawn instead, as before
-import { Platform } from "react-native";
+import { Platform, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Stack } from "expo-router";
 import type { ComponentProps } from "react";
@@ -44,9 +44,23 @@ export function tabHeaderOptions(c: { paper: string; ink: string }): Options {
 // clear of it: the home bar, the floating bar, and a little air. Android
 // keeps the room each page asks for
 const FLOATING_BAR = 50;
+// on an iPad the bar sits along the top instead, so the foot only needs air
+const AIR = 16;
+
+// An iPad at full width (or most of it) has its tab bar along the top of the
+// screen. In a narrow window beside another app it moves back to the foot,
+// as on an iPhone
+const REGULAR_FROM = 700;
+export function useTabsOnTop() {
+  const { width } = useWindowDimensions();
+  return Platform.OS === "ios" && Platform.isPad && width >= REGULAR_FROM;
+}
+
 // `above`: room for something that floats over the bar as well (the
 // shelf's + button)
 export function useTabFoot(androidRoom: number, above = 0) {
   const insets = useSafeAreaInsets();
-  return IOS ? insets.bottom + FLOATING_BAR + above : androidRoom;
+  const onTop = useTabsOnTop();
+  if (!IOS) return androidRoom;
+  return insets.bottom + (onTop ? AIR : FLOATING_BAR) + above;
 }

@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Tap from "@/components/Tap";
 import { themeOf, useLook } from "@/lib/mangaThemes";
 import { usePlan } from "@/store/plan";
+import { useTabsOnTop } from "@/lib/tabHeader";
 
 const clock = (ms: number) => {
   const s = Math.max(0, Math.ceil(ms / 1000));
@@ -20,6 +21,8 @@ export default function TryingTheme() {
   const premium = usePlan((s) => !s.plan.limited);
   const showCollector = usePlan((s) => s.showCollector);
   const insets = useSafeAreaInsets();
+  // on an iPad the tab bar holds the top, so the pill sits at the foot
+  const tabsOnTop = useTabsOnTop();
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     if (!trying) return;
@@ -35,7 +38,9 @@ export default function TryingTheme() {
     <View
       pointerEvents="box-none"
       className="absolute right-0 left-0 items-center"
-      style={{ top: insets.top + 4 }}
+      style={
+        tabsOnTop ? { bottom: insets.bottom + 12 } : { top: insets.top + 4 }
+      }
     >
       <View
         className="flex-row items-center gap-1 rounded-full border-[1.5px] border-ink bg-card pl-3.5 pr-1"

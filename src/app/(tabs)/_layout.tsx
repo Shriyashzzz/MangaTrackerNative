@@ -5,7 +5,7 @@
 import { useAccount } from "@/store/account";
 import { avatarTabIcon } from "@/lib/avatarTabIcons";
 import { useToBuy } from "@/store/toBuy";
-import { IOS } from "@/lib/tabHeader";
+import { IOS, useTabsOnTop } from "@/lib/tabHeader";
 import { useTour } from "@/store/tour";
 import { router, usePathname } from "expo-router";
 import { NativeTabs } from "expo-router/native-tabs";
@@ -47,6 +47,7 @@ export default function TabsLayout() {
   const releases = useShelf((st) => st.releases);
   const toBuyCount = useToBuy((st) => st.list?.items.length ?? 0);
   const avatarId = useAccount((st) => st.account?.avatar);
+  const tabsOnTop = useTabsOnTop();
   const newCount = manga
     ? countNew(manga, editionReleases(manga, releases))
     : 0;
@@ -65,11 +66,11 @@ export default function TabsLayout() {
       badgeBackgroundColor={c.accent}
       badgeTextColor={c.onAccent}
       minimizeBehavior="onScrollDown"
-      // On iPad the tabs are a sidebar down the left, as Apple's own iPad
-      // apps have them, rather than a bar floating over the top of the page.
+      // On iPad the five tabs are one bar along the top, with no sidebar to
+      // switch to: a sidebar of five places only took room from the page.
       // A phone keeps its bar along the foot
-      sidebarAdaptable
-      preferredPlacement="sidebar"
+      sidebarAdaptable={false}
+      preferredPlacement="tabBar"
     >
       <NativeTabs.Trigger name="(shelf)">
         <NativeTabs.Trigger.Icon
@@ -115,7 +116,11 @@ export default function TabsLayout() {
         ) : null}
       </NativeTabs.Trigger>
       {/* Me is an account's: signed out, there's none */}
-      <NativeTabs.Trigger name="(me)" hidden={!IOS || !isSignedIn}>
+      <NativeTabs.Trigger
+        name="(me)"
+        hidden={!IOS || !isSignedIn}
+        accessibilityLabel="Me"
+      >
         {/* their own picture, in colour; signed out, a person */}
         {isSignedIn ? (
           <NativeTabs.Trigger.Icon
@@ -131,7 +136,11 @@ export default function TabsLayout() {
             md="person"
           />
         )}
-        <NativeTabs.Trigger.Label>Me</NativeTabs.Trigger.Label>
+        {/* an iPad's bar along the top shows words, not pictures: Me drops
+            its word there so their picture shows, as on an iPhone */}
+        <NativeTabs.Trigger.Label hidden={tabsOnTop}>
+          Me
+        </NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       {/* (Signing in is an action, not a place: the shelf's welcome and
           the header's Sign in button lead to it, as Apple's tabs are
