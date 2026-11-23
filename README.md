@@ -89,8 +89,8 @@ control the app uses it:
 - "Bought on" opens Android's date picker.
 - The + button floats above the tab bar; Select starts with a long press.
 - A scan buzzes instead of beeping, and the camera reads barcodes itself.
-- The release settings' "how many behind" is a − N + counter (the website
-  has a slider).
+- The release settings' "how many behind" is the app's own slider
+  (`src/components/StepSlider.tsx`), where the website uses the browser's.
 - Share my list and Export my list hand the link or the file to the
   phone's share sheet.
 - The import picks files with the phone's file picker; a MyAnimeList

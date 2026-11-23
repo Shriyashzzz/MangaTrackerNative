@@ -2,6 +2,7 @@
 // for volumes and for chapters, every series or only the ones they're
 // nearly caught up on, and how nearly. Each choice shows an example of what
 // New would say. Saved a moment after the last change
+import StepSlider from "@/components/StepSlider";
 import Tap from "@/components/Tap";
 import { useEffect, useRef, useState } from "react";
 import { Text, View } from "react-native";
@@ -115,6 +116,9 @@ const MODES = [
   { value: "within", label: "Only series I'm nearly caught up on" },
 ] as const;
 
+// the kind at the top of the box (no line over it)
+const FIRST_KIND = Object.keys(KINDS)[0];
+
 export default function ReleaseControls() {
   const [settings, setSettings] = useState<ReleaseSettings | null>(null);
   const [status, setStatus] = useState<
@@ -167,7 +171,16 @@ export default function ReleaseControls() {
   };
 
   return (
-    <View className="gap-6">
+    // one box for both, as on the website: volumes over chapters, a line
+    // between them
+    <View className="rounded-[14px] border-2 border-accent bg-card px-3.5">
+      {/* these decide what the New tab and the alerts are about: the box
+          is drawn to be noticed */}
+      <View className="-mx-3.5 rounded-t-[12px] bg-accent px-3.5 py-2">
+        <Text className="font-brand pr-[6px] text-[17px] tracking-[1px] text-on-accent uppercase">
+          What counts as new{"\u00A0"}
+        </Text>
+      </View>
       {(Object.keys(KINDS) as (keyof typeof KINDS)[]).map((kind) => {
         const copy = KINDS[kind];
         const range = settings[kind];
@@ -179,10 +192,14 @@ export default function ReleaseControls() {
             : `Up to ${range.within} ${copy.many} behind`;
         const example = copy.example(range);
         return (
-          <View key={kind} className="gap-3">
+          <View
+            key={kind}
+            className={`gap-3 py-4 ${kind === FIRST_KIND ? "" : "border-t-[1.5px] border-dashed border-line-soft"}`}
+          >
             <View>
-              <Text className="font-body-semibold text-[16px] text-ink">
+              <Text className="font-brand pr-[6px] text-[21px] tracking-[1px] text-ink uppercase">
                 {copy.title}
+                {"\u00A0"}
               </Text>
               <Text className="font-body text-[13px] text-muted">
                 {copy.note}
@@ -196,41 +213,24 @@ export default function ReleaseControls() {
                 change(mode === "within" ? { mode, within: 1 } : { mode })
               }
             />
-            {/* how nearly: a − N + counter, where the website has a slider */}
+            {/* how nearly: a slider, as on the website */}
             {range.mode === "within" ? (
-              <View className="flex-row items-center gap-3">
-                <View className="flex-row items-center overflow-hidden rounded-[12px] bg-ink/10">
-                  <Tap
-                    onPress={() =>
-                      change({ within: Math.max(1, range.within - 1) })
-                    }
-                    disabled={range.within <= 1}
-                    className="h-10 w-10 items-center justify-center"
-                    accessibilityLabel={`One ${copy.many.slice(0, -1)} closer`}
-                  >
-                    <Text className="font-body-semibold text-[20px] text-ink">
-                      −
-                    </Text>
-                  </Tap>
-                  <Text className="w-12 border-x border-line-soft text-center font-brand text-[20px] text-ink">
-                    {"\u00A0"}
+              <View className="gap-1">
+                <View className="flex-row items-center gap-3">
+                  <View className="flex-1">
+                    <StepSlider
+                      label={copy.title}
+                      value={range.within}
+                      max={copy.max}
+                      onChange={(within) => change({ within })}
+                    />
+                  </View>
+                  <Text className="w-9 text-right font-brand text-[22px] text-ink">
                     {range.within}
                     {"\u00A0"}
                   </Text>
-                  <Tap
-                    onPress={() =>
-                      change({ within: Math.min(copy.max, range.within + 1) })
-                    }
-                    disabled={range.within >= copy.max}
-                    className="h-10 w-10 items-center justify-center"
-                    accessibilityLabel={`One ${copy.many.slice(0, -1)} further`}
-                  >
-                    <Text className="font-body-semibold text-[20px] text-ink">
-                      +
-                    </Text>
-                  </Tap>
                 </View>
-                <Text className="shrink font-body text-[14px] text-ink-soft">
+                <Text className="font-body text-[14px] text-ink-soft">
                   {howClose}
                 </Text>
               </View>
@@ -258,18 +258,21 @@ export default function ReleaseControls() {
           </View>
         );
       })}
-      <Note
-        text={
-          status === "saving"
-            ? "Saving…"
-            : status === "saved"
-              ? "Saved. Your New tab will use this next time it opens."
-              : status === "failed"
-                ? "That didn't save. Try again."
-                : null
-        }
-        failed={status === "failed"}
-      />
+      {/* (room under it: the box has none of its own at the foot) */}
+      <View className="pb-3">
+        <Note
+          text={
+            status === "saving"
+              ? "Saving…"
+              : status === "saved"
+                ? "Saved. Your New tab will use this next time it opens."
+                : status === "failed"
+                  ? "That didn't save. Try again."
+                  : null
+          }
+          failed={status === "failed"}
+        />
+      </View>
     </View>
   );
 }

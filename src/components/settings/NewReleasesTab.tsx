@@ -4,7 +4,7 @@ import { useAccount } from "@/store/account";
 import WeeklyEmail from "./WeeklyEmail";
 import PhoneAlerts from "./PhoneAlerts";
 import { router } from "expo-router";
-import { Text } from "react-native";
+import { Text, View } from "react-native";
 import { usePrefs } from "@/store/prefs";
 import ReleaseControls from "./ReleaseControls";
 import { Help, Section, Tick } from "./parts";
@@ -23,31 +23,32 @@ export default function NewReleasesTab() {
             void save({ releaseChecks: on ? "on" : "off" }).catch(() => {})
           }
         />
-        {checksOn ? (
-          <>
-            <Help>
-              What your shelf's New tab lists.{" "}
-              <Text
-                className="font-body-semibold text-ink underline"
-                onPress={() => router.push("/new-releases")}
-              >
-                How this works
-              </Text>
-            </Help>
-            <ReleaseControls />
-          </>
-        ) : (
+        {!checksOn ? (
           <Help>
             Off. Your shelf has no New tab, and manga pages don't show new
             releases or next chapter dates. Prices still work.
           </Help>
-        )}
-      </Section>
-      {/* how they're told: on this phone, and by email */}
-      <Section title="Alerts">
+        ) : null}
+        {/* how they're told, right under the switch: on this phone, and by
+            email */}
         <PhoneAlerts />
         {account ? <WeeklyEmail account={account} /> : null}
       </Section>
+      {/* what counts as new, for volumes and for chapters: a box each */}
+      {checksOn ? (
+        <View className="mt-6 gap-3">
+          <Help>
+            What your shelf's New tab lists.{" "}
+            <Text
+              className="font-body-semibold text-ink underline"
+              onPress={() => router.push("/new-releases")}
+            >
+              How this works
+            </Text>
+          </Help>
+          <ReleaseControls />
+        </View>
+      ) : null}
     </>
   );
 }

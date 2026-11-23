@@ -10,7 +10,7 @@ import { SORT_OPTIONS } from "@/core/lib/shelf";
 import { useColors } from "@/lib/colors";
 import { usePrefs } from "@/store/prefs";
 import PickSheet from "../PickSheet";
-import { Radios, Section, Tick } from "./parts";
+import { Help, Radios, Section, Tick } from "./parts";
 import { DEFAULT_TRACK_BY } from "@/lib/trackBy";
 
 const TRACKING = [
@@ -19,6 +19,14 @@ const TRACKING = [
   { value: "volumes", label: "Volumes only" },
   { value: "both", label: "Chapters and volumes together" },
 ] as const;
+// what each of those does, said under the one picked
+const TRACKING_MEANS: Record<(typeof TRACKING)[number]["value"], string> = {
+  series:
+    "Each series has its own switch, on its page: Track volumes instead, or Track chapters instead.",
+  chapters: "Every series counts the chapter you've read up to.",
+  volumes: "Every series counts the volume you've read up to.",
+  both: "Every series shows both counters: the chapter and the volume you've read up to.",
+};
 const NEXT = [
   { value: "after", label: "The one after my highest volume" },
   { value: "gap", label: "The first volume I'm missing" },
@@ -50,12 +58,18 @@ export default function ShelfSettingsTab() {
   return (
     <>
       <Section first title="Keeping your place">
+        <Help>
+          How a series' page counts where you are in it: by chapter, by volume,
+          or both.
+        </Help>
         <Radios
           label="Track by"
           options={TRACKING}
           value={prefs.trackBy ?? DEFAULT_TRACK_BY}
           onChange={(value) => set({ trackBy: value })}
         />
+        {/* what the one they've picked does */}
+        <Help>{TRACKING_MEANS[prefs.trackBy ?? DEFAULT_TRACK_BY]}</Help>
       </Section>
       <Section title="To buy">
         <Tick
