@@ -15,7 +15,7 @@ import Backdrop from "@/components/Backdrop";
 import GuestShelf from "@/components/GuestShelf";
 import { useAuth } from "@/store/auth";
 import { useEffect, useState } from "react";
-import { Alert, Text, TextInput, View } from "react-native";
+import { Alert, Platform, Text, TextInput, View } from "react-native";
 import Animated, {
   FadeOut,
   LayoutAnimationConfig,
@@ -54,6 +54,8 @@ import { useColors } from "@/lib/colors";
 import { usePrefs } from "@/store/prefs";
 import { useShelf } from "@/store/shelf";
 import { DEFAULT_TRACK_BY } from "@/lib/trackBy";
+
+const IS_PAD = Platform.OS === "ios" && Platform.isPad;
 
 const Safe = withUniwind(SafeAreaView);
 
@@ -376,7 +378,11 @@ function SignedInShelf() {
         )}
       </PullPage>
       {/* the floating +: type a title or scan a barcode. Not over Volumes */}
-      {tab !== "volumes" && !select.selectOn ? (
+      {/* (an empty shelf on a phone already offers Scan, Add by name and
+          Import in its first look, so no + then; an iPad keeps it) */}
+      {tab !== "volumes" &&
+      !select.selectOn &&
+      !(manga?.length === 0 && !IS_PAD) ? (
         <Animated.View
           style={[
             // an iPad's screen is wider and its corners rounder: more room
