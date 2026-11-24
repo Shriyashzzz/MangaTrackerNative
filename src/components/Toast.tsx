@@ -4,7 +4,7 @@
 import Tap from "@/components/Tap";
 import { useEffect } from "react";
 import { Text, useWindowDimensions } from "react-native";
-import { useTabsOnTop } from "@/lib/tabHeader";
+import { useKenjiRoom, useTabsOnTop } from "@/lib/tabHeader";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
 
@@ -26,6 +26,7 @@ export default function Toast({
   const insets = useSafeAreaInsets();
   // above the tab bar along the foot; an iPad's bar is along the top
   const tabsOnTop = useTabsOnTop();
+  const kenji = useKenjiRoom();
   const { width } = useWindowDimensions();
   const side = Math.max(12, (width - TOAST_MOST) / 2);
   useEffect(() => {
@@ -37,7 +38,7 @@ export default function Toast({
       entering={FadeInDown.duration(220)}
       exiting={FadeOutDown.duration(180)}
       style={{
-        bottom: insets.bottom + (tabsOnTop ? 20 : 72),
+        bottom: insets.bottom + (tabsOnTop ? 20 : 72) + kenji,
         left: side,
         right: side,
       }}

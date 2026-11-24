@@ -7,6 +7,7 @@ import { Platform, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Stack } from "expo-router";
 import type { ComponentProps } from "react";
+import { useTour } from "@/store/tour";
 
 export const IOS = Platform.OS === "ios";
 
@@ -56,11 +57,22 @@ export function useTabsOnTop() {
   return Platform.OS === "ios" && Platform.isPad && width >= REGULAR_FROM;
 }
 
+// On the practice shelf Kenji floats at the foot too (his bubble's button,
+// or the pill with the ways out once the tour is over): the page scrolls on
+// past him, so its last line is never left under him
+const KENJI_ROOM = 72;
+// the room for him, on the practice shelf; none otherwise. (A toast at the
+// foot rises by it too, so he doesn't hide it)
+export function useKenjiRoom() {
+  return useTour((s) => s.steps.length > 0) ? KENJI_ROOM : 0;
+}
+
 // `above`: room for something that floats over the bar as well (the
 // shelf's + button)
 export function useTabFoot(androidRoom: number, above = 0) {
   const insets = useSafeAreaInsets();
   const onTop = useTabsOnTop();
-  if (!IOS) return androidRoom;
-  return insets.bottom + (onTop ? AIR : FLOATING_BAR) + above;
+  const kenji = useKenjiRoom();
+  if (!IOS) return androidRoom + kenji;
+  return insets.bottom + (onTop ? AIR : FLOATING_BAR) + above + kenji;
 }

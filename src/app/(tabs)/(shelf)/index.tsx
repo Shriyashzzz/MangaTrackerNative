@@ -14,7 +14,7 @@ import Tap from "@/components/Tap";
 import Backdrop from "@/components/Backdrop";
 import GuestShelf from "@/components/GuestShelf";
 import { useAuth } from "@/store/auth";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type ComponentRef } from "react";
 import { Alert, Platform, Text, TextInput, View } from "react-native";
 import Animated, {
   FadeOut,
@@ -54,6 +54,7 @@ import { useColors } from "@/lib/colors";
 import { usePrefs } from "@/store/prefs";
 import { useShelf } from "@/store/shelf";
 import { DEFAULT_TRACK_BY } from "@/lib/trackBy";
+import { PLUS_RIGHT, PLUS_RIGHT_PAD, usePlusShown } from "@/lib/floatingPlus";
 
 const IS_PAD = Platform.OS === "ios" && Platform.isPad;
 
@@ -193,6 +194,25 @@ function SignedInShelf() {
     select.start();
     select.toggle(id);
   };
+  // the floating +: type a title or scan a barcode. Not over Volumes, nor
+  // while picking several (an empty shelf on a phone already offers Scan,
+  // Add by name and Import in its first look, so no + then; an iPad keeps
+  // it). Said to the tour too, so Kenji keeps clear of it
+  const plusShown =
+    tab !== "volumes" && !select.selectOn && !(manga?.length === 0 && !IS_PAD);
+  useEffect(() => {
+    usePlusShown.setState({ shown: plusShown, dock: select.selectOn });
+  }, [plusShown, select.selectOn]);
+  useEffect(
+    () => () => usePlusShown.setState({ shown: false, dock: false }),
+    [],
+  );
+  // where the + is on the screen, for Kenji to keep above it
+  const plusRef = useRef<ComponentRef<typeof View>>(null);
+  const measurePlus = () =>
+    plusRef.current?.measureInWindow((_x, y) =>
+      usePlusShown.setState({ top: y }),
+    );
   const fabStyle = useAnimatedStyle(() => ({
     opacity: 1 - fabAway.value,
     transform: [
@@ -377,19 +397,24 @@ function SignedInShelf() {
           </LayoutAnimationConfig>
         )}
       </PullPage>
-      {/* the floating +: type a title or scan a barcode. Not over Volumes */}
-      {/* (an empty shelf on a phone already offers Scan, Add by name and
-          Import in its first look, so no + then; an iPad keeps it) */}
-      {tab !== "volumes" &&
-      !select.selectOn &&
-      !(manga?.length === 0 && !IS_PAD) ? (
+      {plusShown ? (
         <Animated.View
+          ref={plusRef}
+          onLayout={measurePlus}
           style={[
             // an iPad's screen is wider and its corners rounder: more room
             // around it, so it doesn't sit in the corner
             tabsOnTop
-              ? { position: "absolute", right: 36, bottom: insets.bottom + 36 }
-              : { position: "absolute", right: 16, bottom: insets.bottom + 20 },
+              ? {
+                  position: "absolute",
+                  right: PLUS_RIGHT_PAD,
+                  bottom: insets.bottom + 36,
+                }
+              : {
+                  position: "absolute",
+                  right: PLUS_RIGHT,
+                  bottom: insets.bottom + 20,
+                },
             fabStyle,
           ]}
         >

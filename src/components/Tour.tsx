@@ -13,7 +13,7 @@
 import { useCorners } from "@/lib/mangaThemes";
 import { usePathname } from "expo-router";
 import { useState } from "react";
-import { Text, useWindowDimensions, View } from "react-native";
+import { Platform, Text, useWindowDimensions, View } from "react-native";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { InkCrossIcon } from "@/core/components/icons/Icons";
@@ -22,13 +22,28 @@ import { inPractice, leavePractice } from "@/lib/practice";
 import { tourBack, tourGo, touchIsKenjis } from "@/lib/tourGo";
 import { useTour } from "@/store/tour";
 import { useTabsOnTop } from "@/lib/tabHeader";
+import {
+  PLUS_RIGHT,
+  PLUS_RIGHT_PAD,
+  PLUS_SIZE,
+  usePlusShown,
+} from "@/lib/floatingPlus";
 import Button from "./Button";
 import Mascot from "./Mascot";
 import Tap from "./Tap";
 
-// the pages with the tab bar along their foot: Kenji rests above it there
-const TAB_PAGES = new Set(["/", "/new", "/prices"]);
-const TAB_BAR = 84;
+// the pages with the tab bar along their foot: Kenji rests above it there.
+// (To buy and Me are tabs on an iPhone; on Android they're pages without
+// the bar, and their addresses differ)
+const TAB_PAGES = new Set(["/", "/new", "/prices", "/buy", "/me"]);
+// whole-screen pages with their own bar along the foot (the camera's):
+// Kenji steps out while one is open, and is back after
+const OWN_FOOT = new Set(["/scan"]);
+// the air between Kenji and the shelf's floating +
+const PLUS_AIR = 12;
+// the tab bar's height over the home bar: Apple's floating bar, or
+// Android's taller one
+const TAB_BAR = Platform.OS === "ios" ? 50 : 80;
 // the room left between the bubble and what it sits beside (the thing he
 // points at, the tab bar, the screen's foot)
 const GAP = 22;
@@ -44,25 +59,60 @@ const BUBBLE_MOST = 540;
 const NEW_TAB_FROM_MIDDLE = -58;
 const TOP_TAB_WIDTH = 64;
 const TOP_TAB_HEIGHT = 44;
+// On an iPhone the bar along the foot is Apple's floating one, inset from
+// the screen's sides, with five tabs (My shelf, New, Prices, To buy, Me):
+// New is the second. Android's bar spans the screen with three, New the
+// middle one (measured on the simulators)
+const IPHONE_BAR_INSET = 21;
+const IPHONE_TABS = 5;
+const footTab = (width: number) =>
+  Platform.OS === "ios"
+    ? {
+        x: IPHONE_BAR_INSET + (width - 2 * IPHONE_BAR_INSET) / IPHONE_TABS,
+        width: (width - 2 * IPHONE_BAR_INSET) / IPHONE_TABS,
+      }
+    : { x: width / 3, width: width / 3 };
 
 export default function Tour({ signedIn }: { signedIn: boolean }) {
   const corners = useCorners();
-  const { steps, at, hidden, box: found, hide } = useTour();
+  const { steps, at, hidden, done, box: found, hide, finish } = useTour();
   const here = usePathname();
   const insets = useSafeAreaInsets();
   const { height: screen, width } = useWindowDimensions();
   const c = useColors();
   const [height, setHeight] = useState(0);
   const tabsOnTop = useTabsOnTop();
+  const plusOnShelf = usePlusShown((s) => s.shown) && here === "/";
+  const plusTop = usePlusShown((s) => s.top);
+  // picking several on the shelf: Select's buttons sit along the foot, so
+  // Kenji steps out of the way until it's closed
+  const dockOnShelf = usePlusShown((s) => s.dock) && here === "/";
   const step = steps[at];
   if (!signedIn || !inPractice() || !step) return null;
+  if (dockOnShelf || OWN_FOOT.has(here)) return null;
   // above the tab bar where it runs along the foot; on an iPad, where it
   // runs along the top, just clear of the home bar
   const foot = tabsOnTop
     ? insets.bottom + GAP
-    : (TAB_PAGES.has(here) ? TAB_BAR : 0) + GAP;
+    : (TAB_PAGES.has(here) ? insets.bottom + TAB_BAR : 0) + GAP;
   // the room either side: a phone's 12, more on a wide screen
   const side = Math.max(SIDE, (width - BUBBLE_MOST) / 2);
+  // the shelf's +, at the foot on the right: Kenji leaves it free. Where
+  // he'd reach across it (a phone, where he's as wide as the screen), his
+  // bubble and his button rise above it; on a wide screen he's clear of it
+  const plusRoom = plusOnShelf
+    ? (tabsOnTop ? PLUS_RIGHT_PAD : PLUS_RIGHT) + PLUS_SIZE + PLUS_AIR
+    : 0;
+  const besidePlus = plusRoom > side;
+  // (above where the + was measured; until it is, about where it sits)
+  const bubbleFoot = besidePlus
+    ? Math.max(
+        foot,
+        plusTop !== null
+          ? screen - plusTop + PLUS_AIR
+          : foot + PLUS_SIZE + PLUS_AIR,
+      )
+    : foot;
 
   // the two ways out of the practice shelf: an account of their own, or
   // just leaving. Always within reach, in the bubble or beside Kenji's button
@@ -91,6 +141,35 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
     </>
   );
 
+  // The tour over: Kenji has gone, and only the ways out of the practice
+  // shelf stay, in a small pill at the foot (beside the shelf's +, which
+  // it leaves free)
+  if (done)
+    return (
+      <View
+        pointerEvents="box-none"
+        className="absolute flex-row"
+        style={{
+          bottom: foot,
+          left: side,
+          right: besidePlus ? plusRoom : side,
+        }}
+      >
+        <View
+          className="min-h-[48px] shrink flex-row items-center gap-3 rounded-full border-[1.5px] border-line bg-card px-4"
+          style={{ elevation: 6 }}
+        >
+          <Text
+            numberOfLines={1}
+            className="shrink font-mono text-[11.5px] text-muted"
+          >
+            Practice shelf
+          </Text>
+          {waysOut}
+        </View>
+      </View>
+    );
+
   // Aside: Kenji as a round button to come back by, and a pill beside him
   // with the two ways out and "Back to the tour". Both tall enough to hit without aiming
   if (hidden)
@@ -98,7 +177,7 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
       <View
         pointerEvents="box-none"
         className="absolute flex-row items-center gap-2"
-        style={{ bottom: foot, left: side, right: side }}
+        style={{ bottom: bubbleFoot, left: side, right: side }}
         onTouchStart={touchIsKenjis}
       >
         <Tap
@@ -116,7 +195,11 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
         >
           {/* leaving first, coming back last: the way back to the tour
               sits where the thumb ends up */}
-          <Tap onPress={() => leavePractice("/")} hitSlop={14}>
+          <Tap
+            onPress={() => leavePractice("/")}
+            hitSlop={14}
+            className="shrink"
+          >
             <Text
               numberOfLines={1}
               adjustsFontSizeToFit
@@ -126,7 +209,11 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
               Leave
             </Text>
           </Tap>
-          <Tap onPress={() => leavePractice("/sign-up")} hitSlop={14}>
+          <Tap
+            onPress={() => leavePractice("/sign-up")}
+            hitSlop={14}
+            className="shrink"
+          >
             <Text
               numberOfLines={1}
               adjustsFontSizeToFit
@@ -136,7 +223,7 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
               Start mine
             </Text>
           </Tap>
-          <Tap onPress={tourBack} hitSlop={14}>
+          <Tap onPress={tourBack} hitSlop={14} className="shrink">
             <Text
               numberOfLines={1}
               adjustsFontSizeToFit
@@ -151,7 +238,7 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
     );
 
   // A step about the New tab points at the tab itself, in the bar along
-  // the foot: the middle one of the three
+  // the foot (footTab) or, on an iPad, along the top
   const aboutNewTab =
     step.tab === "new" &&
     (step.target === "tab-new" ||
@@ -167,8 +254,7 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
           height: TOP_TAB_HEIGHT,
         }
       : {
-          x: width / 3,
-          width: width / 3,
+          ...footTab(width),
           y: screen - insets.bottom - 62,
           height: 62,
         };
@@ -179,13 +265,13 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
   const under = box ? box.y + box.height + GAP + 14 : 0;
   const over = box ? box.y - GAP - height : 0;
   const place: { top?: number; bottom?: number; tail: "up" | "down" | null } =
-    box && height && under + height <= screen - foot
+    box && height && under + height <= screen - bubbleFoot
       ? { top: under, tail: "up" }
       : box && height && over >= insets.top + HEADER
         ? { top: over, tail: "down" }
         : // too tall to sit beside: he rests at the foot and still
           // points up at it
-          { bottom: foot, tail: box && height ? "up" : null };
+          { bottom: bubbleFoot, tail: box && height ? "up" : null };
   // On a wide screen the bubble is narrower than the screen: it slides
   // towards what he points at (the + in the corner, a tab), as far as the
   // screen's edge allows, so the tail can reach it. On a phone it spans the
@@ -263,12 +349,13 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
             small
             kind="primary"
             label={last ? "Done" : "Next"}
-            onPress={() => (last ? hide(true) : tourGo(1))}
+            onPress={() => (last ? finish() : tourGo(1))}
           />
         </View>
         {/* it's a practice shelf: said once, quietly, with the ways out */}
         <View className="mt-2.5 flex-row items-center gap-3 border-t border-dotted border-line-soft pt-2">
-          <Text className="mr-auto font-mono text-[11.5px] text-muted">
+          {/* on a narrow phone it wraps, so the ways out stay in the bubble */}
+          <Text className="mr-auto shrink font-mono text-[11.5px] text-muted">
             Practice shelf. Nothing is kept.
           </Text>
           {waysOut}
@@ -298,4 +385,18 @@ const wordsFor = (said: string) =>
       "This is Berserk.",
     )
     // (nothing in the app promises a price: the stores' rules differ)
-    .replace("Your shelf is free: bring", "Bring");
+    .replace("Your shelf is free: bring", "Bring")
+    // on an iPhone or iPad their picture is the Me tab, in the tab bar
+    // (Android keeps it at the top right of the page)
+    .replace(
+      "your picture at the top right",
+      Platform.OS === "ios"
+        ? "your picture in the tab bar"
+        : "your picture at the top right",
+    )
+    .replace(
+      "under your avatar at the top right",
+      Platform.OS === "ios"
+        ? "under your picture in the tab bar"
+        : "under your avatar at the top right",
+    );

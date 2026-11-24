@@ -66,6 +66,10 @@ type TourState = {
   steps: TourStep[];
   at: number;
   hidden: boolean;
+  // the last step's Done was pressed: Kenji has said it all and is gone,
+  // leaving only the ways out of the practice shelf
+  done: boolean;
+  finish: () => void;
   // null while there's nothing to point at, or it hasn't been found yet
   box: Box | null;
   point: (box: Box | null) => void;
@@ -89,7 +93,7 @@ function withAlerts(steps: TourStep[]): TourStep[] {
     tab: "new",
     target: "alerts",
     part: steps[last]!.part,
-    say: "Your phone can tell you too: when a new volume is out, when one is on its way, and when it opens for preorder. Once a day at most. Turn it on in Settings, under New releases.",
+    say: "We send you a notification when there are new releases for the series on your shelf: a volume out, one on its way, or one open for preorder. Once a day at most. Turn it on in Settings, under New releases.",
   };
   return [...steps.slice(0, last + 1), alerts, ...steps.slice(last + 1)];
 }
@@ -98,6 +102,7 @@ export const useTour = create<TourState>()((set, get) => ({
   steps: [],
   at: 0,
   hidden: false,
+  done: false,
   box: null,
   point: (box) => set({ box }),
   start: () =>
@@ -111,9 +116,10 @@ export const useTour = create<TourState>()((set, get) => ({
       ),
       at: 0,
       hidden: false,
+      done: false,
       box: null,
     }),
-  end: () => set({ steps: [], at: 0, hidden: false, box: null }),
+  end: () => set({ steps: [], at: 0, hidden: false, done: false, box: null }),
   move: (by) => {
     const { steps, at } = get();
     let next = at + by;
@@ -131,6 +137,7 @@ export const useTour = create<TourState>()((set, get) => ({
       });
   },
   hide: (hidden) => set({ hidden }),
+  finish: () => set({ hidden: true, done: true }),
 }));
 
 // what Kenji is pointing at just now, for the thing itself to show it
