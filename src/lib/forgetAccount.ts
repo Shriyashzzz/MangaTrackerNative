@@ -20,9 +20,11 @@ export function forgetAccountData() {
   usePrefs.getState().reset();
   usePlan.getState().reset();
   // a theme being tried on ends with the account (its timer would otherwise
-  // offer Premium to someone signed out). The one picked stays on the phone
-  // for when a Premium reader signs in again
+  // offer Premium to someone signed out)
   useLook.getState().takeOff();
+  // and the theme picked here goes with the account, so the next one to
+  // sign in on this phone starts on the app's own look
+  useLook.getState().pick(null);
   // what was kept for offline: the last shelf, the pages they opened, and changes not sent yet
   removeLocal(KEPT_SHELF);
   removeLocal(KEPT_TOTALS);

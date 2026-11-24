@@ -162,10 +162,12 @@ export const useLook = create<LookState>()((set) => ({
   tryOn: (theme) => {
     if (tryTimer) clearTimeout(tryTimer);
     set({ trying: theme, tryUntil: Date.now() + TRY_FOR_MS });
-    // time's up: their own look again, and Premium offered to keep it
+    // time's up: their own look again, and Premium offered (not to someone
+    // who has it by now: they'd be shown their member card out of nowhere)
     tryTimer = setTimeout(() => {
       set({ trying: null, tryUntil: 0 });
-      usePlan.getState().showCollector("theme");
+      const plan = usePlan.getState();
+      if (plan.plan.plan === "free") plan.showCollector("theme");
     }, TRY_FOR_MS);
   },
   takeOff: () => {
@@ -174,6 +176,17 @@ export const useLook = create<LookState>()((set) => ({
     set({ trying: null, tryUntil: 0 });
   },
 }));
+
+// Just subscribed (the plan goes from a free one with limits to Premium):
+// a theme being tried ends, and none is put on for them, not even one left
+// picked on this phone. They start on the app's own look and choose
+usePlan.subscribe((now, before) => {
+  const wasFree = before.plan.plan === "free" && before.plan.limited;
+  if (wasFree && now.plan.plan !== "free") {
+    useLook.getState().takeOff();
+    useLook.getState().pick(null);
+  }
+});
 
 // once the device store is read (app/_layout.tsx)
 export function loadLook() {

@@ -96,6 +96,14 @@ export default function ThemeBackdrop({ theme }: { theme: MangaTheme }) {
       </>
     );
   } else if (theme === "shojo") {
+    // the top corner: a soft pink glow with a cluster of sparkles, as a
+    // shojo page's corner blooms
+    const corner: [number, number, number][] = [
+      [w - 64, 92, 26],
+      [w - 34, 128, 14],
+      [w - 98, 136, 12],
+      [w - 46, 62, 10],
+    ];
     const sparks: [number, number, number][] = [
       [0.84, 0.18, 18],
       [0.78, 0.21, 10],
@@ -106,6 +114,30 @@ export default function ThemeBackdrop({ theme }: { theme: MangaTheme }) {
     ];
     art = (
       <>
+        <Svg
+          width={300}
+          height={300}
+          style={{ position: "absolute", right: -110, top: -90 }}
+        >
+          <Defs>
+            <RadialGradient id="bloom" cx="50%" cy="50%" r="50%">
+              <Stop offset="0" stopColor={c.accent} stopOpacity={0.22} />
+              <Stop offset="1" stopColor={c.accent} stopOpacity={0} />
+            </RadialGradient>
+          </Defs>
+          <Circle cx={150} cy={150} r={150} fill="url(#bloom)" />
+        </Svg>
+        {corner.map(([x, y, s], i) => (
+          <Svg
+            key={`c${i}`}
+            width={s}
+            height={s}
+            viewBox="0 0 24 24"
+            style={{ position: "absolute", left: x, top: y, opacity: 0.7 }}
+          >
+            <Path d={SPARKLE} fill={c.star} />
+          </Svg>
+        ))}
         {sparks.map(([x, y, s], i) => (
           <Svg
             key={i}
@@ -135,7 +167,19 @@ export default function ThemeBackdrop({ theme }: { theme: MangaTheme }) {
     // rain, and a brush circle half off the left
     art = (
       <>
-        <Svg width={w} height={h} style={faint(0.06)}>
+        <Svg
+          width={260}
+          height={120}
+          viewBox="0 0 260 120"
+          style={{ position: "absolute", right: -40, top: 2, opacity: 0.2 }}
+        >
+          {/* an ink brush stroke, thick to thin, as if dragged across */}
+          <Path
+            d="M8 86 C 60 40, 140 26, 252 18 C 150 44, 80 70, 20 100 Z"
+            fill={c.ink}
+          />
+        </Svg>
+        <Svg width={w} height={h} style={faint(0.08)}>
           {Array.from({ length: Math.ceil(w / 22) + 10 }, (_, i) => (
             <Line
               key={i}
@@ -186,9 +230,9 @@ export default function ThemeBackdrop({ theme }: { theme: MangaTheme }) {
         viewBox="0 0 100 100"
         style={{
           position: "absolute",
-          right: -80,
-          top: h * 0.42,
-          opacity: 0.16,
+          right: -90,
+          top: -60,
+          opacity: 0.24,
         }}
       >
         <Circle
@@ -239,13 +283,13 @@ export default function ThemeBackdrop({ theme }: { theme: MangaTheme }) {
         <View
           style={{
             position: "absolute",
-            right: -50,
-            top: h * 0.16,
-            width: 200,
-            height: 200,
-            borderRadius: 100,
+            right: -70,
+            top: -70,
+            width: 230,
+            height: 230,
+            borderRadius: 115,
             backgroundColor: c.star,
-            opacity: 0.1,
+            opacity: 0.18,
           }}
         />
         <Sfx
@@ -302,7 +346,7 @@ export default function ThemeBackdrop({ theme }: { theme: MangaTheme }) {
   } else if (theme === "sports") {
     art = (
       <>
-        <Svg width={w} height={h} style={faint(0.06)}>
+        <Svg width={w} height={h} style={faint(0.08)}>
           {Array.from({ length: Math.ceil(w / 76) }, (_, i) => (
             <Line
               key={i}
@@ -318,14 +362,14 @@ export default function ThemeBackdrop({ theme }: { theme: MangaTheme }) {
         <View
           style={{
             position: "absolute",
-            left: -40,
-            top: h * 0.5,
-            width: 240,
-            height: 240,
-            borderRadius: 120,
-            borderWidth: 3,
+            right: -80,
+            top: -80,
+            width: 260,
+            height: 260,
+            borderRadius: 130,
+            borderWidth: 4,
             borderColor: c.accent,
-            opacity: 0.25,
+            opacity: 0.3,
           }}
         />
         <Sfx
@@ -341,7 +385,63 @@ export default function ThemeBackdrop({ theme }: { theme: MangaTheme }) {
     // mecha: a blueprint grid
     art = (
       <>
-        <Svg width={w} height={h} style={faint(0.07)}>
+        <Svg
+          width={104}
+          height={104}
+          viewBox="0 0 120 120"
+          style={{ position: "absolute", right: 4, top: -30, opacity: 0.34 }}
+        >
+          {/* a targeting reticle: four corner brackets and a crosshair */}
+          {[
+            "M4 26 V4 H26",
+            "M94 4 H116 V26",
+            "M116 94 V116 H94",
+            "M26 116 H4 V94",
+          ].map((d) => (
+            <Path key={d} d={d} fill="none" stroke={c.accent} strokeWidth={3} />
+          ))}
+          <Circle
+            cx={60}
+            cy={60}
+            r={18}
+            fill="none"
+            stroke={c.accent}
+            strokeWidth={2}
+          />
+          <Line
+            x1={60}
+            y1={30}
+            x2={60}
+            y2={50}
+            stroke={c.accent}
+            strokeWidth={2}
+          />
+          <Line
+            x1={60}
+            y1={70}
+            x2={60}
+            y2={90}
+            stroke={c.accent}
+            strokeWidth={2}
+          />
+          <Line
+            x1={30}
+            y1={60}
+            x2={50}
+            y2={60}
+            stroke={c.accent}
+            strokeWidth={2}
+          />
+          <Line
+            x1={70}
+            y1={60}
+            x2={90}
+            y2={60}
+            stroke={c.accent}
+            strokeWidth={2}
+          />
+        </Svg>
+        <Svg width={w} height={h} style={faint(0.1)}>
           {Array.from({ length: Math.ceil(w / 26) }, (_, i) => (
             <Line
               key={`v${i}`}

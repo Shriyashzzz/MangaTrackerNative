@@ -100,7 +100,7 @@ function speech(
     shout,
     line:
       reason === "theme"
-        ? "Premium keeps your theme for good, with all eight to pick from."
+        ? "With Premium, all eight themes are yours to pick from in Appearance."
         : "Premium takes the limits off. What you have stays yours.",
   };
 }

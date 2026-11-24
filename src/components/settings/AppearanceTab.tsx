@@ -47,7 +47,9 @@ function ThemeCard({
       // its own corners, as it would wear them
       style={{ backgroundColor: paper, borderRadius: t.corners.panel }}
     >
-      <View className="gap-1 px-3 pt-3 pb-2.5">
+      {/* where it's locked, room under the words for the PREMIUM stamp on
+          the bar, so the line keeps the card's whole width */}
+      <View className={`gap-1 px-3 pt-3 ${locked ? "pb-5" : "pb-2.5"}`}>
         <Text
           numberOfLines={1}
           adjustsFontSizeToFit
@@ -60,8 +62,7 @@ function ThemeCard({
         </Text>
         <Text
           numberOfLines={2}
-          // room on the right for the PREMIUM stamp
-          className={`font-body text-[12px] leading-[16px] ${locked ? "pr-[58px]" : ""}`}
+          className="font-body text-[12px] leading-[16px]"
           style={{ color: ink, opacity: 0.75 }}
         >
           {t.tagline}
