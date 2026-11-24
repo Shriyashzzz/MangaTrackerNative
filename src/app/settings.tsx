@@ -111,6 +111,8 @@ export default function SettingsScreen() {
       {/* the tabs, as Android lays them along the top: the open one underlined */}
       <View className="h-[52px] border-b border-line-soft">
         <ScrollView
+          // on a wide screen the tabs keep to the page's column
+          style={columnStyle}
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerClassName="px-2"

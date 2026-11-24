@@ -70,7 +70,6 @@ export default function TabsLayout() {
       // switch to: a sidebar of five places only took room from the page.
       // A phone keeps its bar along the foot
       sidebarAdaptable={false}
-      preferredPlacement="tabBar"
     >
       <NativeTabs.Trigger name="(shelf)">
         <NativeTabs.Trigger.Icon

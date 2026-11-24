@@ -3,14 +3,20 @@
 // on an iPhone, Material's bar on Android), and its words in a scroll. A
 // page that searches gets the header's own search bar. The pieces the
 // content pages are set in: a heading, a paragraph, a list line
-import { columnStyle } from "@/lib/wide";
+import { columnStyle, useWide } from "@/lib/wide";
 import { openOutside } from "@/lib/openOutside";
 import PullPage, { pause, usePullTop } from "@/components/PullRefresh";
 import Backdrop from "@/components/Backdrop";
 import { useColors } from "@/lib/colors";
+import { themeOf, useWornTheme } from "@/lib/mangaThemes";
+
 import { Stack } from "expo-router";
 import type { ReactNode } from "react";
 import { Platform, ScrollView, Text, View } from "react-native";
+
+// the app's lettering for a page's title: Bangers, or a worn manga theme's
+// own face, as the tabs' own headings have it
+const BRAND_FONT = "Bangers_400Regular";
 
 export type PageSearch = {
   placeholder: string;
@@ -46,28 +52,39 @@ export default function Page({
   const pull = usePullTop();
   const c = useColors();
   const ios = Platform.OS === "ios";
+  const worn = useWornTheme();
+  const { wide } = useWide();
+  const titleFont = worn ? themeOf(worn)!.font : BRAND_FONT;
   return (
     <View className="flex-1 bg-paper">
       <Backdrop />
       <Stack.Screen
         options={{
           headerShown: true,
-          title: ios ? title : title.toUpperCase(),
+          title: title.toUpperCase(),
           headerTitleAlign: "left",
-          headerLargeTitle: ios,
+          // a large title on a phone; on a wide screen the small one, in the
+          // middle over the centred column, rather than at the far left
+          headerLargeTitle: ios && !wide,
           headerTransparent: ios,
           headerBlurEffect: "systemChromeMaterial",
           headerStyle: { backgroundColor: c.paper },
           headerLargeStyle: { backgroundColor: c.paper },
           headerTintColor: c.ink,
+          // in the app's lettering, as every other heading is (the large
+          // title as it starts, the small one as the page scrolls)
           headerTitleStyle: ios
-            ? { color: c.ink }
+            ? { color: c.ink, fontFamily: titleFont, fontSize: 22 }
             : {
                 color: c.ink,
                 fontFamily: "Bangers_400Regular",
                 fontSize: 24,
               },
-          headerLargeTitleStyle: { color: c.ink },
+          headerLargeTitleStyle: {
+            color: c.ink,
+            fontFamily: titleFont,
+            fontSize: 38,
+          },
           headerShadowVisible: false,
           headerBackButtonDisplayMode: "minimal",
           headerRight: right ? () => right : undefined,
