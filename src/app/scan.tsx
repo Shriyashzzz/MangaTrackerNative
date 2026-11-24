@@ -27,6 +27,7 @@ import { CheckIcon, CloseIcon, TorchIcon } from "@/core/components/icons/Icons";
 import { isbnFromTyped } from "@/core/lib/barcode";
 import { editScan, shelveScan, type ScanResult } from "@/core/lib/scan";
 import { useShelf } from "@/store/shelf";
+import Mascot from "@/components/Mascot";
 
 const Safe = withUniwind(SafeAreaView);
 
@@ -313,12 +314,21 @@ export default function ScanScreen() {
       <ScrollView
         className="mt-3 flex-1 rounded-t-2xl bg-paper"
         contentContainerClassName="px-4 pt-3 pb-6"
-        contentContainerStyle={columnStyle}
+        // nothing yet: the list's first look sits in the middle of its panel
+        contentContainerStyle={
+          rows.length ? columnStyle : { ...columnStyle, flexGrow: 1 }
+        }
       >
         {!rows.length ? (
-          <Text className="py-6 text-center font-body text-[14px] text-muted">
-            Nothing scanned yet
-          </Text>
+          <View className="flex-1 items-center justify-center gap-2 py-6">
+            <Mascot mood="happy" width={64} />
+            <Text className="font-body-semibold text-[16px] text-ink">
+              Nothing scanned yet
+            </Text>
+            <Text className="max-w-[280px] text-center font-body text-[14px] leading-[20px] text-ink-soft">
+              Each book you scan lands here, ready to add to your shelf.
+            </Text>
+          </View>
         ) : null}
         {rows.map((row) => (
           <ScanRow

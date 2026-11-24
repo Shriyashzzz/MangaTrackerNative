@@ -36,7 +36,13 @@ export default function EmptyShelf() {
       style={corners.panel}
     >
       <Mascot mood="happy" width={76} />
-      <Text className="mt-3 font-brand pr-[6px] text-[36px] leading-[38px] tracking-[1px] text-ink uppercase">
+      {/* one line in every theme's lettering: a wide face shrinks to fit */}
+      <Text
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.6}
+        className="mt-3 self-stretch text-center font-brand pr-[6px] text-[36px] leading-[40px] tracking-[1px] text-ink uppercase"
+      >
         Start your shelf{" "}
       </Text>
       <View className="mt-6 w-full max-w-[340px] gap-5">

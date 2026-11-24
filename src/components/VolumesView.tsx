@@ -131,7 +131,11 @@ export default function VolumesView({
               {plural(volumes, "volume")} across{" "}
               {plural(manga.length, "series", "series")}
             </Text>
-            {tools ? <ShelfTotals tools={tools} owned={volumes} /> : null}
+            {/* nothing owned yet: no worth to show (a total saved from
+                before would otherwise linger over an empty shelf) */}
+            {tools && volumes > 0 ? (
+              <ShelfTotals tools={tools} owned={volumes} />
+            ) : null}
           </View>
         }
         ListEmptyComponent={

@@ -24,7 +24,12 @@ export default function SignInPrompt({
         style={corners.panel}
       >
         <Mascot mood="happy" width={88} />
-        <Text className="font-brand pr-[7px] text-[30px] tracking-[1px] text-ink uppercase">
+        <Text
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.6}
+          className="self-stretch text-center font-brand pr-[7px] text-[30px] tracking-[1px] text-ink uppercase"
+        >
           {title}
           {" "}
         </Text>
