@@ -10,6 +10,7 @@ import { KEPT_SHELF, KEPT_TOTALS, useShelf } from "@/store/shelf";
 import { removeLocal } from "./deviceStore";
 import { forgetAnswers } from "./keptAnswers";
 import { useToBuy } from "@/store/toBuy";
+import { useLook } from "./mangaThemes";
 
 export function forgetAccountData() {
   useShelf.getState().reset();
@@ -18,6 +19,10 @@ export function forgetAccountData() {
   useBookImport.getState().clear();
   usePrefs.getState().reset();
   usePlan.getState().reset();
+  // a theme being tried on ends with the account (its timer would otherwise
+  // offer Premium to someone signed out). The one picked stays on the phone
+  // for when a Premium reader signs in again
+  useLook.getState().takeOff();
   // what was kept for offline: the last shelf, the pages they opened, and changes not sent yet
   removeLocal(KEPT_SHELF);
   removeLocal(KEPT_TOTALS);

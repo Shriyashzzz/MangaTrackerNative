@@ -7,6 +7,8 @@ import { Platform } from "react-native";
 import { readLocal, removeLocal, writeLocal } from "@/lib/deviceStore";
 import { create } from "zustand";
 import { usePlan } from "@/store/plan";
+import { useAuth } from "@/store/auth";
+import { isDemo as inPractice } from "@/core/lib/demo";
 
 export type MangaTheme =
   | "shonen"
@@ -185,11 +187,17 @@ export const themeOf = (id: MangaTheme | null) =>
 // the theme being worn now: one picked here, on an iPhone, with Premium
 // (where the limits hold, a free account wears none)
 // or one a free reader is trying on for two minutes
+// Signed out (or on the practice shelf) there's never one: the app's own
+// look. Signed in, Premium (paid or early) wears the one picked here; a free
+// account wears none, save the one it's trying on. Premium is the plan
+// itself, not "nothing locked" (what a signed-out or loading plan says), so
+// a theme never shows for someone who doesn't have it
 export function useWornTheme(): MangaTheme | null {
   const picked = useLook((s) => s.picked);
   const trying = useLook((s) => s.trying);
-  const premium = usePlan((s) => !s.plan.limited);
-  if (!THEMES_HERE) return null;
+  const signedIn = useAuth((s) => Boolean(s.isSignedIn));
+  const premium = usePlan((s) => s.plan.plan !== "free");
+  if (!THEMES_HERE || !signedIn || inPractice()) return null;
   return premium ? picked : trying;
 }
 
