@@ -11,7 +11,8 @@ import Tap from "@/components/Tap";
 import { openOutside } from "@/lib/openOutside";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { ScrollView, Share, Text, View } from "react-native";
+import { Alert, ScrollView, Share, Text, View } from "react-native";
+import { BLOCK_TITLE, BLOCK_WHAT, blockReader } from "@/core/lib/blocks";
 import Avatar from "@/components/Avatar";
 import Button from "@/components/Button";
 import Mascot from "@/components/Mascot";
@@ -285,6 +286,21 @@ function FollowBar({
   const [on, setOn] = useState(following);
   const [saving, setSaving] = useState(false);
   const [failed, setFailed] = useState("");
+  // Block: asked first; the shelf then closes to them both, so off to Friends
+  const block = () =>
+    Alert.alert(BLOCK_TITLE, BLOCK_WHAT, [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Block",
+        style: "destructive",
+        onPress: () => {
+          setFailed("");
+          blockReader({ shareCode: code })
+            .then(() => router.replace("/friends"))
+            .catch((e: Error) => setFailed(e.message));
+        },
+      },
+    ]);
   const flip = async () => {
     setSaving(true);
     setFailed("");
@@ -321,6 +337,16 @@ function FollowBar({
         disabled={saving}
         onPress={() => void flip()}
       />
+      <Tap
+        onPress={block}
+        hitSlop={8}
+        accessibilityRole="button"
+        accessibilityLabel={`Block ${name}`}
+      >
+        <Text className="font-body text-[13px] text-muted underline">
+          Block
+        </Text>
+      </Tap>
       {failed ? (
         <Text className="font-body text-[13px] text-accent">{failed}</Text>
       ) : null}

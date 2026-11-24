@@ -106,6 +106,7 @@ const ENTRIES = [
   // the menu's pages: FAQ, Friends, the contact address
   "lib/content/faq.ts",
   "lib/friends.ts",
+  "lib/blocks.ts",
   "lib/contact.ts",
   // To buy's "Out Dec 3", and a volume page's rules
   "pages/Prices/volumePageRules.ts",

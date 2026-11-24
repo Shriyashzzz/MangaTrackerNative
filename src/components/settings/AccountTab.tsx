@@ -19,6 +19,7 @@ import Button from "../Button";
 import { Input } from "../Field";
 import PasswordInput from "../PasswordInput";
 import { Help, Note, Section } from "./parts";
+import BlockedReaders from "./BlockedReaders";
 
 const LINK_NOT_SENT = "We couldn't send the link. Try again in a minute.";
 type NoteOf = { text: string; failed?: boolean } | null;
@@ -211,6 +212,7 @@ export default function AccountTab({ account }: { account: Account }) {
           </View>
         </Section>
       </TourTarget>
+      <BlockedReaders />
       <Section title="Delete my account">
         <Help>
           This removes your account and your whole shelf for good. There's no

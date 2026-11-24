@@ -5,7 +5,8 @@
 import { useCorners } from "@/lib/mangaThemes";
 import Tap from "@/components/Tap";
 import { useState } from "react";
-import { Text, View } from "react-native";
+import { Alert, Text, View } from "react-native";
+import { BLOCK_TITLE, BLOCK_WHAT, blockReader } from "@/core/lib/blocks";
 import { timeAgo } from "@/core/lib/prices";
 import {
   deleteReview,
@@ -86,10 +87,13 @@ function ReviewItem({
   review,
   hasRead,
   mayFlag,
+  onBlocked,
 }: {
   review: Review;
   hasRead: boolean;
   mayFlag: boolean;
+  // its writer blocked: the list is asked again, without them
+  onBlocked: () => void;
 }) {
   const [revealed, setRevealed] = useState(false);
   const [sent, setSent] = useState<{ spoiler?: boolean; report?: boolean }>({});
@@ -100,6 +104,21 @@ function ReviewItem({
       setSent((before) => ({ ...before, [kind]: true }));
     else setFailed(true);
   };
+  // Block: asked first (it hides all their reviews), then gone from the list
+  const block = () =>
+    Alert.alert(BLOCK_TITLE, BLOCK_WHAT, [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Block",
+        style: "destructive",
+        onPress: () => {
+          setFailed(false);
+          blockReader({ reviewId: review.id })
+            .then(onBlocked)
+            .catch(() => setFailed(true));
+        },
+      },
+    ]);
   const inkedOut = review.spoiler && !hasRead && !revealed;
   const link = "font-body text-[12.5px] text-muted underline";
   return (
@@ -148,6 +167,9 @@ function ReviewItem({
               <Text className={link}>Report</Text>
             </Tap>
           )}
+          <Tap onPress={block} hitSlop={6} accessibilityRole="button">
+            <Text className={link}>Block</Text>
+          </Tap>
           {failed ? (
             <Text className="font-body text-[12.5px] text-accent">
               That didn't send. Try again.
@@ -302,6 +324,7 @@ export default function VolumeReviews({
                 review={review}
                 hasRead={hasRead}
                 mayFlag={mayWrite !== "sign-in"}
+                onBlocked={() => void reload()}
               />
             ))
           )}
