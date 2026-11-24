@@ -39,6 +39,11 @@ const TAB_PAGES = new Set(["/", "/new", "/prices", "/buy", "/me"]);
 // whole-screen pages with their own bar along the foot (the camera's):
 // Kenji steps out while one is open, and is back after
 const OWN_FOOT = new Set(["/scan"]);
+// the least a bubble moves when it must: a shorter hop would leave Leave
+// (along its foot) where Next was. A nudge smaller than NUDGE leaves both
+// under the thumb, so it's let be
+const MOVE_AT_LEAST = 80;
+const NUDGE = 16;
 // the air between Kenji and the shelf's floating +
 const PLUS_AIR = 12;
 // the tab bar's height over the home bar: Apple's floating bar, or
@@ -81,6 +86,9 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
   const { height: screen, width } = useWindowDimensions();
   const c = useColors();
   const [height, setHeight] = useState(0);
+  // where the bubble's foot was on the screen, kept from step to step: it
+  // stays there while it can (see "Where the bubble goes")
+  const [held, setHeld] = useState<number | null>(null);
   const tabsOnTop = useTabsOnTop();
   const plusOnShelf = usePlusShown((s) => s.shown) && here === "/";
   const plusTop = usePlusShown((s) => s.top);
@@ -159,12 +167,6 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
           className="min-h-[48px] shrink flex-row items-center gap-3 rounded-full border-[1.5px] border-line bg-card px-4"
           style={{ elevation: 6 }}
         >
-          <Text
-            numberOfLines={1}
-            className="shrink font-mono text-[11.5px] text-muted"
-          >
-            Practice shelf
-          </Text>
           {waysOut}
         </View>
       </View>
@@ -258,20 +260,57 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
           y: screen - insets.bottom - 62,
           height: 62,
         };
-  // Where the bubble goes: under the thing he points at, with its tail up;
-  // over it, tail down, when there's no room under; at the foot, with no
-  // tail, when there's nothing to point at (or it's too tall for either)
-  // (under it, a little more room: Kenji's head rises above the bubble)
-  const under = box ? box.y + box.height + GAP + 14 : 0;
-  const over = box ? box.y - GAP - height : 0;
-  const place: { top?: number; bottom?: number; tail: "up" | "down" | null } =
-    box && height && under + height <= screen - bubbleFoot
-      ? { top: under, tail: "up" }
-      : box && height && over >= insets.top + HEADER
-        ? { top: over, tail: "down" }
-        : // too tall to sit beside: he rests at the foot and still
-          // points up at it
-          { bottom: bubbleFoot, tail: box && height ? "up" : null };
+  // Where the bubble goes, said by where its foot is (its Next and Leave
+  // are along the foot, so they stay put when it does, whatever the line's
+  // length). It stays where it was while that leaves the thing he points
+  // at in sight: Next is still under the thumb. When it has to move: under
+  // the thing, over it when there's no room under, or at the screen's foot
+  // when there's nothing to point at (or it's too tall for either). A move
+  // is never a short hop, which would put Leave where Next just was
+  const highest = insets.top + HEADER;
+  const lowest = screen - bubbleFoot;
+  const clearOfIt = (foot: number) => {
+    if (foot - height < highest || foot > lowest) return false;
+    if (!box) return true;
+    // (under it, a little more room: Kenji's head rises above the bubble)
+    return (
+      foot - height >= box.y + box.height + GAP + 14 || foot <= box.y - GAP
+    );
+  };
+  const fresh = box
+    ? [box.y + box.height + GAP + 14 + height, box.y - GAP].filter(clearOfIt)
+    : [];
+  let footAt: number;
+  if (!height) footAt = lowest;
+  else if (held !== null && clearOfIt(held)) footAt = held;
+  else {
+    const wanted = fresh[0] ?? lowest;
+    const hop = held === null ? 0 : wanted - held;
+    const short = Math.abs(hop) >= NUDGE && Math.abs(hop) < MOVE_AT_LEAST;
+    // a short hop from where it was: on the same way, far enough; or
+    // another place that's clear and far enough; or the hop after all
+    const onTheSameWay =
+      held !== null ? held + Math.sign(hop) * MOVE_AT_LEAST : wanted;
+    const elsewhere = [...fresh, ...(clearOfIt(lowest) ? [lowest] : [])].find(
+      (f) => held !== null && Math.abs(f - held) >= MOVE_AT_LEAST,
+    );
+    footAt = !short
+      ? wanted
+      : clearOfIt(onTheSameWay)
+        ? onTheSameWay
+        : (elsewhere ?? wanted);
+  }
+  // the tail points at the thing: up when it's above the bubble, down when
+  // it's below
+  const tailSide: "up" | "down" | null =
+    !box || !height
+      ? null
+      : box.y + box.height <= footAt - height
+        ? "up"
+        : box.y >= footAt
+          ? "down"
+          : null;
+  const place = { bottom: screen - footAt, tail: tailSide };
   // On a wide screen the bubble is narrower than the screen: it slides
   // towards what he points at (the + in the corner, a tab), as far as the
   // screen's edge allows, so the tail can reach it. On a phone it spans the
@@ -298,10 +337,14 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
     <Animated.View
       pointerEvents="box-none"
       className="absolute"
-      style={{ top: place.top, bottom: place.bottom, left, right }}
+      style={{ bottom: place.bottom, left, right }}
       // it glides to its next place: a hop would read as a stutter
       layout={LinearTransition.duration(180)}
-      onLayout={(e) => setHeight(e.nativeEvent.layout.height)}
+      onLayout={(e) => {
+        const { y, height: tall } = e.nativeEvent.layout;
+        setHeight(tall);
+        setHeld(y + tall);
+      }}
       onTouchStart={touchIsKenjis}
     >
       <View
@@ -354,9 +397,8 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
         </View>
         {/* it's a practice shelf: said once, quietly, with the ways out */}
         <View className="mt-2.5 flex-row items-center gap-3 border-t border-dotted border-line-soft pt-2">
-          {/* on a narrow phone it wraps, so the ways out stay in the bubble */}
           <Text className="mr-auto shrink font-mono text-[11.5px] text-muted">
-            Practice shelf. Nothing is kept.
+            Practice shelf
           </Text>
           {waysOut}
         </View>
