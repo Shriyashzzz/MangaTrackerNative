@@ -204,6 +204,7 @@ export default function RootLayout() {
                 <Stack.Screen name="to-buy" />
                 <Stack.Screen name="new-releases" />
                 <Stack.Screen name="friends" />
+                <Stack.Screen name="blocked" />
                 <Stack.Screen name="import" />
                 <Stack.Screen name="calendar" />
                 <Stack.Screen name="year" />
