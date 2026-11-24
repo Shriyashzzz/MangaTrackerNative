@@ -56,6 +56,7 @@ import { phoneAlertsOn } from "@/lib/phoneAlerts";
 import { usePrefs } from "@/store/prefs";
 import { useShelf } from "@/store/shelf";
 import { useToBuy } from "@/store/toBuy";
+import LoadingQuote from "@/components/LoadingQuote";
 
 const Safe = withUniwind(SafeAreaView);
 
@@ -562,9 +563,12 @@ export function ToBuyScreen({ inTab = false }: { inTab?: boolean }) {
   const [pickingSort, setPickingSort] = useState(false);
   const pull = usePullTop();
   const scroller = useAnimatedRef<Animated.ScrollView>();
+  // asked for when there's no list: on opening, and again whenever it's
+  // cleared (signing out and in, the practice shelf starting), as this tab
+  // stays open behind the others and wouldn't otherwise ask again
   useEffect(() => {
-    void load();
-  }, [load]);
+    if (list === null) void load();
+  }, [list, load]);
 
   // On my shelf, Ordered and Remove take the book off the screen at once
   // and tell the server after: waiting on the answer (and on the whole
@@ -698,7 +702,12 @@ export function ToBuyScreen({ inTab = false }: { inTab?: boolean }) {
   return (
     <Safe edges={["top"]} className="flex-1 bg-paper">
       <Backdrop />
-      <View className="h-[62px] flex-row items-center gap-3 px-2">
+      {/* on a wide screen the title keeps to the list's column, as the
+          shelf's does */}
+      <View
+        className="h-[62px] flex-row items-center gap-3 px-2"
+        style={columnStyle}
+      >
         {inTab ? (
           <View className="w-2" />
         ) : (
@@ -740,6 +749,8 @@ export function ToBuyScreen({ inTab = false }: { inTab?: boolean }) {
           onScroll={pull.track}
         >
           {items?.length ? <LimitCount what="priceAlerts" /> : null}
+          {/* on its way: the loading quote, not a blank page */}
+          {!items && !loadFailed ? <LoadingQuote /> : null}
           {!items && loadFailed ? (
             <View className="items-center gap-3 py-8">
               <Mascot mood="panic" width={100} />
