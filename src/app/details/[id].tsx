@@ -14,8 +14,14 @@ import Tap from "@/components/Tap";
 import { isNetworkError } from "@/core/lib/offline";
 import PullPage, { usePullTop } from "@/components/PullRefresh";
 import Backdrop from "@/components/Backdrop";
-import { router, useLocalSearchParams } from "expo-router";
-import { type ComponentRef, useEffect, useRef, useState } from "react";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import {
+  type ComponentRef,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Alert, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
@@ -100,6 +106,17 @@ export default function DetailsScreen() {
   const [manga, setManga] = useState<Manga | null>(null);
   const [failed, setFailed] = useState<string | null>(null);
   const [loadTry, setLoadTry] = useState(0);
+  // back on this page from one it opened (Edit details, a price page): the
+  // series is asked for again, so a change made there (a new cover, a new
+  // name) shows here at once rather than only on the shelf. What's shown
+  // stays meanwhile
+  const shownBefore = useRef(false);
+  useFocusEffect(
+    useCallback(() => {
+      if (shownBefore.current) setLoadTry((n) => n + 1);
+      shownBefore.current = true;
+    }, []),
+  );
   const [releaseData, setReleaseData] = useState<ReleaseData | null>(null);
   const [releaseStatus, setReleaseStatus] = useState<ReleaseStatus | null>(
     null,
