@@ -86,6 +86,9 @@ const ENTRIES = [
   "lib/booksApi.ts",
   "lib/titleKey.ts",
   "lib/anilist.ts",
+  // covers for series that came in without one (a scan, an import): found
+  // on AniList by the shelf and saved, as the website's shelf does
+  "lib/coverFill.ts",
   "lib/formChecks.ts",
   "lib/seriesFormRules.ts",
   "lib/content/genres.ts",

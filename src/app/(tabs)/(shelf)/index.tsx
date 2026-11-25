@@ -3,6 +3,8 @@
 // a row per series. Pull down to load it again. Volumes is its own view
 // (VolumesView). Who's in each tab, the search and the sort are the web's own
 // rules (core filterShelf); it opens on the tab and sort the account chose
+import { isDemo } from "@/core/lib/demo";
+import { fillCovers } from "@/core/lib/coverFill";
 import { DENSE } from "@/lib/textScale";
 import { useCorners } from "@/lib/mangaThemes";
 import { useLimit } from "@/components/LimitCount";
@@ -81,6 +83,26 @@ function SignedInShelf() {
   const insets = useSafeAreaInsets();
   const tabsOnTop = useTabsOnTop();
   const manga = useShelf((s) => s.manga);
+  // covers for series that came in without one (a scan, an import): looked
+  // up once per visit in the background, each shown as soon as it's found
+  // (core lib/coverFill.ts, the website's own). Never on the practice shelf
+  const hasManga = Boolean(manga?.length);
+  useEffect(() => {
+    if (!hasManga || isDemo()) return;
+    const controller = new AbortController();
+    void fillCovers(
+      useShelf.getState().manga ?? [],
+      controller.signal,
+      (id, cover) =>
+        useShelf.setState((state) => ({
+          manga:
+            state.manga?.map((m) =>
+              m.id === id ? { ...m, image: cover } : m,
+            ) ?? null,
+        })),
+    );
+    return () => controller.abort();
+  }, [hasManga]);
   const failed = useShelf((s) => s.failed);
   const load = useShelf((s) => s.load);
   const releases = useShelf((s) => s.releases);
