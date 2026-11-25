@@ -535,17 +535,15 @@ export default function DetailsScreen() {
                 >
                   {statusWord}
                 </Text>
-                {[m.lightNovel ? "Novel" : null, genre]
-                  .filter(Boolean)
-                  .map((chip) => (
-                    <Text
-                      maxFontSizeMultiplier={DENSE}
-                      key={chip}
-                      className="rounded-[2px] border-[1.5px] border-line-soft px-2 py-0.5 font-body-medium text-[13px] text-ink-soft"
-                    >
-                      {chip}
-                    </Text>
-                  ))}
+                {[genre].filter(Boolean).map((chip) => (
+                  <Text
+                    maxFontSizeMultiplier={DENSE}
+                    key={chip}
+                    className="rounded-[2px] border-[1.5px] border-line-soft px-2 py-0.5 font-body-medium text-[13px] text-ink-soft"
+                  >
+                    {chip}
+                  </Text>
+                ))}
               </View>
               {/* the edition they collect, under the chips: its label says what
                 it is, the value is the tap. The shelf, the counter and Buy

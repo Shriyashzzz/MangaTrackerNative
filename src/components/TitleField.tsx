@@ -1,6 +1,7 @@
 // The add page's title box with AniList's matches under it (the web's
 // pages/AddManga/TitleField.tsx): a list of covers and names to pick from,
 // "Did you mean" for a typo, and "Add as typed" to keep their own words
+import LightNovelBand from "@/components/LightNovelBand";
 import TextBox from "@/components/TextBox";
 import Tap from "@/components/Tap";
 import { Image } from "expo-image";
@@ -77,11 +78,15 @@ export default function TitleField({
                 onPress={() => onPick(hit)}
                 className="flex-row items-center gap-3 border-b border-line-soft px-3 py-2 active:bg-accent-wash"
               >
-                <Image
-                  source={{ uri: hit.cover }}
-                  style={{ width: 32, height: 48, borderRadius: 2 }}
-                  contentFit="cover"
-                />
+                {/* a novel: the band on its cover says so, as everywhere */}
+                <View className="overflow-hidden rounded-[2px]">
+                  <Image
+                    source={{ uri: hit.cover }}
+                    style={{ width: 32, height: 48 }}
+                    contentFit="cover"
+                  />
+                  {hit.lightNovel ? <LightNovelBand width={32} /> : null}
+                </View>
                 <View className="min-w-0 flex-1">
                   <Text
                     numberOfLines={1}
@@ -89,10 +94,9 @@ export default function TitleField({
                   >
                     {hit.title}
                   </Text>
-                  {hit.year || hit.lightNovel ? (
+                  {hit.year ? (
                     <Text className="font-mono text-[12px] text-muted">
-                      {hit.year ?? ""}
-                      {hit.lightNovel ? `${hit.year ? " · " : ""}novel` : ""}
+                      {hit.year}
                     </Text>
                   ) : null}
                 </View>

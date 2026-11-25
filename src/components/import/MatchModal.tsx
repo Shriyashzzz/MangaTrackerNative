@@ -1,6 +1,7 @@
 // Choosing which AniList series a book is, and how many volumes of it they
 // own (the web's pages/Import/MatchModal.tsx), in a sheet: search AniList as
 // they type, the hits as a pick-one list, "None of these", then the volumes
+import LightNovelBand from "@/components/LightNovelBand";
 import Tap from "@/components/Tap";
 import { Image } from "expo-image";
 import { useEffect, useState } from "react";
@@ -290,7 +291,10 @@ function Hit({
 }) {
   const meta = [
     hit.year,
-    hit.format ? (FORMATS[hit.format] ?? "Other") : null,
+    // (a novel is said by the band on its cover, not in words)
+    hit.format && hit.format !== "NOVEL"
+      ? (FORMATS[hit.format] ?? "Other")
+      : null,
     hit.adult ? "18+" : null,
   ]
     .filter(Boolean)
@@ -303,11 +307,14 @@ function Hit({
       className={`flex-row items-center gap-3 rounded-[4px] border-[1.5px] p-2 ${chosen ? "border-accent bg-accent-wash" : "border-line-soft"}`}
     >
       {hit.cover ? (
-        <Image
-          source={{ uri: hit.cover }}
-          style={{ width: 40, height: 56, borderRadius: 2 }}
-          contentFit="cover"
-        />
+        <View className="overflow-hidden rounded-[2px]">
+          <Image
+            source={{ uri: hit.cover }}
+            style={{ width: 40, height: 56 }}
+            contentFit="cover"
+          />
+          {hit.format === "NOVEL" ? <LightNovelBand width={40} /> : null}
+        </View>
       ) : (
         <View className="h-14 w-10 rounded-[2px] bg-paper-2" />
       )}

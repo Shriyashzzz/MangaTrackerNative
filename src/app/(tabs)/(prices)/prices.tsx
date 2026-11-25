@@ -240,9 +240,11 @@ export default function PricesScreen() {
     /^(\d{13}|\d{9}[\dXx])$/.test(isbnDigits) && !isbnFromTyped(query);
 
   // the box, full screen: suggestions, or the recent searches
+  // (it has no AppHeader to keep the status bar's room on an iPhone or
+  // iPad, so it keeps that room itself)
   if (full)
     return (
-      <Safe edges={IOS ? [] : ["top"]} className="flex-1 bg-paper">
+      <Safe edges={["top"]} className="flex-1 bg-paper">
         <Backdrop />
         <View className="flex-row items-center gap-2 px-2 pt-2 pb-2">
           <Tap
@@ -315,7 +317,6 @@ export default function PricesScreen() {
                     </Text>
                     <Text className="font-mono text-[12px] text-muted">
                       {[
-                        s.lightNovel && "Novel",
                         s.year,
                         s.volumes ? `${s.volumes} vols` : null,
                         s.score ? `★ ${starsOf(s.score)}` : null,

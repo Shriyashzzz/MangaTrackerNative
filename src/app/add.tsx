@@ -4,6 +4,7 @@
 // it in), stars, and under "More about it" the volumes they own, the type,
 // genre and notes. The checks and the request are the web's own (core
 // seriesFormRules); AniList's matches come through core useCoverSearch
+import LightNovelBand from "@/components/LightNovelBand";
 import AppBar, { BAR_EDGES } from "@/components/AppBar";
 import { useCorners } from "@/lib/mangaThemes";
 import { columnStyle } from "@/lib/wide";
@@ -327,9 +328,8 @@ export default function AddScreen() {
   };
 
   const genreName = GENRES.find((g) => g.value === genre)?.label;
-  const meta = [lightNovel ? "Novel" : "Manga", picked?.year, genreName].filter(
-    Boolean,
-  );
+  // (manga or novel is the Type switch's to say, not this line)
+  const meta = [picked?.year, genreName].filter(Boolean);
   const coverShows = Boolean(image) && brokenCover !== image;
   const genreLabel =
     GENRE_OPTIONS.find((g) => g.value === genre)?.label ?? "Select a genre";
@@ -394,17 +394,19 @@ export default function AddScreen() {
             {/* what they picked: cover, name, what we know of it, Change */}
             <View className="flex-row gap-3 rounded-[4px] border-[1.5px] border-line-soft bg-card p-3">
               {coverShows ? (
-                <Image
-                  source={{ uri: image }}
-                  style={{
-                    width: 56,
-                    aspectRatio: 2 / 3,
-                    borderWidth: 1.5,
-                    borderColor: c.line,
-                  }}
-                  contentFit="cover"
-                  onError={() => setBrokenCover(image)}
-                />
+                // a novel: the band across its cover says so, as everywhere
+                <View
+                  className="overflow-hidden"
+                  style={{ borderWidth: 1.5, borderColor: c.line }}
+                >
+                  <Image
+                    source={{ uri: image }}
+                    style={{ width: 56, aspectRatio: 2 / 3 }}
+                    contentFit="cover"
+                    onError={() => setBrokenCover(image)}
+                  />
+                  {lightNovel ? <LightNovelBand width={56} /> : null}
+                </View>
               ) : (
                 <View
                   style={{
@@ -416,7 +418,7 @@ export default function AddScreen() {
                   }}
                   className="items-center justify-center p-1"
                 >
-                  <Text className="text-center font-mono text-[9.5px] text-muted">
+                  <Text className="text-center font-mono text-[11px] text-muted">
                     {image ? "link not loading" : "no cover"}
                   </Text>
                 </View>

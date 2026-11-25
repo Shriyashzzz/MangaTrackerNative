@@ -282,11 +282,10 @@ export default function VolumeCard({
           {shown.title}
         </Text>
       )}
-      {!bare && (subtitle || shown.lightNovel) ? (
+      {/* (a novel says so on its cover's band, not in words) */}
+      {!bare && subtitle ? (
         <Text numberOfLines={2} className="font-mono text-[11.5px] text-muted">
-          {[shown.lightNovel && "Novel", subtitle && novelParts(subtitle).title]
-            .filter(Boolean)
-            .join(" · ")}
+          {novelParts(subtitle).title}
         </Text>
       ) : null}
       {bare && priceCents == null && isbn13 ? (
