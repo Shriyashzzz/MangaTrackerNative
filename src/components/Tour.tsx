@@ -1,3 +1,6 @@
+// iPHONE AND iPAD: Android keeps its own (Tour.android.tsx, as build 23
+// had it)
+//
 // Kenji's tour of the practice shelf, the app's way: a speech bubble that
 // floats over the page (it never pushes the page about), with Kenji
 // leaning on its corner. It sits right under the thing he's talking about
@@ -39,16 +42,24 @@ const TAB_PAGES = new Set(["/", "/new", "/prices", "/buy", "/me"]);
 // whole-screen pages with their own bar along the foot (the camera's):
 // Kenji steps out while one is open, and is back after
 const OWN_FOOT = new Set(["/scan"]);
-// the least a bubble moves when it must: a shorter hop would leave Leave
-// (along its foot) where Next was. A nudge smaller than NUDGE leaves both
-// under the thumb, so it's let be
+// Leave sits about 40 points under Next: a new step's bubble rising by
+// between these would put Leave where Next just was, under the thumb.
+// Shorter or longer hops, and any hop down, are safe
+const SWAP_FROM = 24;
+const SWAP_TO = 60;
+// when it must not make that hop, how far it moves instead
 const MOVE_AT_LEAST = 80;
-const NUDGE = 16;
+// how far from its spot beside the thing the bubble may be and still point
+// at it with its tail
+const TAIL_REACH = 16;
 // the air between Kenji and the shelf's floating +
 const PLUS_AIR = 12;
 // the tab bar's height over the home bar: Apple's floating bar, or
 // Android's taller one
 const TAB_BAR = Platform.OS === "ios" ? 50 : 80;
+// a tab in the bar along the foot, as Kenji points at it (the iPhone's
+// floating bar is a little taller than its room)
+const FOOT_TAB_HEIGHT = Platform.OS === "ios" ? 62 : 80;
 // the room left between the bubble and what it sits beside (the thing he
 // points at, the tab bar, the screen's foot)
 const GAP = 22;
@@ -88,7 +99,14 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
   const [height, setHeight] = useState(0);
   // where the bubble's foot was on the screen, kept from step to step: it
   // stays there while it can (see "Where the bubble goes")
-  const [held, setHeld] = useState<number | null>(null);
+  // where the bubble's foot is (`foot`, for the step `at`), and where it
+  // was on the step before (`from`): a new step's hop is judged from there,
+  // while within a step the bubble follows its thing as the page settles
+  const [spot, setSpot] = useState<{
+    at: number;
+    foot: number;
+    from: number | null;
+  } | null>(null);
   const tabsOnTop = useTabsOnTop();
   const plusOnShelf = usePlusShown((s) => s.shown) && here === "/";
   const plusTop = usePlusShown((s) => s.top);
@@ -257,8 +275,9 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
         }
       : {
           ...footTab(width),
-          y: screen - insets.bottom - 62,
-          height: 62,
+          // (the bar's own height over the home bar: Android's is taller)
+          y: screen - insets.bottom - FOOT_TAB_HEIGHT,
+          height: FOOT_TAB_HEIGHT,
         };
   // Where the bubble goes, said by where its foot is (its Next and Leave
   // are along the foot, so they stay put when it does, whatever the line's
@@ -269,45 +288,58 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
   // is never a short hop, which would put Leave where Next just was
   const highest = insets.top + HEADER;
   const lowest = screen - bubbleFoot;
+  // (a point's slack: a place worked out from the thing's own edges is
+  // clear of it, whatever fractions the measuring brings)
+  const SLACK = 1;
   const clearOfIt = (foot: number) => {
-    if (foot - height < highest || foot > lowest) return false;
+    if (foot - height < highest - SLACK || foot > lowest + SLACK) return false;
     if (!box) return true;
     // (under it, a little more room: Kenji's head rises above the bubble)
     return (
-      foot - height >= box.y + box.height + GAP + 14 || foot <= box.y - GAP
+      foot - height >= box.y + box.height + GAP + 14 - SLACK ||
+      foot <= box.y - GAP + SLACK
     );
   };
   const fresh = box
     ? [box.y + box.height + GAP + 14 + height, box.y - GAP].filter(clearOfIt)
     : [];
-  let footAt: number;
-  if (!height) footAt = lowest;
-  else if (held !== null && clearOfIt(held)) footAt = held;
-  else {
-    const wanted = fresh[0] ?? lowest;
-    const hop = held === null ? 0 : wanted - held;
-    const short = Math.abs(hop) >= NUDGE && Math.abs(hop) < MOVE_AT_LEAST;
-    // a short hop from where it was: on the same way, far enough; or
-    // another place that's clear and far enough; or the hop after all
-    const onTheSameWay =
-      held !== null ? held + Math.sign(hop) * MOVE_AT_LEAST : wanted;
-    const elsewhere = [...fresh, ...(clearOfIt(lowest) ? [lowest] : [])].find(
-      (f) => held !== null && Math.abs(f - held) >= MOVE_AT_LEAST,
-    );
-    footAt = !short
+  // beside the thing (under it, or over it with no room under), or at the
+  // foot with nothing to point at. A short hop from where it was would put
+  // Leave where Next just was: it stays put then if that leaves the thing
+  // in sight, or moves far enough to be plainly a move
+  const wanted = fresh[0] ?? lowest;
+  // where it was on the step before
+  const held = !spot ? null : spot.at === at ? spot.from : spot.foot;
+  // (only a hop up is a risk: Leave, along the foot, rises to where Next
+  // was. A hop down leaves only the bubble's words there)
+  const hop = held === null ? 0 : wanted - held;
+  const short = hop <= -SWAP_FROM && hop >= -SWAP_TO;
+  // the other side of the thing, if it's clear and far enough
+  const otherSide = fresh.find(
+    (f) => held !== null && Math.abs(f - held) >= MOVE_AT_LEAST,
+  );
+  const higherStill = held !== null ? held - MOVE_AT_LEAST : wanted;
+  const footAt = !height
+    ? lowest
+    : !short || held === null
       ? wanted
-      : clearOfIt(onTheSameWay)
-        ? onTheSameWay
-        : (elsewhere ?? wanted);
-  }
-  // the tail points at the thing: up when it's above the bubble, down when
-  // it's below
+      : clearOfIt(held)
+        ? held
+        : otherSide !== undefined
+          ? otherSide
+          : clearOfIt(higherStill)
+            ? higherStill
+            : wanted;
+  // the tail only when the bubble sits right against the thing: up when
+  // it's just above the bubble, down when just below. Off to one side, no
+  // tail (the ring round the thing shows it)
   const tailSide: "up" | "down" | null =
     !box || !height
       ? null
-      : box.y + box.height <= footAt - height
+      : Math.abs(footAt - height - (box.y + box.height) - (GAP + 14)) <=
+          TAIL_REACH
         ? "up"
-        : box.y >= footAt
+        : Math.abs(box.y - footAt - GAP) <= TAIL_REACH
           ? "down"
           : null;
   const place = { bottom: screen - footAt, tail: tailSide };
@@ -316,7 +348,8 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
   // screen's edge allows, so the tail can reach it. On a phone it spans the
   // screen anyway
   const bubbleWidth = width - 2 * side;
-  const target = box ? box.x + box.width / 2 : width / 2;
+  // (with no tail it has nothing to reach for: it stays in the middle)
+  const target = box && tailSide ? box.x + box.width / 2 : width / 2;
   const left = Math.min(
     Math.max(target - bubbleWidth / 2, SIDE),
     width - bubbleWidth - SIDE,
@@ -343,7 +376,11 @@ export default function Tour({ signedIn }: { signedIn: boolean }) {
       onLayout={(e) => {
         const { y, height: tall } = e.nativeEvent.layout;
         setHeight(tall);
-        setHeld(y + tall);
+        setSpot((was) =>
+          was && was.at === at
+            ? { ...was, foot: y + tall }
+            : { at, foot: y + tall, from: was ? was.foot : null },
+        );
       }}
       onTouchStart={touchIsKenjis}
     >

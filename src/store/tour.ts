@@ -57,6 +57,8 @@ const RINGED = new Set([
   "scan",
   "gaps",
   "gaps-open",
+  "series-cost",
+  "worth",
 ]);
 
 // where the thing he's pointing at is on the screen
