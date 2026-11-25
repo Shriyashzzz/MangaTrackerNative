@@ -3,9 +3,10 @@
 // lettering "ドン" (the default), an ink brush circle, a stack of pages, or manga
 // panels. Which one is the account's choice (Settings, Appearance). Nothing
 // here takes a touch
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useWornTheme } from "@/lib/mangaThemes";
 import ThemeBackdrop from "./ThemeBackdrop";
-import { useWindowDimensions, View } from "react-native";
+import { Platform, useWindowDimensions, View } from "react-native";
 import Svg, {
   ClipPath,
   Defs,
@@ -51,8 +52,34 @@ function isDark(hex: string) {
 export default function Backdrop() {
   // a manga theme brings its own drawing (components/ThemeBackdrop.tsx)
   const worn = useWornTheme();
-  if (worn) return <ThemeBackdrop theme={worn} />;
-  return <ChosenBackdrop />;
+  return (
+    <>
+      {worn ? <ThemeBackdrop theme={worn} /> : <ChosenBackdrop />}
+      <StatusBarCover />
+    </>
+  );
+}
+
+// Android draws the page up under the status bar: there, over the drawing,
+// a strip in the page's paper, so the bar along the top is solid like the
+// header under it. (An iPhone's header already covers it)
+function StatusBarCover() {
+  const c = useColors();
+  const insets = useSafeAreaInsets();
+  if (Platform.OS !== "android") return null;
+  return (
+    <View
+      pointerEvents="none"
+      style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        height: insets.top,
+        backgroundColor: c.paper,
+      }}
+    />
+  );
 }
 
 function ChosenBackdrop() {
