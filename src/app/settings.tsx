@@ -10,7 +10,11 @@ import Tap from "@/components/Tap";
 import PullPage, { usePullTop } from "@/components/PullRefresh";
 import Backdrop from "@/components/Backdrop";
 import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useRef, useState, type ComponentRef } from "react";
+import {
+  KeyboardAwareScrollView,
+  type KeyboardAwareScrollViewRef,
+} from "react-native-keyboard-controller";
+import { useEffect, useRef, useState } from "react";
 import { Platform, ScrollView, Text, View } from "react-native";
 import AppBar, { BAR_EDGES } from "@/components/AppBar";
 import Page from "@/components/Page";
@@ -124,7 +128,7 @@ export default function SettingsScreen() {
   const loadFailed = useAccount((s) => s.loadFailed);
   const load = useAccount((s) => s.load);
   const pull = usePullTop();
-  const page = useRef<ComponentRef<typeof ScrollView>>(null);
+  const page = useRef<KeyboardAwareScrollViewRef>(null);
   // (the tour scrolls this page to what Kenji points at)
   useTourScroll(page, pull.top);
   useEffect(() => {
@@ -212,8 +216,11 @@ export default function SettingsScreen() {
         </>
       )}
       <PullPage refresh={load} scrollTop={pull.top}>
-        <ScrollView
+        {/* moves up with the keyboard, so the field being typed in (the
+            password to delete the account, the email) is never under it */}
+        <KeyboardAwareScrollView
           ref={page}
+          bottomOffset={24}
           contentContainerClassName="gap-7 px-4 pt-5 pb-16"
           contentContainerStyle={columnStyle}
           keyboardShouldPersistTaps="handled"
@@ -245,7 +252,7 @@ export default function SettingsScreen() {
               ) : null}
             </>
           )}
-        </ScrollView>
+        </KeyboardAwareScrollView>
       </PullPage>
     </Safe>
   );
