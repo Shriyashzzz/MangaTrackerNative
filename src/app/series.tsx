@@ -16,6 +16,40 @@ import type { SeriesIndexEntry } from "@/core/lib/types";
 import { useColors } from "@/lib/colors";
 
 const PAGE = 40;
+const CARD_WIDTH = 104;
+// the least room between two cards in a row
+const CARD_GAP = 12;
+
+// Cards in rows, spread across the width. A last row that isn't full keeps
+// to the columns above it (the room it doesn't fill is left empty at the
+// end), rather than its few cards being pushed to the far edges
+function CardGrid({
+  count,
+  children,
+  dim = false,
+}: {
+  count: number;
+  children: React.ReactNode;
+  dim?: boolean;
+}) {
+  const [width, setWidth] = useState(0);
+  const columns = width
+    ? Math.max(1, Math.floor((width + CARD_GAP) / (CARD_WIDTH + CARD_GAP)))
+    : 1;
+  const empty = width ? (columns - (count % columns)) % columns : 0;
+  return (
+    <View
+      onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
+      className="flex-row flex-wrap justify-between"
+      style={{ rowGap: 18, opacity: dim ? 0.5 : 1 }}
+    >
+      {children}
+      {Array.from({ length: empty }, (_, i) => (
+        <View key={`empty${i}`} style={{ width: CARD_WIDTH }} />
+      ))}
+    </View>
+  );
+}
 const letterOf = (name: string) => {
   const first =
     name
@@ -99,7 +133,11 @@ export default function SeriesIndexScreen() {
     [all],
   );
   const card = (s: SeriesIndexEntry) => (
-    <SeriesCard key={s.name} series={cardData.get(s.name)!} width={104} />
+    <SeriesCard
+      key={s.name}
+      series={cardData.get(s.name)!}
+      width={CARD_WIDTH}
+    />
   );
   // A to Z: grouped under their letters
   const groups: [string, SeriesIndexEntry[]][] = [];
@@ -162,21 +200,13 @@ export default function SeriesIndexScreen() {
             style={{ opacity: catchingUp ? 0.5 : 1 }}
           >
             <H2>{letter}</H2>
-            <View
-              className="flex-row flex-wrap justify-between"
-              style={{ rowGap: 18 }}
-            >
-              {list.map(card)}
-            </View>
+            <CardGrid count={list.length}>{list.map(card)}</CardGrid>
           </View>
         ))
       ) : (
-        <View
-          className="flex-row flex-wrap justify-between"
-          style={{ rowGap: 18, opacity: catchingUp ? 0.5 : 1 }}
-        >
+        <CardGrid count={page.length} dim={catchingUp}>
           {page.map(card)}
-        </View>
+        </CardGrid>
       )}
       {shownCount < shown.length ? (
         <Tap
