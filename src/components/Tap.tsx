@@ -11,6 +11,8 @@
 import { Platform, Pressable, type PressableProps } from "react-native";
 import { useRipple } from "@/lib/press";
 import { controlUsed } from "@/lib/tourGo";
+import { useIsOffline } from "@/core/lib/offline";
+import { OFFLINE_OPACITY } from "@/lib/needsConnection";
 
 const ANDROID = Platform.OS === "android";
 // how far the round ripple reaches from the icon's middle
@@ -23,13 +25,31 @@ export default function Tap({
   feel = "ripple",
   className,
   android_ripple,
-  style,
+  style: ownStyle,
+  needsConnection = false,
   ...pressable
 }: PressableProps & {
   className?: string;
   feel?: "ripple" | "round" | "none";
+  // it opens something that needs the connection (a price page)
+  needsConnection?: boolean;
 }) {
   const ripple = useRipple(feel === "round");
+  const offline = useIsOffline();
+  const cut = needsConnection && offline;
+  const style: PressableProps["style"] = cut
+    ? (state) => [
+        typeof ownStyle === "function" ? ownStyle(state) : ownStyle,
+        { opacity: OFFLINE_OPACITY },
+      ]
+    : ownStyle;
+  if (cut) {
+    pressable.disabled = true;
+    pressable.accessibilityState = {
+      ...pressable.accessibilityState,
+      disabled: true,
+    };
+  }
   // (Kenji's tour steps aside when something is pressed: lib/tourGo.ts)
   const { onPress } = pressable;
   const pressed: PressableProps["onPress"] = onPress

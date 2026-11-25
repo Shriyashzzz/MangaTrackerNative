@@ -88,6 +88,7 @@ export default function ReleaseList({
           >
             <Tap
               onPress={() => router.push(`/prices/${v.isbn13}`)}
+              needsConnection
               className="active:opacity-70"
               accessibilityLabel={`${named}: out ${dayName(v.published)}${v.owned ? ", on your shelf" : ""}`}
             >
@@ -97,7 +98,10 @@ export default function ReleaseList({
             </Tap>
             {/* the name and volume, and under them the date to save */}
             <View className="min-w-0 flex-1 justify-between gap-2">
-              <Tap onPress={() => router.push(`/prices/${v.isbn13}`)}>
+              <Tap
+                onPress={() => router.push(`/prices/${v.isbn13}`)}
+                needsConnection
+              >
                 <Text
                   numberOfLines={1}
                   className="font-body-semibold text-[16px] leading-[22px] text-ink"
@@ -131,6 +135,7 @@ export default function ReleaseList({
               ) : (
                 <Tap
                   onPress={() => router.push(`/prices/${v.isbn13}`)}
+                  needsConnection
                   accessibilityRole="button"
                   // an outline, so the date stays the loudest thing in the row
                   className="min-h-[34px] justify-center rounded-full border-[1.5px] border-accent-ink px-3.5 active:opacity-70"

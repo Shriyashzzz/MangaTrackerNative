@@ -1,6 +1,7 @@
 // The shelf for someone not signed in (the web's pages/Home/GuestHero.tsx):
 // what a shelf is for, and the two ways in. Prices stay open to them along
 // the bottom
+import { checkConnection, isOffline } from "@/core/lib/offline";
 import { useTabFoot } from "@/lib/tabHeader";
 import { columnStyle, useWide } from "@/lib/wide";
 import { startPractice } from "@/lib/practice";
@@ -18,6 +19,7 @@ import Animated, {
 } from "react-native-reanimated";
 import Mascot from "./Mascot";
 import {
+  Alert,
   Modal,
   ScrollView,
   Text,
@@ -152,6 +154,9 @@ function StockingShelf() {
 // the box's widest on an iPad
 const TALL_WIDTH = 580;
 
+// how long a tour's start waits to hear whether the connection is there
+const ASK_AT_MOST_MS = 3000;
+
 export default function GuestShelf() {
   const foot = useTabFoot(120);
   // a small screen (an iPhone app in an iPad's window, a small phone): the
@@ -165,8 +170,26 @@ export default function GuestShelf() {
   // pressed: the loader shows first, then the shelf is put together (the
   // work would otherwise hold the press's own frame back)
   const [starting, setStarting] = useState(false);
-  const start = (kind: "reader" | "collector") => {
-    setStarting(true);
+  const start = async (kind: "reader" | "collector") => {
+    // the tour opens covers and prices, which need the connection. Known
+    // to be offline: said at once, in the system's own dialog, and it
+    // doesn't start. Thought to be online: asked once more, for at most a
+    // few seconds (no answer in that time, the tour starts anyway)
+    if (!isOffline()) {
+      setStarting(true);
+      await Promise.race([
+        checkConnection(),
+        new Promise((done) => setTimeout(done, ASK_AT_MOST_MS)),
+      ]);
+    }
+    if (isOffline()) {
+      setStarting(false);
+      Alert.alert(
+        "You're offline",
+        "The tour needs a connection. Try again when you're back.",
+      );
+      return;
+    }
     // (long enough for the window to open and the books to start bouncing:
     // putting the shelf together holds everything else still)
     setTimeout(() => startPractice(kind), 350);
@@ -253,10 +276,13 @@ export default function GuestShelf() {
                 I&apos;ll walk you round a practice shelf.
               </Text>
               <View className="flex-row gap-1.5">
-                <TourButton kind="Reader" onPress={() => start("reader")} />
+                <TourButton
+                  kind="Reader"
+                  onPress={() => void start("reader")}
+                />
                 <TourButton
                   kind="Collector"
-                  onPress={() => start("collector")}
+                  onPress={() => void start("collector")}
                 />
               </View>
               {/* the bubble's tail, pointing at him */}

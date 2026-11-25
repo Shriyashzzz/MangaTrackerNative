@@ -1,6 +1,7 @@
 // One volume on a series' price page, as the Android app's cover grid (web
 // pages/Prices/VolumeCard.tsx): its cover with a "Vol. 5" flag, "Yours" when
 // it's on their shelf, and its price under it, or "check price"
+import { DENSE } from "@/lib/textScale";
 import { coverAt } from "@/lib/coverAt";
 import LightNovelBand from "@/components/LightNovelBand";
 import Tap from "@/components/Tap";
@@ -23,7 +24,11 @@ export default function VolumeTile({
   const c = useColors();
   return (
     <Link href={`/prices/${volume.isbn13}`} asChild>
-      <Tap style={{ width }} className="gap-1 active:opacity-70">
+      <Tap
+        style={{ width }}
+        needsConnection
+        className="gap-1 active:opacity-70"
+      >
         <View>
           <Image
             source={
@@ -46,18 +51,27 @@ export default function VolumeTile({
             <LightNovelBand width={width} />
           ) : null}
           <View className="absolute top-0 left-0 flex-row items-baseline gap-0.5 bg-ink px-1.5">
-            <Text className="font-brand pr-[4px] text-[10px] tracking-[0.5px] text-paper uppercase">
+            <Text
+              maxFontSizeMultiplier={DENSE}
+              className="font-brand pr-[4px] text-[11px] tracking-[0.5px] text-paper uppercase"
+            >
               Vol.
               {"\u00A0"}
             </Text>
-            <Text className="font-brand pr-[4px] text-[15px] text-paper">
+            <Text
+              maxFontSizeMultiplier={DENSE}
+              className="font-brand pr-[4px] text-[15px] text-paper"
+            >
               {volume.volume}
               {"\u00A0"}
             </Text>
           </View>
           {yours ? (
             <View className="absolute bottom-1 left-1 rounded-[2px] border-[1.5px] border-line bg-card px-1">
-              <Text className="font-brand pr-[4px] text-[11px] tracking-[1px] text-ink uppercase">
+              <Text
+                maxFontSizeMultiplier={DENSE}
+                className="font-brand pr-[4px] text-[11px] tracking-[1px] text-ink uppercase"
+              >
                 Yours
                 {"\u00A0"}
               </Text>
@@ -65,6 +79,7 @@ export default function VolumeTile({
           ) : null}
         </View>
         <Text
+          maxFontSizeMultiplier={DENSE}
           numberOfLines={1}
           className="font-mono-medium text-[12px] text-ink"
         >

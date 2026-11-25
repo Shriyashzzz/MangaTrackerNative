@@ -111,6 +111,7 @@ export default function ReleaseModal({
           key={row.key}
           onPress={row.isbn13 ? () => open(row.isbn13!) : undefined}
           disabled={!row.isbn13}
+          needsConnection={Boolean(row.isbn13)}
           className="flex-row items-baseline gap-2 border-t border-dotted border-line-soft py-2.5"
         >
           <Text

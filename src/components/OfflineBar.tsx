@@ -82,7 +82,10 @@ export default function OfflineBar({ signedIn }: { signedIn: boolean }) {
     : sending
       ? `Sending ${changes}…`
       : (note ?? (waiting ? `${changes} waiting to be sent.` : null));
-  if (!said) return null;
+  // offline, nothing is said: what they change is kept and sent once the
+  // connection is back, without a strip along the foot saying so. (This
+  // stays mounted all the same: it's what sends the kept changes)
+  if (!said || offline) return null;
 
   const canOpen = waiting > 0;
   return (

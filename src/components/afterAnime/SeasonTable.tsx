@@ -1,5 +1,6 @@
 // Every season at a glance (the web's SeasonTable.tsx), for a long show: what
 // they watched, the chapter to start at, and the volume to buy, a row each
+import { useNeedsConnection } from "@/lib/needsConnection";
 import Tap from "@/components/Tap";
 import { router } from "expo-router";
 import { Text, View } from "react-native";
@@ -8,7 +9,7 @@ import type { SeriesVolume } from "@/core/lib/types";
 import { bookFor } from "@/core/pages/AfterAnime/bookFor";
 
 const cell = "font-body text-[14px] text-ink";
-const link = "font-body-semibold text-[14px] text-ink underline";
+const linkClass = "font-body-semibold text-[14px] text-ink underline";
 
 function VolumeCell({
   stop,
@@ -19,6 +20,7 @@ function VolumeCell({
   seriesName: string;
   volumes: SeriesVolume[] | null;
 }) {
+  const { link } = useNeedsConnection();
   if (stop.coversAll)
     return (
       <Text accessibilityLabel="Nothing to buy next" className={cell}>
@@ -29,13 +31,13 @@ function VolumeCell({
   if (volume === null)
     return (
       <Text
-        onPress={() =>
+        {...link(() =>
           router.push({
             pathname: "/prices/series",
             params: { name: seriesName },
-          })
-        }
-        className={link}
+          }),
+        )}
+        className={linkClass}
       >
         See volumes
       </Text>
@@ -44,9 +46,9 @@ function VolumeCell({
   if (!book) return <Text className={cell}>{volume}</Text>;
   return (
     <Text
-      onPress={() => router.push(`/prices/${book.isbn13.trim()}`)}
+      {...link(() => router.push(`/prices/${book.isbn13.trim()}`))}
       accessibilityLabel={`${book.inBook ? `Book ${book.inBook.book}` : `Volume ${volume}`} prices`}
-      className={link}
+      className={linkClass}
     >
       {book.inBook ? `Book ${book.inBook.book}` : volume}
     </Text>

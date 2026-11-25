@@ -4,6 +4,8 @@
 // and the highlights: Popular this season, Latest deals, Prices
 // just checked. A search lists the series found, with Did you mean for a
 // typo. The rules are the web's (core findSeries, nearMatches, askedEdition)
+import PricesNeedConnection from "@/components/prices/PricesNeedConnection";
+import { useIsOffline } from "@/core/lib/offline";
 import { useCorners } from "@/lib/mangaThemes";
 import { IOS, useTabFoot } from "@/lib/tabHeader";
 import { columnStyle, gridOf, useWide } from "@/lib/wide";
@@ -141,6 +143,7 @@ function HighlightsStrip() {
 export default function PricesScreen() {
   const corners = useCorners();
   const foot = useTabFoot(40);
+  const offline = useIsOffline();
   const c = useColors();
   const pull = usePullTop();
   // bumped by a pull to refresh: the page's strips load again
@@ -340,6 +343,15 @@ export default function PricesScreen() {
       </Safe>
     );
 
+  // offline: the tab still opens, and says why there are no prices
+  if (offline)
+    return (
+      <Safe edges={IOS ? [] : ["top"]} className="flex-1 bg-paper">
+        <Backdrop />
+        <AppHeader title="Prices" />
+        <PricesNeedConnection />
+      </Safe>
+    );
   return (
     <Safe edges={IOS ? [] : ["top"]} className="flex-1 bg-paper">
       <Backdrop />

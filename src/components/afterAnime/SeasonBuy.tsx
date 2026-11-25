@@ -1,6 +1,7 @@
 // What to buy after a season (the web's pages/AfterAnime/SeasonBuy.tsx): the
 // volume's BuyRow, the one after it for someone who has it, or why there's
 // nothing to point at yet, with the way to every volume
+import { useNeedsConnection } from "@/lib/needsConnection";
 import { router } from "expo-router";
 import { Text, View } from "react-native";
 import type { VolumeOffers } from "@/core/lib/afterAnime";
@@ -24,14 +25,15 @@ const Line = ({ children }: { children: string }) => (
 );
 
 export function AllVolumesLink({ seriesName }: { seriesName: string }) {
+  const { link } = useNeedsConnection();
   return (
     <Text
-      onPress={() =>
+      {...link(() =>
         router.push({
           pathname: "/prices/series",
           params: { name: seriesName },
-        })
-      }
+        }),
+      )}
       className="self-start font-body-semibold text-[15px] text-ink underline"
     >
       {ALL_VOLUMES}
@@ -55,6 +57,7 @@ export default function SeasonBuy({
   seriesCoverUrl: string | null;
   lead?: boolean;
 }) {
+  const { link } = useNeedsConnection();
   const toBuy = buyVolume(stop);
   const book = toBuy !== null && volumes ? bookFor(volumes, toBuy) : null;
   const after = volumeAfter(stop);
@@ -89,7 +92,7 @@ export default function SeasonBuy({
           Already have{" "}
           {book.inBook ? bookShort(book, toBuy!) : `volume ${toBuy}`}?{" "}
           <Text
-            onPress={() => router.push(`/prices/${next.isbn13.trim()}`)}
+            {...link(() => router.push(`/prices/${next.isbn13.trim()}`))}
             className="font-body-semibold text-ink underline"
           >
             {next.inBook ? bookShort(next, after!) : `Volume ${after}`} is next

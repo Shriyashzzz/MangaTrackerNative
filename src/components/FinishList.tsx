@@ -43,12 +43,20 @@ function Row({
 function Link({
   onPress,
   children,
+  needsConnection = false,
 }: {
   onPress: () => void;
   children: React.ReactNode;
+  // it opens a price page (a store's own page doesn't)
+  needsConnection?: boolean;
 }) {
   return (
-    <Tap onPress={onPress} hitSlop={6} className="min-w-0 shrink">
+    <Tap
+      onPress={onPress}
+      needsConnection={needsConnection}
+      hitSlop={6}
+      className="min-w-0 shrink"
+    >
       <Text
         numberOfLines={1}
         className="text-right font-body text-[14px] text-ink-soft underline"
@@ -66,10 +74,18 @@ const Price = ({ cents }: { cents: number }) => (
 function Where({ volume }: { volume: MissingVolume }) {
   const cheapest = volume.cheapest;
   const openVolume = () => router.push(`/prices/${volume.isbn13}`);
-  if (!cheapest) return <Link onPress={openVolume}>check price</Link>;
+  if (!cheapest)
+    return (
+      <Link onPress={openVolume} needsConnection>
+        check price
+      </Link>
+    );
   const url = cheapest.url;
   return (
-    <Link onPress={url ? () => openOutside(url) : openVolume}>
+    <Link
+      onPress={url ? () => openOutside(url) : openVolume}
+      needsConnection={!url}
+    >
       <Price cents={cheapest.cents} /> at {shopName(cheapest.store)}
     </Link>
   );
@@ -159,7 +175,7 @@ export default function FinishList({
               </>
             }
           >
-            <Link onPress={() => openSeries(series)}>
+            <Link onPress={() => openSeries(series)} needsConnection>
               {allPriced ? <Price cents={cents} /> : "check prices"}
             </Link>
           </Row>
@@ -171,7 +187,7 @@ export default function FinishList({
             <Text className="font-body text-ink-soft">{`${shown.length ? `${rest} more` : rest} ${unit}${rest === 1 ? "" : "s"}`}</Text>
           }
         >
-          <Tap onPress={() => openSeries(series)} hitSlop={6}>
+          <Tap onPress={() => openSeries(series)} needsConnection hitSlop={6}>
             <Text className="font-body-medium text-[14px] text-ink border-b pb-[2px] border-ink self-start decoration-accent">
               Check the series page
             </Text>

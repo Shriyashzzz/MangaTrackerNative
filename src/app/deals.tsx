@@ -1,5 +1,7 @@
 // Deals, as the web's pages/Prices/Deals.tsx: volumes selling for less than
 // they usually do, biggest discount first
+import PricesNeedConnection from "@/components/prices/PricesNeedConnection";
+import { useIsOffline } from "@/core/lib/offline";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { View } from "react-native";
@@ -15,6 +17,7 @@ const percentOff = (d: PriceCard) =>
 
 export default function DealsScreen() {
   const canada = inCanada();
+  const offline = useIsOffline();
   const [state, setState] = useState<{
     deals: PriceCard[] | null;
     error: boolean;
@@ -34,6 +37,12 @@ export default function DealsScreen() {
       Browse every series
     </TextLink>
   );
+  if (offline)
+    return (
+      <Page title="Deals" center>
+        <PricesNeedConnection />
+      </Page>
+    );
   return (
     <Page title="Deals">
       <P muted>

@@ -1,6 +1,7 @@
 // The volume to buy after a season (the web's pages/AfterAnime/BuyRow.tsx):
 // its cover, why this one, the best saved price and the store, or the way
 // to its prices when none is saved
+import { useNeedsConnection } from "@/lib/needsConnection";
 import { coverAt } from "@/lib/coverAt";
 import LightNovelBand from "@/components/LightNovelBand";
 import Tap from "@/components/Tap";
@@ -38,6 +39,7 @@ export default function BuyRow({
   // "Chapters 53–61 are in this volume.", under the volume's name
   chapters?: string | null;
 }) {
+  const { off, link } = useNeedsConnection();
   const words = bookWords(book, volume);
   const heading = words[0]!.toUpperCase() + words.slice(1);
   const short = bookShort(book, volume);
@@ -53,6 +55,7 @@ export default function BuyRow({
       <View className="flex-row gap-3">
         <Tap
           onPress={openPrices}
+          needsConnection
           accessibilityLabel={`${heading} prices`}
           style={{ width: COVER_WIDTH, aspectRatio: 2 / 3 }}
         >
@@ -104,6 +107,7 @@ export default function BuyRow({
                 small
                 label={`Check ${short} prices`}
                 onPress={openPrices}
+                disabled={off}
               />
             )}
           </View>
@@ -118,7 +122,7 @@ export default function BuyRow({
                 </Text>
               ) : null}
               <Text
-                onPress={openPrices}
+                {...link(openPrices)}
                 className="font-body-medium text-[13.5px] text-ink underline"
               >
                 Compare all stores{cheaperElsewhere}
