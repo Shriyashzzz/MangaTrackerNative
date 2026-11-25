@@ -24,12 +24,11 @@ type SeriesCardData = {
 };
 
 const vols = (count: number) => `${count} vol${count === 1 ? "" : "s"}`;
-function volumesText(series: SeriesCardData, lightNovel: boolean) {
-  const { volumes: japan, englishVolumes: english } = series;
-  if (lightNovel) return japan ? vols(japan) : null;
-  if (!english) return japan ? `${vols(japan)} in Japan` : null;
-  if (!japan || english === japan) return vols(english);
-  return `${english} in English · ${japan} in Japan`;
+// one count under the cover: the English volumes, and nothing when that
+// isn't known (never the Japanese count)
+function volumesText(series: SeriesCardData) {
+  const english = series.englishVolumes;
+  return english ? vols(english) : null;
 }
 
 export function SeriesScoreBadge({ percent }: { percent?: number | null }) {
@@ -67,7 +66,7 @@ export default memo(function SeriesCard({
   onPress?: () => void;
 }) {
   const shown = novelParts(series.name);
-  const volumes = volumesText(series, shown.lightNovel);
+  const volumes = volumesText(series);
   return (
     <PressScale
       onPress={
