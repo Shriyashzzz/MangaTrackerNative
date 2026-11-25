@@ -789,7 +789,7 @@ export default function SharedShelfScreen() {
               {isTopPick ? (
                 <View className="flex-row items-center gap-0.5 rounded-[2px] bg-ink px-1">
                   <StarIcon filled color={c.star} width={10} height={10} />
-                  <Text className="font-mono text-[10px] text-paper uppercase">
+                  <Text className="font-mono text-[11px] text-paper uppercase">
                     Top pick
                   </Text>
                 </View>

@@ -6,7 +6,7 @@ import { usePlan } from "@/store/plan";
 import TourTarget from "@/components/TourTarget";
 import { router } from "expo-router";
 import { useState } from "react";
-import { Share, Text, View } from "react-native";
+import { Platform, Share, Text, View } from "react-native";
 import { deleteAccount, shelfToCsv, type Account } from "@/core/lib/account";
 import { apiFetch, getJson } from "@/core/lib/api";
 import type { OwnedBook } from "@/core/lib/books";
@@ -20,6 +20,8 @@ import { Input } from "../Field";
 import PasswordInput from "../PasswordInput";
 import { Help, Note, Section } from "./parts";
 import BlockedReaders from "./BlockedReaders";
+
+const IOS = Platform.OS === "ios";
 
 const LINK_NOT_SENT = "We couldn't send the link. Try again in a minute.";
 type NoteOf = { text: string; failed?: boolean } | null;
@@ -46,6 +48,11 @@ function SignInSection({ account }: { account: Account }) {
     <Section first title="Signing in">
       {account.google ? (
         <Help>You can sign in with Google.</Help>
+      ) : IOS ? (
+        // (an iPhone says only what is: linking Google is a website's job)
+        account.hasPassword ? (
+          <Help>You sign in with your username and password.</Help>
+        ) : null
       ) : (
         <Help>
           Linking Google to this account is done on the website for now.
@@ -53,7 +60,11 @@ function SignInSection({ account }: { account: Account }) {
       )}
       {!account.hasPassword ? (
         <>
-          <Help>Add a password to sign in without Google</Help>
+          <Help>
+            {IOS
+              ? "Add a password to sign in with your username as well"
+              : "Add a password to sign in without Google"}
+          </Help>
           <PasswordInput
             value={password}
             onChangeText={setPassword}
@@ -93,8 +104,8 @@ function PlanRow() {
       {plan.limited || plan.plan !== "free" ? (
         <Button
           small
-          // those who have it open their member card; the rest see Collector
-          label={plan.plan === "free" ? "Manage subscription" : "Show my card"}
+          // those who have it open their member card; the rest see Premium
+          label={plan.plan === "free" ? "Get Premium" : "Show my card"}
           onPress={() => show()}
         />
       ) : null}

@@ -29,7 +29,7 @@ export default function ToBuyBag() {
       <BagIcon color={c.inkSoft} width={24} height={24} />
       {count ? (
         <View className="absolute -top-1 -right-1 min-w-[18px] items-center rounded-full border border-paper bg-accent px-1">
-          <Text className="font-mono-medium text-[10px] text-on-accent">
+          <Text className="font-mono-medium text-[11px] text-on-accent">
             {count}
           </Text>
         </View>

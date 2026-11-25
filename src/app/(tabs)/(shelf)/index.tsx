@@ -3,6 +3,7 @@
 // a row per series. Pull down to load it again. Volumes is its own view
 // (VolumesView). Who's in each tab, the search and the sort are the web's own
 // rules (core filterShelf); it opens on the tab and sort the account chose
+import { DENSE } from "@/lib/textScale";
 import { useCorners } from "@/lib/mangaThemes";
 import { useLimit } from "@/components/LimitCount";
 import { IOS, useTabFoot, useTabsOnTop } from "@/lib/tabHeader";
@@ -235,7 +236,7 @@ function SignedInShelf() {
           and sort on the right. On a wide screen it keeps to the list's
           column, so the two line up */}
         <View style={columnStyle}>
-          <View className="h-[64px] flex-row items-center gap-2 px-4 pt-3">
+          <View className="min-h-[64px] flex-row items-center gap-2 px-4 pt-3">
             {searching ? (
               <View
                 className="flex-1 flex-row items-center gap-2 rounded-[14px] border border-line-soft bg-card px-3"
@@ -267,11 +268,17 @@ function SignedInShelf() {
                 className="flex-1 flex-row items-baseline gap-2"
                 accessibilityLabel={`Showing ${shown.label}, ${counts[tab]}. Change what's shown`}
               >
-                <Text className="font-brand pr-[7px] text-[30px] tracking-[1px] text-ink uppercase">
+                <Text
+                  maxFontSizeMultiplier={DENSE}
+                  className="font-brand pr-[7px] text-[30px] tracking-[1px] text-ink uppercase"
+                >
                   {shown.label}
                   {"\u00A0"}
                 </Text>
-                <Text className="font-mono text-[14px] text-muted">
+                <Text
+                  maxFontSizeMultiplier={DENSE}
+                  className="font-mono text-[14px] text-muted"
+                >
                   {counts[tab]}
                   {/* a free shelf's size, beside the whole shelf's count */}
                   {tab === "all" && seriesLimit
@@ -313,7 +320,10 @@ function SignedInShelf() {
                 className="py-2 pl-1"
                 accessibilityLabel="Select several"
               >
-                <Text className="font-body-semibold text-[14.5px] text-ink">
+                <Text
+                  maxFontSizeMultiplier={DENSE}
+                  className="font-body-semibold text-[14.5px] text-ink"
+                >
                   Select
                 </Text>
               </Tap>

@@ -54,7 +54,7 @@ export default function AppHeader({
     );
   return (
     <View className="bg-paper">
-      <View className="h-[62px] flex-row items-center gap-3 px-4">
+      <View className="min-h-[62px] flex-row items-center gap-3 px-4">
         <View className="mr-auto flex-row items-center gap-2">
           <SvgXml xml={LOGO_SVG} width={30} height={30} />
           <Text

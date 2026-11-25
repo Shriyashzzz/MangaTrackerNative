@@ -3,6 +3,7 @@
 // (light or dark), New releases, Your shelf, Prices, Account (email, the
 // weekly email, alerts, export, delete). Every setting is saved on the
 // account (store/prefs save, the web's savePrefs; store/account)
+import { DENSE } from "@/lib/textScale";
 import { columnStyle } from "@/lib/wide";
 import { useTourScroll } from "@/lib/tourScroll";
 import Tap from "@/components/Tap";
@@ -10,7 +11,9 @@ import PullPage, { usePullTop } from "@/components/PullRefresh";
 import Backdrop from "@/components/Backdrop";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState, type ComponentRef } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { Platform, ScrollView, Text, View } from "react-native";
+import AppBar, { BAR_EDGES } from "@/components/AppBar";
+import Page from "@/components/Page";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -25,21 +28,61 @@ import NewReleasesTab from "@/components/settings/NewReleasesTab";
 import PricesTab from "@/components/settings/PricesTab";
 import ProfileTab from "@/components/settings/ProfileTab";
 import ShelfSettingsTab from "@/components/settings/ShelfSettingsTab";
-import { ChevronLeftIcon } from "@/core/components/icons/Icons";
+import {
+  BellIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  PersonIcon,
+  SettingsIcon,
+  ShelfIcon,
+  SunIcon,
+  TagIcon,
+} from "@/core/components/icons/Icons";
 import { useColors } from "@/lib/colors";
 import { useAccount } from "@/store/account";
 
 const Safe = withUniwind(SafeAreaView);
+const IOS = Platform.OS === "ios";
 
 const TABS = [
-  { id: "profile", label: "Profile" },
-  { id: "appearance", label: "Appearance" },
-  { id: "new-releases", label: "New releases" },
-  { id: "shelf", label: "Your shelf" },
-  { id: "prices", label: "Prices" },
-  { id: "account", label: "Account" },
+  { id: "profile", label: "Profile", icon: PersonIcon },
+  { id: "appearance", label: "Appearance", icon: SunIcon },
+  { id: "new-releases", label: "New releases", icon: BellIcon },
+  { id: "shelf", label: "Your shelf", icon: ShelfIcon },
+  { id: "prices", label: "Prices", icon: TagIcon },
+  { id: "account", label: "Account", icon: SettingsIcon },
 ] as const;
 type TabId = (typeof TABS)[number]["id"];
+
+// Settings' parts as a list, on an iPhone or iPad: a tap opens the part
+function SettingsList() {
+  const c = useColors();
+  return (
+    <Page title="Settings" ruled>
+      <View className="rounded-[14px] border border-line-soft bg-card px-1 py-2">
+        {TABS.map(({ id, label, icon: Icon }) => (
+          <Tap
+            key={id}
+            onPress={() =>
+              router.push({ pathname: "/settings", params: { tab: id } })
+            }
+            accessibilityRole="button"
+            className="min-h-[48px] flex-row items-center gap-3 rounded-[3px] px-3 active:bg-accent-wash"
+          >
+            <Icon color={c.inkSoft} width={18} height={18} />
+            <Text
+              maxFontSizeMultiplier={DENSE}
+              className="flex-1 font-body text-[15.5px] text-ink"
+            >
+              {label}
+            </Text>
+            <ChevronRightIcon color={c.muted} width={16} height={16} />
+          </Tap>
+        ))}
+      </View>
+    </Page>
+  );
+}
 
 export default function SettingsScreen() {
   const c = useColors();
@@ -88,75 +131,86 @@ export default function SettingsScreen() {
     void load();
   }, [load]);
   const needsAccount = tab === "profile" || tab === "account";
+  // On an iPhone or iPad, Settings opens on a list of its parts, each one
+  // a page of its own, as Apple's apps have them. A link to one part (the
+  // tour, an alert) opens that part straight away. Android keeps its row of
+  // tabs along the top
+  if (IOS && !TABS.some((t) => t.id === params.tab)) return <SettingsList />;
 
   return (
-    <Safe edges={["top"]} className="flex-1 bg-paper">
+    <Safe edges={BAR_EDGES} className="flex-1 bg-paper">
       <Backdrop />
-      <View className="h-[62px] flex-row items-center gap-3 px-2">
-        <Tap
-          feel="round"
-          onPress={() => router.back()}
-          hitSlop={8}
-          className="p-2"
-          accessibilityLabel="Back"
-        >
-          <ChevronLeftIcon color={c.ink} width={24} height={24} />
-        </Tap>
-        <Text className="flex-1 font-brand pr-[6px] text-[24px] tracking-[1px] text-ink uppercase">
-          Settings
-          {"\u00A0"}
-        </Text>
-      </View>
-      <DoubleRule />
-      {/* the tabs, as Android lays them along the top: the open one underlined */}
-      <View className="h-[52px] border-b border-line-soft">
-        <ScrollView
-          // on a wide screen the tabs keep to the page's column
-          style={columnStyle}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerClassName="px-2"
-        >
-          {TABS.map((t) => (
+      {IOS ? (
+        <AppBar title={TABS.find((t) => t.id === tab)!.label} />
+      ) : (
+        <>
+          <View className="h-[62px] flex-row items-center gap-3 px-2">
             <Tap
-              // the underline sliding to the tab is the answer to the tap
-              feel="none"
-              key={t.id}
-              onPress={() => {
-                setTab(t.id);
-                page.current?.scrollTo({ y: 0, animated: false });
-              }}
-              onLayout={(e) => {
-                const { x, width } = e.nativeEvent.layout;
-                setSpots((now) => ({ ...now, [t.id]: { x, width } }));
-              }}
-              accessibilityRole="tab"
-              accessibilityState={{ selected: t.id === tab }}
-              className="h-[52px] justify-center px-4"
+              feel="round"
+              onPress={() => router.back()}
+              hitSlop={8}
+              className="p-2"
+              accessibilityLabel="Back"
             >
-              {/* the same weight picked or not, so no tab changes width */}
-              <Text
-                className={`font-body-semibold text-[16px] ${t.id === tab ? "text-ink" : "text-ink-soft"}`}
-              >
-                {t.label}
-              </Text>
+              <ChevronLeftIcon color={c.ink} width={24} height={24} />
             </Tap>
-          ))}
-          <Animated.View
-            pointerEvents="none"
-            style={[
-              {
-                position: "absolute",
-                bottom: 0,
-                left: 0,
-                height: 3,
-                backgroundColor: c.accent,
-              },
-              underline,
-            ]}
-          />
-        </ScrollView>
-      </View>
+            <Text className="flex-1 font-brand pr-[6px] text-[24px] tracking-[1px] text-ink uppercase">
+              Settings
+              {"\u00A0"}
+            </Text>
+          </View>
+          <DoubleRule />
+          {/* the tabs, as Android lays them along the top: the open one underlined */}
+          <View className="h-[52px] border-b border-line-soft">
+            <ScrollView
+              // on a wide screen the tabs keep to the page's column
+              style={columnStyle}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerClassName="px-2"
+            >
+              {TABS.map((t) => (
+                <Tap
+                  // the underline sliding to the tab is the answer to the tap
+                  feel="none"
+                  key={t.id}
+                  onPress={() => {
+                    setTab(t.id);
+                    page.current?.scrollTo({ y: 0, animated: false });
+                  }}
+                  onLayout={(e) => {
+                    const { x, width } = e.nativeEvent.layout;
+                    setSpots((now) => ({ ...now, [t.id]: { x, width } }));
+                  }}
+                  accessibilityRole="tab"
+                  accessibilityState={{ selected: t.id === tab }}
+                  className="h-[52px] justify-center px-4"
+                >
+                  {/* the same weight picked or not, so no tab changes width */}
+                  <Text
+                    className={`font-body-semibold text-[16px] ${t.id === tab ? "text-ink" : "text-ink-soft"}`}
+                  >
+                    {t.label}
+                  </Text>
+                </Tap>
+              ))}
+              <Animated.View
+                pointerEvents="none"
+                style={[
+                  {
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    height: 3,
+                    backgroundColor: c.accent,
+                  },
+                  underline,
+                ]}
+              />
+            </ScrollView>
+          </View>
+        </>
+      )}
       <PullPage refresh={load} scrollTop={pull.top}>
         <ScrollView
           ref={page}

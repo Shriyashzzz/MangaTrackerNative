@@ -2,7 +2,7 @@
 // a way back at the top, and the form in a paper box with an ink border,
 // in the middle of the screen (the signed-out shelf's look). On a phone the
 // box fills the width; on an iPad it keeps a form's width
-import { router } from "expo-router";
+import { Stack, router } from "expo-router";
 import type { ReactNode } from "react";
 import { Platform, ScrollView, View } from "react-native";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
@@ -25,8 +25,20 @@ export default function AuthPage({ children }: { children: ReactNode }) {
   return (
     <Safe className="flex-1 bg-paper">
       <Backdrop />
-      {/* the way back, as the swipe from the edge does */}
-      {router.canGoBack() ? (
+      {/* the way back, as the swipe from the edge does: on an iPhone or
+          iPad, Apple's own back button over the page, as every page has */}
+      {Platform.OS === "ios" ? (
+        <Stack.Screen
+          options={{
+            headerShown: router.canGoBack(),
+            title: "",
+            headerTransparent: true,
+            headerShadowVisible: false,
+            headerTintColor: c.ink,
+            headerBackButtonDisplayMode: "minimal",
+          }}
+        />
+      ) : router.canGoBack() ? (
         <View className="px-3 pt-1">
           <Tap
             feel="round"

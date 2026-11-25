@@ -4,6 +4,7 @@
 // it in), stars, and under "More about it" the volumes they own, the type,
 // genre and notes. The checks and the request are the web's own (core
 // seriesFormRules); AniList's matches come through core useCoverSearch
+import AppBar, { BAR_EDGES } from "@/components/AppBar";
 import { useCorners } from "@/lib/mangaThemes";
 import { columnStyle } from "@/lib/wide";
 import { isDemo } from "@/core/lib/demo";
@@ -23,7 +24,6 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 import Button from "@/components/Button";
-import DoubleRule from "@/components/DoubleRule";
 import { Field, Input } from "@/components/Field";
 import PickSheet from "@/components/PickSheet";
 import PlaceField from "@/components/PlaceField";
@@ -32,11 +32,7 @@ import StarRating from "@/components/StarRating";
 import TitleField from "@/components/TitleField";
 import VolumePicker, { useVolumePicker } from "@/components/VolumePicker";
 import WatchedAnime from "@/components/WatchedAnime";
-import {
-  ChevronDownIcon,
-  ChevronLeftIcon,
-  LinkIcon,
-} from "@/core/components/icons/Icons";
+import { ChevronDownIcon, LinkIcon } from "@/core/components/icons/Icons";
 import { useCoverSearch } from "@/core/components/coverPicker/useCoverSearch";
 import type { CoverHit } from "@/core/lib/anilist";
 import { apiFetch, errorMessages } from "@/core/lib/api";
@@ -339,23 +335,12 @@ export default function AddScreen() {
     GENRE_OPTIONS.find((g) => g.value === genre)?.label ?? "Select a genre";
 
   return (
-    <Safe edges={["top"]} className="flex-1 bg-paper">
-      <View className="h-[62px] flex-row items-center gap-3 px-2">
-        <Tap
-          feel="round"
-          onPress={leave}
-          hitSlop={8}
-          className="p-2"
-          accessibilityLabel="Back to the shelf"
-        >
-          <ChevronLeftIcon color={c.ink} width={24} height={24} />
-        </Tap>
-        <Text className="flex-1 font-brand pr-[6px] text-[24px] tracking-[1px] text-ink uppercase">
-          Add a manga
-          {"\u00A0"}
-        </Text>
-      </View>
-      <DoubleRule />
+    <Safe edges={BAR_EDGES} className="flex-1 bg-paper">
+      <AppBar
+        title="Add a manga"
+        onBack={leave}
+        backLabel="Back to the shelf"
+      />
       <KeyboardAwareScrollView
         bottomOffset={24}
         contentContainerClassName="gap-5 px-4 pt-4 pb-16"

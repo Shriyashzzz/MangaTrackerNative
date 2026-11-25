@@ -2,7 +2,7 @@
 // recovery email gets a reset link (it opens the website's reset page, or
 // this app's when the link is set up to open it)
 import { columnStyle } from "@/lib/wide";
-import { router } from "expo-router";
+import { Stack, router } from "expo-router";
 import { useState } from "react";
 import { Platform, ScrollView, Text, View } from "react-native";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
@@ -64,6 +64,18 @@ export default function ForgotPassword() {
 
   return (
     <Safe className="flex-1 bg-paper">
+      {/* on an iPhone or iPad, Apple's own back button, as every page has */}
+      {Platform.OS === "ios" ? (
+        <Stack.Screen
+          options={{
+            headerShown: true,
+            title: "",
+            headerTransparent: true,
+            headerShadowVisible: false,
+            headerBackButtonDisplayMode: "minimal",
+          }}
+        />
+      ) : null}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1"

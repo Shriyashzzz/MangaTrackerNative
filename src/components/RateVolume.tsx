@@ -46,7 +46,7 @@ export default function RateVolume({ volume, onWrite }: Props) {
       }
     >
       <View className="min-w-[54px] items-center justify-center bg-ink px-2.5 pt-1 pb-0.5">
-        <Text className="font-mono text-[10px] tracking-[1px] text-paper uppercase">
+        <Text className="font-mono text-[11px] tracking-[1px] text-paper uppercase">
           Vol.
         </Text>
         <Text className="font-brand pr-[6px] text-[24px] leading-[26px] text-paper">

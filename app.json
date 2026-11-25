@@ -56,7 +56,6 @@
           }
         }
       ],
-      "expo-secure-store",
       "expo-apple-authentication",
       [
         "@react-native-google-signin/google-signin",
@@ -77,6 +76,7 @@
         "expo-camera",
         {
           "cameraPermission": "Manga Tracker reads a book's barcode with the camera. The picture never leaves your phone.",
+          "microphonePermission": false,
           "recordAudioAndroid": false
         }
       ],
@@ -86,6 +86,12 @@
           "photosPermission": "Manga Tracker uses a photo you pick as a cover.",
           "cameraPermission": "Manga Tracker takes a photo to use as a cover.",
           "microphonePermission": false
+        }
+      ],
+      [
+        "expo-secure-store",
+        {
+          "faceIDPermission": false
         }
       ],
       [

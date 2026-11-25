@@ -134,7 +134,10 @@ export default function VolumesView({
             {/* nothing owned yet: no worth to show (a total saved from
                 before would otherwise linger over an empty shelf) */}
             {tools && volumes > 0 ? (
-              <ShelfTotals tools={tools} owned={volumes} />
+              // the tour's "your whole shelf" step, as the website marks it
+              <TourTarget name="worth">
+                <ShelfTotals tools={tools} owned={volumes} />
+              </TourTarget>
             ) : null}
           </View>
         }

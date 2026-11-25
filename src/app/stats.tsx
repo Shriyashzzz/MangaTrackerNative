@@ -3,6 +3,7 @@
 // complete it is and where the biggest gaps are, the genres, and the
 // longest runs. Every figure is from lib/collectionStats.ts or the server's
 // own shelf totals; a number the app can't know isn't shown as one
+import { DENSE } from "@/lib/textScale";
 import { useCorners } from "@/lib/mangaThemes";
 import Tap from "@/components/Tap";
 import { router } from "expo-router";
@@ -34,11 +35,19 @@ function Figure({ value, label }: { value: string; label: string }) {
       className="min-w-[46%] flex-1 gap-0.5 rounded-[14px] border border-line-soft bg-card px-4 py-3"
       style={corners.panel}
     >
-      <Text className="font-brand pr-[7px] text-[28px] leading-[32px] text-ink">
+      <Text
+        maxFontSizeMultiplier={DENSE}
+        className="font-brand pr-[7px] text-[28px] leading-[32px] text-ink"
+      >
         {value}
         {" "}
       </Text>
-      <Text className="font-body text-[13px] text-ink-soft">{label}</Text>
+      <Text
+        maxFontSizeMultiplier={DENSE}
+        className="font-body text-[13px] text-ink-soft"
+      >
+        {label}
+      </Text>
     </View>
   );
 }
@@ -63,12 +72,18 @@ function BarRow({
     >
       <View className="flex-row items-baseline justify-between gap-3">
         <Text
+          maxFontSizeMultiplier={DENSE}
           numberOfLines={1}
           className="min-w-0 flex-1 font-body-medium text-[15px] text-ink"
         >
           {name}
         </Text>
-        <Text className="font-mono text-[13px] text-ink-soft">{value}</Text>
+        <Text
+          maxFontSizeMultiplier={DENSE}
+          className="font-mono text-[13px] text-ink-soft"
+        >
+          {value}
+        </Text>
       </View>
       <View className="h-[6px] overflow-hidden rounded-full bg-ink/10">
         <View

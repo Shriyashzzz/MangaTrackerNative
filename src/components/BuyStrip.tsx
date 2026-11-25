@@ -5,6 +5,7 @@
 // newest out, what's ordered and on its way, and the series' price page.
 // Every rule is the web's: the one to buy next (core useBuyOptions), an
 // edition's plan (core useEditions), what's on sale (core onSale)
+import { DENSE } from "@/lib/textScale";
 import { useCorners } from "@/lib/mangaThemes";
 import Tap from "@/components/Tap";
 import { H2 } from "@/components/Page";
@@ -380,6 +381,7 @@ export default function BuyStrip({
         <H2>{title}</H2>
         {!open ? (
           <Text
+            maxFontSizeMultiplier={DENSE}
             numberOfLines={1}
             className="min-w-0 flex-1 font-mono-medium text-[14px] text-accent"
           >

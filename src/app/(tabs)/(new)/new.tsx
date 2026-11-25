@@ -5,6 +5,8 @@
 // one, or any far behind, is sorted into piles, each a fan of covers that
 // opens to all of them. Nothing new says why. Who's in, where, and the
 // words are all the web's own (core shelfViews, piles, farBehind, newTabLinks)
+import { useIsOffline } from "@/core/lib/offline";
+import { DENSE } from "@/lib/textScale";
 import { IOS, useTabFoot } from "@/lib/tabHeader";
 import { columnStyle } from "@/lib/wide";
 import { usePlan } from "@/store/plan";
@@ -95,6 +97,7 @@ const Word = ({
 }) => (
   <Tap onPress={onPress} hitSlop={6}>
     <Text
+      maxFontSizeMultiplier={DENSE}
       className={`font-body-semibold text-[14px] underline ${accent ? "text-accent" : "text-ink"}`}
     >
       {children}
@@ -125,6 +128,7 @@ export default function NewScreen() {
   const showCollector = usePlan((s) => s.showCollector);
   const [askingHideAll, setAskingHideAll] = useState(false);
   const pull = usePullTop();
+  const offline = useIsOffline();
   // (the tour scrolls this page to what Kenji points at)
   const scroller = useRef<ComponentRef<typeof ScrollView>>(null);
   useTourScroll(scroller, pull.top);
@@ -246,7 +250,9 @@ export default function NewScreen() {
   const openManga = all.find((m) => m.id === openList);
   // the next volume leads straight to its prices, as on the web: there's
   // nothing to do with it but buy it. Null: the series' page, as usual
+  // (offline, the series' page instead: prices need the connection)
   const buyHref = (found: ReleaseStatus | null | undefined) => {
+    if (offline) return null;
     const to = buyLinkFor(found, kind);
     return to ? hrefOf(to) : null;
   };
@@ -277,7 +283,10 @@ export default function NewScreen() {
   // when the releases were last looked for
   const checkedLine =
     !checking && Number.isFinite(oldestCheck) ? (
-      <Text className="font-mono text-[12px] text-muted">
+      <Text
+        maxFontSizeMultiplier={DENSE}
+        className="font-mono text-[12px] text-muted"
+      >
         Checked {checkedAgo(oldestCheck)}
       </Text>
     ) : null;
@@ -295,13 +304,19 @@ export default function NewScreen() {
           onScroll={pull.track}
         >
           <View className="flex-row items-baseline gap-2">
-            <Text className="font-brand pr-[7px] text-[30px] tracking-[1px] text-ink uppercase">
+            <Text
+              maxFontSizeMultiplier={DENSE}
+              className="font-brand pr-[7px] text-[30px] tracking-[1px] text-ink uppercase"
+            >
               {viewingHidden ? "Hidden" : "New"}
               {"\u00A0"}
             </Text>
             {/* the same number as the tab's badge: every series listed here,
                 volumes and chapters together (core releaseMath countNew) */}
-            <Text className="font-mono text-[14px] text-muted">
+            <Text
+              maxFontSizeMultiplier={DENSE}
+              className="font-mono text-[14px] text-muted"
+            >
               {viewingHidden ? list.length : counts.new}
             </Text>
           </View>
@@ -315,7 +330,10 @@ export default function NewScreen() {
                   style={{ width: `${(checked / total) * 100}%` }}
                 />
               </View>
-              <Text className="font-mono text-[12px] text-muted">
+              <Text
+                maxFontSizeMultiplier={DENSE}
+                className="font-mono text-[12px] text-muted"
+              >
                 Checking {checked} of {total}
                 {bigShelfNote ? ` · ${bigShelfNote}` : ""}
               </Text>
@@ -346,12 +364,18 @@ export default function NewScreen() {
             }
           />
           {viewingHidden ? (
-            <Text className="font-body text-[14px] text-ink-soft">
+            <Text
+              maxFontSizeMultiplier={DENSE}
+              className="font-body text-[14px] text-ink-soft"
+            >
               What you've hidden under {RELEASE_KINDS[kind].label}. Show one to
               put it back.
             </Text>
           ) : RELEASE_KINDS[kind].note ? (
-            <Text className="font-body text-[14px] text-ink-soft">
+            <Text
+              maxFontSizeMultiplier={DENSE}
+              className="font-body text-[14px] text-ink-soft"
+            >
               {RELEASE_KINDS[kind].note}
             </Text>
           ) : null}
@@ -364,11 +388,17 @@ export default function NewScreen() {
               className="flex-row items-center gap-1.5"
             >
               <View className="h-5 w-5 items-center justify-center rounded-full bg-accent">
-                <Text className="font-brand pr-[4px] text-[12px] text-on-accent">
+                <Text
+                  maxFontSizeMultiplier={DENSE}
+                  className="font-brand pr-[4px] text-[12px] text-on-accent"
+                >
                   {"\u00A0"}?{"\u00A0"}
                 </Text>
               </View>
-              <Text className="font-body-medium text-[14px] text-ink">
+              <Text
+                maxFontSizeMultiplier={DENSE}
+                className="font-body-medium text-[14px] text-ink"
+              >
                 How New works
               </Text>
             </Tap>
@@ -391,7 +421,10 @@ export default function NewScreen() {
                 hitSlop={6}
                 className={`ml-auto bg-ink/10 px-3.5 py-2 ${look.buttonRadius}`}
               >
-                <Text className="font-body-medium text-[13.5px] text-ink">
+                <Text
+                  maxFontSizeMultiplier={DENSE}
+                  className="font-body-medium text-[13.5px] text-ink"
+                >
                   {askingHideAll
                     ? `Hide all ${list.length}? Press again`
                     : `Hide all ${list.length}`}
@@ -410,25 +443,36 @@ export default function NewScreen() {
                     <View className="gap-1">
                       {farBehind.slice(0, FAR_BEHIND_NAMED).map((one) => (
                         <Text
+                          maxFontSizeMultiplier={DENSE}
                           key={one.name}
                           className="font-body text-[14px] text-ink-soft"
                         >
-                          <Text className="font-body-semibold text-ink">
+                          <Text
+                            maxFontSizeMultiplier={DENSE}
+                            className="font-body-semibold text-ink"
+                          >
                             {one.name}:
                           </Text>{" "}
                           {standing(one)}
                         </Text>
                       ))}
                       {farBehind.length > FAR_BEHIND_NAMED ? (
-                        <Text className="font-body text-[14px] text-ink-soft">
+                        <Text
+                          maxFontSizeMultiplier={DENSE}
+                          className="font-body text-[14px] text-ink-soft"
+                        >
                           +{farBehind.length - FAR_BEHIND_NAMED} more
                         </Text>
                       ) : null}
                     </View>
                   ) : null}
-                  <Text className="text-center font-body text-[14.5px] text-ink-soft">
+                  <Text
+                    maxFontSizeMultiplier={DENSE}
+                    className="text-center font-body text-[14.5px] text-ink-soft"
+                  >
                     New chapters show here once you're nearly caught up.{" "}
                     <Text
+                      maxFontSizeMultiplier={DENSE}
                       className="font-body-semibold text-ink underline"
                       onPress={toSettings}
                     >
@@ -438,14 +482,21 @@ export default function NewScreen() {
                 </View>
               ) : heldBack > 0 ? (
                 <>
-                  <Text className="text-center font-display text-[22px] text-ink">
+                  <Text
+                    maxFontSizeMultiplier={DENSE}
+                    className="text-center font-display text-[22px] text-ink"
+                  >
                     Nothing this close to caught up.
                   </Text>
-                  <Text className="text-center font-body text-[14.5px] text-ink-soft">
+                  <Text
+                    maxFontSizeMultiplier={DENSE}
+                    className="text-center font-body text-[14.5px] text-ink-soft"
+                  >
                     {heldBack === 1
                       ? "1 series is further behind than your setting shows. "
                       : `${heldBack} series are further behind than your setting shows. `}
                     <Text
+                      maxFontSizeMultiplier={DENSE}
                       className="font-body-semibold text-ink underline"
                       onPress={toSettings}
                     >
@@ -455,7 +506,10 @@ export default function NewScreen() {
                 </>
               ) : (
                 <>
-                  <Text className="text-center font-display text-[22px] text-ink">
+                  <Text
+                    maxFontSizeMultiplier={DENSE}
+                    className="text-center font-display text-[22px] text-ink"
+                  >
                     {looked.length > 0 && chapterOnly === looked.length
                       ? "We know your chapter, not your volume."
                       : looked.length > 0 && unknownPlace === looked.length
@@ -467,7 +521,10 @@ export default function NewScreen() {
                   {unknownPlace > 0 &&
                   (chapterOnly === looked.length ||
                     unknownPlace === looked.length) ? (
-                    <Text className="text-center font-body text-[14.5px] text-ink-soft">
+                    <Text
+                      maxFontSizeMultiplier={DENSE}
+                      className="text-center font-body text-[14.5px] text-ink-soft"
+                    >
                       {chapterOnly === looked.length
                         ? "We can't tell which volume your chapter is in. "
                         : ""}
@@ -485,7 +542,10 @@ export default function NewScreen() {
                 >{`See ${elsewhere.count} under ${RELEASE_KINDS[elsewhere.kind].label}`}</Word>
               ) : null}
               {!checking && notFound > 0 ? (
-                <Text className="text-center font-body text-[13px] text-muted">
+                <Text
+                  maxFontSizeMultiplier={DENSE}
+                  className="text-center font-body text-[13px] text-muted"
+                >
                   {notFound === looked.length
                     ? "We couldn't find release news for any of your series."
                     : notFound === 1
@@ -502,7 +562,10 @@ export default function NewScreen() {
                 <View className="flex-row items-end justify-between">
                   <H2>
                     {PILE_TEXT[kind][p].name}{" "}
-                    <Text className="font-mono text-[14px] text-muted">
+                    <Text
+                      maxFontSizeMultiplier={DENSE}
+                      className="font-mono text-[14px] text-muted"
+                    >
                       {piles[p].length}
                     </Text>
                   </H2>
@@ -510,12 +573,18 @@ export default function NewScreen() {
                     onPress={() => setOpenPile(openPile === p ? null : p)}
                     hitSlop={8}
                   >
-                    <Text className="font-body-semibold text-[14px] text-ink">
+                    <Text
+                      maxFontSizeMultiplier={DENSE}
+                      className="font-body-semibold text-[14px] text-ink"
+                    >
                       {openPile === p ? "Back" : "See all"}
                     </Text>
                   </Tap>
                 </View>
-                <Text className="pb-3 font-body text-[13.5px] text-ink-soft">
+                <Text
+                  maxFontSizeMultiplier={DENSE}
+                  className="pb-3 font-body text-[13.5px] text-ink-soft"
+                >
                   {PILE_TEXT[kind][p].why}
                   {catchUpText(p, piles[p], releases, kind)}
                   {checking && (p === "few" || p === "way") ? " so far" : ""}
@@ -554,7 +623,10 @@ export default function NewScreen() {
                             />
                             {stampFor(found, kind) ? (
                               <View className="absolute -top-2 -left-1 bg-accent px-1">
-                                <Text className="font-brand pr-[4px] text-[12px] tracking-[0.5px] text-on-accent uppercase">
+                                <Text
+                                  maxFontSizeMultiplier={DENSE}
+                                  className="font-brand pr-[4px] text-[12px] tracking-[0.5px] text-on-accent uppercase"
+                                >
                                   {stampFor(found, kind)}
                                   {"\u00A0"}
                                 </Text>
@@ -563,6 +635,7 @@ export default function NewScreen() {
                           </View>
                           {p !== "one" ? (
                             <Text
+                              maxFontSizeMultiplier={DENSE}
                               numberOfLines={1}
                               className="font-body text-[12px] text-ink-soft"
                             >
@@ -601,7 +674,10 @@ export default function NewScreen() {
           {list.length > 0 ? (
             <View className="flex-row items-baseline justify-between gap-3 pt-1">
               <Tap onPress={toSettings} hitSlop={8}>
-                <Text className="font-mono-bold text-[12px] text-ink-soft underline">
+                <Text
+                  maxFontSizeMultiplier={DENSE}
+                  className="font-mono-bold text-[12px] text-ink-soft underline"
+                >
                   Change what New shows
                 </Text>
               </Tap>

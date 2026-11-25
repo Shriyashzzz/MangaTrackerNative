@@ -3,6 +3,7 @@
 // volumes they own on the spine picker (an edition's books, for a collector
 // of one). The checks and the request are the web's own (core
 // seriesFormRules)
+import AppBar, { BAR_EDGES } from "@/components/AppBar";
 import { columnStyle } from "@/lib/wide";
 import Tap from "@/components/Tap";
 import { router, useLocalSearchParams } from "expo-router";
@@ -14,15 +15,11 @@ import { withUniwind } from "uniwind";
 import Button from "@/components/Button";
 import CoverPicker, { type OwnCover } from "@/components/CoverPicker";
 import VolumePicker, { useVolumePicker } from "@/components/VolumePicker";
-import DoubleRule from "@/components/DoubleRule";
 import { Field, Input } from "@/components/Field";
 import PickSheet from "@/components/PickSheet";
 import PlaceField from "@/components/PlaceField";
 import Segmented from "@/components/Segmented";
-import {
-  ChevronDownIcon,
-  ChevronLeftIcon,
-} from "@/core/components/icons/Icons";
+import { ChevronDownIcon } from "@/core/components/icons/Icons";
 import { apiFetch, errorMessages } from "@/core/lib/api";
 import { GENRES } from "@/core/lib/content/genres";
 import { ownCoversOf } from "@/core/lib/books";
@@ -192,23 +189,8 @@ export default function EditScreen() {
     genreOptions.find((g) => g.value === genre)?.label ?? "Select a genre";
 
   return (
-    <Safe edges={["top"]} className="flex-1 bg-paper">
-      <View className="h-[62px] flex-row items-center gap-3 px-2">
-        <Tap
-          feel="round"
-          onPress={() => router.back()}
-          hitSlop={8}
-          className="p-2"
-          accessibilityLabel="Back"
-        >
-          <ChevronLeftIcon color={c.ink} width={24} height={24} />
-        </Tap>
-        <Text className="flex-1 font-brand pr-[6px] text-[24px] tracking-[1px] text-ink uppercase">
-          Edit details
-          {"\u00A0"}
-        </Text>
-      </View>
-      <DoubleRule />
+    <Safe edges={BAR_EDGES} className="flex-1 bg-paper">
+      <AppBar title="Edit details" />
       {!manga ? (
         errors.length ? (
           <Text className="px-4 pt-6 font-body text-[15px] text-accent">

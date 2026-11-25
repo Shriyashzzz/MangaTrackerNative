@@ -50,7 +50,7 @@ function Thumb({
       />
       {yours ? (
         <View className="absolute inset-x-0 bottom-0 bg-ink py-[1px]">
-          <Text className="text-center font-mono text-[9px] tracking-[0.5px] text-paper uppercase">
+          <Text className="text-center font-mono text-[11px] tracking-[0.5px] text-paper uppercase">
             yours
           </Text>
         </View>

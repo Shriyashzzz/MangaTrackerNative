@@ -5,6 +5,7 @@
 // reading), so the two apps always say the same. While selecting, a tick box
 // sits on the cover and a tap picks the row. A long press opens the
 // platform's own menu: Edit, Move to, Select several, Delete
+import { DENSE } from "@/lib/textScale";
 import Tap from "@/components/Tap";
 import SeriesCover from "@/components/SeriesCover";
 import {
@@ -105,12 +106,17 @@ export default memo(function ShelfRow({
         ) : null}
       </View>
       <View className="min-w-0 flex-1 gap-[2px]">
-        <Text numberOfLines={1} className="font-display text-[17px] text-ink">
+        <Text
+          maxFontSizeMultiplier={DENSE}
+          numberOfLines={1}
+          className="font-display text-[17px] text-ink"
+        >
           {manga.name}
         </Text>
         {rating > 0 && <StarRating value={rating} />}
         {kindLine ? (
           <Text
+            maxFontSizeMultiplier={DENSE}
             numberOfLines={1}
             className="font-mono text-[12.5px] text-muted"
           >
@@ -252,10 +258,15 @@ function RowProgress({
   place: string | null;
 }) {
   const text = "font-mono text-[12px] text-ink-soft text-right";
-  if (finished) return <Text className={text}>Finished</Text>;
+  if (finished)
+    return (
+      <Text maxFontSizeMultiplier={DENSE} className={text}>
+        Finished
+      </Text>
+    );
   if (knownTotal == null || reading <= 0)
     return place ? (
-      <Text numberOfLines={1} className={text}>
+      <Text maxFontSizeMultiplier={DENSE} numberOfLines={1} className={text}>
         {place}
       </Text>
     ) : null;
@@ -265,6 +276,7 @@ function RowProgress({
       {/* one line always: a long count ("ch. 1100 of 1199") shrinks a
           little to fit, it never wraps */}
       <Text
+        maxFontSizeMultiplier={DENSE}
         numberOfLines={1}
         adjustsFontSizeToFit
         minimumFontScale={0.8}

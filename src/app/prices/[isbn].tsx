@@ -4,6 +4,9 @@
 // Canada's), the box-set note, more places to look, the price history,
 // about the series, readers' reviews, and the volumes beside it. Every rule
 // is the web's (core volumePageRules, offerLabels, useVolumeLoad)
+import PricesNeedConnection from "@/components/prices/PricesNeedConnection";
+import { useIsOffline } from "@/core/lib/offline";
+import AppBar, { BAR_EDGES } from "@/components/AppBar";
 import { useCorners } from "@/lib/mangaThemes";
 import { columnStyle } from "@/lib/wide";
 import { useShelf } from "@/store/shelf";
@@ -16,7 +19,6 @@ import Tap from "@/components/Tap";
 import PullPage, { pause, usePullTop } from "@/components/PullRefresh";
 import Backdrop from "@/components/Backdrop";
 import Button from "@/components/Button";
-import DoubleRule from "@/components/DoubleRule";
 import LoadingQuote from "@/components/LoadingQuote";
 import Mascot from "@/components/Mascot";
 import OfferList from "@/components/OfferList";
@@ -30,10 +32,7 @@ import ShelfAction from "@/components/prices/ShelfAction";
 import StoreButtons from "@/components/prices/StoreButtons";
 import VolumeCard from "@/components/prices/VolumeCard";
 import VolumeReviews from "@/components/prices/VolumeReviews";
-import {
-  ChevronDownIcon,
-  ChevronLeftIcon,
-} from "@/core/components/icons/Icons";
+import { ChevronDownIcon } from "@/core/components/icons/Icons";
 import { isbnFromTyped } from "@/core/lib/barcode";
 import { bookName } from "@/core/lib/bookName";
 import {
@@ -109,32 +108,12 @@ export default function PriceVolumeScreen() {
   );
   const reviews = useVolumeReviews(loadedBook?.isbn13 ?? null);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const offline = useIsOffline();
 
   const frame = (title: string, body: React.ReactNode) => (
-    <Safe edges={["top"]} className="flex-1 bg-paper">
+    <Safe edges={BAR_EDGES} className="flex-1 bg-paper">
       <Backdrop />
-      <View className="h-[62px] flex-row items-center gap-3 px-2">
-        <Tap
-          feel="round"
-          onPress={() => router.back()}
-          hitSlop={8}
-          className="p-2"
-          accessibilityLabel="Back"
-        >
-          <ChevronLeftIcon color={c.ink} width={24} height={24} />
-        </Tap>
-        <Text
-          numberOfLines={1}
-          className="flex-1 font-brand pr-[6px] text-[24px] tracking-[1px] text-ink uppercase"
-        >
-          {title}
-          {"\u00A0"}
-        </Text>
-        <View className="pr-2">
-          <ToBuyBag />
-        </View>
-      </View>
-      <DoubleRule />
+      <AppBar title={title} padRight right={<ToBuyBag />} />
       {body}
     </Safe>
   );
@@ -166,6 +145,7 @@ export default function PriceVolumeScreen() {
         "Search by name, or type the 13 digits from the back of a volume.",
       ),
     );
+  if (offline) return frame("Prices", <PricesNeedConnection />);
   if (page.loading) return frame("Prices", <LoadingQuote />);
   if (page.error || !page.data)
     return frame(

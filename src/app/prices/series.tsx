@@ -5,6 +5,10 @@
 // card with its price, Yours and Next, Not on your shelf to see only the
 // gaps with what they cost. The rules are the web's (core seriesPageRules,
 // finishCost, useSeriesData)
+import PricesNeedConnection from "@/components/prices/PricesNeedConnection";
+import { useIsOffline } from "@/core/lib/offline";
+import TourTarget from "@/components/TourTarget";
+import AppBar, { BAR_EDGES } from "@/components/AppBar";
 import { gridOf } from "@/lib/wide";
 import { columnStyle } from "@/lib/wide";
 import { useTourScroll } from "@/lib/tourScroll";
@@ -16,7 +20,6 @@ import TrackPitch from "@/components/prices/TrackPitch";
 import { useAuth } from "@/store/auth";
 import Backdrop from "@/components/Backdrop";
 import Button from "@/components/Button";
-import DoubleRule from "@/components/DoubleRule";
 import LoadingQuote from "@/components/LoadingQuote";
 import Mascot from "@/components/Mascot";
 import { H2 } from "@/components/Page";
@@ -34,7 +37,6 @@ import SeriesFacts, {
 import SetsBox from "@/components/prices/SetsBox";
 import ToReadButton from "@/components/prices/ToReadButton";
 import VolumeCard from "@/components/prices/VolumeCard";
-import { ChevronLeftIcon } from "@/core/components/icons/Icons";
 import { getJson } from "@/core/lib/api";
 import { headlineLine, type EditionLine } from "@/core/lib/editions";
 import {
@@ -61,7 +63,6 @@ import {
   useSeriesLoad,
   useShelfMatch,
 } from "@/core/pages/Prices/useSeriesData";
-import { useColors } from "@/lib/colors";
 import { usePrefs } from "@/store/prefs";
 import { router, useLocalSearchParams } from "expo-router";
 import { type ComponentRef, useEffect, useRef, useState } from "react";
@@ -84,7 +85,6 @@ export default function PriceSeriesScreen() {
     toget?: string;
   }>();
   const name = params.name;
-  const c = useColors();
   const nextFor = usePrefs((s) => s.prefs.nextFor ?? "after");
   const series = useSeriesLoad(name);
   const mine = useShelfMatch(name);
@@ -128,38 +128,19 @@ export default function PriceSeriesScreen() {
   useTourScroll(page, pull.top);
 
   const isSignedIn = useAuth((st) => st.isSignedIn);
+  const offline = useIsOffline();
   const [askedEdition, setAskedEdition] = useState<string | null>(
     params.edition ?? null,
   );
 
   const frame = (title: string, body: React.ReactNode) => (
-    <Safe edges={["top"]} className="flex-1 bg-paper">
+    <Safe edges={BAR_EDGES} className="flex-1 bg-paper">
       <Backdrop />
-      <View className="h-[62px] flex-row items-center gap-3 px-2">
-        <Tap
-          feel="round"
-          onPress={() => router.back()}
-          hitSlop={8}
-          className="p-2"
-          accessibilityLabel="Back"
-        >
-          <ChevronLeftIcon color={c.ink} width={24} height={24} />
-        </Tap>
-        <Text
-          numberOfLines={1}
-          className="flex-1 font-brand pr-[6px] text-[24px] tracking-[1px] text-ink uppercase"
-        >
-          {title}
-          {"\u00A0"}
-        </Text>
-        <View className="pr-2">
-          <ToBuyBag />
-        </View>
-      </View>
-      <DoubleRule />
+      <AppBar title={title} padRight right={<ToBuyBag />} />
       {body}
     </Safe>
   );
+  if (offline) return frame(name, <PricesNeedConnection />);
   if (series.loading || (!series.error && !editionsKnown))
     return frame(name, <LoadingQuote />);
   if (series.error || !series.data) {
@@ -372,7 +353,11 @@ export default function PriceSeriesScreen() {
               </Text>
             ) : null}
             {finish || (mine && toGet.length < volumes.length) ? (
-              <View className="flex-row flex-wrap items-center gap-3">
+              // the tour's "what the series costs" step, as the website marks it
+              <TourTarget
+                name="series-cost"
+                className="flex-row flex-wrap items-center gap-3 self-start"
+              >
                 {mine && toGet.length < volumes.length ? (
                   <Tap
                     onPress={() => setToGetOnly(!toGetOnly)}
@@ -391,7 +376,7 @@ export default function PriceSeriesScreen() {
                     {finishText(finish, formatCents)}
                   </Text>
                 ) : null}
-              </View>
+              </TourTarget>
             ) : null}
             {volumes.length ? (
               <>

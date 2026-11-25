@@ -208,7 +208,7 @@ function MemberCard({ plan }: { plan: Plan }) {
       className="mt-2 items-center overflow-visible rounded-[14px] border-2 border-ink bg-card px-4 pt-3.5"
       style={[{ transform: [{ rotate: "-1deg" }] }, corners.panel]}
     >
-      <Text className="font-mono text-[10.5px] tracking-[1.5px] text-muted uppercase">
+      <Text className="font-mono text-[11px] tracking-[1.5px] text-muted uppercase">
         Member card
       </Text>
       <Text className="mt-1.5 font-brand pl-[4px] pr-[4px] text-[32px] leading-[34px] tracking-[0.5px] text-ink uppercase">
@@ -541,8 +541,9 @@ export default function CollectorSheet() {
                 style={TEXT.plain}
                 className="font-body text-[14px] leading-[20px] text-ink-soft"
               >
-                Premium takes the end off: no limits, plus coming soon alerts,
-                the full calendar, In Japan and eight manga themes.
+                Premium takes the end off: no limits, plus alerts before a
+                volume comes out, the full calendar, In Japan and eight manga
+                themes.
               </Text>
             </>
           ) : (

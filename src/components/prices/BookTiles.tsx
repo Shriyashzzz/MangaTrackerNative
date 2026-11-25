@@ -46,12 +46,12 @@ export default function BookTiles({
                 {"\u00A0"}
               </Text>
               <Text
-                className={`font-mono text-[10.5px] ${ownsAll ? "text-paper" : "text-muted"}`}
+                className={`font-mono text-[11px] ${ownsAll ? "text-paper" : "text-muted"}`}
               >
                 {rangesText(book.volumes)}
               </Text>
               {book.coming ? (
-                <Text className="font-mono text-[10px] text-muted">
+                <Text className="font-mono text-[11px] text-muted">
                   {book.coming.replace(/ \d+,/, "")}
                 </Text>
               ) : null}

@@ -2,6 +2,8 @@
 // buy, what they'd cost new and used all together, each with its prices,
 // On my shelf, Ordered and Remove, sorted their way, and Clear list.
 // Marking one theirs whose series isn't on the shelf offers to add it
+import { isOffline } from "@/core/lib/offline";
+import { DENSE } from "@/lib/textScale";
 import { useTabFoot } from "@/lib/tabHeader";
 import { useCorners } from "@/lib/mangaThemes";
 import LimitCount from "@/components/LimitCount";
@@ -159,14 +161,16 @@ function SumCell({
         style={{ height: SUM_HEIGHT }}
       >
         <Text
+          maxFontSizeMultiplier={DENSE}
           numberOfLines={1}
           adjustsFontSizeToFit
           minimumFontScale={0.75}
-          className="font-mono-medium text-[10.5px] tracking-[1px] text-ink-soft uppercase"
+          className="font-mono-medium text-[11px] tracking-[1px] text-ink-soft uppercase"
         >
           {label}
         </Text>
         <Text
+          maxFontSizeMultiplier={DENSE}
           numberOfLines={1}
           adjustsFontSizeToFit
           className="font-brand pr-[6px] text-[22px] leading-[27px] text-ink uppercase"
@@ -230,6 +234,10 @@ const COVER_WIDTH = 66;
 // (On my shelf, Ordered, moving it, Remove) behind the ⋯ menu.
 // A preorder with a price is bought the same way; one with none yet opens
 // its own price page, where the preorder links are
+// the note and alert chips are 32 points tall: reached 6 more above and
+// below, a 44-point tap
+const CHIP_REACH = { top: 6, bottom: 6 };
+
 function Card({
   item,
   onOwned,
@@ -269,8 +277,10 @@ function Card({
   const open = () => router.push(`/prices/${item.isbn13}`);
   // the store's own page for a copy, or this book's price page when the
   // copy has no link
+  // (offline, a copy without a link goes nowhere: its price page needs
+  // the connection)
   const toStore = (url: string | null | undefined) =>
-    url ? openOutside(url) : open();
+    url ? openOutside(url) : isOffline() ? undefined : open();
   const alertMet =
     item.alertCents != null && best != null && best.cents <= item.alertCents;
   const chip = "min-h-[32px] flex-1 justify-center rounded-full border px-3";
@@ -303,7 +313,7 @@ function Card({
       <View className="flex-row gap-3">
         {/* as tall as the cover and no taller: stretched to the row's
             height, the band at its foot hung below the picture */}
-        <Tap onPress={open} className="self-start">
+        <Tap onPress={open} needsConnection className="self-start">
           {/* no picture for it (or it won't load, as with no connection):
               the series' name on a printed cover, as on the shelf */}
           {coverUrl && !coverFailed ? (
@@ -331,6 +341,7 @@ function Card({
               style={{ maxWidth: COVER_WIDTH }}
             >
               <Text
+                maxFontSizeMultiplier={DENSE}
                 numberOfLines={1}
                 adjustsFontSizeToFit
                 minimumFontScale={0.6}
@@ -349,8 +360,9 @@ function Card({
         </Tap>
         <View className="min-w-0 flex-1 gap-1.5">
           <View className="flex-row items-start gap-2">
-            <Tap onPress={open} className="min-w-0 flex-1">
+            <Tap onPress={open} needsConnection className="min-w-0 flex-1">
               <Text
+                maxFontSizeMultiplier={DENSE}
                 numberOfLines={3}
                 className="font-body-semibold text-[15.5px] leading-[20px] text-ink"
               >
@@ -364,7 +376,10 @@ function Card({
                   accessible={false}
                   className="-mt-1 h-7 w-7 items-center justify-center"
                 >
-                  <Text className="font-body-semibold text-[20px] leading-[22px] text-ink-soft">
+                  <Text
+                    maxFontSizeMultiplier={DENSE}
+                    className="font-body-semibold text-[20px] leading-[22px] text-ink-soft"
+                  >
                     ≡
                   </Text>
                 </View>
@@ -377,13 +392,19 @@ function Card({
               accessibilityLabel={`More for ${name}`}
               className="-mt-1 px-1"
             >
-              <Text className="font-body-semibold text-[22px] leading-[24px] text-ink-soft">
+              <Text
+                maxFontSizeMultiplier={DENSE}
+                className="font-body-semibold text-[22px] leading-[24px] text-ink-soft"
+              >
                 ⋯
               </Text>
             </Tap>
           </View>
           {item.shelf?.state ? (
-            <Text className="font-mono text-[11px] tracking-[0.5px] text-ok uppercase">
+            <Text
+              maxFontSizeMultiplier={DENSE}
+              className="font-mono text-[11px] tracking-[0.5px] text-ok uppercase"
+            >
               {item.shelf.state === "owned" ? "Already yours" : "Ordered"}
             </Text>
           ) : null}
@@ -391,6 +412,8 @@ function Card({
               ways to add them. Two equal chips, so the row never ends short */}
           <View className="flex-row gap-2 pt-0.5">
             <Tap
+              // a 44-point tap, as Apple asks, without a bigger chip
+              hitSlop={CHIP_REACH}
               onPress={onNote}
               accessibilityLabel={
                 item.note ? `Note: ${item.note}. Change` : "Add a note"
@@ -399,6 +422,7 @@ function Card({
             >
               {item.note ? (
                 <Text
+                  maxFontSizeMultiplier={DENSE}
                   numberOfLines={1}
                   className="font-display-italic text-[13.5px] text-ink"
                 >
@@ -406,6 +430,7 @@ function Card({
                 </Text>
               ) : (
                 <Text
+                  maxFontSizeMultiplier={DENSE}
                   numberOfLines={1}
                   className="font-body text-[12.5px] text-ink-soft"
                 >
@@ -414,6 +439,8 @@ function Card({
               )}
             </Tap>
             <Tap
+              // a 44-point tap, as Apple asks, without a bigger chip
+              hitSlop={CHIP_REACH}
               onPress={onAlert}
               accessibilityLabel={
                 item.alertCents
@@ -423,6 +450,7 @@ function Card({
               className={`${chip} ${item.alertCents ? "border-accent bg-accent-wash" : "border-line-soft"}`}
             >
               <Text
+                maxFontSizeMultiplier={DENSE}
                 numberOfLines={1}
                 className={`font-body text-[12.5px] ${item.alertCents ? "text-accent-ink" : "text-ink-soft"}`}
               >
@@ -439,7 +467,10 @@ function Card({
           {/* a preorder with a price: when it's out, under their chips (one
               with no price says so on its button) */}
           {best && item.outOn ? (
-            <Text className="font-mono text-[12.5px] text-ink-soft">
+            <Text
+              maxFontSizeMultiplier={DENSE}
+              className="font-mono text-[12.5px] text-ink-soft"
+            >
               Out {releaseDay(item.outOn)}
             </Text>
           ) : null}
@@ -453,11 +484,15 @@ function Card({
               className="min-h-[44px] flex-row items-center justify-between gap-2 rounded-[12px] bg-ink/10 px-3 py-1.5"
               style={corners.box}
             >
-              <Text className="font-brand pr-[6px] text-[21px] leading-[26px] text-ink">
+              <Text
+                maxFontSizeMultiplier={DENSE}
+                className="font-brand pr-[6px] text-[21px] leading-[26px] text-ink"
+              >
                 {formatCents(other.cents)}
                 {"\u00A0"}
               </Text>
               <Text
+                maxFontSizeMultiplier={DENSE}
                 numberOfLines={2}
                 className="min-w-0 shrink text-right font-body-semibold text-[12.5px] leading-[16px] text-ink"
               >
@@ -476,11 +511,15 @@ function Card({
           className="min-h-[46px] flex-row items-center justify-between gap-3 rounded-[12px] bg-accent px-3.5 py-2"
           style={corners.box}
         >
-          <Text className="font-brand pr-[6px] text-[23px] leading-[28px] text-on-accent">
+          <Text
+            maxFontSizeMultiplier={DENSE}
+            className="font-brand pr-[6px] text-[23px] leading-[28px] text-on-accent"
+          >
             {formatCents(best.cents)}
             {"\u00A0"}
           </Text>
           <Text
+            maxFontSizeMultiplier={DENSE}
             numberOfLines={1}
             className="min-w-0 shrink text-right font-body-semibold text-[13.5px] text-on-accent"
           >
@@ -491,17 +530,22 @@ function Card({
       ) : (
         <Tap
           onPress={open}
+          needsConnection
           accessibilityRole="link"
           className="min-h-[46px] flex-row items-center justify-between gap-3 rounded-[12px] bg-ink/10 px-3.5 py-2"
           style={corners.box}
         >
           {item.outOn ? (
-            <Text className="font-brand pr-[6px] text-[21px] leading-[28px] text-ink uppercase">
+            <Text
+              maxFontSizeMultiplier={DENSE}
+              className="font-brand pr-[6px] text-[21px] leading-[28px] text-ink uppercase"
+            >
               Out {releaseDay(item.outOn)}
               {"\u00A0"}
             </Text>
           ) : null}
           <Text
+            maxFontSizeMultiplier={DENSE}
             numberOfLines={2}
             className="ml-auto min-w-0 shrink text-right font-body-semibold text-[13.5px] leading-[17px] text-ink"
           >
@@ -694,7 +738,11 @@ export function ToBuyScreen({ inTab = false }: { inTab?: boolean }) {
     );
   };
   const link = (label: string, go: () => void) => (
-    <Text className="font-body-semibold text-ink underline" onPress={go}>
+    <Text
+      maxFontSizeMultiplier={DENSE}
+      className="font-body-semibold text-ink underline"
+      onPress={go}
+    >
       {label}
     </Text>
   );
@@ -705,7 +753,7 @@ export function ToBuyScreen({ inTab = false }: { inTab?: boolean }) {
       {/* on a wide screen the title keeps to the list's column, as the
           shelf's does */}
       <View
-        className="h-[62px] flex-row items-center gap-3 px-2"
+        className="min-h-[62px] flex-row items-center gap-3 px-2"
         style={columnStyle}
       >
         {inTab ? (
@@ -721,7 +769,10 @@ export function ToBuyScreen({ inTab = false }: { inTab?: boolean }) {
             <ChevronLeftIcon color={c.ink} width={24} height={24} />
           </Tap>
         )}
-        <Text className="flex-1 font-brand pr-[6px] text-[24px] tracking-[1px] text-ink uppercase">
+        <Text
+          maxFontSizeMultiplier={DENSE}
+          className="flex-1 font-brand pr-[6px] text-[24px] tracking-[1px] text-ink uppercase"
+        >
           To buy
           {"\u00A0"}
         </Text>
@@ -754,7 +805,10 @@ export function ToBuyScreen({ inTab = false }: { inTab?: boolean }) {
           {!items && loadFailed ? (
             <View className="items-center gap-3 py-8">
               <Mascot mood="panic" width={100} />
-              <Text className="font-body text-[15px] text-ink-soft">
+              <Text
+                maxFontSizeMultiplier={DENSE}
+                className="font-body text-[15px] text-ink-soft"
+              >
                 Your list didn't load.
               </Text>
               <Button
@@ -768,7 +822,10 @@ export function ToBuyScreen({ inTab = false }: { inTab?: boolean }) {
           {items?.length === 0 ? (
             <View className="items-center gap-3 py-8">
               <Mascot mood="confused" width={100} />
-              <Text className="text-center font-body text-[15px] text-ink-soft">
+              <Text
+                maxFontSizeMultiplier={DENSE}
+                className="text-center font-body text-[15px] text-ink-soft"
+              >
                 Open a volume's prices and tap “+ To buy” to keep it here.
               </Text>
               <Button
@@ -780,7 +837,10 @@ export function ToBuyScreen({ inTab = false }: { inTab?: boolean }) {
             </View>
           ) : null}
           {note ? (
-            <Text className="font-body text-[14.5px] text-ink-soft">
+            <Text
+              maxFontSizeMultiplier={DENSE}
+              className="font-body text-[14.5px] text-ink-soft"
+            >
               {note.text}
               {"link" in note && note.link ? (
                 <> {link(note.link.label, note.link.go)}.</>
@@ -812,16 +872,25 @@ export function ToBuyScreen({ inTab = false }: { inTab?: boolean }) {
                   className="flex-row items-center gap-1"
                   accessibilityLabel={`Sorted by ${sortLabel}. Change`}
                 >
-                  <Text className="font-body text-[14px] text-ink-soft">
+                  <Text
+                    maxFontSizeMultiplier={DENSE}
+                    className="font-body text-[14px] text-ink-soft"
+                  >
                     Sorted by
                   </Text>
-                  <Text className="font-body-semibold text-[14px] text-ink">
+                  <Text
+                    maxFontSizeMultiplier={DENSE}
+                    className="font-body-semibold text-[14px] text-ink"
+                  >
                     {sortLabel}
                   </Text>
                   <ChevronDownIcon color={c.ink} width={14} height={14} />
                 </Tap>
                 <Tap onPress={askToClear} hitSlop={6}>
-                  <Text className="font-body text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start">
+                  <Text
+                    maxFontSizeMultiplier={DENSE}
+                    className="font-body text-[14px] text-ink-soft border-b pb-[2px] border-ink-soft self-start"
+                  >
                     Clear list
                   </Text>
                 </Tap>
@@ -832,7 +901,10 @@ export function ToBuyScreen({ inTab = false }: { inTab?: boolean }) {
               {sort === "mine" ? (
                 <>
                   {sorted.length > 1 ? (
-                    <Text className="-mt-2 font-mono text-[12px] text-muted">
+                    <Text
+                      maxFontSizeMultiplier={DENSE}
+                      className="-mt-2 font-mono text-[12px] text-muted"
+                    >
                       Drag a book by its ≡ to reorder.
                     </Text>
                   ) : null}
@@ -876,7 +948,10 @@ export function ToBuyScreen({ inTab = false }: { inTab?: boolean }) {
             {/* only when there's one saved to remove */}
             {sorted.find((item) => item.isbn13 === noting?.isbn13)?.note ? (
               <Tap onPress={removeNote} hitSlop={6} className="mr-auto">
-                <Text className="font-body text-[14px] text-ink-soft underline">
+                <Text
+                  maxFontSizeMultiplier={DENSE}
+                  className="font-body text-[14px] text-ink-soft underline"
+                >
                   Remove note
                 </Text>
               </Tap>
@@ -889,7 +964,10 @@ export function ToBuyScreen({ inTab = false }: { inTab?: boolean }) {
       <Sheet open={alerting !== null} onClose={() => setAlerting(null)}>
         <View className="gap-3 pb-4">
           <H2>Price alert</H2>
-          <Text className="font-body text-[14.5px] leading-[20px] text-ink-soft">
+          <Text
+            maxFontSizeMultiplier={DENSE}
+            className="font-body text-[14.5px] leading-[20px] text-ink-soft"
+          >
             An alert on this phone when a copy, new or used, is at or under your
             price.
           </Text>
@@ -908,15 +986,22 @@ export function ToBuyScreen({ inTab = false }: { inTab?: boolean }) {
             }}
           />
           {alertCents && alertingBest && alertingBest.cents <= alertCents ? (
-            <Text className="font-body text-[13.5px] leading-[19px] text-ink-soft">
+            <Text
+              maxFontSizeMultiplier={DENSE}
+              className="font-body text-[13.5px] leading-[19px] text-ink-soft"
+            >
               It's {formatCents(alertingBest.cents)} right now, already under
               that.
             </Text>
           ) : null}
           {phoneAlertsOn() ? null : (
-            <Text className="font-body text-[13.5px] leading-[19px] text-ink-soft">
+            <Text
+              maxFontSizeMultiplier={DENSE}
+              className="font-body text-[13.5px] leading-[19px] text-ink-soft"
+            >
               Alerts are off on this phone.{" "}
               <Text
+                maxFontSizeMultiplier={DENSE}
                 className="font-body-semibold text-ink underline"
                 onPress={() => {
                   setAlerting(null);
@@ -938,7 +1023,10 @@ export function ToBuyScreen({ inTab = false }: { inTab?: boolean }) {
                 hitSlop={6}
                 className="mr-auto"
               >
-                <Text className="font-body text-[14px] text-ink-soft underline">
+                <Text
+                  maxFontSizeMultiplier={DENSE}
+                  className="font-body text-[14px] text-ink-soft underline"
+                >
                   Remove alert
                 </Text>
               </Tap>

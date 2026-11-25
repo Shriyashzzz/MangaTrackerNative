@@ -3,6 +3,7 @@
 // on an iPhone, Material's bar on Android), and its words in a scroll. A
 // page that searches gets the header's own search bar. The pieces the
 // content pages are set in: a heading, a paragraph, a list line
+import { DENSE } from "@/lib/textScale";
 import { columnStyle, useWide } from "@/lib/wide";
 import { openOutside } from "@/lib/openOutside";
 import PullPage, { pause, usePullTop } from "@/components/PullRefresh";
@@ -61,7 +62,10 @@ export default function Page({
       <Stack.Screen
         options={{
           headerShown: true,
-          title: title.toUpperCase(),
+          // (a blank after it: the lettering leans, and its last letter
+          // would be cut at the title's edge. A blank, not a space, which
+          // Apple's bar trims off)
+          title: `${title.toUpperCase()}\u2800`,
           headerTitleAlign: "left",
           // a large title on a phone; on a wide screen the small one, in the
           // middle over the centred column, rather than at the far left
@@ -133,7 +137,12 @@ export const Rule = () => <View className="h-px bg-line-soft" />;
 // a section's title: the lettering with a short accent rule under it
 export const H2 = ({ children }: { children: ReactNode }) => (
   <View className="gap-1 self-start w-fit ">
-    <Text className="font-brand min-w-fit pr-[5px] text-[22px] tracking-[1px] text-ink uppercase">
+    {/* a section's title shares its line with a count or "See all": it
+        grows only so far (lib/textScale.ts) */}
+    <Text
+      maxFontSizeMultiplier={DENSE}
+      className="font-brand min-w-fit pr-[5px] text-[22px] tracking-[1px] text-ink uppercase"
+    >
       {children}
       {"\u00A0"}
     </Text>

@@ -91,7 +91,7 @@ export function VolTab({
     >
       <Text
         numberOfLines={1}
-        className={`font-brand pr-[3px] tracking-[0.5px] text-paper uppercase ${small ? "text-[8px]" : "text-[10px]"}`}
+        className={`font-brand pr-[3px] tracking-[0.5px] text-paper uppercase ${small ? "text-[11px]" : "text-[11px]"}`}
       >
         {many ? "Vols." : "Vol."}
         {"\u00A0"}
@@ -267,7 +267,7 @@ export default function VolumeCard({
               accessibilityLabel={`Readers rate it ${scoreText(rating)} out of 5`}
             >
               <StarIcon filled color={c.star} width={10} height={10} />
-              <Text className="font-mono-medium text-[10.5px] text-paper">
+              <Text className="font-mono-medium text-[11px] text-paper">
                 {scoreText(rating)}
               </Text>
             </View>

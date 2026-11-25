@@ -5,6 +5,8 @@
 // finished. Edit and Delete are in the ⋮ menu. This file loads the series
 // and saves changes to it; each part of the page is its own component, and
 // every rule is the web's own (core pages/Details, core lib)
+import { DENSE } from "@/lib/textScale";
+import AppBar, { BAR_EDGES } from "@/components/AppBar";
 import { columnStyle } from "@/lib/wide";
 import { useTourScroll } from "@/lib/tourScroll";
 import TourTarget from "@/components/TourTarget";
@@ -19,7 +21,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 import Button from "@/components/Button";
 import BuyStrip from "@/components/BuyStrip";
-import DoubleRule from "@/components/DoubleRule";
 import MenuSheet from "@/components/MenuSheet";
 import NotesField from "@/components/NotesField";
 import PickSheet from "@/components/PickSheet";
@@ -34,11 +35,7 @@ import Toast from "@/components/Toast";
 import TwiceNote from "@/components/TwiceNote";
 import YourBooks from "@/components/YourBooks";
 import YourReviews from "@/components/YourReviews";
-import {
-  ChevronDownIcon,
-  ChevronLeftIcon,
-  MoreIcon,
-} from "@/core/components/icons/Icons";
+import { ChevronDownIcon, MoreIcon } from "@/core/components/icons/Icons";
 import { apiFetch } from "@/core/lib/api";
 import { ownEditionBook } from "@/core/lib/booksApi";
 import type { EditionBook, EditionLine } from "@/core/lib/editions";
@@ -471,37 +468,24 @@ export default function DetailsScreen() {
   ];
 
   return (
-    <Safe edges={["top"]} className="flex-1 bg-paper">
+    <Safe edges={BAR_EDGES} className="flex-1 bg-paper">
       <Backdrop />
       {/* the app bar: back, the name once scrolled past it, and the menu */}
-      <View className="h-[62px] flex-row items-center gap-2 px-2">
-        <Tap
-          feel="round"
-          onPress={() => router.back()}
-          hitSlop={8}
-          className="p-2"
-          accessibilityLabel="Back"
-        >
-          <ChevronLeftIcon color={c.ink} width={24} height={24} />
-        </Tap>
-        <Text
-          numberOfLines={1}
-          className="flex-1 font-brand pr-[6px] text-[24px] tracking-[1px] text-ink uppercase"
-        >
-          {titleShown ? m.name : ""}
-          {"\u00A0"}
-        </Text>
-        <Tap
-          feel="round"
-          onPress={() => setMenuOpen(true)}
-          hitSlop={8}
-          className="p-2"
-          accessibilityLabel="More"
-        >
-          <MoreIcon color={c.ink} width={22} height={22} />
-        </Tap>
-      </View>
-      <DoubleRule />
+      <AppBar
+        tight
+        title={titleShown ? m.name : ""}
+        right={
+          <Tap
+            feel="round"
+            onPress={() => setMenuOpen(true)}
+            hitSlop={8}
+            className="p-2"
+            accessibilityLabel="More"
+          >
+            <MoreIcon color={c.ink} width={22} height={22} />
+          </Tap>
+        }
+      />
       <PullPage refresh={refreshPage} scrollTop={pull.top}>
         <ScrollView
           ref={scroller}
@@ -538,11 +522,15 @@ export default function DetailsScreen() {
               ) : null}
             </View>
             <View className="min-w-0 flex-1 justify-center gap-2.5">
-              <Text className="font-display text-[26px] leading-[30px] text-ink">
+              <Text
+                maxFontSizeMultiplier={DENSE}
+                className="font-display text-[26px] leading-[30px] text-ink"
+              >
                 {m.name}
               </Text>
               <View className="flex-row flex-wrap items-center gap-1.5">
                 <Text
+                  maxFontSizeMultiplier={DENSE}
                   className={`rounded-[2px] border-[1.5px] px-2 py-0.5 font-body-medium text-[13px] ${finished ? "border-ok text-ok" : "border-accent text-accent"}`}
                 >
                   {statusWord}
@@ -551,6 +539,7 @@ export default function DetailsScreen() {
                   .filter(Boolean)
                   .map((chip) => (
                     <Text
+                      maxFontSizeMultiplier={DENSE}
                       key={chip}
                       className="rounded-[2px] border-[1.5px] border-line-soft px-2 py-0.5 font-body-medium text-[13px] text-ink-soft"
                     >
@@ -570,10 +559,14 @@ export default function DetailsScreen() {
                     accessibilityLabel={`Edition: ${editions.line?.label ?? "Single volumes"}. Change`}
                     className="flex-row items-center gap-1 self-start active:opacity-70"
                   >
-                    <Text className="font-body text-[13.5px] text-ink-soft">
+                    <Text
+                      maxFontSizeMultiplier={DENSE}
+                      className="font-body text-[13.5px] text-ink-soft"
+                    >
                       Edition
                     </Text>
                     <Text
+                      maxFontSizeMultiplier={DENSE}
                       numberOfLines={1}
                       className="shrink font-body-semibold text-[13.5px] text-accent-ink"
                     >
@@ -615,7 +608,10 @@ export default function DetailsScreen() {
           <View className="gap-2">
             <View className="flex-row items-end justify-between">
               <SectionTitle>Your shelf</SectionTitle>
-              <Text className="font-body text-[14px] text-ink-soft">
+              <Text
+                maxFontSizeMultiplier={DENSE}
+                className="shrink text-right font-body text-[14px] text-ink-soft"
+              >
                 {shelf.count}
               </Text>
             </View>
