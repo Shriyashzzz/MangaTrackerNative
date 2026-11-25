@@ -8,7 +8,7 @@
     "scheme": "mangatracker",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "buildNumber": "12",
+      "buildNumber": "13",
       "icon": "./assets/images/icon.png",
       "bundleIdentifier": "xyz.mangatracker.app.rn",
       "appleTeamId": "84JH94RQR3",
@@ -36,7 +36,7 @@
       "googleServicesFile": "./firebase/google-services.json",
       "permissions": ["android.permission.CAMERA"],
       "blockedPermissions": ["android.permission.RECORD_AUDIO"],
-      "versionCode": 25
+      "versionCode": 26
     },
     "web": {
       "output": "single",
