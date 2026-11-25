@@ -114,7 +114,7 @@ function PlanRow() {
 }
 
 export default function AccountTab({ account }: { account: Account }) {
-  const logOut = useAuth((s) => s.logOut);
+  const accountDeleted = useAuth((s) => s.accountDeleted);
   const saveAccount = useAccount((s) => s.save);
   const [email, setEmail] = useState(account.recoveryEmail ?? "");
   const [emailNote, setEmailNote] = useState<NoteOf>(null);
@@ -163,7 +163,7 @@ export default function AccountTab({ account }: { account: Account }) {
       await deleteAccount(
         account.hasPassword ? { password } : { username: password },
       );
-      await logOut();
+      accountDeleted();
       useShelf.getState().reset();
       usePrefs.getState().reset();
       useAccount.getState().clear();

@@ -26,6 +26,8 @@ type AuthState = {
     name: string | null,
   ) => Promise<Response>;
   logOut: () => Promise<void>;
+  // the account was just deleted: signed out on this phone at once
+  accountDeleted: () => void;
 };
 
 const SIGNED_IN = "signedInBefore";
@@ -102,6 +104,16 @@ export const useAuth = create<AuthState>()((set) => ({
       set({ isSignedIn: false });
       void forgetGoogle();
     }
+  },
+
+  // The server has already ended the session and removed this phone's alerts
+  // with the account, so nothing is asked of it: the phone forgets the account
+  // straight away. Waiting on a request first left a moment where closing the
+  // app kept the account remembered here, and it opened as if still signed in
+  accountDeleted: () => {
+    set({ isSignedIn: false });
+    void forgetThisPhone();
+    void forgetGoogle();
   },
 }));
 
