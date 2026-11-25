@@ -67,6 +67,7 @@ export default memo(function SeriesCard({
   onPress?: () => void;
 }) {
   const shown = novelParts(series.name);
+  const volumes = volumesText(series, shown.lightNovel);
   return (
     <PressScale
       onPress={
@@ -95,16 +96,13 @@ export default memo(function SeriesCard({
       >
         {shown.title}
       </Text>
-      <Text numberOfLines={2} className="font-mono text-[11px] text-muted">
-        {[
-          shown.lightNovel && "Novel",
-          series.year,
-          volumesText(series, shown.lightNovel),
-          series.genre,
-        ]
-          .filter(Boolean)
-          .join(" · ")}
-      </Text>
+      {/* under the name, only how many volumes (a novel says so on its
+          cover's band) */}
+      {volumes ? (
+        <Text numberOfLines={2} className="font-mono text-[11px] text-muted">
+          {volumes}
+        </Text>
+      ) : null}
     </PressScale>
   );
 });
